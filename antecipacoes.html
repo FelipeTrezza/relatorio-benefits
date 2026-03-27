@@ -185,13 +185,13 @@
 <main>
 
   <!-- ── MTD HERO ─────────────────────────────────────────── -->
-  <div class="sec-lbl" style="margin-top:0">MTD — Mês Atual vs Mês Anterior (mesma janela de dias)</div>
+  <div class="sec-lbl" style="margin-top:0" id="sec-hero-lbl">MTD — ··· vs ···</div>
   <div class="mtd-hero">
     <div class="mth-col">
       <div class="mth-lbl">Antecipações MTD</div>
       <div class="mth-val" id="h-qtd-atual">—</div>
       <div class="mth-cmp">
-        <span class="mth-cmp-val" id="h-qtd-mm1">— mês ant.</span>
+        <span class="mth-cmp-val" id="h-qtd-mm1">—</span>
         <span class="mth-delta fl" id="h-qtd-delta">—</span>
       </div>
     </div>
@@ -199,7 +199,7 @@
       <div class="mth-lbl">Valor Antecipado MTD</div>
       <div class="mth-val" id="h-val-atual">—</div>
       <div class="mth-cmp">
-        <span class="mth-cmp-val" id="h-val-mm1">— mês ant.</span>
+        <span class="mth-cmp-val" id="h-val-mm1">—</span>
         <span class="mth-delta fl" id="h-val-delta">—</span>
       </div>
     </div>
@@ -207,7 +207,7 @@
       <div class="mth-lbl">Ticket Médio MTD</div>
       <div class="mth-val" id="h-ticket-atual">—</div>
       <div class="mth-cmp">
-        <span class="mth-cmp-val" id="h-ticket-mm1">— mês ant.</span>
+        <span class="mth-cmp-val" id="h-ticket-mm1">—</span>
         <span class="mth-delta fl" id="h-ticket-delta">—</span>
       </div>
     </div>
@@ -215,35 +215,28 @@
       <div class="mth-lbl">Usuários Únicos MTD</div>
       <div class="mth-val" id="h-users-atual">—</div>
       <div class="mth-cmp">
-        <span class="mth-cmp-val" id="h-users-mm1">— mês ant.</span>
+        <span class="mth-cmp-val" id="h-users-mm1">—</span>
         <span class="mth-delta fl" id="h-users-delta">—</span>
       </div>
     </div>
   </div>
 
   <!-- ── SETOR CARDS ──────────────────────────────────────── -->
-  <div class="sec-lbl">MTD por Setor</div>
+  <div class="sec-lbl" id="sec-setor-lbl">MTD por Setor — ···</div>
   <div class="setor-grid" id="setor-grid">
     <!-- preenchido por renderSetorCards() -->
   </div>
 
-  <!-- ── GRÁFICOS ─────────────────────────────────────────── -->
-  <div class="sec-lbl">Evolução Mensal</div>
-  <div class="crow2">
-    <div class="card">
-      <h2>Antecipações por Mês</h2>
-      <div class="card-sub">Quantidade total · linha de tendência</div>
-      <canvas id="chart-mensal" height="90"></canvas>
-    </div>
-    <div class="card">
-      <h2>Distribuição por Setor</h2>
-      <div class="card-sub">MTD atual · Private · Grupo · INSS</div>
-      <canvas id="chart-setor" height="180"></canvas>
+  <!-- ── GRÁFICO DONUT ────────────────────────────────────── -->
+  <div class="sec-lbl" id="sec-dist-lbl">Distribuição por Setor — ···</div>
+  <div style="max-width:340px;margin:0 auto 14px">
+    <div class="card" style="margin-bottom:0">
+      <canvas id="chart-setor" height="200"></canvas>
     </div>
   </div>
 
   <!-- ── RANKING EMPRESAS ──────────────────────────────────── -->
-  <div class="sec-lbl">Top Empresas — Último Mês Completo</div>
+  <div class="sec-lbl" id="sec-top-lbl">Top Empresas — ···</div>
   <div class="card">
     <table>
       <thead>
@@ -275,53 +268,25 @@
 // Próxima atualização: rodar atualizar_antecipacoes.py
 // ================================================================
 const DATA = {
+  "cur_label": "Mar/26",
+  "prev_label": "Fev/26",
   "mtd_qtd_atual": 306727,
   "mtd_qtd_mm1": 417132,
   "mtd_val_atual": 46684309,
   "mtd_val_mm1": 77494946,
+  "mtd_users_atual": 80710,
+  "mtd_users_mm1": 93555,
   "mtd_first_atual": 6051,
-  "mtd_first_mm1": 6457,
-  "mtd_users_atual": 279165,
-  "mtd_users_mm1": 382334,
-  "mensal_labels": [
-    "08/25",
-    "09/25",
-    "10/25",
-    "11/25",
-    "12/25",
-    "01/26",
-    "02/26",
-    "03/26"
-  ],
-  "mensal_qtd": [
-    301715,
-    362676,
-    379431,
-    426177,
-    408313,
-    427362,
-    418432,
-    306727
-  ],
-  "mensal_val": [
-    61334949,
-    73151391,
-    75004315,
-    83553822,
-    76900779,
-    80492280,
-    77864071,
-    46684309
-  ],
+  "mtd_first_mm1": 6408,
   "setor_labels": [
     "Público",
-    "Private",
-    "Grupo"
+    "Grupo",
+    "Private"
   ],
   "setor_qtd": [
     96680,
-    7712,
-    202335
+    202335,
+    7712
   ],
   "mtd_por_setor": {
     "public": {
@@ -329,8 +294,6 @@ const DATA = {
       "mm1": 218479,
       "valor_atual": 18519478,
       "valor_mm1": 49836420,
-      "first_atual": 6051,
-      "first_mm1": 6457,
       "top": [
         {
           "nome": "PIAUI SECRETARIA DE ED",
@@ -354,43 +317,11 @@ const DATA = {
         }
       ]
     },
-    "private": {
-      "atual": 7712,
-      "mm1": 8355,
-      "valor_atual": 600446,
-      "valor_mm1": 691675,
-      "first_atual": 0,
-      "first_mm1": 0,
-      "top": [
-        {
-          "nome": "SUPERMERCADO IQUEGAMI ",
-          "qtd": 1108
-        },
-        {
-          "nome": "MERCADO VIOLETA LTDA",
-          "qtd": 1047
-        },
-        {
-          "nome": "HIPER CARIJOS",
-          "qtd": 952
-        },
-        {
-          "nome": "ESPARTACO TERCEIRIZACA",
-          "qtd": 392
-        },
-        {
-          "nome": "GUARDED PLACE SEGURANC",
-          "qtd": 379
-        }
-      ]
-    },
     "grupo": {
       "atual": 202335,
       "mm1": 190298,
       "valor_atual": 27564384,
       "valor_mm1": 26966851,
-      "first_atual": 0,
-      "first_mm1": 0,
       "top": [
         {
           "nome": "SEARA ALIMENTOS LTDA",
@@ -413,98 +344,116 @@ const DATA = {
           "qtd": 4670
         }
       ]
+    },
+    "private": {
+      "atual": 7712,
+      "mm1": 8355,
+      "valor_atual": 600446,
+      "valor_mm1": 691675,
+      "top": [
+        {
+          "nome": "SUPERMERCADO IQUEGAMI ",
+          "qtd": 1108
+        },
+        {
+          "nome": "MERCADO VIOLETA LTDA",
+          "qtd": 1047
+        },
+        {
+          "nome": "HIPER CARIJOS",
+          "qtd": 952
+        },
+        {
+          "nome": "ESPARTACO TERCEIRIZACA",
+          "qtd": 392
+        },
+        {
+          "nome": "GUARDED PLACE SEGURANC",
+          "qtd": 379
+        }
+      ]
     }
   },
   "empresas": [
     {
       "rank": 1,
-      "nome": "SECRETARIA DE ESTADO DE POLICI",
-      "setor": "public",
-      "qtd": 204180,
-      "valor": 59999158,
-      "ticket": 294,
-      "first": 0
+      "nome": "SEARA ALIMENTOS LTDA",
+      "setor": "grupo",
+      "qtd": 16472,
+      "valor": 2227622,
+      "ticket": 135
     },
     {
       "rank": 2,
-      "nome": "SECRETARIA DE ESTADO DE EDUCAC",
+      "nome": "PIAUI SECRETARIA DE EDUCACAO",
       "setor": "public",
-      "qtd": 197087,
-      "valor": 43448315,
-      "ticket": 220,
-      "first": 0
+      "qtd": 12911,
+      "valor": 1478213,
+      "ticket": 114
     },
     {
       "rank": 3,
-      "nome": "DISTRITO FEDERAL SECRETARIA DE",
-      "setor": "public",
-      "qtd": 125513,
-      "valor": 30759947,
-      "ticket": 245,
-      "first": 0
+      "nome": "SEARA ALI - DOURADOS ALIM P",
+      "setor": "grupo",
+      "qtd": 10359,
+      "valor": 1354838,
+      "ticket": 131
     },
     {
       "rank": 4,
-      "nome": "SEARA ALIMENTOS LTDA",
-      "setor": "grupo",
-      "qtd": 117407,
-      "valor": 17549342,
-      "ticket": 149,
-      "first": 0
+      "nome": "ESTADO DO CEARA",
+      "setor": "public",
+      "qtd": 9222,
+      "valor": 3033193,
+      "ticket": 329
     },
     {
       "rank": 5,
-      "nome": "PREVIDENCIA SOCIAL DO RJ",
+      "nome": "SECRETARIA DE ESTADO DE EDUCAC",
       "setor": "public",
-      "qtd": 110485,
-      "valor": 19750335,
-      "ticket": 179,
-      "first": 0
+      "qtd": 6341,
+      "valor": 1183422,
+      "ticket": 187
     },
     {
       "rank": 6,
-      "nome": "SECRETARIA DE ESTADO DE EDUCAC",
+      "nome": "MUNICIPIO DE BOA VISTA",
       "setor": "public",
-      "qtd": 97451,
-      "valor": 19709580,
-      "ticket": 202,
-      "first": 0
+      "qtd": 6253,
+      "valor": 757044,
+      "ticket": 121
     },
     {
       "rank": 7,
-      "nome": "SEARA ALI - DOURADOS ALIM P",
-      "setor": "grupo",
-      "qtd": 73281,
-      "valor": 10524916,
-      "ticket": 144,
-      "first": 0
+      "nome": "PIAUI SECRETARIA DE SAUDE",
+      "setor": "public",
+      "qtd": 5990,
+      "valor": 648902,
+      "ticket": 108
     },
     {
       "rank": 8,
-      "nome": "PIAUI SECRETARIA DE EDUCACAO",
-      "setor": "public",
-      "qtd": 72576,
-      "valor": 10137876,
-      "ticket": 140,
-      "first": 0
+      "nome": "JBS AVES LTDA",
+      "setor": "grupo",
+      "qtd": 5695,
+      "valor": 648017,
+      "ticket": 114
     },
     {
       "rank": 9,
-      "nome": "SECRETARIA DE ESTADO DE DEFESA",
+      "nome": "ESTADO DO MARANHAO - POLICIA M",
       "setor": "public",
-      "qtd": 56411,
-      "valor": 18284175,
-      "ticket": 324,
-      "first": 0
+      "qtd": 5694,
+      "valor": 982729,
+      "ticket": 173
     },
     {
       "rank": 10,
-      "nome": "ESTADO DO CEARA",
-      "setor": "public",
-      "qtd": 47063,
-      "valor": 21315978,
-      "ticket": 453,
-      "first": 0
+      "nome": "JBS - MOZARLÂNDIA",
+      "setor": "grupo",
+      "qtd": 4818,
+      "valor": 646227,
+      "ticket": 134
     }
   ]
 };
@@ -550,22 +499,31 @@ function setScDelta(id, atual, ant) {
 // ================================================================
 function renderHero() {
   const D = DATA;
+  const CL = D.cur_label  || 'Atual';
+  const PL = D.prev_label || 'Ant.';
+
+  // Títulos de seção dinâmicos
+  document.getElementById('sec-hero-lbl').textContent = `MTD — ${CL} vs ${PL} (mesma janela de dias)`;
+  document.getElementById('sec-setor-lbl').textContent = `MTD por Setor — ${CL} vs ${PL}`;
+  document.getElementById('sec-dist-lbl').textContent  = `Distribuição por Setor — ${CL}`;
+  document.getElementById('sec-top-lbl').textContent   = `Top Empresas — ${CL}`;
+
   document.getElementById('h-qtd-atual').textContent   = fmtN(D.mtd_qtd_atual);
-  document.getElementById('h-qtd-mm1').textContent     = fmtN(D.mtd_qtd_mm1)+' mês ant.';
+  document.getElementById('h-qtd-mm1').textContent     = fmtN(D.mtd_qtd_mm1) + ` ${PL}`;
   setDelta('h-qtd-delta', D.mtd_qtd_atual, D.mtd_qtd_mm1);
 
   document.getElementById('h-val-atual').textContent   = fmtBRL(D.mtd_val_atual);
-  document.getElementById('h-val-mm1').textContent     = fmtBRL(D.mtd_val_mm1)+' mês ant.';
+  document.getElementById('h-val-mm1').textContent     = fmtBRL(D.mtd_val_mm1) + ` ${PL}`;
   setDelta('h-val-delta', D.mtd_val_atual, D.mtd_val_mm1);
 
   const ticketAtual = D.mtd_qtd_atual > 0 ? Math.round(D.mtd_val_atual / D.mtd_qtd_atual) : 0;
   const ticketMm1   = D.mtd_qtd_mm1   > 0 ? Math.round(D.mtd_val_mm1   / D.mtd_qtd_mm1)   : 0;
   document.getElementById('h-ticket-atual').textContent = fmtBRL(ticketAtual);
-  document.getElementById('h-ticket-mm1').textContent   = fmtBRL(ticketMm1)+' mês ant.';
+  document.getElementById('h-ticket-mm1').textContent   = fmtBRL(ticketMm1) + ` ${PL}`;
   setDelta('h-ticket-delta', ticketAtual, ticketMm1);
 
   document.getElementById('h-users-atual').textContent = fmtN(D.mtd_users_atual);
-  document.getElementById('h-users-mm1').textContent   = fmtN(D.mtd_users_mm1)+' mês ant.';
+  document.getElementById('h-users-mm1').textContent   = fmtN(D.mtd_users_mm1) + ` ${PL}`;
   setDelta('h-users-delta', D.mtd_users_atual, D.mtd_users_mm1);
 }
 
@@ -719,37 +677,22 @@ function renderTable() {
 // ================================================================
 function renderCharts() {
   const C = {green:'#2dc974',blue:'#58a6ff',orange:'#f0883e',purple:'#bc8cff',yellow:'#e3b341'};
+  // cores na mesma ordem de ORDEM = [public, grupo, private, INSS]
+  const SETOR_CORES = {'Público':C.green,'Grupo':C.purple,'Private':C.orange,'INSS':C.blue};
+  const cores = DATA.setor_labels.map(l => SETOR_CORES[l] || '#8b949e');
 
-  // Mensal
-  new Chart(document.getElementById('chart-mensal'), {
-    type: 'bar',
-    data: {
-      labels: DATA.mensal_labels,
-      datasets: [
-        {type:'line', label:'Valor (R$)', data:DATA.mensal_val, borderColor:C.blue, backgroundColor:'rgba(88,166,255,0.06)', borderWidth:2, pointRadius:3, fill:true, yAxisID:'y2', tension:0.4},
-        {type:'bar',  label:'Qtd',       data:DATA.mensal_qtd, backgroundColor:'rgba(45,201,116,0.7)', borderRadius:5, yAxisID:'y1'}
-      ]
-    },
-    options: {
-      responsive:true,
-      plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11},color:'#8b949e'}}},
-      scales:{
-        y1:{type:'linear',position:'left', ticks:{font:{size:10},color:'#8b949e'},grid:{color:'#21262d'}},
-        y2:{type:'linear',position:'right',ticks:{font:{size:10},color:'#8b949e',callback:v=>fmtBRL(v)},grid:{drawOnChartArea:false}}
-      }
-    }
-  });
-
-  // Setor Donut
   new Chart(document.getElementById('chart-setor'), {
     type: 'doughnut',
     data: {
       labels: DATA.setor_labels,
-      datasets:[{data:DATA.setor_qtd,backgroundColor:[C.orange,C.purple,C.blue],borderWidth:0,hoverOffset:8}]
+      datasets:[{data:DATA.setor_qtd, backgroundColor:cores, borderWidth:0, hoverOffset:8}]
     },
     options:{
       responsive:true, cutout:'68%',
-      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11},color:'#8b949e'}}}
+      plugins:{
+        legend:{position:'bottom',labels:{boxWidth:10,font:{size:12},color:'#e6edf3',padding:14}},
+        tooltip:{callbacks:{label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString('pt-BR')}`}}
+      }
     }
   });
 }
