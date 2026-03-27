@@ -52,7 +52,8 @@
   main{max-width:1520px;margin:0 auto;padding:22px 28px}
 
   /* ── PERIODO LABEL ───────────────────────────────────────── */
-  .periodo-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .sec-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+  .sec-lbl::before{content:'';display:inline-block;width:3px;height:13px;background:var(--green);border-radius:2px}
   .periodo-title{font-size:13px;font-weight:700;color:var(--text)}
   .periodo-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
@@ -178,6 +179,7 @@
 <main>
 
   <!-- PERIODO BAR -->
+  <div class="sec-lbl">Todas as Antecipações</div>
   <div class="periodo-bar">
     <div>
       <div class="periodo-title" id="periodo-title">— vs —</div>
@@ -190,8 +192,9 @@
     <!-- preenchido por renderDashboard() -->
   </div>
 
-  <!-- ── RÉPLICA SEM ACCOUNTS 1817 e 892 ──────────────────────── -->
-  <div style="margin-top:28px">
+  <!-- ── RÉPLICA SEM GDF E RJ ──────────────────────── -->
+  <div style="margin-top:32px">
+    <div class="sec-lbl">Excluindo GDF e RJ</div>
     <div class="periodo-bar">
       <div>
         <div class="periodo-title" id="periodo-title-2">— vs —</div>
