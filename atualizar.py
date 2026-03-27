@@ -115,16 +115,17 @@ with base_docs as (
   left join benefits.accounts  f on e.account_id          = f.account_id
 )
 select
-  date_format(sent_bacen_at, 'yyyy-MM') as mes,
+  date_format(sent_bacen_at, 'yyyy-MM')    as mes,
+  date_format(sent_bacen_at, 'yyyy-MM-dd') as dia,
   setor,
-  Secretaria                            as secretaria,
-  regiao_brasil                         as regiao,
-  count(*)                              as count
+  Secretaria                               as secretaria,
+  regiao_brasil                            as regiao,
+  count(*)                                 as count
 from fim
 where date_format(sent_bacen_at, 'yyyyMM') > date_format(current_date() - 150, 'yyyyMM')
   and sent_bacen_at  is not null
   and Secretaria     is not null
-group by 1, 2, 3, 4
+group by 1, 2, 3, 4, 5
 order by 1, 2, 3
 """
 
