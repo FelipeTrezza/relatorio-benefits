@@ -52,6 +52,8 @@
   main{max-width:1520px;margin:0 auto;padding:22px 28px}
 
   /* ── PERIODO LABEL ───────────────────────────────────────── */
+  .sec-lbl{font-size:15px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+  .sec-lbl::before{content:'';display:inline-block;width:4px;height:16px;background:var(--green);border-radius:2px}
   .periodo-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
   .periodo-title{font-size:13px;font-weight:700;color:var(--text)}
   .periodo-sub{font-size:11px;color:var(--muted);margin-top:2px}
@@ -178,6 +180,7 @@
 <main>
 
   <!-- PERIODO BAR -->
+  <div class="sec-lbl">PIX</div>
   <div class="periodo-bar">
     <div>
       <div class="periodo-title" id="periodo-title">— vs —</div>
