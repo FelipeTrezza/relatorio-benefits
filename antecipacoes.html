@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Antecipações de Salário — Relatório</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --surf2:   #1c2330;
+    --border:  #30363d;
+    --green:   #21a366;
+    --greenl:  #2dc974;
+    --greend:  #177a4d;
+    --text:    #e6edf3;
+    --muted:   #8b949e;
+    --inss:    #58a6ff;
+    --priv:    #f0883e;
+    --grupo:   #bc8cff;
+    --red:     #f85149;
+    --yellow:  #e3b341;
+    --teal:    #39d353;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px}
+
+  /* NAV TABS */
+  .nav-tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;display:flex;gap:0}
+  .nav-tab{padding:12px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:7px}
+  .nav-tab:hover{color:var(--text)}
+  .nav-tab.active{color:var(--text);border-bottom-color:var(--green);font-weight:600}
+
+  /* HEADER */
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+  .hdr-left{display:flex;align-items:center;gap:12px}
+  .hdr-logo{width:34px;height:34px}
+  .hdr-title{font-size:17px;font-weight:700}
+  .hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
+  .hdr-right{display:flex;align-items:center;gap:10px}
+  .badge-periodo{background:var(--greend);color:var(--greenl);font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;border:1px solid var(--green)}
+
+  main{max-width:1400px;margin:0 auto;padding:24px 32px}
+
+  /* SECTION LABEL */
+  .sec-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:11px;margin-top:26px}
+  .sec-lbl:first-of-type{margin-top:0}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:14px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;position:relative;overflow:hidden}
+  .kpi::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green)}
+  .kpi.c-red::after{background:var(--red)}
+  .kpi.c-blue::after{background:var(--inss)}
+  .kpi.c-grupo::after{background:var(--grupo)}
+  .kpi.c-priv::after{background:var(--priv)}
+  .kpi.c-yellow::after{background:var(--yellow)}
+  .kpi-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px}
+  .kpi-val{font-size:26px;font-weight:700;line-height:1}
+  .kpi-sub{font-size:10px;color:var(--muted);margin-top:5px}
+  .kpi-delta{font-size:11px;margin-top:4px;font-weight:600}
+  .kpi-delta.up{color:var(--greenl)} .kpi-delta.dn{color:var(--red)} .kpi-delta.fl{color:var(--muted)}
+
+  /* CARDS / CHARTS */
+  .crow2{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+  .crow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+  .card h2{font-size:13px;font-weight:600;margin-bottom:3px}
+  .card-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+  .card-nomargin{margin-bottom:0}
+
+  /* FILTROS */
+  .filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px;align-items:center}
+  .filters label{font-size:11px;color:var(--muted);margin-right:3px;text-transform:uppercase;letter-spacing:.4px}
+  .filters select{background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:6px;font-size:13px;cursor:pointer;outline:none;transition:border .2s}
+  .filters select:hover,.filters select:focus{border-color:var(--green)}
+  .fg{display:flex;align-items:center;gap:6px}
+  .btn-reset{background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;transition:all .2s}
+  .btn-reset:hover{border-color:var(--green);color:var(--greenl)}
+
+  /* TABLE */
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead th{text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--border)}
+  tbody tr{border-bottom:1px solid var(--surf2);transition:background .15s}
+  tbody tr:hover{background:var(--surf2)}
+  tbody td{padding:9px 12px;color:var(--muted)}
+  td.td-val{font-weight:600;color:var(--text)}
+  .td-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:600}
+  .badge-private{background:rgba(240,136,62,.15);color:var(--priv);border:1px solid rgba(240,136,62,.25)}
+  .badge-grupo{background:rgba(188,140,255,.15);color:var(--grupo);border:1px solid rgba(188,140,255,.25)}
+  .badge-inss{background:rgba(88,166,255,.15);color:var(--inss);border:1px solid rgba(88,166,255,.25)}
+
+  /* MTD */
+  .mtd-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+  .mtd-card{background:var(--surf2);border:1px solid var(--border);border-radius:9px;padding:16px}
+  .mtd-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .mtd-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .mtd-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+  .sp-priv .mtd-title{color:var(--priv)}  .sp-priv .mtd-badge{background:rgba(240,136,62,.15);color:var(--priv);border:1px solid rgba(240,136,62,.3)}
+  .sp-grupo .mtd-title{color:var(--grupo)}.sp-grupo .mtd-badge{background:rgba(188,140,255,.15);color:var(--grupo);border:1px solid rgba(188,140,255,.3)}
+  .sp-inss .mtd-title{color:var(--inss)}  .sp-inss .mtd-badge{background:rgba(88,166,255,.15);color:var(--inss);border:1px solid rgba(88,166,255,.3)}
+  .mtd-nums{display:flex;justify-content:space-between;align-items:flex-end;padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:12px}
+  .mtd-main-val{font-size:24px;font-weight:700}
+  .mtd-main-lbl{font-size:10px;color:var(--muted);margin-bottom:3px}
+  .mtd-cmp{text-align:right}
+  .mtd-cmp-lbl{font-size:10px;color:var(--muted)}
+  .mtd-cmp-val{font-size:11px;color:var(--muted)}
+  .mtd-delta{font-size:13px;font-weight:700}
+  .mtd-delta.up{color:var(--greenl)} .mtd-delta.dn{color:var(--red)} .mtd-delta.fl{color:var(--muted)}
+  .bar-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+  .bar-lbl{font-size:10px;color:var(--muted);width:58px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bar-track{flex:1;background:var(--surface);border-radius:3px;height:6px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:3px}
+  .bar-num{font-size:10px;color:var(--muted);width:42px;text-align:right;flex-shrink:0}
+  .bars-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
+
+  footer{text-align:center;padding:22px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:4px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-left">
+    <svg class="hdr-logo" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#21a366"/><text x="17" y="22" text-anchor="middle" font-size="15" font-weight="bold" fill="white">P</text></svg>
+    <div>
+      <div class="hdr-sub">Benefits — Antecipações de Salário</div>
+      <div class="hdr-title">Relatório de Antecipações</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="badge-periodo" id="badge-periodo">—</span>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<nav class="nav-tabs">
+  <a class="nav-tab" href="index.html">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 2c1.29 0 2.49.38 3.5 1.03L3.03 11.5A5.97 5.97 0 0 1 2 8c0-3.31 2.69-6 6-6zm0 12c-1.29 0-2.49-.38-3.5-1.03l8.47-8.47A5.97 5.97 0 0 1 14 8c0 3.31-2.69 6-6 6z"/></svg>
+    Abertura de Contas
+  </a>
+  <a class="nav-tab active" href="antecipacoes.html">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>
+    Antecipações
+  </a>
+</nav>
+
+<main>
+
+  <!-- FILTROS -->
+  <div class="filters">
+    <div class="fg">
+      <label>Setor</label>
+      <select id="f-setor">
+        <option value="all">Todos</option>
+        <option value="private">Private</option>
+        <option value="grupo">Grupo</option>
+        <option value="inss">INSS</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Mês</label>
+      <select id="f-mes"><option value="all">Todos</option></select>
+    </div>
+    <button class="btn-reset" onclick="resetFilters()">↺ Limpar</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="sec-lbl">Visão Geral</div>
+  <div class="kpis">
+    <div class="kpi c-red">
+      <div class="kpi-lbl">Total de Antecipações</div>
+      <div class="kpi-val" id="kpi-total">—</div>
+      <div class="kpi-sub">período selecionado</div>
+      <div class="kpi-delta fl" id="delta-total">vs mês ant.</div>
+    </div>
+    <div class="kpi c-blue">
+      <div class="kpi-lbl">Valor Antecipado</div>
+      <div class="kpi-val" id="kpi-valor">—</div>
+      <div class="kpi-sub">soma request_value</div>
+      <div class="kpi-delta fl" id="delta-valor">vs mês ant.</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Ticket Médio</div>
+      <div class="kpi-val" id="kpi-ticket">—</div>
+      <div class="kpi-sub">valor / quantidade</div>
+      <div class="kpi-delta fl" id="delta-ticket">vs mês ant.</div>
+    </div>
+    <div class="kpi c-grupo">
+      <div class="kpi-lbl">Fee Médio</div>
+      <div class="kpi-val" id="kpi-fee">—</div>
+      <div class="kpi-sub">anticipation_fee médio</div>
+      <div class="kpi-delta fl" id="delta-fee">vs mês ant.</div>
+    </div>
+    <div class="kpi c-yellow">
+      <div class="kpi-lbl">Primeiras Antecip.</div>
+      <div class="kpi-val" id="kpi-first">—</div>
+      <div class="kpi-sub">fl_pri_antecipacao = 1</div>
+      <div class="kpi-delta fl" id="delta-first">vs mês ant.</div>
+    </div>
+    <div class="kpi c-priv">
+      <div class="kpi-lbl">Usuários Únicos</div>
+      <div class="kpi-val" id="kpi-users">—</div>
+      <div class="kpi-sub">consumer_id distintos</div>
+      <div class="kpi-delta fl" id="delta-users">vs mês ant.</div>
+    </div>
+  </div>
+
+  <!-- GRÁFICO DIÁRIO + DONUT SETOR -->
+  <div class="sec-lbl">Evolução</div>
+  <div class="crow2">
+    <div class="card card-nomargin">
+      <h2>Volume de Antecipações por Dia</h2>
+      <div class="card-sub">Quantidade e valor antecipado diário</div>
+      <canvas id="chart-daily" height="100"></canvas>
+    </div>
+    <div class="card card-nomargin">
+      <h2>Distribuição por Setor</h2>
+      <div class="card-sub">Private · Grupo · INSS</div>
+      <canvas id="chart-setor" height="180"></canvas>
+    </div>
+  </div>
+
+  <!-- DIA SEMANA + HORA + CASHIN -->
+  <div class="crow3" style="margin-top:14px">
+    <div class="card card-nomargin">
+      <h2>Por Dia da Semana</h2>
+      <div class="card-sub">dia_semana_antecipacao</div>
+      <canvas id="chart-diasemana" height="160"></canvas>
+    </div>
+    <div class="card card-nomargin">
+      <h2>Distribuição por Hora</h2>
+      <div class="card-sub">hr_antecipacao</div>
+      <canvas id="chart-hora" height="160"></canvas>
+    </div>
+    <div class="card card-nomargin">
+      <h2>Destino do Cashin</h2>
+      <div class="card-sub">cashin_destiny</div>
+      <canvas id="chart-cashin" height="160"></canvas>
+    </div>
+  </div>
+
+  <!-- TOP EMPRESAS -->
+  <div class="sec-lbl" style="margin-top:26px">Top Empresas</div>
+  <div class="crow2">
+    <div class="card card-nomargin">
+      <h2>Ranking por Volume</h2>
+      <div class="card-sub">Top 10 empresas com mais antecipações no período</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Empresa</th>
+            <th>Setor</th>
+            <th>Qtd</th>
+            <th>Valor Total</th>
+            <th>Ticket Médio</th>
+          </tr>
+        </thead>
+        <tbody id="table-empresas">
+          <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card card-nomargin">
+      <h2>Top 5 por Valor</h2>
+      <div class="card-sub">Valor total antecipado por empresa</div>
+      <canvas id="chart-empresas" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- MTD -->
+  <div class="sec-lbl" style="margin-top:26px">MTD — Mês Atual vs Mês Anterior</div>
+  <div class="kpis">
+    <div class="kpi c-red">
+      <div class="kpi-lbl">Qtd MTD Atual</div>
+      <div class="kpi-val" id="kpi-mtd-atual">—</div>
+      <div class="kpi-sub">fl_mes_atual = 1</div>
+    </div>
+    <div class="kpi c-blue">
+      <div class="kpi-lbl">Qtd MTD Mês Ant.</div>
+      <div class="kpi-val" id="kpi-mtd-mm1">—</div>
+      <div class="kpi-sub">fl_dia_mtd_mm1 = 1</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Valor MTD Atual</div>
+      <div class="kpi-val" id="kpi-mtd-val-atual">—</div>
+      <div class="kpi-sub">fl_mes_atual = 1</div>
+    </div>
+    <div class="kpi c-grupo">
+      <div class="kpi-lbl">Valor MTD Mês Ant.</div>
+      <div class="kpi-val" id="kpi-mtd-val-mm1">—</div>
+      <div class="kpi-sub">fl_dia_mtd_mm1 = 1</div>
+    </div>
+    <div class="kpi c-yellow">
+      <div class="kpi-lbl">Primeiras MTD Atual</div>
+      <div class="kpi-val" id="kpi-mtd-first-atual">—</div>
+      <div class="kpi-sub">fl_pri_antecipacao + fl_mes_atual</div>
+    </div>
+    <div class="kpi c-priv">
+      <div class="kpi-lbl">Primeiras MTD Ant.</div>
+      <div class="kpi-val" id="kpi-mtd-first-mm1">—</div>
+      <div class="kpi-sub">fl_pri_antecipacao + fl_dia_mtd_mm1</div>
+    </div>
+  </div>
+
+  <!-- MTD POR SETOR -->
+  <div class="mtd-wrap" style="margin-top:14px">
+    <div class="mtd-card sp-priv">
+      <div class="mtd-hdr">
+        <div class="mtd-title">Private</div>
+        <span class="mtd-badge">SETOR</span>
+      </div>
+      <div class="mtd-nums">
+        <div>
+          <div class="mtd-main-lbl">MTD Atual</div>
+          <div class="mtd-main-val" id="mtd-priv-atual">—</div>
+        </div>
+        <div class="mtd-cmp">
+          <div class="mtd-cmp-lbl">Mês Anterior</div>
+          <div class="mtd-cmp-val" id="mtd-priv-mm1">—</div>
+          <div class="mtd-delta fl" id="mtd-priv-delta">—</div>
+        </div>
+      </div>
+      <div class="bars-lbl">Top Empresas</div>
+      <div id="bars-priv"></div>
+    </div>
+    <div class="mtd-card sp-grupo">
+      <div class="mtd-hdr">
+        <div class="mtd-title">Grupo</div>
+        <span class="mtd-badge">SETOR</span>
+      </div>
+      <div class="mtd-nums">
+        <div>
+          <div class="mtd-main-lbl">MTD Atual</div>
+          <div class="mtd-main-val" id="mtd-grupo-atual">—</div>
+        </div>
+        <div class="mtd-cmp">
+          <div class="mtd-cmp-lbl">Mês Anterior</div>
+          <div class="mtd-cmp-val" id="mtd-grupo-mm1">—</div>
+          <div class="mtd-delta fl" id="mtd-grupo-delta">—</div>
+        </div>
+      </div>
+      <div class="bars-lbl">Top Empresas</div>
+      <div id="bars-grupo"></div>
+    </div>
+    <div class="mtd-card sp-inss">
+      <div class="mtd-hdr">
+        <div class="mtd-title">INSS</div>
+        <span class="mtd-badge">SETOR</span>
+      </div>
+      <div class="mtd-nums">
+        <div>
+          <div class="mtd-main-lbl">MTD Atual</div>
+          <div class="mtd-main-val" id="mtd-inss-atual">—</div>
+        </div>
+        <div class="mtd-cmp">
+          <div class="mtd-cmp-lbl">Mês Anterior</div>
+          <div class="mtd-cmp-val" id="mtd-inss-mm1">—</div>
+          <div class="mtd-delta fl" id="mtd-inss-delta">—</div>
+        </div>
+      </div>
+      <div class="bars-lbl">Top Empresas</div>
+      <div id="bars-inss"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Relatório gerado automaticamente · Benefits Analytics · <span id="footer-date"></span>
+</footer>
+
+<script>
+// ============================================================
+// DADOS SIMULADOS — substituir pelos resultados reais da query
+// ============================================================
+const DATA = {
+  total: 8432, total_mm1: 7890,
+  valor: 42350000, valor_mm1: 39800000,
+  ticket: 5024, ticket_mm1: 5044,
+  fee: 3.2, fee_mm1: 3.1,
+  primeiras: 1203, primeiras_mm1: 1041,
+  usuarios: 6710, usuarios_mm1: 6322,
+
+  mtd_atual: 3201, mtd_mm1: 2988,
+  mtd_val_atual: 16100000, mtd_val_mm1: 14800000,
+  mtd_first_atual: 512, mtd_first_mm1: 431,
+
+  daily_labels: Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-29+i);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});}),
+  daily_qtd: Array.from({length:30},()=>Math.floor(200+Math.random()*350)),
+  daily_val: Array.from({length:30},()=>Math.floor(900000+Math.random()*1800000)),
+
+  setor_labels: ['Private','Grupo','INSS'],
+  setor_qtd: [5210, 2108, 1114],
+
+  diasemana_labels: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+  diasemana_qtd: [120, 1820, 1780, 1690, 1740, 1210, 72],
+
+  hora_labels: Array.from({length:24},(_,i)=>String(i).padStart(2,'0')+'h'),
+  hora_qtd: [12,8,5,3,2,4,45,320,780,610,490,520,380,450,510,420,380,310,270,190,120,80,40,20],
+
+  cashin_labels: ['WALLET','BANK_ACCOUNT','PIX'],
+  cashin_qtd: [4100, 2800, 1532],
+
+  empresas: [
+    {rank:1,nome:'Empresa Alpha',setor:'private',qtd:820,valor:4100000,ticket:5000},
+    {rank:2,nome:'Empresa Beta',setor:'grupo',qtd:710,valor:3550000,ticket:5000},
+    {rank:3,nome:'Empresa Gamma',setor:'private',qtd:604,valor:3020000,ticket:5000},
+    {rank:4,nome:'Empresa Delta',setor:'inss',qtd:530,valor:2650000,ticket:5000},
+    {rank:5,nome:'Empresa Epsilon',setor:'private',qtd:480,valor:2400000,ticket:5000},
+    {rank:6,nome:'Empresa Zeta',setor:'grupo',qtd:410,valor:2050000,ticket:5000},
+    {rank:7,nome:'Empresa Eta',setor:'private',qtd:380,valor:1900000,ticket:5000},
+    {rank:8,nome:'Empresa Theta',setor:'private',qtd:350,valor:1750000,ticket:5000},
+    {rank:9,nome:'Empresa Iota',setor:'inss',qtd:310,valor:1550000,ticket:5000},
+    {rank:10,nome:'Empresa Kappa',setor:'grupo',qtd:280,valor:1400000,ticket:5000},
+  ],
+
+  mtd_por_setor: {
+    private: { atual: 1820, mm1: 1650, top: [{nome:'Alpha',qtd:320},{nome:'Gamma',qtd:280},{nome:'Epsilon',qtd:210},{nome:'Eta',qtd:190},{nome:'Theta',qtd:170}] },
+    grupo:   { atual: 890,  mm1: 820,  top: [{nome:'Beta',qtd:290},{nome:'Zeta',qtd:180},{nome:'Kappa',qtd:130},{nome:'Lambda',qtd:95},{nome:'Mu',qtd:70}] },
+    inss:    { atual: 491,  mm1: 518,  top: [{nome:'Delta',qtd:210},{nome:'Iota',qtd:175},{nome:'Nu',qtd:60},{nome:'Xi',qtd:30},{nome:'Omicron',qtd:16}] },
+  }
+};
+
+// ============================================================
+// HELPERS
+// ============================================================
+const fmtNum = n => n.toLocaleString('pt-BR');
+const fmtBRL = n => {
+  if(n>=1000000) return 'R$ '+(n/1000000).toFixed(1).replace('.',',')+'M';
+  if(n>=1000) return 'R$ '+(n/1000).toFixed(0)+'k';
+  return 'R$ '+n.toLocaleString('pt-BR');
+};
+function applyDelta(elId, atual, ant) {
+  const el = document.getElementById(elId);
+  if(!el||!ant) return;
+  const pct = ((atual-ant)/ant*100);
+  el.className = 'kpi-delta '+(pct>0?'up':pct<0?'dn':'fl');
+  el.textContent = (pct>0?'↑ +':'↓ ')+Math.abs(pct).toFixed(1)+'% vs mês ant.';
+}
+function applyMtdDelta(elId, atual, ant) {
+  const el = document.getElementById(elId);
+  if(!el||!ant) return;
+  const pct = ((atual-ant)/ant*100);
+  el.className = 'mtd-delta '+(pct>0?'up':pct<0?'dn':'fl');
+  el.textContent = (pct>0?'↑ +':'↓ ')+Math.abs(pct).toFixed(1)+'%';
+}
+
+// ============================================================
+// KPIs
+// ============================================================
+function renderKPIs() {
+  document.getElementById('kpi-total').textContent = fmtNum(DATA.total);
+  document.getElementById('kpi-valor').textContent = fmtBRL(DATA.valor);
+  document.getElementById('kpi-ticket').textContent = fmtBRL(DATA.ticket);
+  document.getElementById('kpi-fee').textContent = DATA.fee+'%';
+  document.getElementById('kpi-first').textContent = fmtNum(DATA.primeiras);
+  document.getElementById('kpi-users').textContent = fmtNum(DATA.usuarios);
+  applyDelta('delta-total', DATA.total, DATA.total_mm1);
+  applyDelta('delta-valor', DATA.valor, DATA.valor_mm1);
+  applyDelta('delta-ticket', DATA.ticket, DATA.ticket_mm1);
+  applyDelta('delta-fee', DATA.fee, DATA.fee_mm1);
+  applyDelta('delta-first', DATA.primeiras, DATA.primeiras_mm1);
+  applyDelta('delta-users', DATA.usuarios, DATA.usuarios_mm1);
+
+  document.getElementById('kpi-mtd-atual').textContent = fmtNum(DATA.mtd_atual);
+  document.getElementById('kpi-mtd-mm1').textContent = fmtNum(DATA.mtd_mm1);
+  document.getElementById('kpi-mtd-val-atual').textContent = fmtBRL(DATA.mtd_val_atual);
+  document.getElementById('kpi-mtd-val-mm1').textContent = fmtBRL(DATA.mtd_val_mm1);
+  document.getElementById('kpi-mtd-first-atual').textContent = fmtNum(DATA.mtd_first_atual);
+  document.getElementById('kpi-mtd-first-mm1').textContent = fmtNum(DATA.mtd_first_mm1);
+}
+
+// ============================================================
+// MTD POR SETOR
+// ============================================================
+function renderMTDSetor() {
+  ['private','grupo','inss'].forEach(s => {
+    const d = DATA.mtd_por_setor[s];
+    document.getElementById(`mtd-${s}-atual`).textContent = fmtNum(d.atual);
+    document.getElementById(`mtd-${s}-mm1`).textContent = fmtNum(d.mm1);
+    applyMtdDelta(`mtd-${s}-delta`, d.atual, d.mm1);
+
+    const colors = {private:'#f0883e',grupo:'#bc8cff',inss:'#58a6ff'};
+    const max = d.top[0].qtd;
+    document.getElementById(`bars-${s}`).innerHTML = d.top.map(e=>`
+      <div class="bar-row">
+        <span class="bar-lbl" title="${e.nome}">${e.nome}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(e.qtd/max*100)}%;background:${colors[s]}"></div></div>
+        <span class="bar-num">${fmtNum(e.qtd)}</span>
+      </div>
+    `).join('');
+  });
+}
+
+// ============================================================
+// TABELA EMPRESAS
+// ============================================================
+function renderTable() {
+  document.getElementById('table-empresas').innerHTML = DATA.empresas.map(e=>`
+    <tr>
+      <td>${e.rank}</td>
+      <td class="td-val">${e.nome}</td>
+      <td><span class="td-badge badge-${e.setor}">${e.setor}</span></td>
+      <td>${fmtNum(e.qtd)}</td>
+      <td class="td-val">${fmtBRL(e.valor)}</td>
+      <td>${fmtBRL(e.ticket)}</td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================
+// GRÁFICOS
+// ============================================================
+const C = {green:'#2dc974',blue:'#58a6ff',orange:'#f0883e',purple:'#bc8cff',yellow:'#e3b341',teal:'#39d353',red:'#f85149'};
+
+function renderCharts() {
+  // Diário
+  new Chart(document.getElementById('chart-daily'),{
+    type:'bar',
+    data:{
+      labels:DATA.daily_labels,
+      datasets:[
+        {type:'line',label:'Valor (R$)',data:DATA.daily_val,borderColor:C.blue,backgroundColor:'rgba(88,166,255,0.07)',borderWidth:1.5,pointRadius:1.5,fill:true,yAxisID:'y2',tension:0.4},
+        {type:'bar',label:'Qtd',data:DATA.daily_qtd,backgroundColor:'rgba(45,201,116,0.65)',borderRadius:3,yAxisID:'y1'}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11},color:'#8b949e'}}},
+      scales:{
+        y1:{type:'linear',position:'left',ticks:{font:{size:10},color:'#8b949e'},grid:{color:'#21262d'}},
+        y2:{type:'linear',position:'right',ticks:{font:{size:10},color:'#8b949e',callback:v=>fmtBRL(v)},grid:{drawOnChartArea:false}}
+      }
+    }
+  });
+
+  // Setor Donut
+  new Chart(document.getElementById('chart-setor'),{
+    type:'doughnut',
+    data:{labels:DATA.setor_labels,datasets:[{data:DATA.setor_qtd,backgroundColor:[C.orange,C.purple,C.blue],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11},color:'#8b949e'}}}}
+  });
+
+  // Dia semana
+  new Chart(document.getElementById('chart-diasemana'),{
+    type:'bar',
+    data:{labels:DATA.diasemana_labels,datasets:[{label:'Antecipações',data:DATA.diasemana_qtd,backgroundColor:C.purple,borderRadius:5}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{size:10},color:'#8b949e'},grid:{color:'#21262d'}},x:{ticks:{font:{size:11},color:'#8b949e'}}}}
+  });
+
+  // Hora
+  new Chart(document.getElementById('chart-hora'),{
+    type:'bar',
+    data:{labels:DATA.hora_labels,datasets:[{label:'Antecipações',data:DATA.hora_qtd,backgroundColor:C.teal,borderRadius:2}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{size:10},color:'#8b949e'},grid:{color:'#21262d'}},x:{ticks:{font:{size:9},color:'#8b949e',maxRotation:0}}}}
+  });
+
+  // Cashin
+  new Chart(document.getElementById('chart-cashin'),{
+    type:'doughnut',
+    data:{labels:DATA.cashin_labels,datasets:[{data:DATA.cashin_qtd,backgroundColor:[C.blue,C.yellow,C.green],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11},color:'#8b949e'}}}}
+  });
+
+  // Empresas
+  const top5 = DATA.empresas.slice(0,5);
+  new Chart(document.getElementById('chart-empresas'),{
+    type:'bar',
+    data:{labels:top5.map(e=>e.nome),datasets:[{label:'Valor Total',data:top5.map(e=>e.valor),backgroundColor:[C.green,C.blue,C.orange,C.purple,C.yellow],borderRadius:5}]},
+    options:{
+      indexAxis:'y',responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{font:{size:10},color:'#8b949e',callback:v=>fmtBRL(v)},grid:{color:'#21262d'}},
+        y:{ticks:{font:{size:11},color:'#8b949e'}}
+      }
+    }
+  });
+}
+
+// ============================================================
+// FILTROS (placeholder)
+// ============================================================
+function resetFilters() {
+  document.getElementById('f-setor').value='all';
+  document.getElementById('f-mes').value='all';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded',()=>{
+  const now = new Date();
+  document.getElementById('badge-periodo').textContent = 'Atualizado '+now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('footer-date').textContent = now.toLocaleDateString('pt-BR',{year:'numeric',month:'long',day:'numeric'});
+  renderKPIs();
+  renderMTDSetor();
+  renderTable();
+  renderCharts();
+});
+</script>
+</body>
+</html>
