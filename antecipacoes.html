@@ -46,6 +46,8 @@
   .btn-refresh svg{transition:transform .6s}
   .btn-refresh.spinning svg{animation:spin .8s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
+  .cmd-hint{font-size:11px;color:var(--muted);white-space:nowrap}
+  .cmd-hint code{background:var(--surf2);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:11px;color:var(--greenl);font-family:'SF Mono',Menlo,monospace}
 
   /* ── MAIN ─────────────────────────────────────────────────── */
   main{max-width:1520px;margin:0 auto;padding:22px 28px}
@@ -142,10 +144,11 @@
   </div>
   <div class="hdr-right">
     <span class="badge-periodo" id="badge-periodo">—</span>
-    <a class="btn-refresh" id="btn-refresh" href="antecipacoes.html">
+    <a class="btn-refresh" id="btn-refresh" href="antecipacoes.html" title="Recarrega a página. Para buscar dados frescos, rode no terminal: atualizar-antecipacoes">
       <svg id="refresh-icon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
-      Atualizar
+      Recarregar
     </a>
+    <div class="cmd-hint">Para dados frescos: <code>atualizar-antecipacoes</code></div>
   </div>
 </header>
 
