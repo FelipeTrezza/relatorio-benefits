@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Abertura de Contas — Relatório</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --surf2:   #1c2330;
+    --border:  #30363d;
+    --green:   #21a366;
+    --greenl:  #2dc974;
+    --greend:  #177a4d;
+    --text:    #e6edf3;
+    --muted:   #8b949e;
+    --inss:    #58a6ff;
+    --priv:    #f0883e;
+    --grupo:   #bc8cff;
+    --red:     #f85149;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px}
+
+  /* HEADER */
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+  .hdr-left{display:flex;align-items:center;gap:12px}
+  .hdr-logo{width:34px;height:34px}
+  .hdr-title{font-size:17px;font-weight:700}
+  .hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
+  .hdr-right{display:flex;align-items:center;gap:10px}
+  .badge-periodo{background:var(--greend);color:var(--greenl);font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;border:1px solid var(--green)}
+
+  /* BOTÃO ATUALIZAR */
+  .btn-refresh{display:flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;white-space:nowrap}
+  .btn-refresh:hover{border-color:var(--green);color:var(--greenl);background:#1a2a22}
+  .btn-refresh svg{transition:transform .6s}
+  .btn-refresh.spinning svg{animation:spin .8s linear infinite}
+  .btn-refresh .upd-ts{font-size:10px;color:var(--muted);font-weight:400}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  main{max-width:1400px;margin:0 auto;padding:24px 32px}
+
+  /* FILTROS */
+  .filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px;align-items:center}
+  .filters label{font-size:11px;color:var(--muted);margin-right:3px;text-transform:uppercase;letter-spacing:.4px}
+  .filters select{background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:6px;font-size:13px;cursor:pointer;outline:none;transition:border .2s}
+  .filters select:hover,.filters select:focus{border-color:var(--green)}
+  .fg{display:flex;align-items:center;gap:6px}
+  .btn-reset{background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;transition:all .2s}
+  .btn-reset:hover{border-color:var(--green);color:var(--greenl)}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:24px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;position:relative;overflow:hidden}
+  .kpi::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green)}
+  .kpi.c-inss::after{background:var(--inss)}
+  .kpi.c-priv::after{background:var(--priv)}
+  .kpi.c-grupo::after{background:var(--grupo)}
+  .kpi-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px}
+  .kpi-val{font-size:26px;font-weight:700;line-height:1}
+  .kpi-sub{font-size:10px;color:var(--muted);margin-top:5px}
+  .kpi-delta{font-size:11px;margin-top:4px;font-weight:600}
+  .kpi-delta.up{color:var(--greenl)} .kpi-delta.dn{color:var(--red)}
+
+  /* CHARTS */
+  .crow2{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+  .card h2{font-size:13px;font-weight:600;margin-bottom:3px}
+  .card-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+
+  /* FILTRO INTERNO DO GRÁFICO DE LINHA DIÁRIO */
+  .chart-filter{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .chart-filter label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .chart-filter select{background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;outline:none;transition:border .2s}
+  .chart-filter select:hover,.chart-filter select:focus{border-color:var(--green)}
+
+  /* MTD */
+  .mtd-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+  .mtd-card{background:var(--surf2);border:1px solid var(--border);border-radius:9px;padding:16px}
+  .mtd-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .mtd-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .mtd-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+  .sp-pub .mtd-title{color:var(--greenl)} .sp-pub .mtd-badge{background:rgba(33,163,102,.15);color:var(--greenl);border:1px solid rgba(33,163,102,.3)}
+  .sp-priv .mtd-title{color:var(--priv)}  .sp-priv .mtd-badge{background:rgba(240,136,62,.15);color:var(--priv);border:1px solid rgba(240,136,62,.3)}
+  .sp-grupo .mtd-title{color:var(--grupo)}.sp-grupo .mtd-badge{background:rgba(188,140,255,.15);color:var(--grupo);border:1px solid rgba(188,140,255,.3)}
+  .sp-inss .mtd-title{color:var(--inss)}  .sp-inss .mtd-badge{background:rgba(88,166,255,.15);color:var(--inss);border:1px solid rgba(88,166,255,.3)}
+  .mtd-nums{display:flex;justify-content:space-between;align-items:flex-end;padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:12px}
+  .mtd-main-val{font-size:24px;font-weight:700}
+  .mtd-main-lbl{font-size:10px;color:var(--muted);margin-bottom:3px}
+  .mtd-cmp{text-align:right}
+  .mtd-cmp-lbl{font-size:10px;color:var(--muted)}
+  .mtd-cmp-val{font-size:11px;color:var(--muted)}
+  .mtd-delta{font-size:13px;font-weight:700}
+  .mtd-delta.up{color:var(--greenl)} .mtd-delta.dn{color:var(--red)} .mtd-delta.fl{color:var(--muted)}
+  .bar-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+  .bar-lbl{font-size:10px;color:var(--muted);width:58px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bar-track{flex:1;background:var(--surface);border-radius:3px;height:6px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:3px}
+  .bar-num{font-size:10px;color:var(--muted);width:42px;text-align:right;flex-shrink:0}
+  .bars-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
+
+  footer{text-align:center;padding:22px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-left">
+    <svg class="hdr-logo" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#21a366"/><text x="17" y="22" text-anchor="middle" font-size="15" font-weight="bold" fill="white">P</text></svg>
+    <div>
+      <div class="hdr-sub">Benefits — Abertura de Contas</div>
+      <div class="hdr-title">Relatório de Abertura de Contas</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="badge-periodo" id="badge-periodo">Últimos 5 meses</span>
+    <button class="btn-refresh" id="btn-refresh" onclick="refreshData()" title="Atualizar dados">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+      Atualizar
+      <span class="upd-ts" id="upd-ts"></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- FILTROS GLOBAIS -->
+  <div class="filters">
+    <div class="fg">
+      <label>Setor</label>
+      <select id="f-setor">
+        <option value="all">Todos</option>
+        <option value="public">Público</option>
+        <option value="private">Privado</option>
+        <option value="grupo">Grupo</option>
+        <option value="INSS">INSS</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Secretaria</label>
+      <select id="f-secretaria"><option value="all">Todas</option></select>
+    </div>
+    <div class="fg">
+      <label>Mês</label>
+      <select id="f-mes"><option value="all">Todos</option></select>
+    </div>
+    <button class="btn-reset" onclick="resetFilters()">↺ Limpar</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-lbl">Total de Aberturas</div>
+      <div class="kpi-val" id="kpi-total">—</div>
+      <div class="kpi-sub">período filtrado</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Mês Mais Recente</div>
+      <div class="kpi-val" id="kpi-ultimo">—</div>
+      <div class="kpi-sub" id="kpi-ultimo-sub"></div>
+      <div class="kpi-delta" id="kpi-delta-mes"></div>
+    </div>
+    <div class="kpi c-inss">
+      <div class="kpi-lbl">INSS</div>
+      <div class="kpi-val" id="kpi-inss">—</div>
+      <div class="kpi-sub">no período</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Público</div>
+      <div class="kpi-val" id="kpi-pub">—</div>
+      <div class="kpi-sub">no período</div>
+    </div>
+    <div class="kpi c-priv">
+      <div class="kpi-lbl">Privado</div>
+      <div class="kpi-val" id="kpi-priv">—</div>
+      <div class="kpi-sub">no período</div>
+    </div>
+    <div class="kpi c-grupo">
+      <div class="kpi-lbl">Grupo</div>
+      <div class="kpi-val" id="kpi-grupo">—</div>
+      <div class="kpi-sub">no período</div>
+    </div>
+  </div>
+
+  <!-- ROW 1: linha mês a mês + donut setor -->
+  <div class="crow2">
+    <div class="card">
+      <h2>Aberturas Mês a Mês</h2>
+      <div class="card-sub">Total de contas abertas por mês (sent_bacen_at)</div>
+      <canvas id="cMes" height="95"></canvas>
+    </div>
+    <div class="card">
+      <h2>Distribuição por Setor</h2>
+      <div class="card-sub">Participação no período filtrado</div>
+      <canvas id="cSetor" height="205"></canvas>
+    </div>
+  </div>
+
+  <!-- GRÁFICO DIÁRIO -->
+  <div class="card">
+    <h2>Aberturas Dia a Dia</h2>
+    <div class="chart-filter">
+      <label>Mês</label>
+      <select id="f-mes-dia" onchange="renderChartDia()"></select>
+      <label style="margin-left:8px">Setor</label>
+      <select id="f-setor-dia" onchange="renderChartDia()">
+        <option value="all">Todos</option>
+        <option value="public">Público</option>
+        <option value="private">Privado</option>
+        <option value="grupo">Grupo</option>
+        <option value="INSS">INSS</option>
+      </select>
+    </div>
+    <canvas id="cDia" height="80"></canvas>
+  </div>
+
+  <!-- MTD -->
+  <div class="card" style="margin-bottom:28px">
+    <h2>Abertura de Contas por Setor — MTD</h2>
+    <div class="card-sub" id="mtd-sub">Mês vigente vs mês anterior</div>
+    <div class="mtd-wrap" id="mtd-wrap"></div>
+  </div>
+
+</main>
+
+<footer>
+  Fonte: benefits.sec_collaborators · consumers.sec_consumers · consumers.consumers &nbsp;|&nbsp;
+  Filtro: sent_bacen_at últimos 5 meses &nbsp;|&nbsp;
+  Atualizado em <span id="gen-date"></span>
+</footer>
+
+<script>
+// ─── DADOS ────────────────────────────────────────────────────────────────────
+const RAW_DATA = %%DADOS%%;
+
+// ─── ESTADO ──────────────────────────────────────────────────────────────────
+let RAW = RAW_DATA;
+let ALL_MESES = [];
+const MESES_PT_MAP = {};
+let charts = {};
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function fmt(n){ return Number(n).toLocaleString('pt-BR') }
+function pct(a,b){ if(!b) return ''; const d=((a-b)/b*100); return (d>=0?'▲ +':'▼ ')+d.toFixed(1)+'%' }
+function destroyChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id] } }
+
+function mesPT(m){
+  if(MESES_PT_MAP[m]) return MESES_PT_MAP[m];
+  const [y,mo] = m.split('-');
+  const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const label = nomes[parseInt(mo)-1]+'/'+y.slice(2);
+  MESES_PT_MAP[m] = label;
+  return label;
+}
+
+function diaPT(d){
+  // "2025-11-03" → "03/Nov"
+  const [,mo,dd] = d.split('-');
+  const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  return dd+'/'+nomes[parseInt(mo)-1];
+}
+
+function buildMeses(){
+  const set = new Set(RAW.map(r=>r.mes).filter(Boolean));
+  ALL_MESES = [...set].sort();
+}
+
+// ─── SELECTS GLOBAIS ─────────────────────────────────────────────────────────
+function populateMes(){
+  const sel = document.getElementById('f-mes');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="all">Todos</option>' +
+    ALL_MESES.map(m=>`<option value="${m}"${m===cur?' selected':''}>${mesPT(m)}</option>`).join('');
+}
+
+function populateMesDia(){
+  // Filtro interno do gráfico diário — sempre lista todos os meses
+  // e pré-seleciona o mais recente
+  const sel = document.getElementById('f-mes-dia');
+  const cur = sel.value || ALL_MESES[ALL_MESES.length-1];
+  sel.innerHTML = ALL_MESES.map(m=>`<option value="${m}"${m===cur?' selected':''}>${mesPT(m)}</option>`).join('');
+}
+
+function populateSec(){
+  const sel = document.getElementById('f-secretaria');
+  const cur = sel.value;
+  const setor = document.getElementById('f-setor').value;
+  const mes   = document.getElementById('f-mes').value;
+  const secs  = [...new Set(
+    RAW.filter(r=>(setor==='all'||r.setor===setor)&&(mes==='all'||r.mes===mes)&&r.secretaria)
+       .map(r=>r.secretaria)
+  )].sort();
+  sel.innerHTML = '<option value="all">Todas</option>' +
+    secs.map(s=>`<option value="${s}"${s===cur?' selected':''}>${s}</option>`).join('');
+}
+
+// ─── FILTRO GLOBAL ────────────────────────────────────────────────────────────
+function getFiltered(){
+  const setor = document.getElementById('f-setor').value;
+  const sec   = document.getElementById('f-secretaria').value;
+  const mes   = document.getElementById('f-mes').value;
+  return RAW.filter(r=>
+    r.secretaria &&
+    (setor==='all'||r.setor===setor) &&
+    (sec==='all'||r.secretaria===sec) &&
+    (mes==='all'||r.mes===mes)
+  );
+}
+
+function resetFilters(){
+  document.getElementById('f-setor').value='all';
+  document.getElementById('f-mes').value='all';
+  populateSec();
+  render();
+}
+
+// ─── KPIs ────────────────────────────────────────────────────────────────────
+function renderKPIs(data){
+  const total   = data.reduce((s,r)=>s+Number(r.count),0);
+  const lastMes = ALL_MESES[ALL_MESES.length-1];
+  const prevMes = ALL_MESES[ALL_MESES.length-2];
+  const lastV   = data.filter(r=>r.mes===lastMes).reduce((s,r)=>s+Number(r.count),0);
+  const prevV   = data.filter(r=>r.mes===prevMes).reduce((s,r)=>s+Number(r.count),0);
+
+  document.getElementById('kpi-total').textContent  = fmt(total);
+  document.getElementById('kpi-ultimo').textContent = fmt(lastV);
+  document.getElementById('kpi-ultimo-sub').textContent = mesPT(lastMes)||lastMes;
+  document.getElementById('kpi-inss').textContent   = fmt(data.filter(r=>r.setor==='INSS').reduce((a,r)=>a+Number(r.count),0));
+  document.getElementById('kpi-pub').textContent    = fmt(data.filter(r=>r.setor==='public').reduce((a,r)=>a+Number(r.count),0));
+  document.getElementById('kpi-priv').textContent   = fmt(data.filter(r=>r.setor==='private').reduce((a,r)=>a+Number(r.count),0));
+  document.getElementById('kpi-grupo').textContent  = fmt(data.filter(r=>r.setor==='grupo').reduce((a,r)=>a+Number(r.count),0));
+
+  const el = document.getElementById('kpi-delta-mes');
+  const d  = pct(lastV,prevV);
+  el.textContent = d ? d+' vs '+(mesPT(prevMes)||prevMes) : '';
+  el.className   = 'kpi-delta '+(lastV>=prevV?'up':'dn');
+}
+
+// ─── CHART MÊS A MÊS ─────────────────────────────────────────────────────────
+function renderChartMes(data){
+  destroyChart('mes');
+  const totais = ALL_MESES.map(m=>data.filter(r=>r.mes===m).reduce((s,r)=>s+Number(r.count),0));
+  charts['mes'] = new Chart(document.getElementById('cMes'),{
+    type:'line',
+    data:{
+      labels:ALL_MESES.map(mesPT),
+      datasets:[{label:'Aberturas',data:totais,borderColor:'#21a366',backgroundColor:'rgba(33,163,102,.1)',
+        borderWidth:2.5,pointBackgroundColor:'#21a366',pointRadius:5,fill:true,tension:.35}]
+    },
+    options:{responsive:true,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)+' aberturas'}}},
+      scales:{x:{grid:{color:'#21262d'},ticks:{color:'#8b949e'}},
+              y:{grid:{color:'#21262d'},ticks:{color:'#8b949e',callback:v=>fmt(v)}}}}
+  });
+}
+
+// ─── CHART SETOR DONUT ───────────────────────────────────────────────────────
+function renderChartSetor(data){
+  destroyChart('setor');
+  const setores = ['public','private','grupo','INSS'];
+  const lbls    = ['Público','Privado','Grupo','INSS'];
+  const cores   = ['#21a366','#f0883e','#bc8cff','#58a6ff'];
+  const vals    = setores.map(s=>data.filter(r=>r.setor===s).reduce((a,r)=>a+Number(r.count),0));
+  const tot     = vals.reduce((a,b)=>a+b,0)||1;
+  charts['setor'] = new Chart(document.getElementById('cSetor'),{
+    type:'doughnut',
+    data:{labels:lbls,datasets:[{data:vals,backgroundColor:cores,borderColor:'#161b22',borderWidth:3}]},
+    options:{responsive:true,cutout:'62%',
+      plugins:{legend:{position:'bottom',labels:{color:'#8b949e',padding:12,boxWidth:12}},
+        tooltip:{callbacks:{label:c=>` ${c.label}: ${fmt(c.raw)} (${(c.raw/tot*100).toFixed(1)}%)`}}}}
+  });
+}
+
+// ─── CHART DIA A DIA ─────────────────────────────────────────────────────────
+function renderChartDia(){
+  destroyChart('dia');
+  const mesSel   = document.getElementById('f-mes-dia').value;
+  const setorDia = document.getElementById('f-setor-dia').value;
+  const sec      = document.getElementById('f-secretaria').value;
+
+  // Filtro próprio de mês + setor do gráfico diário + secretaria global
+  const dataFilt = RAW.filter(r=>
+    r.dia &&
+    r.mes === mesSel &&
+    r.secretaria &&
+    (setorDia==='all'||r.setor===setorDia) &&
+    (sec==='all'||r.secretaria===sec)
+  );
+
+  // Agrega por dia
+  const porDia = {};
+  dataFilt.forEach(r=>{ porDia[r.dia]=(porDia[r.dia]||0)+Number(r.count) });
+
+  const dias   = Object.keys(porDia).sort();
+  const totais = dias.map(d=>porDia[d]);
+  const media  = totais.length ? Math.round(totais.reduce((a,b)=>a+b,0)/totais.length) : 0;
+
+  charts['dia'] = new Chart(document.getElementById('cDia'),{
+    type:'line',
+    data:{
+      labels: dias.map(diaPT),
+      datasets:[
+        {
+          label:'Aberturas',
+          data:totais,
+          borderColor:'#21a366',
+          backgroundColor:'rgba(33,163,102,.08)',
+          borderWidth:2,
+          pointBackgroundColor:'#21a366',
+          pointRadius:3,
+          pointHoverRadius:6,
+          fill:true,
+          tension:.3
+        },
+        {
+          label:'Média',
+          data: dias.map(()=>media),
+          borderColor:'rgba(139,148,158,.5)',
+          borderWidth:1.5,
+          borderDash:[5,4],
+          pointRadius:0,
+          fill:false,
+          tension:0
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{
+          display:true,
+          labels:{color:'#8b949e',boxWidth:12,padding:14,font:{size:11}}
+        },
+        tooltip:{
+          callbacks:{
+            title: items => dias[items[0].dataIndex],
+            label: c => c.dataset.label==='Média'
+              ? ` Média: ${fmt(c.raw)}`
+              : ` Aberturas: ${fmt(c.raw)}`
+          }
+        }
+      },
+      scales:{
+        x:{
+          grid:{color:'#21262d'},
+          ticks:{color:'#8b949e',font:{size:10},maxRotation:45,minRotation:0,
+            // mostra 1 tick a cada N dias pra não poluir
+            callback:(val,i)=> i%2===0 ? dias.map(diaPT)[i] : ''
+          }
+        },
+        y:{grid:{color:'#21262d'},ticks:{color:'#8b949e',callback:v=>fmt(v)}}
+      }
+    }
+  });
+}
+
+// ─── MTD ─────────────────────────────────────────────────────────────────────
+function renderMTD(){
+  const mesMTD = ALL_MESES[ALL_MESES.length-1];
+  const mesAnt = ALL_MESES[ALL_MESES.length-2];
+  document.getElementById('mtd-sub').textContent =
+    `Mês vigente (${mesPT(mesMTD)}) vs mês anterior (${mesPT(mesAnt)})`;
+
+  const setor = document.getElementById('f-setor').value;
+  const sec   = document.getElementById('f-secretaria').value;
+  const base  = RAW.filter(r=>r.secretaria&&(setor==='all'||r.setor===setor)&&(sec==='all'||r.secretaria===sec));
+
+  const setDefs=[
+    {k:'public', lbl:'Público', cls:'sp-pub',  badge:'PÚBLICO', cor:'#21a366'},
+    {k:'private',lbl:'Privado', cls:'sp-priv', badge:'PRIVADO', cor:'#f0883e'},
+    {k:'grupo',  lbl:'Grupo',   cls:'sp-grupo',badge:'GRUPO',   cor:'#bc8cff'},
+    {k:'INSS',   lbl:'INSS',    cls:'sp-inss', badge:'INSS',    cor:'#58a6ff'},
+  ];
+
+  const wrap = document.getElementById('mtd-wrap');
+  wrap.innerHTML = '';
+
+  setDefs.forEach(s=>{
+    const dMTD = base.filter(r=>r.mes===mesMTD&&r.setor===s.k);
+    const dAnt = base.filter(r=>r.mes===mesAnt&&r.setor===s.k);
+    const vMTD = dMTD.reduce((a,r)=>a+Number(r.count),0);
+    const vAnt = dAnt.reduce((a,r)=>a+Number(r.count),0);
+    const delta = pct(vMTD,vAnt);
+    const dcls  = vMTD>vAnt?'up':vMTD<vAnt?'dn':'fl';
+
+    const aggSec={};
+    dMTD.forEach(r=>{aggSec[r.secretaria]=(aggSec[r.secretaria]||0)+Number(r.count)});
+    const topSecs=Object.entries(aggSec).sort((a,b)=>b[1]-a[1]).slice(0,4);
+    const maxSec=topSecs[0]?.[1]||1;
+
+    const card=document.createElement('div');
+    card.className=`mtd-card ${s.cls}`;
+    card.innerHTML=`
+      <div class="mtd-hdr">
+        <span class="mtd-title">${s.lbl}</span>
+        <span class="mtd-badge">${s.badge}</span>
+      </div>
+      <div class="mtd-nums">
+        <div>
+          <div class="mtd-main-lbl">${mesPT(mesMTD)}</div>
+          <div class="mtd-main-val">${fmt(vMTD)}</div>
+        </div>
+        <div class="mtd-cmp">
+          <div class="mtd-cmp-lbl">vs ${mesPT(mesAnt)}</div>
+          <div class="mtd-delta ${dcls}">${delta||'—'}</div>
+          <div class="mtd-cmp-val">${fmt(vAnt)}</div>
+        </div>
+      </div>
+      ${topSecs.length?`
+      <div class="bars-lbl">Top Secretarias</div>
+      ${topSecs.map(([n,v])=>`
+        <div class="bar-row">
+          <span class="bar-lbl" title="${n}">${n}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxSec*100)}%;background:${s.cor}"></div></div>
+          <span class="bar-num">${fmt(v)}</span>
+        </div>`).join('')}`
+      :'<div style="font-size:11px;color:var(--muted);margin-top:6px">Sem dados no período</div>'}
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+// ─── RENDER TOTAL ────────────────────────────────────────────────────────────
+function render(){
+  const data=getFiltered();
+  renderKPIs(data);
+  renderChartMes(data);
+  renderChartSetor(data);
+  renderChartDia();
+  renderMTD();
+}
+
+// ─── ATUALIZAR ────────────────────────────────────────────────────────────────
+async function refreshData(){
+  const btn = document.getElementById('btn-refresh');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  btn.title = 'Recarregando...';
+  setTimeout(() => { window.location.reload(); }, 800);
+}
+
+// Preenche o timestamp "atualizado às HH:MM" no botão
+(function setUpdTs(){
+  const el = document.getElementById('upd-ts');
+  if(!el) return;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  el.textContent = hh+':'+mm;
+})();
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+document.getElementById('gen-date').textContent =
+  new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+document.getElementById('f-setor').addEventListener('change',()=>{populateSec();render()});
+document.getElementById('f-secretaria').addEventListener('change',render);
+document.getElementById('f-mes').addEventListener('change',()=>{populateSec();render()});
+
+buildMeses();
+populateMes();
+populateMesDia();
+populateSec();
+render();
+</script>
+</body>
+</html>
