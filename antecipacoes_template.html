@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Antecipações de Salário — Benefits</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
     --bg:      #0d1117;
@@ -21,19 +20,22 @@
     --grupo:   #bc8cff;
     --red:     #f85149;
     --yellow:  #e3b341;
+    /* cor do fundo dos metric-cards — mesmo da foto (cinza claro no light, surf2 no dark) */
+    --card-bg: #1c2330;
+    --card-border: #30363d;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px}
 
-  /* NAV */
-  .nav-tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;display:flex;gap:0}
-  .nav-tab{padding:12px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:7px}
+  /* ── NAV ──────────────────────────────────────────────────── */
+  .nav-tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:0}
+  .nav-tab{padding:11px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:7px}
   .nav-tab:hover{color:var(--text)}
   .nav-tab.active{color:var(--text);border-bottom-color:var(--green);font-weight:600}
 
-  /* HEADER */
-  header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
-  .hdr-left{display:flex;align-items:center;gap:12px}
+  /* ── HEADER ───────────────────────────────────────────────── */
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between}
+  .hdr-left{display:flex;align-items:center;gap:11px}
   .hdr-logo{width:32px;height:32px}
   .hdr-title{font-size:16px;font-weight:700}
   .hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
@@ -45,102 +47,86 @@
   .btn-refresh.spinning svg{animation:spin .8s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  main{max-width:1380px;margin:0 auto;padding:22px 32px}
+  /* ── MAIN ─────────────────────────────────────────────────── */
+  main{max-width:1520px;margin:0 auto;padding:22px 28px}
 
-  /* SECTION LABEL */
-  .sec-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;margin-top:28px;display:flex;align-items:center;gap:6px}
-  .sec-lbl::before{content:'';display:inline-block;width:3px;height:13px;background:var(--green);border-radius:2px}
-  .sec-lbl:first-of-type{margin-top:0}
+  /* ── PERIODO LABEL ───────────────────────────────────────── */
+  .periodo-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .periodo-title{font-size:13px;font-weight:700;color:var(--text)}
+  .periodo-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
-  /* MTD HERO — bloco principal */
-  .mtd-hero{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;position:relative;overflow:hidden}
-  .mtd-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--greenl),#4ae89c)}
-  .mth-col{padding:0 24px;border-right:1px solid var(--border)}
-  .mth-col:first-child{padding-left:0}
-  .mth-col:last-child{border-right:none}
-  .mth-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
-  .mth-val{font-size:32px;font-weight:700;line-height:1;letter-spacing:-1px}
-  .mth-cmp{margin-top:8px;display:flex;align-items:center;gap:8px}
-  .mth-cmp-val{font-size:12px;color:var(--muted)}
-  .mth-delta{font-size:13px;font-weight:700;padding:2px 8px;border-radius:12px}
-  .mth-delta.up{background:rgba(33,163,102,.15);color:var(--greenl)}
-  .mth-delta.dn{background:rgba(248,81,73,.12);color:var(--red)}
-  .mth-delta.fl{background:rgba(139,148,158,.1);color:var(--muted)}
+  /* ── GRID PRINCIPAL: 4 colunas ────────────────────────────── */
+  .dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+  }
 
-  /* KPI GRID */
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
-  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden}
-  .kpi::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green)}
-  .kpi.c-blue::after{background:var(--inss)}
-  .kpi.c-priv::after{background:var(--priv)}
-  .kpi.c-grupo::after{background:var(--grupo)}
-  .kpi.c-yellow::after{background:var(--yellow)}
-  .kpi.c-red::after{background:var(--red)}
-  .kpi-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-  .kpi-val{font-size:24px;font-weight:700;line-height:1}
-  .kpi-delta{font-size:11px;margin-top:5px;font-weight:600}
-  .kpi-delta.up{color:var(--greenl)} .kpi-delta.dn{color:var(--red)} .kpi-delta.fl{color:var(--muted)}
+  /* ── COLUNA DE SETOR ──────────────────────────────────────── */
+  .setor-col{}
 
-  /* SETOR CARDS */
-  .setor-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
-  .setor-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;position:relative;overflow:hidden}
-  .setor-card .sc-accent{position:absolute;top:0;left:0;right:0;height:3px}
-  .setor-priv .sc-accent{background:var(--priv)}
-  .setor-grupo .sc-accent{background:var(--grupo)}
-  .setor-inss .sc-accent{background:var(--inss)}
-  .sc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;margin-top:4px}
-  .sc-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
-  .setor-priv .sc-name{color:var(--priv)}
-  .setor-grupo .sc-name{color:var(--grupo)}
-  .setor-inss .sc-name{color:var(--inss)}
-  .sc-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
-  .setor-priv .sc-badge{background:rgba(240,136,62,.12);color:var(--priv);border:1px solid rgba(240,136,62,.25)}
-  .setor-grupo .sc-badge{background:rgba(188,140,255,.12);color:var(--grupo);border:1px solid rgba(188,140,255,.25)}
-  .setor-inss .sc-badge{background:rgba(88,166,255,.12);color:var(--inss);border:1px solid rgba(88,166,255,.25)}
-  .sc-nums{display:flex;justify-content:space-between;align-items:flex-end;padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:12px}
-  .sc-main-val{font-size:28px;font-weight:700;line-height:1}
-  .sc-main-lbl{font-size:10px;color:var(--muted);margin-bottom:4px}
-  .sc-cmp{text-align:right}
-  .sc-cmp-lbl{font-size:10px;color:var(--muted)}
-  .sc-cmp-val{font-size:12px;color:var(--muted)}
-  .sc-delta{font-size:13px;font-weight:700;margin-top:2px}
-  .sc-delta.up{color:var(--greenl)} .sc-delta.dn{color:var(--red)} .sc-delta.fl{color:var(--muted)}
-  .sc-sub-row{display:flex;justify-content:space-between;margin-bottom:6px}
-  .sc-sub-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-  .sc-sub-val{font-size:11px;color:var(--text);font-weight:600}
+  /* ── PILL HEADER (estilo da foto) ─────────────────────────── */
+  .pill-header{
+    border-radius:40px;
+    padding:10px 0;
+    text-align:center;
+    font-size:17px;
+    font-weight:800;
+    color:#fff;
+    margin-bottom:14px;
+    letter-spacing:.3px;
+  }
+  .pill-total  {background:linear-gradient(135deg,#1a6640,#21a366)}
+  .pill-publico{background:linear-gradient(135deg,#1f7a45,#27b96a)}
+  .pill-privado{background:linear-gradient(135deg,#3a8a52,#4db870)}
+  .pill-grupo  {background:linear-gradient(135deg,#5aa668,#7ec87e)}
 
-  /* BARS */
-  .bars-title{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px;margin-top:10px}
-  .bar-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
-  .bar-lbl{font-size:10px;color:var(--muted);width:62px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .bar-track{flex:1;background:var(--surf2);border-radius:3px;height:5px;overflow:hidden}
-  .bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
-  .bar-num{font-size:10px;color:var(--muted);width:38px;text-align:right;flex-shrink:0}
+  /* ── GRID DE MÉTRICAS: 2 colunas dentro de cada setor ──────── */
+  .metrics-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
 
-  /* CHARTS ROW */
-  .crow2{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:14px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:0}
-  .card h2{font-size:13px;font-weight:600;margin-bottom:3px}
-  .card-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+  /* ── METRIC CARD (estilo da foto: canto arredondado, fundo claro) */
+  .mc{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    padding:14px 14px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    min-height:90px;
+  }
+  .mc-lbl{
+    font-size:10px;
+    font-weight:600;
+    color:var(--muted);
+    text-transform:none;
+    letter-spacing:.1px;
+    line-height:1.3;
+  }
+  .mc-val{
+    font-size:26px;
+    font-weight:800;
+    color:var(--greenl);
+    line-height:1;
+    letter-spacing:-0.5px;
+  }
+  .mc-delta{
+    font-size:11px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:3px;
+  }
+  .mc-delta.up{color:var(--greenl)}
+  .mc-delta.dn{color:var(--red)}
+  .mc-delta.fl{color:var(--muted)}
 
-  /* TABLE */
-  table{width:100%;border-collapse:collapse;font-size:12px}
-  thead th{text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--border)}
-  tbody tr{border-bottom:1px solid var(--surf2);transition:background .15s}
-  tbody tr:hover{background:var(--surf2)}
-  tbody td{padding:9px 12px;color:var(--muted)}
-  td.td-val{font-weight:600;color:var(--text)}
-  .td-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:600}
-  .badge-private{background:rgba(240,136,62,.12);color:var(--priv);border:1px solid rgba(240,136,62,.25)}
-  .badge-grupo{background:rgba(188,140,255,.12);color:var(--grupo);border:1px solid rgba(188,140,255,.25)}
-  .badge-inss{background:rgba(88,166,255,.12);color:var(--inss);border:1px solid rgba(88,166,255,.25)}
-  .rank-badge{display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--surf2);font-size:10px;font-weight:700;color:var(--muted);text-align:center;line-height:20px}
-  .rank-badge.r1{background:rgba(227,179,65,.2);color:var(--yellow)}
-  .rank-badge.r2{background:rgba(139,148,158,.15);color:#b0bec5}
-  .rank-badge.r3{background:rgba(240,136,62,.12);color:var(--priv)}
-
-  /* FOOTER */
-  footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:8px}
+  /* ── FOOTER ───────────────────────────────────────────────── */
+  footer{text-align:center;padding:18px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:8px}
 </style>
 </head>
 <body>
@@ -177,176 +163,23 @@
 
 <main>
 
-  <!-- ── MTD HERO ─────────────────────────────────────────── -->
-  <div class="sec-lbl" style="margin-top:0">MTD — Mês Atual vs Mês Anterior (mesma janela de dias)</div>
-  <div class="mtd-hero">
-    <div class="mth-col">
-      <div class="mth-lbl">Antecipações MTD</div>
-      <div class="mth-val" id="h-qtd-atual">—</div>
-      <div class="mth-cmp">
-        <span class="mth-cmp-val" id="h-qtd-mm1">— mês ant.</span>
-        <span class="mth-delta fl" id="h-qtd-delta">—</span>
-      </div>
-    </div>
-    <div class="mth-col">
-      <div class="mth-lbl">Valor Antecipado MTD</div>
-      <div class="mth-val" id="h-val-atual">—</div>
-      <div class="mth-cmp">
-        <span class="mth-cmp-val" id="h-val-mm1">— mês ant.</span>
-        <span class="mth-delta fl" id="h-val-delta">—</span>
-      </div>
-    </div>
-    <div class="mth-col">
-      <div class="mth-lbl">Primeiras Antecip. MTD</div>
-      <div class="mth-val" id="h-first-atual">—</div>
-      <div class="mth-cmp">
-        <span class="mth-cmp-val" id="h-first-mm1">— mês ant.</span>
-        <span class="mth-delta fl" id="h-first-delta">—</span>
-      </div>
-    </div>
-    <div class="mth-col">
-      <div class="mth-lbl">Usuários Únicos MTD</div>
-      <div class="mth-val" id="h-users-atual">—</div>
-      <div class="mth-cmp">
-        <span class="mth-cmp-val" id="h-users-mm1">— mês ant.</span>
-        <span class="mth-delta fl" id="h-users-delta">—</span>
-      </div>
+  <!-- PERIODO BAR -->
+  <div class="periodo-bar">
+    <div>
+      <div class="periodo-title" id="periodo-title">— vs —</div>
+      <div class="periodo-sub">Comparativo MTD — mesma janela de dias úteis</div>
     </div>
   </div>
 
-  <!-- ── SETOR CARDS ──────────────────────────────────────── -->
-  <div class="sec-lbl">MTD por Setor</div>
-  <div class="setor-grid">
-
-    <div class="setor-card setor-priv">
-      <div class="sc-accent"></div>
-      <div class="sc-header">
-        <div class="sc-name">Private</div>
-        <span class="sc-badge">SETOR</span>
-      </div>
-      <div class="sc-nums">
-        <div>
-          <div class="sc-main-lbl">Antecipações MTD</div>
-          <div class="sc-main-val" id="sc-priv-atual">—</div>
-        </div>
-        <div class="sc-cmp">
-          <div class="sc-cmp-lbl">Mês Anterior</div>
-          <div class="sc-cmp-val" id="sc-priv-mm1">—</div>
-          <div class="sc-delta fl" id="sc-priv-delta">—</div>
-        </div>
-      </div>
-      <div class="sc-sub-row">
-        <span class="sc-sub-lbl">Valor MTD</span>
-        <span class="sc-sub-val" id="sc-priv-valor">—</span>
-      </div>
-      <div class="sc-sub-row">
-        <span class="sc-sub-lbl">Primeiras</span>
-        <span class="sc-sub-val" id="sc-priv-first">—</span>
-      </div>
-      <div class="bars-title">Top Empresas</div>
-      <div id="bars-priv"></div>
-    </div>
-
-    <div class="setor-card setor-grupo">
-      <div class="sc-accent"></div>
-      <div class="sc-header">
-        <div class="sc-name">Grupo</div>
-        <span class="sc-badge">SETOR</span>
-      </div>
-      <div class="sc-nums">
-        <div>
-          <div class="sc-main-lbl">Antecipações MTD</div>
-          <div class="sc-main-val" id="sc-grupo-atual">—</div>
-        </div>
-        <div class="sc-cmp">
-          <div class="sc-cmp-lbl">Mês Anterior</div>
-          <div class="sc-cmp-val" id="sc-grupo-mm1">—</div>
-          <div class="sc-delta fl" id="sc-grupo-delta">—</div>
-        </div>
-      </div>
-      <div class="sc-sub-row">
-        <span class="sc-sub-lbl">Valor MTD</span>
-        <span class="sc-sub-val" id="sc-grupo-valor">—</span>
-      </div>
-      <div class="sc-sub-row">
-        <span class="sc-sub-lbl">Primeiras</span>
-        <span class="sc-sub-val" id="sc-grupo-first">—</span>
-      </div>
-      <div class="bars-title">Top Empresas</div>
-      <div id="bars-grupo"></div>
-    </div>
-
-    <div class="setor-card setor-inss">
-      <div class="sc-accent"></div>
-      <div class="sc-header">
-        <div class="sc-name">INSS</div>
-        <span class="sc-badge">SETOR</span>
-      </div>
-      <div class="sc-nums">
-        <div>
-          <div class="sc-main-lbl">Antecipações MTD</div>
-          <div class="sc-main-val" id="sc-inss-atual">—</div>
-        </div>
-        <div class="sc-cmp">
-          <div class="sc-cmp-lbl">Mês Anterior</div>
-          <div class="sc-cmp-val" id="sc-inss-mm1">—</div>
-          <div class="sc-delta fl" id="sc-inss-delta">—</div>
-        </div>
-      </div>
-      <div class="sc-sub-row">
-        <span class="sc-sub-lbl">Valor MTD</span>
-        <span class="sc-sub-val" id="sc-inss-valor">—</span>
-      </div>
-      <div class="sc-sub-row">
-        <span class="sc-sub-lbl">Primeiras</span>
-        <span class="sc-sub-val" id="sc-inss-first">—</span>
-      </div>
-      <div class="bars-title">Top Empresas</div>
-      <div id="bars-inss"></div>
-    </div>
-
-  </div>
-
-  <!-- ── GRÁFICOS ─────────────────────────────────────────── -->
-  <div class="sec-lbl">Evolução Mensal</div>
-  <div class="crow2">
-    <div class="card">
-      <h2>Antecipações por Mês</h2>
-      <div class="card-sub">Quantidade total · linha de tendência</div>
-      <canvas id="chart-mensal" height="90"></canvas>
-    </div>
-    <div class="card">
-      <h2>Distribuição por Setor</h2>
-      <div class="card-sub">MTD atual · Private · Grupo · INSS</div>
-      <canvas id="chart-setor" height="180"></canvas>
-    </div>
-  </div>
-
-  <!-- ── RANKING EMPRESAS ──────────────────────────────────── -->
-  <div class="sec-lbl">Top Empresas — Último Mês Completo</div>
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:38px">#</th>
-          <th>Empresa</th>
-          <th>Setor</th>
-          <th style="text-align:right">Antecipações</th>
-          <th style="text-align:right">Valor Total</th>
-          <th style="text-align:right">Ticket Médio</th>
-          <th style="text-align:right">Primeiras</th>
-        </tr>
-      </thead>
-      <tbody id="table-empresas">
-        <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Carregando...</td></tr>
-      </tbody>
-    </table>
+  <!-- DASHBOARD GRID -->
+  <div class="dashboard-grid" id="dashboard-grid">
+    <!-- preenchido por renderDashboard() -->
   </div>
 
 </main>
 
 <footer>
-  Benefits Analytics · Atualizado em <span id="footer-date"></span> · Dados simulados — substituir pela query Databricks
+  Benefits Analytics · Atualizado em <span id="footer-date"></span>
 </footer>
 
 <script>
@@ -358,143 +191,104 @@ const DATA = %%DADOS%%;
 // ================================================================
 // HELPERS
 // ================================================================
-const fmtN = n => n.toLocaleString('pt-BR');
-const fmtBRL = n => {
-  if(n >= 1e9) return 'R$ '+(n/1e9).toFixed(2).replace('.',',')+'B';
-  if(n >= 1e6) return 'R$ '+(n/1e6).toFixed(1).replace('.',',')+'M';
-  if(n >= 1e3) return 'R$ '+(n/1e3).toFixed(0)+'k';
-  return 'R$ '+n.toLocaleString('pt-BR');
-};
-function pct(a,b){ return b ? ((a-b)/b*100) : 0; }
-function deltaClass(p){ return p>0?'up':p<0?'dn':'fl'; }
-function deltaText(p){ return (p>0?'↑ +':'↓ ')+Math.abs(p).toFixed(1)+'%'; }
-
-function setDelta(id, atual, ant, cls='mth-delta') {
-  const el = document.getElementById(id);
-  if(!el) return;
-  const p = pct(atual, ant);
-  el.className = cls+' '+deltaClass(p);
-  el.textContent = deltaText(p);
+function fmtVal(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return (n/1e9).toFixed(1).replace('.',',') + 'Bi';
+  if (abs >= 1e6) return (n/1e6).toFixed(0) + 'Mi';
+  if (abs >= 1e3) return (n/1e3).toFixed(0) + 'k';
+  return n.toLocaleString('pt-BR');
 }
-function setKpiDelta(id, atual, ant) {
-  const el = document.getElementById(id);
-  if(!el) return;
-  const p = pct(atual, ant);
-  el.className = 'kpi-delta '+deltaClass(p);
-  el.textContent = deltaText(p)+' vs mês ant.';
+function fmtBRL(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e6) return 'R$ ' + (n/1e6).toFixed(0) + 'Mi';
+  if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(0) + 'K';
+  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
-function setScDelta(id, atual, ant) {
-  const el = document.getElementById(id);
-  if(!el) return;
-  const p = pct(atual, ant);
-  el.className = 'sc-delta '+deltaClass(p);
-  el.textContent = deltaText(p);
+function fmtTicket(n) {
+  if (!n) return '—';
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function delta(cur, prv) {
+  if (!prv) return {cls:'fl', txt:'—'};
+  const p = (cur - prv) / prv * 100;
+  const sign = p >= 0 ? '↑' : '↓';
+  const cls  = p > 0 ? 'up' : p < 0 ? 'dn' : 'fl';
+  return {cls, txt: `${sign}${Math.abs(p).toFixed(2).replace('.',',')}%`};
 }
 
 // ================================================================
-// MTD HERO
+// RENDER
 // ================================================================
-function renderHero() {
+function mc(label, valCur, valPrv, fmt) {
+  const v  = fmt(valCur);
+  const d  = delta(valCur, valPrv);
+  return `<div class="mc">
+    <div class="mc-lbl">${label}</div>
+    <div class="mc-val">${v}</div>
+    <div class="mc-delta ${d.cls}">${d.txt}</div>
+  </div>`;
+}
+
+function renderDashboard() {
   const D = DATA;
-  document.getElementById('h-qtd-atual').textContent   = fmtN(D.mtd_qtd_atual);
-  document.getElementById('h-qtd-mm1').textContent     = fmtN(D.mtd_qtd_mm1)+' mês ant.';
-  setDelta('h-qtd-delta', D.mtd_qtd_atual, D.mtd_qtd_mm1);
+  const CL = D.cur_label  || 'Atual';
+  const PL = D.prev_label || 'Ant.';
 
-  document.getElementById('h-val-atual').textContent   = fmtBRL(D.mtd_val_atual);
-  document.getElementById('h-val-mm1').textContent     = fmtBRL(D.mtd_val_mm1)+' mês ant.';
-  setDelta('h-val-delta', D.mtd_val_atual, D.mtd_val_mm1);
+  document.getElementById('periodo-title').textContent = `${CL} vs ${PL}`;
+  document.getElementById('badge-periodo').textContent = `${CL} vs ${PL}`;
 
-  document.getElementById('h-first-atual').textContent = fmtN(D.mtd_first_atual);
-  document.getElementById('h-first-mm1').textContent   = fmtN(D.mtd_first_mm1)+' mês ant.';
-  setDelta('h-first-delta', D.mtd_first_atual, D.mtd_first_mm1);
+  // ordem de colunas: total, public, private, grupo
+  const COLS = [
+    { key: 'total',   label: 'Total',   pill: 'pill-total'   },
+    { key: 'public',  label: 'Público', pill: 'pill-publico' },
+    { key: 'private', label: 'Privado', pill: 'pill-privado' },
+    { key: 'grupo',   label: 'Grupo',   pill: 'pill-grupo'   },
+  ];
 
-  document.getElementById('h-users-atual').textContent = fmtN(D.mtd_users_atual);
-  document.getElementById('h-users-mm1').textContent   = fmtN(D.mtd_users_mm1)+' mês ant.';
-  setDelta('h-users-delta', D.mtd_users_atual, D.mtd_users_mm1);
-}
+  // agrega total a partir dos setores
+  const allSetores = ['public','private','grupo','INSS'];
+  function sumField(field) {
+    return allSetores.reduce((s,k) => s + ((D.setores[k] && D.setores[k][field]) || 0), 0);
+  }
 
-// KPIs removidos (bloco "Mês Fechado" retirado a pedido)
+  D.setores.total = {
+    vidas:          sumField('vidas'),
+    vidas_prv:      sumField('vidas_prv'),
+    antecipacoes:   sumField('antecipacoes'),
+    antecip_prv:    sumField('antecip_prv'),
+    tpv:            sumField('tpv'),
+    tpv_prv:        sumField('tpv_prv'),
+    abertura:       sumField('abertura'),
+    abertura_prv:   sumField('abertura_prv'),
+    vidas_novas:    sumField('vidas_novas'),
+    vidas_novas_prv:sumField('vidas_novas_prv'),
+  };
 
-// ================================================================
-// SETOR CARDS
-// ================================================================
-function renderSetorCards() {
-  const colors = {private:'#f0883e', grupo:'#bc8cff', inss:'#58a6ff'};
-  ['private','grupo','inss'].forEach(s => {
-    const d = DATA.mtd_por_setor[s];
-    document.getElementById(`sc-${s}-atual`).textContent  = fmtN(d.atual);
-    document.getElementById(`sc-${s}-mm1`).textContent    = fmtN(d.mm1);
-    document.getElementById(`sc-${s}-valor`).textContent  = fmtBRL(d.valor_atual);
-    document.getElementById(`sc-${s}-first`).textContent  = fmtN(d.first_atual);
-    setScDelta(`sc-${s}-delta`, d.atual, d.mm1);
+  const grid = document.getElementById('dashboard-grid');
+  grid.innerHTML = '';
 
-    const max = d.top[0].qtd;
-    document.getElementById(`bars-${s}`).innerHTML = d.top.map(e=>`
-      <div class="bar-row">
-        <span class="bar-lbl" title="${e.nome}">${e.nome}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(e.qtd/max*100)}%;background:${colors[s]}"></div></div>
-        <span class="bar-num">${fmtN(e.qtd)}</span>
+  COLS.forEach(col => {
+    const s = D.setores[col.key];
+    if (!s) return;
+
+    const tk_cur = s.vidas     > 0 ? s.tpv     / s.antecipacoes : 0;
+    const tk_prv = s.vidas_prv > 0 ? s.tpv_prv / s.antecip_prv  : 0;
+
+    const html = `
+    <div class="setor-col">
+      <div class="pill-header ${col.pill}">${col.label}</div>
+      <div class="metrics-grid">
+        ${mc('Vidas Antecipando #',    s.vidas,          s.vidas_prv,       fmtVal)}
+        ${mc('Antecipações #',         s.antecipacoes,   s.antecip_prv,     fmtVal)}
+        ${mc('TPV R$',                 s.tpv,            s.tpv_prv,         fmtBRL)}
+        ${mc('Ticket Médio R$',        tk_cur,           tk_prv,            fmtTicket)}
+        ${mc('Abertura de Conta #',    s.abertura,       s.abertura_prv,    fmtVal)}
+        ${mc('Vidas Novas Antecipando #', s.vidas_novas, s.vidas_novas_prv, fmtVal)}
       </div>
-    `).join('');
-  });
-}
-
-// ================================================================
-// TABELA
-// ================================================================
-function renderTable() {
-  document.getElementById('table-empresas').innerHTML = DATA.empresas.map(e => {
-    const rc = e.rank<=3 ? `r${e.rank}` : '';
-    return `
-    <tr>
-      <td><span class="rank-badge ${rc}">${e.rank}</span></td>
-      <td class="td-val">${e.nome}</td>
-      <td><span class="td-badge badge-${e.setor==='private'?'private':e.setor}">${e.setor}</span></td>
-      <td style="text-align:right" class="td-val">${fmtN(e.qtd)}</td>
-      <td style="text-align:right" class="td-val">${fmtBRL(e.valor)}</td>
-      <td style="text-align:right">${fmtBRL(e.ticket)}</td>
-      <td style="text-align:right">${fmtN(e.first)}</td>
-    </tr>`;
-  }).join('');
-}
-
-// ================================================================
-// GRÁFICOS
-// ================================================================
-function renderCharts() {
-  const C = {green:'#2dc974',blue:'#58a6ff',orange:'#f0883e',purple:'#bc8cff',yellow:'#e3b341'};
-
-  // Mensal
-  new Chart(document.getElementById('chart-mensal'), {
-    type: 'bar',
-    data: {
-      labels: DATA.mensal_labels,
-      datasets: [
-        {type:'line', label:'Valor (R$)', data:DATA.mensal_val, borderColor:C.blue, backgroundColor:'rgba(88,166,255,0.06)', borderWidth:2, pointRadius:3, fill:true, yAxisID:'y2', tension:0.4},
-        {type:'bar',  label:'Qtd',       data:DATA.mensal_qtd, backgroundColor:'rgba(45,201,116,0.7)', borderRadius:5, yAxisID:'y1'}
-      ]
-    },
-    options: {
-      responsive:true,
-      plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11},color:'#8b949e'}}},
-      scales:{
-        y1:{type:'linear',position:'left', ticks:{font:{size:10},color:'#8b949e'},grid:{color:'#21262d'}},
-        y2:{type:'linear',position:'right',ticks:{font:{size:10},color:'#8b949e',callback:v=>fmtBRL(v)},grid:{drawOnChartArea:false}}
-      }
-    }
-  });
-
-  // Setor Donut
-  new Chart(document.getElementById('chart-setor'), {
-    type: 'doughnut',
-    data: {
-      labels: DATA.setor_labels,
-      datasets:[{data:DATA.setor_qtd,backgroundColor:[C.orange,C.purple,C.blue],borderWidth:0,hoverOffset:8}]
-    },
-    options:{
-      responsive:true, cutout:'68%',
-      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11},color:'#8b949e'}}}
-    }
+    </div>`;
+    grid.insertAdjacentHTML('beforeend', html);
   });
 }
 
@@ -503,21 +297,16 @@ function renderCharts() {
 // ================================================================
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
-  document.getElementById('badge-periodo').textContent = '%%UPDATED%%';//('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('footer-date').textContent   = now.toLocaleDateString('pt-BR',{year:'numeric',month:'long',day:'numeric'});
-  renderHero();
-  // renderKPIs removido
-  renderSetorCards();
-  renderTable();
-  renderCharts();
+  document.getElementById('footer-date').textContent =
+    now.toLocaleDateString('pt-BR',{year:'numeric',month:'long',day:'numeric'}) + ' ' +
+    now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
-  // Botão refresh — spin + reload (dados são embarcados no HTML pelo script Python diário)
+  renderDashboard();
+
   document.getElementById('btn-refresh').addEventListener('click', e => {
     e.preventDefault();
-    const btn = document.getElementById('btn-refresh');
-    btn.classList.add('spinning');
-    // force-reload ignorando cache
-    setTimeout(() => { window.location.reload(true); }, 400);
+    document.getElementById('btn-refresh').classList.add('spinning');
+    setTimeout(() => window.location.reload(true), 400);
   });
 });
 </script>
