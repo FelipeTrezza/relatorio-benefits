@@ -268,6 +268,10 @@ function fmtBRL(n) {
   if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(2).replace('.',',') + 'K';
   return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
+function fmtTicket(n) {
+  if (!n) return '—';
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
 function fmtInt(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
   return Math.round(n).toLocaleString('pt-BR');
