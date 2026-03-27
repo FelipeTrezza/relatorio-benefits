@@ -41,13 +41,12 @@
   .hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
   .hdr-right{display:flex;align-items:center;gap:10px}
   .badge-periodo{background:var(--greend);color:var(--greenl);font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;border:1px solid var(--green)}
-  .btn-refresh{display:flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:7px 13px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;white-space:nowrap;text-decoration:none}
+  .btn-refresh{display:flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;white-space:nowrap}
   .btn-refresh:hover{border-color:var(--green);color:var(--greenl);background:#1a2a22}
   .btn-refresh svg{transition:transform .6s}
   .btn-refresh.spinning svg{animation:spin .8s linear infinite}
+  .btn-refresh .upd-ts{font-size:10px;color:var(--muted);font-weight:400}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .cmd-hint{font-size:11px;color:var(--muted);white-space:nowrap}
-  .cmd-hint code{background:var(--surf2);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:11px;color:var(--greenl);font-family:'SF Mono',Menlo,monospace}
 
   /* ── MAIN ─────────────────────────────────────────────────── */
   main{max-width:1520px;margin:0 auto;padding:22px 28px}
@@ -144,11 +143,14 @@
   </div>
   <div class="hdr-right">
     <span class="badge-periodo" id="badge-periodo">—</span>
-    <a class="btn-refresh" id="btn-refresh" href="antecipacoes.html" title="Recarrega a página. Para buscar dados frescos, rode no terminal: atualizar-antecipacoes">
-      <svg id="refresh-icon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
-      Recarregar
-    </a>
-    <div class="cmd-hint">Para dados frescos: <code>atualizar-antecipacoes</code></div>
+    <button class="btn-refresh" id="btn-refresh" onclick="refreshData()" title="Atualizar dados">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+      Atualizar
+      <span class="upd-ts" id="upd-ts"></span>
+    </button>
   </div>
 </header>
 
@@ -358,13 +360,22 @@ document.addEventListener('DOMContentLoaded', () => {
     now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
   renderDashboard();
-
-  document.getElementById('btn-refresh').addEventListener('click', e => {
-    e.preventDefault();
-    document.getElementById('btn-refresh').classList.add('spinning');
-    setTimeout(() => window.location.reload(true), 400);
-  });
 });
+
+function refreshData() {
+  const btn = document.getElementById('btn-refresh');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  btn.title = 'Recarregando...';
+  setTimeout(() => { window.location.reload(); }, 800);
+}
+
+(function setUpdTs(){
+  const el = document.getElementById('upd-ts');
+  if (!el) return;
+  const now = new Date();
+  el.textContent = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+})();
 </script>
 </body>
 </html>
