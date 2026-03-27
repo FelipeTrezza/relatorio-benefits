@@ -268,9 +268,9 @@ function fmtBRL(n) {
   if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(2).replace('.',',') + 'K';
   return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
-function fmtTicket(n) {
-  if (!n) return '—';
-  return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+function fmtInt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return Math.round(n).toLocaleString('pt-BR');
 }
 function delta(cur, prv) {
   if (!prv) return {cls:'fl', txt:'—'};
@@ -347,7 +347,7 @@ function renderDashboard() {
         ${mc('TPV R$',                 s.tpv,            s.tpv_prv,         fmtBRL)}
         ${mc('Ticket Médio R$',        tk_cur,           tk_prv,            fmtTicket)}
         ${mc('Abertura de Conta #',    s.abertura,       s.abertura_prv,    fmtVal)}
-        ${mc('Vidas Novas Antecipando #', s.vidas_novas, s.vidas_novas_prv, fmtVal)}
+        ${mc('Vidas Novas Antecipando #', s.vidas_novas, s.vidas_novas_prv, fmtInt)}
       </div>
     </div>`;
     grid.insertAdjacentHTML('beforeend', html);
