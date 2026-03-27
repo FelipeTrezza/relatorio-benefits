@@ -82,14 +82,9 @@
   .pill-privado{background:linear-gradient(135deg,#3a8a52,#4db870)}
   .pill-grupo  {background:linear-gradient(135deg,#5aa668,#7ec87e)}
 
-  /* ── GRID DE MÉTRICAS: 2 colunas dentro de cada setor ──────── */
-  .metrics-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-  }
+  /* ── GRID DE MÉTRICAS ────────────────────────────────────── */
 
-  /* ── METRIC CARD (estilo da foto: canto arredondado, fundo claro) */
+  /* ── METRIC CARD ─────────────────────────────────────────── */
   .mc{
     background:var(--card-bg);
     border:1px solid var(--card-border);
@@ -98,7 +93,16 @@
     display:flex;
     flex-direction:column;
     gap:5px;
-    min-height:90px;
+    height:100px;          /* altura fixa igual em todos */
+    box-sizing:border-box;
+  }
+  /* grid alinha as linhas pela maior célula → todos ficam igual */
+  .metrics-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-auto-rows:1fr;    /* linhas de altura uniforme */
+    gap:10px;
+    align-items:stretch;
   }
   .mc-lbl{
     font-size:10px;
