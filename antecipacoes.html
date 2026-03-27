@@ -200,11 +200,11 @@
       </div>
     </div>
     <div class="mth-col">
-      <div class="mth-lbl">Primeiras Antecip. MTD</div>
-      <div class="mth-val" id="h-first-atual">—</div>
+      <div class="mth-lbl">Ticket Médio MTD</div>
+      <div class="mth-val" id="h-ticket-atual">—</div>
       <div class="mth-cmp">
-        <span class="mth-cmp-val" id="h-first-mm1">— mês ant.</span>
-        <span class="mth-delta fl" id="h-first-delta">—</span>
+        <span class="mth-cmp-val" id="h-ticket-mm1">— mês ant.</span>
+        <span class="mth-delta fl" id="h-ticket-delta">—</span>
       </div>
     </div>
     <div class="mth-col">
@@ -554,9 +554,11 @@ function renderHero() {
   document.getElementById('h-val-mm1').textContent     = fmtBRL(D.mtd_val_mm1)+' mês ant.';
   setDelta('h-val-delta', D.mtd_val_atual, D.mtd_val_mm1);
 
-  document.getElementById('h-first-atual').textContent = fmtN(D.mtd_first_atual);
-  document.getElementById('h-first-mm1').textContent   = fmtN(D.mtd_first_mm1)+' mês ant.';
-  setDelta('h-first-delta', D.mtd_first_atual, D.mtd_first_mm1);
+  const ticketAtual = D.mtd_qtd_atual > 0 ? Math.round(D.mtd_val_atual / D.mtd_qtd_atual) : 0;
+  const ticketMm1   = D.mtd_qtd_mm1   > 0 ? Math.round(D.mtd_val_mm1   / D.mtd_qtd_mm1)   : 0;
+  document.getElementById('h-ticket-atual').textContent = fmtBRL(ticketAtual);
+  document.getElementById('h-ticket-mm1').textContent   = fmtBRL(ticketMm1)+' mês ant.';
+  setDelta('h-ticket-delta', ticketAtual, ticketMm1);
 
   document.getElementById('h-users-atual').textContent = fmtN(D.mtd_users_atual);
   document.getElementById('h-users-mm1').textContent   = fmtN(D.mtd_users_mm1)+' mês ant.';
