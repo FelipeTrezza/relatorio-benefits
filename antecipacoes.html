@@ -82,7 +82,11 @@
   .kpi-delta.up{color:var(--greenl)} .kpi-delta.dn{color:var(--red)} .kpi-delta.fl{color:var(--muted)}
 
   /* SETOR CARDS */
-  .setor-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+  /* setor-grid: 1 coluna total + N setores, sempre numa linha só */
+  .setor-grid{display:grid;grid-template-columns:repeat(var(--sc-cols,4),1fr);gap:12px;margin-bottom:14px}
+  /* card total tem destaque com borda verde */
+  .setor-total{border-color:var(--green)!important}
+  .setor-total .sc-accent{background:linear-gradient(90deg,var(--green),var(--greenl))}
   .setor-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;position:relative;overflow:hidden}
   .setor-card .sc-accent{position:absolute;top:0;left:0;right:0;height:3px}
   .setor-public .sc-accent{background:var(--greenl)}
@@ -571,31 +575,82 @@ function renderHero() {
 // SETOR CARDS
 // ================================================================
 function renderSetorCards() {
-  // mapeamento chave_dados → { label, classe_css, cor_barra }
   const META = {
     public:  { label:'Público',  cls:'setor-public', cor:'#2dc974' },
     private: { label:'Private',  cls:'setor-priv',   cor:'#f0883e' },
     grupo:   { label:'Grupo',    cls:'setor-grupo',  cor:'#bc8cff' },
     inss:    { label:'INSS',     cls:'setor-inss',   cor:'#58a6ff' },
   };
-
-  const grid = document.getElementById('setor-grid');
-  grid.innerHTML = '';
-
-  // ordem de exibição: public, grupo, private, inss (os que tiverem dados)
   const ORDEM = ['public','grupo','private','inss'];
 
-  ORDEM.forEach(key => {
+  // filtra só os setores com dados
+  const setoresAtivos = ORDEM.filter(k => DATA.mtd_por_setor[k]);
+
+  // ajusta número de colunas: 1 (total) + N setores ativos
+  const totalCols = 1 + setoresAtivos.length;
+  const grid = document.getElementById('setor-grid');
+  grid.style.setProperty('--sc-cols', totalCols);
+  grid.innerHTML = '';
+
+  // ── Card TOTAL ────────────────────────────────────────────────
+  const totAtual = setoresAtivos.reduce((s,k) => s + DATA.mtd_por_setor[k].atual,      0);
+  const totMm1   = setoresAtivos.reduce((s,k) => s + DATA.mtd_por_setor[k].mm1,        0);
+  const totValC  = setoresAtivos.reduce((s,k) => s + DATA.mtd_por_setor[k].valor_atual, 0);
+  const totValP  = setoresAtivos.reduce((s,k) => s + DATA.mtd_por_setor[k].valor_mm1,   0);
+  const tkAtual  = totAtual > 0 ? Math.round(totValC / totAtual) : 0;
+  const tkMm1    = totMm1   > 0 ? Math.round(totValP / totMm1)   : 0;
+
+  function deltaHtml(a, b, cls='sc-delta') {
+    if (!b) return `<div class="${cls} fl">—</div>`;
+    const p = (a - b) / b * 100;
+    const dc = p > 0 ? 'up' : p < 0 ? 'dn' : 'fl';
+    return `<div class="${cls} ${dc}">${p > 0 ? '↑ +' : '↓ '}${Math.abs(p).toFixed(1)}%</div>`;
+  }
+
+  grid.insertAdjacentHTML('beforeend', `
+    <div class="setor-card setor-total">
+      <div class="sc-accent"></div>
+      <div class="sc-header">
+        <div class="sc-name" style="color:var(--greenl)">Total</div>
+        <span class="sc-badge" style="background:rgba(45,201,116,.12);color:var(--greenl);border:1px solid rgba(45,201,116,.25)">GERAL</span>
+      </div>
+      <div class="sc-nums">
+        <div>
+          <div class="sc-main-lbl">Antecipações MTD</div>
+          <div class="sc-main-val">${fmtN(totAtual)}</div>
+        </div>
+        <div class="sc-cmp">
+          <div class="sc-cmp-lbl">Mês Anterior</div>
+          <div class="sc-cmp-val">${fmtN(totMm1)}</div>
+          ${deltaHtml(totAtual, totMm1)}
+        </div>
+      </div>
+      <div class="sc-sub-row">
+        <span class="sc-sub-lbl">Valor MTD</span>
+        <span class="sc-sub-val">${fmtBRL(totValC)}</span>
+      </div>
+      <div class="sc-sub-row">
+        <span class="sc-sub-lbl">Ticket Médio</span>
+        <span class="sc-sub-val">${fmtBRL(tkAtual)}</span>
+      </div>
+      <div class="bars-title">Distribuição por setor</div>
+      ${setoresAtivos.map(k => {
+        const d = DATA.mtd_por_setor[k];
+        const m = META[k];
+        const pct = totAtual > 0 ? Math.round(d.atual / totAtual * 100) : 0;
+        return `<div class="bar-row">
+          <span class="bar-lbl">${m.label}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${m.cor}"></div></div>
+          <span class="bar-num">${pct}%</span>
+        </div>`;
+      }).join('')}
+    </div>`);
+
+  // ── Cards por setor ───────────────────────────────────────────
+  setoresAtivos.forEach(key => {
     const d = DATA.mtd_por_setor[key];
-    if (!d) return;                    // setor sem dados neste período
-
-    const m   = META[key] || { label: key, cls: 'setor-priv', cor: '#8b949e' };
+    const m = META[key];
     const max = d.top && d.top.length ? d.top[0].qtd : 1;
-
-    const pct = (a, b) => b ? ((a - b) / b * 100) : 0;
-    const p   = pct(d.atual, d.mm1);
-    const dCls  = p > 0 ? 'up' : p < 0 ? 'dn' : 'fl';
-    const dText = (p > 0 ? '↑ +' : '↓ ') + Math.abs(p).toFixed(1) + '%';
 
     const barsHtml = (d.top || []).map(e => `
       <div class="bar-row">
@@ -606,11 +661,7 @@ function renderSetorCards() {
         <span class="bar-num">${fmtN(e.qtd)}</span>
       </div>`).join('');
 
-    const firstRow = d.first_atual > 0
-      ? `<div class="sc-sub-row">
-           <span class="sc-sub-lbl">Primeiras</span>
-           <span class="sc-sub-val">${fmtN(d.first_atual)}</span>
-         </div>` : '';
+    const tkS  = d.atual > 0 ? Math.round(d.valor_atual / d.atual) : 0;
 
     grid.insertAdjacentHTML('beforeend', `
       <div class="setor-card ${m.cls}">
@@ -627,14 +678,17 @@ function renderSetorCards() {
           <div class="sc-cmp">
             <div class="sc-cmp-lbl">Mês Anterior</div>
             <div class="sc-cmp-val">${fmtN(d.mm1)}</div>
-            <div class="sc-delta ${dCls}">${dText}</div>
+            ${deltaHtml(d.atual, d.mm1)}
           </div>
         </div>
         <div class="sc-sub-row">
           <span class="sc-sub-lbl">Valor MTD</span>
           <span class="sc-sub-val">${fmtBRL(d.valor_atual)}</span>
         </div>
-        ${firstRow}
+        <div class="sc-sub-row">
+          <span class="sc-sub-lbl">Ticket Médio</span>
+          <span class="sc-sub-val">${fmtBRL(tkS)}</span>
+        </div>
         <div class="bars-title">Top Empresas</div>
         ${barsHtml}
       </div>`);
