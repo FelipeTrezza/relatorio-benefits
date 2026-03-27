@@ -252,16 +252,16 @@ const DATA = {
 function fmtVal(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
   const abs = Math.abs(n);
-  if (abs >= 1e9) return (n/1e9).toFixed(1).replace('.',',') + 'Bi';
-  if (abs >= 1e6) return (n/1e6).toFixed(0) + 'Mi';
-  if (abs >= 1e3) return (n/1e3).toFixed(0) + 'k';
-  return n.toLocaleString('pt-BR');
+  if (abs >= 1e9) return (n/1e9).toFixed(2).replace('.',',') + 'Bi';
+  if (abs >= 1e6) return (n/1e6).toFixed(2).replace('.',',') + 'Mi';
+  if (abs >= 1e3) return (n/1e3).toFixed(2).replace('.',',') + 'k';
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function fmtBRL(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
   const abs = Math.abs(n);
-  if (abs >= 1e6) return 'R$ ' + (n/1e6).toFixed(0) + 'Mi';
-  if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(0) + 'K';
+  if (abs >= 1e6) return 'R$ ' + (n/1e6).toFixed(2).replace('.',',') + 'Mi';
+  if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(2).replace('.',',') + 'K';
   return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function fmtTicket(n) {
