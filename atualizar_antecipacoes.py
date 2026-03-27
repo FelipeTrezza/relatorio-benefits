@@ -4,15 +4,16 @@ Relatório Antecipações de Salário — Atualização Diária
 =======================================================
 Uso:  python3 atualizar_antecipacoes.py
 
-Lógica: mês vigente (MTD até hoje) vs mês anterior (mesmo nº de dias).
-Duas queries paralelas: uma por mês. Rápido e preciso.
+Queries (6 em paralelo):
+  - antecipações: vidas, qtd, TPV por setor × (mês atual | mês anterior)
+  - vidas novas:  1ª antecipação ever, dentro do mês × setor
+  - abertura de contas: via sec_collaborators × setor
 
 Link: https://felipetrezza.github.io/relatorio-benefits/antecipacoes.html
 """
 
 import json, time, sys, warnings, subprocess, re
 from datetime import datetime, date, timedelta
-from collections import defaultdict
 from pathlib import Path
 
 warnings.filterwarnings("ignore")
@@ -25,65 +26,83 @@ TEMPLATE_PATH      = SCRIPT_DIR / "antecipacoes_template.html"
 OUTPUT_PATH        = SCRIPT_DIR / "antecipacoes.html"
 GITHUB_PAGES_URL   = "https://felipetrezza.github.io/relatorio-benefits/antecipacoes.html"
 
-# ── datas ─────────────────────────────────────────────────────────────────────
-def calc_datas():
-    today    = date.today()
-    cur_ini  = today.replace(day=1)
-    prev_ini = (cur_ini - timedelta(days=1)).replace(day=1)
-    # limite superior de cada mês
-    cur_fim  = cur_ini.replace(month=cur_ini.month % 12 + 1) if cur_ini.month < 12 \
-               else cur_ini.replace(year=cur_ini.year+1, month=1)
-    prev_fim = cur_ini  # mês anterior termina no início do atual
-    return {
-        "cur_ini":  cur_ini.strftime("%Y-%m-%d"),
-        "cur_fim":  cur_fim.strftime("%Y-%m-%d"),
-        "prev_ini": prev_ini.strftime("%Y-%m-%d"),
-        "prev_fim": prev_fim.strftime("%Y-%m-%d"),
-        "cur_day":  today.day,
-        "cur_mes":  cur_ini.strftime("%Y-%m"),
-        "prev_mes": prev_ini.strftime("%Y-%m"),
-        "cur_label":  cur_ini.strftime("%b/%y").capitalize(),   # ex: Mar/26
-        "prev_label": prev_ini.strftime("%b/%y").capitalize(),  # ex: Fev/26
-    }
+MESES_PT = {'Jan':'Jan','Feb':'Fev','Mar':'Mar','Apr':'Abr','May':'Mai',
+            'Jun':'Jun','Jul':'Jul','Aug':'Ago','Sep':'Set','Oct':'Out','Nov':'Nov','Dec':'Dez'}
+def label_mes(d):
+    s = d.strftime("%b/%y").capitalize()
+    for en, pt in MESES_PT.items(): s = s.replace(en, pt)
+    return s
 
-# ── query por mês ─────────────────────────────────────────────────────────────
-SQL_MES = """
-SELECT
+SETOR_CASE = """
   CASE
-    WHEN f.account_id = 1420                                     THEN 'INSS'
+    WHEN f.account_id = 1420 THEN 'INSS'
     WHEN f.account_id IN (6,52,57,58,60,62,65,73,100,3170,3675) THEN 'grupo'
-    WHEN f.account_id IS NULL                                    THEN 'INSS'
+    WHEN f.account_id IS NULL THEN 'INSS'
     ELSE coalesce(e.flag_company_sector, 'private')
-  END                                       AS setor,
-  coalesce(upper(f.account_name), 'N/I')   AS secretaria,
-  coalesce(upper(e.company_name), 'N/I')   AS empresa,
-  count(*)                                 AS qtd,
-  round(sum(cast(ar.request_value   AS double)), 2) AS valor_total,
-  count(distinct ar.consumer_id)           AS usuarios_unicos
+  END
+"""
+
+SQL_ANTECIP = """
+SELECT
+  {setor} AS setor,
+  count(distinct ar.consumer_id)                      AS vidas,
+  count(*)                                            AS antecipacoes,
+  round(sum(cast(ar.request_value AS double)), 2)     AS tpv
 FROM benefits.anticipation_request ar
 LEFT JOIN benefits.companies e ON ar.company_id = e.company_id
 LEFT JOIN benefits.accounts  f ON e.account_id  = f.account_id
 WHERE ar.request_status = 'FINISH'
-  AND ar.created_at >= '{ini}'
-  AND ar.created_at <  '{fim}'
-  {filtro_dia}
-GROUP BY 1,2,3
-ORDER BY 1,3 DESC
-"""
+  AND ar.created_at >= '{{ini}}'
+  AND ar.created_at <  '{{fim}}'
+  AND day(ar.created_at) <= {{d}}
+GROUP BY 1
+""".format(setor=SETOR_CASE)
 
-# primeiras antecipações no mês (consumers que anteciparam pela 1ª vez)
-SQL_PRIM_MES = """
-SELECT count(*) AS primeiras
-FROM (
-  SELECT consumer_id
-  FROM benefits.anticipation_request
-  WHERE request_status = 'FINISH'
-  GROUP BY 1
-  HAVING min(created_at) >= '{ini}'
-     AND min(created_at) <  '{fim}'
-     {filtro_dia_having}
-) sub
-"""
+SQL_NOVAS = """
+SELECT
+  {setor} AS setor,
+  count(distinct ar.consumer_id) AS vidas_novas
+FROM benefits.anticipation_request ar
+LEFT JOIN benefits.companies e ON ar.company_id = e.company_id
+LEFT JOIN benefits.accounts  f ON e.account_id  = f.account_id
+WHERE ar.request_status = 'FINISH'
+  AND ar.created_at >= '{{ini}}'
+  AND ar.created_at <  '{{fim}}'
+  AND day(ar.created_at) <= {{d}}
+  AND ar.consumer_id NOT IN (
+    SELECT DISTINCT consumer_id
+    FROM benefits.anticipation_request
+    WHERE request_status = 'FINISH'
+      AND created_at < '{{ini}}'
+  )
+GROUP BY 1
+""".format(setor=SETOR_CASE)
+
+SQL_ABERTURA = """
+WITH base AS (
+  SELECT
+    sc.collaborator_document,
+    sc.company_id
+  FROM benefits.sec_collaborators sc
+  INNER JOIN consumers.sec_consumers cc ON cc.cpf = sc.collaborator_document
+  INNER JOIN consumers.consumers c      ON c.consumer_id = cc.consumer_id
+  WHERE c.sent_bacen_at >= '{{ini}}'
+    AND c.sent_bacen_at <  '{{fim}}'
+    AND day(c.sent_bacen_at) <= {{d}}
+    AND c.sent_bacen_at IS NOT NULL
+  QUALIFY row_number() OVER (PARTITION BY sc.collaborator_document ORDER BY sc.collaborator_id DESC) = 1
+)
+SELECT
+  {setor} AS setor,
+  count(*) AS abertura_contas
+FROM base b
+LEFT JOIN benefits.companies e ON b.company_id = e.company_id
+LEFT JOIN benefits.accounts  f ON e.account_id = f.account_id
+GROUP BY 1
+""".format(setor=SETOR_CASE)
+
+def fmt(sql, ini, fim, d):
+    return sql.replace("{ini}", str(ini)).replace("{fim}", str(fim)).replace("{d}", str(d))
 
 # ── auth ──────────────────────────────────────────────────────────────────────
 def check_auth():
@@ -104,125 +123,76 @@ def submit(w, sql):
         warehouse_id=WAREHOUSE_ID, statement=sql, wait_timeout="0s")
     return r.statement_id
 
-def poll(w, sid, label="", timeout=300):
+def poll_all(w, stmts, timeout=300):
     from databricks.sdk.service.sql import StatementState
+    results = {}
+    pending = dict(stmts)
     elapsed = 0
-    while elapsed < timeout:
+    while pending and elapsed < timeout:
         time.sleep(10); elapsed += 10
-        s = w.statement_execution.get_statement(sid)
-        st = s.status.state
-        print(f"   [{elapsed:>3}s] {label} {st}     ", end="\r", flush=True)
-        if st == StatementState.SUCCEEDED:
-            print(f"\n   ✅ {label} ({elapsed}s)")
-            cols = [c.name for c in s.manifest.schema.columns]
-            return [dict(zip(cols, r)) for r in (s.result.data_array or [])]
-        if st in (StatementState.FAILED, StatementState.CANCELED):
-            raise RuntimeError(f"{label} falhou: {s.status.error.message if s.status.error else '?'}")
-    raise TimeoutError(f"{label} timeout")
+        done = []
+        for key, sid in pending.items():
+            s = w.statement_execution.get_statement(sid)
+            st = s.status.state
+            if st == StatementState.SUCCEEDED:
+                cols = [c.name for c in s.manifest.schema.columns]
+                results[key] = [dict(zip(cols, r)) for r in (s.result.data_array or [])]
+                print(f"   ✅ {key}: {len(results[key])} linhas")
+                done.append(key)
+            elif st in (StatementState.FAILED, StatementState.CANCELED):
+                results[key] = []
+                print(f"   ❌ {key}: {s.status.error.message if s.status.error else '?'}")
+                done.append(key)
+        for k in done: del pending[k]
+        if pending:
+            print(f"   [{elapsed}s] aguardando: {list(pending.keys())}", end="\r")
+    return results
 
 # ── transform ─────────────────────────────────────────────────────────────────
-def agg_mes(rows):
-    """Agrega linhas de um mês em totais por setor e top-5 empresas."""
-    by_setor = defaultdict(lambda: {"qtd":0,"valor":0.0,"usuarios":0})
-    by_emp   = defaultdict(lambda: {"setor":"","qtd":0,"valor":0.0})
+def build_data(raw, cur_ini, prev_ini, cur_day):
+    def idx(rows): return {r['setor']: r for r in rows}
 
-    for r in rows:
-        sk  = r["setor"]
-        emp = r["empresa"]
-        q   = int(r["qtd"]        or 0)
-        v   = float(r["valor_total"] or 0)
-        u   = int(r["usuarios_unicos"] or 0)
+    ac  = idx(raw.get('antecip_cur',  []))
+    ap  = idx(raw.get('antecip_prev', []))
+    nc  = idx(raw.get('novas_cur',    []))
+    np_ = idx(raw.get('novas_prev',   []))
+    bc  = idx(raw.get('abertura_cur', []))
+    bp  = idx(raw.get('abertura_prev',[]))
 
-        by_setor[sk]["qtd"]    += q
-        by_setor[sk]["valor"]  += v
-        by_setor[sk]["usuarios"] += u
-        by_emp[emp]["setor"]    = sk
-        by_emp[emp]["qtd"]     += q
-        by_emp[emp]["valor"]   += v
-
-    # top-5 por setor
-    def top5(sk):
-        items = [(e,d["qtd"]) for e,d in by_emp.items() if d["setor"]==sk and d["qtd"]>0]
-        items.sort(key=lambda x:x[1], reverse=True)
-        return [{"nome":e[:22],"qtd":q} for e,q in items[:5]]
-
-    result = {}
-    for sk, d in by_setor.items():
-        result[sk] = {**d, "top": top5(sk)}
-    return result, by_emp
-
-def build_data(cur_rows, prev_rows, prim_cur, prim_prev, datas):
-    cur_agg,  cur_emp  = agg_mes(cur_rows)
-    prev_agg, prev_emp = agg_mes(prev_rows)
-
-    ORDEM = ['public','grupo','private','INSS']
-    LABELS = {'public':'Público','private':'Private','grupo':'Grupo','INSS':'INSS'}
-
-    # totais gerais
-    def tot(agg, field): return sum(d[field] for d in agg.values())
-
-    tot_qtd_c = tot(cur_agg,  "qtd");   tot_qtd_p = tot(prev_agg, "qtd")
-    tot_val_c = tot(cur_agg,  "valor"); tot_val_p = tot(prev_agg, "valor")
-    tot_usr_c = tot(cur_agg,  "usuarios"); tot_usr_p = tot(prev_agg, "usuarios")
-    tk_c = round(tot_val_c/tot_qtd_c) if tot_qtd_c else 0
-    tk_p = round(tot_val_p/tot_qtd_p) if tot_qtd_p else 0
-
-    # mtd_por_setor
-    setores_presentes = sorted(set(list(cur_agg.keys())+list(prev_agg.keys())),
-                                key=lambda x: ORDEM.index(x) if x in ORDEM else 99)
-    mtd_por_setor = {}
-    for sk in setores_presentes:
-        cd = cur_agg.get(sk,  {"qtd":0,"valor":0.0,"top":[]})
-        pd = prev_agg.get(sk, {"qtd":0,"valor":0.0,"top":[]})
-        slabel = sk.lower() if sk not in ('INSS',) else 'inss'
-        mtd_por_setor[slabel] = {
-            "atual":       cd["qtd"],
-            "mm1":         pd["qtd"],
-            "valor_atual": round(cd["valor"]),
-            "valor_mm1":   round(pd["valor"]),
-            "top":         cd.get("top", []),
+    setores = {}
+    for sk in ['public', 'private', 'grupo', 'INSS']:
+        q_c = int((ac.get(sk) or {}).get('antecipacoes', 0) or 0)
+        q_p = int((ap.get(sk) or {}).get('antecipacoes', 0) or 0)
+        ab_c = int((bc.get(sk) or {}).get('abertura_contas', 0) or 0)
+        ab_p = int((bp.get(sk) or {}).get('abertura_contas', 0) or 0)
+        # inclui setor se tiver antecipações OU abertura de conta
+        if q_c == 0 and q_p == 0 and ab_c == 0 and ab_p == 0:
+            continue
+        setores[sk] = {
+            'vidas':            int((ac.get(sk) or {}).get('vidas', 0) or 0),
+            'vidas_prv':        int((ap.get(sk) or {}).get('vidas', 0) or 0),
+            'antecipacoes':     q_c,
+            'antecip_prv':      q_p,
+            'tpv':              float((ac.get(sk) or {}).get('tpv', 0) or 0),
+            'tpv_prv':          float((ap.get(sk) or {}).get('tpv', 0) or 0),
+            'abertura':         ab_c,
+            'abertura_prv':     ab_p,
+            'vidas_novas':      int((nc.get(sk) or {}).get('vidas_novas', 0) or 0),
+            'vidas_novas_prv':  int((np_.get(sk) or {}).get('vidas_novas', 0) or 0),
         }
 
-    # donut (setor cur)
-    donut_labels, donut_qtd = [], []
-    for sk in ORDEM:
-        q = cur_agg.get(sk,{}).get("qtd",0)
-        if q > 0:
-            donut_labels.append(LABELS.get(sk, sk))
-            donut_qtd.append(q)
-
-    # top-10 empresas geral (mês atual)
-    top10 = sorted(cur_emp.items(), key=lambda x:x[1]["qtd"], reverse=True)[:10]
-    empresas = []
-    for i,(nome,d) in enumerate(top10,1):
-        tk = round(d["valor"]/d["qtd"]) if d["qtd"] else 0
-        empresas.append({"rank":i,"nome":nome[:30],"setor":d["setor"],
-                         "qtd":d["qtd"],"valor":round(d["valor"]),"ticket":tk})
-
     return {
-        # hero
-        "cur_label":  datas["cur_label"],
-        "prev_label": datas["prev_label"],
-        "mtd_qtd_atual":   tot_qtd_c,   "mtd_qtd_mm1":   tot_qtd_p,
-        "mtd_val_atual":   round(tot_val_c), "mtd_val_mm1": round(tot_val_p),
-        "mtd_users_atual": tot_usr_c,   "mtd_users_mm1": tot_usr_p,
-        "mtd_first_atual": prim_cur,    "mtd_first_mm1": prim_prev,
-        # setor
-        "setor_labels": donut_labels, "setor_qtd": donut_qtd,
-        "mtd_por_setor": mtd_por_setor,
-        # tabela
-        "empresas": empresas,
+        'cur_label':  label_mes(cur_ini),
+        'prev_label': label_mes(prev_ini),
+        'setores':    setores,
     }
 
 # ── html ──────────────────────────────────────────────────────────────────────
-def generate_html(data, datas):
+def generate_html(data):
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
-    now_str  = datetime.now().strftime("%d/%m/%Y %H:%M")
-    periodo  = f"{datas['cur_label']} vs {datas['prev_label']}"
-    html = (template
-            .replace("%%DADOS%%",   json.dumps(data, ensure_ascii=False))
-            .replace("%%UPDATED%%", now_str)
-            .replace("%%PERIODO%%", periodo))
+    new_data = f"const DATA = {json.dumps(data, ensure_ascii=False, indent=2)};"
+    html = re.sub(r'const DATA = %%DADOS%%;', new_data, template)
+    html = re.sub(r'const DATA = \{[\s\S]*?\n\};', new_data, html)
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     print(f"📄 {OUTPUT_PATH.name} ({OUTPUT_PATH.stat().st_size//1024} KB)")
 
@@ -257,33 +227,29 @@ def main():
     from databricks.sdk import WorkspaceClient
     w = WorkspaceClient(host=DATABRICKS_HOST, profile=DATABRICKS_PROFILE)
 
-    datas = calc_datas()
-    print(f"\n[2/4] Período: {datas['cur_label']} (até dia {datas['cur_day']}) vs {datas['prev_label']} (mesmo período)")
-    print(f"      cur:  {datas['cur_ini']} → hoje")
-    print(f"      prev: {datas['prev_ini']} → dia {datas['cur_day']}")
+    today    = date.today()
+    cur_ini  = today.replace(day=1)
+    prev_ini = (cur_ini - timedelta(days=1)).replace(day=1)
+    cur_fim  = cur_ini.replace(month=cur_ini.month % 12 + 1) if cur_ini.month < 12 \
+               else cur_ini.replace(year=cur_ini.year+1, month=1)
+    prev_fim = cur_ini
+    cur_day  = today.day
 
-    # filtro de dia: mês atual = até hoje; mês anterior = mesmo dia
-    filtro_cur  = f"AND day(ar.created_at) <= {datas['cur_day']}"
-    filtro_prev = f"AND day(ar.created_at) <= {datas['cur_day']}"
+    print(f"\n[2/4] Período: {label_mes(cur_ini)} (dia≤{cur_day}) vs {label_mes(prev_ini)}")
 
-    sid_cur  = submit(w, SQL_MES.format(ini=datas["cur_ini"],  fim=datas["cur_fim"],  filtro_dia=filtro_cur))
-    sid_prev = submit(w, SQL_MES.format(ini=datas["prev_ini"], fim=datas["prev_fim"], filtro_dia=filtro_prev))
-    sid_pc   = submit(w, SQL_PRIM_MES.format(ini=datas["cur_ini"],  fim=datas["cur_fim"],
-                                              filtro_dia_having=f"AND day(min(created_at)) <= {datas['cur_day']}"))
-    sid_pp   = submit(w, SQL_PRIM_MES.format(ini=datas["prev_ini"], fim=datas["prev_fim"],
-                                              filtro_dia_having=f"AND day(min(created_at)) <= {datas['cur_day']}"))
-    print(f"   4 queries submetidas em paralelo")
+    stmts = {}
+    for periodo, ini, fim in [("cur", cur_ini, cur_fim), ("prev", prev_ini, prev_fim)]:
+        for nome, sql in [("antecip",SQL_ANTECIP),("novas",SQL_NOVAS),("abertura",SQL_ABERTURA)]:
+            stmts[f"{nome}_{periodo}"] = submit(w, fmt(sql, ini, fim, cur_day))
+    print(f"   {len(stmts)} queries submetidas em paralelo")
 
-    cur_rows  = poll(w, sid_cur,  f"{datas['cur_label']}")
-    prev_rows = poll(w, sid_prev, f"{datas['prev_label']}")
-    prim_cur  = int((poll(w, sid_pc, "Primeiras cur") [0] or {}).get("primeiras", 0) or 0)
-    prim_prev = int((poll(w, sid_pp, "Primeiras prev")[0] or {}).get("primeiras", 0) or 0)
+    raw = poll_all(w, stmts)
 
-    print(f"\n[3/4] Transformando dados...")
-    data = build_data(cur_rows, prev_rows, prim_cur, prim_prev, datas)
-    print(f"   MTD {datas['cur_label']}: {data['mtd_qtd_atual']:,} antecip | R$ {data['mtd_val_atual']:,.0f}")
-    print(f"   MTD {datas['prev_label']}: {data['mtd_qtd_mm1']:,} antecip | R$ {data['mtd_val_mm1']:,.0f}")
-    generate_html(data, datas)
+    print("\n[3/4] Transformando dados...")
+    data = build_data(raw, cur_ini, prev_ini, cur_day)
+    for sk, d in data['setores'].items():
+        print(f"   {sk}: vidas={d['vidas']:,} antecip={d['antecipacoes']:,} tpv=R${d['tpv']:,.0f} abertura={d['abertura']:,} novas={d['vidas_novas']:,}")
+    generate_html(data)
 
     print("\n[4/4] Publicando...")
     git_push()
