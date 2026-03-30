@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
 Relatório Antecipações PIX — Atualização Diária
-=======================================================
+================================================
 Uso:  python3 atualizar_pix.py
 
-Queries (6 em paralelo):
-  - antecipações: vidas, qtd, TPV por setor × (mês atual | mês anterior)
-  - vidas novas:  1ª antecipação ever, dentro do mês × setor
-  - abertura de contas: via sec_collaborators × setor
+2 queries paralelas por mês (atual + anterior):
+  - antecip: vidas, qtd, TPV, vidas novas — filtrado cashin_destiny='PIX'
+  - abertura: abertura de contas por setor
 
 Link: https://felipetrezza.github.io/relatorio-benefits/pix.html
 """
@@ -42,67 +41,82 @@ SETOR_CASE = """
   END
 """
 
-SQL_ANTECIP = """
-SELECT
-  {setor} AS setor,
-  count(distinct ar.consumer_id)                      AS vidas,
-  count(*)                                            AS antecipacoes,
-  round(sum(cast(ar.request_value AS double)), 2)     AS tpv
-FROM benefits.anticipation_request ar
-LEFT JOIN benefits.companies e ON ar.company_id = e.company_id
-LEFT JOIN benefits.accounts  f ON e.account_id  = f.account_id
-WHERE ar.request_status = 'FINISH'
-  AND ar.created_at >= '{{ini}}'
-  AND ar.created_at <  '{{fim}}'
-  AND day(ar.created_at) <= {{d}}
-GROUP BY 1
-""".format(setor=SETOR_CASE)
-
-SQL_NOVAS = """
-SELECT
-  {setor} AS setor,
-  count(distinct ar.consumer_id) AS vidas_novas
-FROM benefits.anticipation_request ar
-LEFT JOIN benefits.companies e ON ar.company_id = e.company_id
-LEFT JOIN benefits.accounts  f ON e.account_id  = f.account_id
-WHERE ar.request_status = 'FINISH'
-  AND ar.created_at >= '{{ini}}'
-  AND ar.created_at <  '{{fim}}'
-  AND day(ar.created_at) <= {{d}}
-  AND ar.consumer_id NOT IN (
-    SELECT DISTINCT consumer_id
-    FROM benefits.anticipation_request
-    WHERE request_status = 'FINISH'
-      AND created_at < '{{ini}}'
-  )
-GROUP BY 1
-""".format(setor=SETOR_CASE)
-
-SQL_ABERTURA = """
-WITH base AS (
+def sql_antecip(cur_mes, prev_mes, cur_ini, prev_ini, cur_day):
+    """Query PIX com flags MTD embutidos — datas passadas como literais."""
+    return f"""
+WITH pri_antecipacao AS (
+  SELECT consumer_id, min(created_at) AS dt_pri
+  FROM benefits.anticipation_request
+  WHERE request_status = 'FINISH'
+  GROUP BY 1
+),
+fim AS (
   SELECT
-    sc.collaborator_document,
-    sc.company_id
+    {SETOR_CASE} AS setor,
+    ar.consumer_id,
+    ar.request_value,
+    CASE WHEN pa.consumer_id IS NULL THEN 0 ELSE 1 END AS fl_pri,
+    CASE WHEN date_format(ar.created_at,'yyyy-MM') = '{cur_mes}'
+              AND day(ar.created_at) <= {cur_day} THEN 1 ELSE 0 END AS fl_cur,
+    CASE WHEN date_format(ar.created_at,'yyyy-MM') = '{prev_mes}'
+              AND day(ar.created_at) <= {cur_day} THEN 1 ELSE 0 END AS fl_prv
+  FROM benefits.anticipation_request ar
+  LEFT JOIN benefits.companies e ON ar.company_id = e.company_id
+  LEFT JOIN benefits.accounts  f ON e.account_id  = f.account_id
+  LEFT JOIN pri_antecipacao pa
+         ON ar.consumer_id = pa.consumer_id AND ar.created_at = pa.dt_pri
+  WHERE ar.request_status = 'FINISH'
+    AND ar.cashin_destiny = 'PIX'
+    AND ar.created_at >= '{prev_ini}'
+)
+SELECT
+  setor,
+  count(distinct CASE WHEN fl_cur=1 THEN consumer_id END)                     AS vidas_cur,
+  count(CASE WHEN fl_cur=1 THEN 1 END)                                        AS antecip_cur,
+  round(sum(CASE WHEN fl_cur=1 THEN request_value ELSE 0 END), 2)             AS tpv_cur,
+  count(distinct CASE WHEN fl_cur=1 AND fl_pri=1 THEN consumer_id END)        AS novas_cur,
+  count(distinct CASE WHEN fl_prv=1 THEN consumer_id END)                     AS vidas_prv,
+  count(CASE WHEN fl_prv=1 THEN 1 END)                                        AS antecip_prv,
+  round(sum(CASE WHEN fl_prv=1 THEN request_value ELSE 0 END), 2)             AS tpv_prv,
+  count(distinct CASE WHEN fl_prv=1 AND fl_pri=1 THEN consumer_id END)        AS novas_prv
+FROM fim
+GROUP BY 1
+ORDER BY 1
+"""
+
+def sql_abertura(cur_mes, prev_mes, cur_ini, prev_ini, cur_day):
+    """Abertura de contas por setor — mês atual e anterior."""
+    return f"""
+WITH base AS (
+  SELECT sc.collaborator_document, sc.company_id
   FROM benefits.sec_collaborators sc
   INNER JOIN consumers.sec_consumers cc ON cc.cpf = sc.collaborator_document
   INNER JOIN consumers.consumers c      ON c.consumer_id = cc.consumer_id
-  WHERE c.sent_bacen_at >= '{{ini}}'
-    AND c.sent_bacen_at <  '{{fim}}'
-    AND day(c.sent_bacen_at) <= {{d}}
+  WHERE c.sent_bacen_at >= '{prev_ini}'
     AND c.sent_bacen_at IS NOT NULL
   QUALIFY row_number() OVER (PARTITION BY sc.collaborator_document ORDER BY sc.collaborator_id DESC) = 1
+),
+flagged AS (
+  SELECT
+    {SETOR_CASE} AS setor,
+    CASE WHEN date_format(c.sent_bacen_at,'yyyy-MM') = '{cur_mes}'
+              AND day(c.sent_bacen_at) <= {cur_day} THEN 1 ELSE 0 END AS fl_cur,
+    CASE WHEN date_format(c.sent_bacen_at,'yyyy-MM') = '{prev_mes}'
+              AND day(c.sent_bacen_at) <= {cur_day} THEN 1 ELSE 0 END AS fl_prv
+  FROM base b
+  INNER JOIN consumers.sec_consumers cc ON cc.cpf = b.collaborator_document
+  INNER JOIN consumers.consumers c      ON c.consumer_id = cc.consumer_id
+  LEFT JOIN  benefits.companies e       ON b.company_id = e.company_id
+  LEFT JOIN  benefits.accounts  f       ON e.account_id = f.account_id
 )
 SELECT
-  {setor} AS setor,
-  count(*) AS abertura_contas
-FROM base b
-LEFT JOIN benefits.companies e ON b.company_id = e.company_id
-LEFT JOIN benefits.accounts  f ON e.account_id = f.account_id
+  setor,
+  sum(fl_cur) AS abertura_cur,
+  sum(fl_prv) AS abertura_prv
+FROM flagged
 GROUP BY 1
-""".format(setor=SETOR_CASE)
-
-def fmt(sql, ini, fim, d):
-    return sql.replace("{ini}", str(ini)).replace("{fim}", str(fim)).replace("{d}", str(d))
+ORDER BY 1
+"""
 
 # ── auth ──────────────────────────────────────────────────────────────────────
 def check_auth():
@@ -149,36 +163,30 @@ def poll_all(w, stmts, timeout=300):
     return results
 
 # ── transform ─────────────────────────────────────────────────────────────────
-def build_data(raw, cur_ini, prev_ini, cur_day):
-    def idx(rows): return {r['setor']: r for r in rows}
-
-    ac  = idx(raw.get('antecip_cur',  []))
-    ap  = idx(raw.get('antecip_prev', []))
-    nc  = idx(raw.get('novas_cur',    []))
-    np_ = idx(raw.get('novas_prev',   []))
-    bc  = idx(raw.get('abertura_cur', []))
-    bp  = idx(raw.get('abertura_prev',[]))
+def build_data(raw, cur_ini, prev_ini):
+    ac = {r['setor']: r for r in raw.get('antecip',  [])}
+    bc = {r['setor']: r for r in raw.get('abertura', [])}
 
     setores = {}
     for sk in ['public', 'private', 'grupo', 'INSS']:
-        q_c = int((ac.get(sk) or {}).get('antecipacoes', 0) or 0)
-        q_p = int((ap.get(sk) or {}).get('antecipacoes', 0) or 0)
-        ab_c = int((bc.get(sk) or {}).get('abertura_contas', 0) or 0)
-        ab_p = int((bp.get(sk) or {}).get('abertura_contas', 0) or 0)
-        # inclui setor se tiver antecipações OU abertura de conta
-        if q_c == 0 and q_p == 0 and ab_c == 0 and ab_p == 0:
+        a = ac.get(sk, {}); b = bc.get(sk, {})
+        qc   = int(a.get('antecip_cur',   0) or 0)
+        qp   = int(a.get('antecip_prv',   0) or 0)
+        ab_c = int(b.get('abertura_cur',  0) or 0)
+        ab_p = int(b.get('abertura_prv',  0) or 0)
+        if qc == 0 and qp == 0 and ab_c == 0 and ab_p == 0:
             continue
         setores[sk] = {
-            'vidas':            int((ac.get(sk) or {}).get('vidas', 0) or 0),
-            'vidas_prv':        int((ap.get(sk) or {}).get('vidas', 0) or 0),
-            'antecipacoes':     q_c,
-            'antecip_prv':      q_p,
-            'tpv':              float((ac.get(sk) or {}).get('tpv', 0) or 0),
-            'tpv_prv':          float((ap.get(sk) or {}).get('tpv', 0) or 0),
+            'vidas':            int(a.get('vidas_cur',   0) or 0),
+            'vidas_prv':        int(a.get('vidas_prv',   0) or 0),
+            'antecipacoes':     qc,
+            'antecip_prv':      qp,
+            'tpv':              float(a.get('tpv_cur',   0) or 0),
+            'tpv_prv':          float(a.get('tpv_prv',   0) or 0),
             'abertura':         ab_c,
             'abertura_prv':     ab_p,
-            'vidas_novas':      int((nc.get(sk) or {}).get('vidas_novas', 0) or 0),
-            'vidas_novas_prv':  int((np_.get(sk) or {}).get('vidas_novas', 0) or 0),
+            'vidas_novas':      int(a.get('novas_cur',   0) or 0),
+            'vidas_novas_prv':  int(a.get('novas_prv',   0) or 0),
         }
 
     return {
@@ -191,7 +199,7 @@ def build_data(raw, cur_ini, prev_ini, cur_day):
 def generate_html(data):
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     new_data = f"const DATA = {json.dumps(data, ensure_ascii=False, indent=2)};"
-    html = re.sub(r'const DATA = %%DADOS%%;', new_data, template)
+    html = re.sub(r'const DATA = %%DADOS%%;',      new_data, template)
     html = re.sub(r'const DATA = \{[\s\S]*?\n\};', new_data, html)
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     print(f"📄 {OUTPUT_PATH.name} ({OUTPUT_PATH.stat().st_size//1024} KB)")
@@ -201,7 +209,7 @@ def git_push():
     now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
     for cmd in [
         ["git","-C",str(SCRIPT_DIR),"add","pix.html"],
-        ["git","-C",str(SCRIPT_DIR),"commit","-m",f"chore: antecipacoes — {now_str}"],
+        ["git","-C",str(SCRIPT_DIR),"commit","-m",f"chore: pix — {now_str}"],
         ["git","-C",str(SCRIPT_DIR),"push","origin","main"],
     ]:
         r = subprocess.run(cmd, capture_output=True, text=True)
@@ -230,43 +238,24 @@ def main():
     today    = date.today()
     cur_ini  = today.replace(day=1)
     prev_ini = (cur_ini - timedelta(days=1)).replace(day=1)
-    cur_fim  = cur_ini.replace(month=cur_ini.month % 12 + 1) if cur_ini.month < 12 \
-               else cur_ini.replace(year=cur_ini.year+1, month=1)
-    prev_fim = cur_ini
+    cur_mes  = cur_ini.strftime("%Y-%m")
+    prev_mes = prev_ini.strftime("%Y-%m")
     cur_day  = today.day
 
     print(f"\n[2/4] Período: {label_mes(cur_ini)} (dia≤{cur_day}) vs {label_mes(prev_ini)}")
 
-    stmts = {}
-    today   = date.today()
-    cur_day = today.day
-    stmts["antecip"]  = submit(w, SQL_ANTECIP.replace("{d}", str(cur_day)))
-    stmts["abertura"] = submit(w, SQL_ABERTURA.replace("{d}", str(cur_day)))
+    stmts = {
+        "antecip":  submit(w, sql_antecip( cur_mes, prev_mes, cur_ini, prev_ini, cur_day)),
+        "abertura": submit(w, sql_abertura(cur_mes, prev_mes, cur_ini, prev_ini, cur_day)),
+    }
     print(f"   2 queries submetidas em paralelo")
 
     raw = poll_all(w, stmts)
 
     print("\n[3/4] Transformando dados...")
-    ac = {r["setor"]: r for r in raw.get("antecip",  [])}
-    bc = {r["setor"]: r for r in raw.get("abertura", [])}
-
-    setores = {}
-    for sk in ["public","private","grupo","INSS"]:
-        a = ac.get(sk, {}); b = bc.get(sk, {})
-        qc = int(a.get("antecip_cur", 0) or 0); qp = int(a.get("antecip_prv", 0) or 0)
-        ac_v = int(b.get("abertura_cur", 0) or 0); ap_v = int(b.get("abertura_prv", 0) or 0)
-        if qc == 0 and qp == 0 and ac_v == 0 and ap_v == 0: continue
-        setores[sk] = {
-            "vidas": int(a.get("vidas_cur",0) or 0), "vidas_prv": int(a.get("vidas_prv",0) or 0),
-            "antecipacoes": qc, "antecip_prv": qp,
-            "tpv": float(a.get("tpv_cur",0) or 0), "tpv_prv": float(a.get("tpv_prv",0) or 0),
-            "abertura": ac_v, "abertura_prv": ap_v,
-            "vidas_novas": int(a.get("novas_cur",0) or 0), "vidas_novas_prv": int(a.get("novas_prv",0) or 0),
-        }
-        d = setores[sk]
+    data = build_data(raw, cur_ini, prev_ini)
+    for sk, d in data['setores'].items():
         print(f"   {sk}: vidas={d['vidas']:,} antecip={d['antecipacoes']:,} tpv=R${d['tpv']:,.0f} abertura={d['abertura']:,} novas={d['vidas_novas']:,}")
-
-    data = {"cur_label": label_mes(cur_ini), "prev_label": label_mes(prev_ini), "setores": setores}
     generate_html(data)
 
     print("\n[4/4] Publicando...")

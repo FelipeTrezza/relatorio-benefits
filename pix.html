@@ -173,7 +173,7 @@
 
   <a class="nav-tab active" href="pix.html">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 2a.5.5 0 0 1 .5.5V6h3.5a.5.5 0 0 1 0 1H10v3.5a.5.5 0 0 1-1 0V7H5.5a.5.5 0 0 1 0-1H9V2.5a.5.5 0 0 1 .5-.5z"/></svg>
-    Antecipações
+    PIX
   </a>
 </nav>
 
@@ -406,17 +406,7 @@ function refreshData() {
     })
     .catch(() => {
       // Servidor não está rodando
-      const msg = 'Servidor local não encontrado.
-
-' +
-        'Para ativar o botão Atualizar, abra um terminal e rode:
-
-' +
-        '  cd ~/relatorio-benefits && python3 server.py
-
-' +
-        'Deixe o terminal aberto enquanto usa os relatórios.';
-      alert(msg);
+      alert('Servidor local não encontrado.\n\nAbra um terminal e rode:\n  cd ~/relatorio-benefits && python3 server.py\n\nDeixe o terminal aberto enquanto usa os relatórios.');
     });
 }
 

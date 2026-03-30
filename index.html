@@ -597,11 +597,12 @@ function refreshData() {
     })
     .catch(() => {
       // Servidor não está rodando
-      const msg = 'Servidor local não encontrado.\n\n' +
-        'Para ativar o botão Atualizar, abra um terminal e rode:\n\n' +
-        '  cd ~/relatorio-benefits && python3 server.py\n\n' +
-        'Deixe o terminal aberto enquanto usa os relatórios.';
-      alert(msg);
+            alert('Servidor local não encontrado.
+
+Abra um terminal e rode:
+  cd ~/relatorio-benefits && python3 server.py
+
+Deixe o terminal aberto enquanto usa os relatórios.');
     });
 }
 
