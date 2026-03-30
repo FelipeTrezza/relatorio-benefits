@@ -386,63 +386,74 @@ const REFRESH_ENDPOINT = '/atualizar/pix';
 
 function refreshData() {
   const btn = document.getElementById('btn-refresh');
+  const ts  = document.getElementById('upd-ts');
   const SERVER = 'http://localhost:5001';
-  const endpoint = REFRESH_ENDPOINT;  // definido por cada página
 
-  // Verifica se o servidor está rodando
-  fetch(SERVER + '/status', { signal: AbortSignal.timeout(2000) })
-    .then(r => r.json())
-    .then(status => {
-      if (status.running) {
-        alert('⏳ Já existe uma atualização em andamento. Aguarde...');
-        return;
-      }
-      // Inicia a atualização
-      btn.classList.add('spinning');
-      btn.disabled = true;
-      btn.title = 'Atualizando dados...';
-      document.getElementById('upd-ts').textContent = '...';
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  if (ts) ts.textContent = '...';
 
-      fetch(SERVER + endpoint, { method: 'POST' })
-        .then(r => r.json())
-        .then(() => pollStatus(SERVER))
-        .catch(err => { showError(err); });
-    })
-    .catch(() => {
-      // Servidor não está rodando
-      alert('Servidor local não encontrado.\n\nAbra um terminal e rode:\n  cd ~/relatorio-benefits && python3 server.py\n\nDeixe o terminal aberto enquanto usa os relatórios.');
-    });
+  // Tenta conectar; se falhar aguarda 3s e tenta de novo (servidor pode estar subindo)
+  function tryConnect(attempts) {
+    fetch(SERVER + '/status', { signal: AbortSignal.timeout(3000) })
+      .then(r => r.json())
+      .then(status => {
+        if (status.running) {
+          if (ts) ts.textContent = 'aguarde...';
+          setTimeout(() => tryConnect(attempts), 3000);
+          return;
+        }
+        if (ts) ts.textContent = '...';
+        fetch(SERVER + REFRESH_ENDPOINT, { method: 'POST' })
+          .then(r => r.json())
+          .then(() => pollStatus(SERVER))
+          .catch(() => showError('Erro ao iniciar atualização'));
+      })
+      .catch(() => {
+        if (attempts > 0) {
+          // Servidor ainda subindo, aguarda e tenta de novo
+          if (ts) ts.textContent = 'iniciando...';
+          setTimeout(() => tryConnect(attempts - 1), 2000);
+        } else {
+          // Desiste após tentativas
+          btn.classList.remove('spinning');
+          btn.disabled = false;
+          if (ts) ts.textContent = 'erro';
+          alert('Servidor local indispon\u00edvel.\\n\\nRode: servidor-benefits');
+        }
+      });
+  }
+  tryConnect(5); // tenta por até 10s
 }
 
 function pollStatus(SERVER) {
   const btn = document.getElementById('btn-refresh');
-  const interval = setInterval(() => {
-    fetch(SERVER + '/status')
-      .then(r => r.json())
-      .then(s => {
-        if (!s.running) {
-          clearInterval(interval);
-          btn.classList.remove('spinning');
-          btn.disabled = false;
-          if (s.last_status === 'success') {
-            document.getElementById('upd-ts').textContent = 'atualizado!';
-            setTimeout(() => window.location.reload(), 1500);
-          } else {
-            btn.title = 'Erro na atualização — veja o terminal';
-            document.getElementById('upd-ts').textContent = 'erro';
-            alert('❌ Erro na atualização. Veja o terminal do servidor.');
-          }
+  const ts  = document.getElementById('upd-ts');
+  const iv = setInterval(() => {
+    fetch(SERVER + '/status').then(r => r.json()).then(s => {
+      if (!s.running) {
+        clearInterval(iv);
+        btn.classList.remove('spinning');
+        btn.disabled = false;
+        if (s.last_status === 'success') {
+          if (ts) ts.textContent = 'atualizado!';
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          if (ts) ts.textContent = 'erro';
+          alert('Erro na atualização. Veja o terminal.');
         }
-      });
-  }, 3000);  // poll a cada 3s
+      }
+    }).catch(() => { clearInterval(iv); btn.classList.remove('spinning'); btn.disabled = false; });
+  }, 3000);
 }
 
-function showError(err) {
+function showError(msg) {
   const btn = document.getElementById('btn-refresh');
+  const ts  = document.getElementById('upd-ts');
   btn.classList.remove('spinning');
   btn.disabled = false;
-  document.getElementById('upd-ts').textContent = 'erro';
-  console.error(err);
+  if (ts) ts.textContent = 'erro';
+  console.error(msg);
 }
 
 (function setUpdTs(){

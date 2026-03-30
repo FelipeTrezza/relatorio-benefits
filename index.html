@@ -577,6 +577,80 @@ async function refreshData(){
 }
 
 // Preenche o timestamp "atualizado às HH:MM" no botão
+const REFRESH_ENDPOINT = '/atualizar/contas';
+
+function refreshData() {
+  const btn = document.getElementById('btn-refresh');
+  const ts  = document.getElementById('upd-ts');
+  const SERVER = 'http://localhost:5001';
+
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  if (ts) ts.textContent = '...';
+
+  // Tenta conectar; se falhar aguarda 3s e tenta de novo (servidor pode estar subindo)
+  function tryConnect(attempts) {
+    fetch(SERVER + '/status', { signal: AbortSignal.timeout(3000) })
+      .then(r => r.json())
+      .then(status => {
+        if (status.running) {
+          if (ts) ts.textContent = 'aguarde...';
+          setTimeout(() => tryConnect(attempts), 3000);
+          return;
+        }
+        if (ts) ts.textContent = '...';
+        fetch(SERVER + REFRESH_ENDPOINT, { method: 'POST' })
+          .then(r => r.json())
+          .then(() => pollStatus(SERVER))
+          .catch(() => showError('Erro ao iniciar atualização'));
+      })
+      .catch(() => {
+        if (attempts > 0) {
+          // Servidor ainda subindo, aguarda e tenta de novo
+          if (ts) ts.textContent = 'iniciando...';
+          setTimeout(() => tryConnect(attempts - 1), 2000);
+        } else {
+          // Desiste após tentativas
+          btn.classList.remove('spinning');
+          btn.disabled = false;
+          if (ts) ts.textContent = 'erro';
+          alert('Servidor local indispon\u00edvel.\\n\\nRode: servidor-benefits');
+        }
+      });
+  }
+  tryConnect(5); // tenta por até 10s
+}
+
+function pollStatus(SERVER) {
+  const btn = document.getElementById('btn-refresh');
+  const ts  = document.getElementById('upd-ts');
+  const iv = setInterval(() => {
+    fetch(SERVER + '/status').then(r => r.json()).then(s => {
+      if (!s.running) {
+        clearInterval(iv);
+        btn.classList.remove('spinning');
+        btn.disabled = false;
+        if (s.last_status === 'success') {
+          if (ts) ts.textContent = 'atualizado!';
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          if (ts) ts.textContent = 'erro';
+          alert('Erro na atualização. Veja o terminal.');
+        }
+      }
+    }).catch(() => { clearInterval(iv); btn.classList.remove('spinning'); btn.disabled = false; });
+  }, 3000);
+}
+
+function showError(msg) {
+  const btn = document.getElementById('btn-refresh');
+  const ts  = document.getElementById('upd-ts');
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+  if (ts) ts.textContent = 'erro';
+  console.error(msg);
+}
+
 (function setUpdTs(){
   const el = document.getElementById('upd-ts');
   if(!el) return;
