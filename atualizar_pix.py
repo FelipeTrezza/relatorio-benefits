@@ -246,8 +246,7 @@ def main():
 
     raw = poll_all(w, stmts)
 
-    print("
-[3/4] Transformando dados...")
+    print("\n[3/4] Transformando dados...")
     ac = {r["setor"]: r for r in raw.get("antecip",  [])}
     bc = {r["setor"]: r for r in raw.get("abertura", [])}
 
