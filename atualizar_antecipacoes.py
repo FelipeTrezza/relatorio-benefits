@@ -101,6 +101,67 @@ LEFT JOIN benefits.accounts  f ON e.account_id = f.account_id
 GROUP BY 1
 """.format(setor=SETOR_CASE)
 
+# SQLs com filtro GDF/RJ (account_id NOT IN 892, 1817)
+SQL_ANTECIP2 = """
+SELECT
+  {setor} AS setor,
+  count(distinct ar.consumer_id)                      AS vidas,
+  count(*)                                            AS antecipacoes,
+  round(sum(cast(ar.request_value AS double)), 2)     AS tpv
+FROM benefits.anticipation_request ar
+LEFT JOIN benefits.companies e ON ar.company_id = e.company_id
+LEFT JOIN benefits.accounts  f ON e.account_id  = f.account_id
+WHERE ar.request_status = 'FINISH'
+  AND ar.created_at >= '{{ini}}'
+  AND ar.created_at <  '{{fim}}'
+  AND day(ar.created_at) <= {{d}}
+  AND f.account_id NOT IN (892, 1817)
+GROUP BY 1
+""".format(setor=SETOR_CASE)
+
+SQL_NOVAS2 = """
+SELECT
+  {setor} AS setor,
+  count(distinct ar.consumer_id) AS vidas_novas
+FROM benefits.anticipation_request ar
+LEFT JOIN benefits.companies e ON ar.company_id = e.company_id
+LEFT JOIN benefits.accounts  f ON e.account_id  = f.account_id
+WHERE ar.request_status = 'FINISH'
+  AND ar.created_at >= '{{ini}}'
+  AND ar.created_at <  '{{fim}}'
+  AND day(ar.created_at) <= {{d}}
+  AND f.account_id NOT IN (892, 1817)
+  AND ar.consumer_id NOT IN (
+    SELECT DISTINCT consumer_id
+    FROM benefits.anticipation_request
+    WHERE request_status = 'FINISH'
+      AND created_at < '{{ini}}'
+  )
+GROUP BY 1
+""".format(setor=SETOR_CASE)
+
+SQL_ABERTURA2 = """
+WITH base AS (
+  SELECT sc.collaborator_document, sc.company_id
+  FROM benefits.sec_collaborators sc
+  INNER JOIN consumers.sec_consumers cc ON cc.cpf = sc.collaborator_document
+  INNER JOIN consumers.consumers c      ON c.consumer_id = cc.consumer_id
+  WHERE c.sent_bacen_at >= '{{ini}}'
+    AND c.sent_bacen_at <  '{{fim}}'
+    AND day(c.sent_bacen_at) <= {{d}}
+    AND c.sent_bacen_at IS NOT NULL
+  QUALIFY row_number() OVER (PARTITION BY sc.collaborator_document ORDER BY sc.collaborator_id DESC) = 1
+)
+SELECT
+  {setor} AS setor,
+  count(*) AS abertura_contas
+FROM base b
+LEFT JOIN benefits.companies e ON b.company_id = e.company_id
+LEFT JOIN benefits.accounts  f ON e.account_id = f.account_id
+WHERE f.account_id NOT IN (892, 1817)
+GROUP BY 1
+""".format(setor=SETOR_CASE)
+
 def fmt(sql, ini, fim, d):
     return sql.replace("{ini}", str(ini)).replace("{fim}", str(fim)).replace("{d}", str(d))
 
@@ -188,11 +249,14 @@ def build_data(raw, cur_ini, prev_ini, cur_day):
     }
 
 # ── html ──────────────────────────────────────────────────────────────────────
-def generate_html(data):
+def generate_html(data, data2):
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
-    new_data = f"const DATA = {json.dumps(data, ensure_ascii=False, indent=2)};"
-    html = re.sub(r'const DATA = %%DADOS%%;', new_data, template)
-    html = re.sub(r'const DATA = \{[\s\S]*?\n\};', new_data, html)
+    new_data  = f"const DATA  = {json.dumps(data,  ensure_ascii=False, indent=2)};"
+    new_data2 = f"const DATA2 = {json.dumps(data2, ensure_ascii=False, indent=2)};"
+    html = re.sub(r'const DATA = %%DADOS%%;',   new_data,  template)
+    html = re.sub(r'const DATA2 = %%DADOS2%%;', new_data2, html)
+    html = re.sub(r'const DATA = \{[\s\S]*?\n\};',  new_data,  html)
+    html = re.sub(r'const DATA2 = \{[\s\S]*?\n\};', new_data2, html)
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     print(f"📄 {OUTPUT_PATH.name} ({OUTPUT_PATH.stat().st_size//1024} KB)")
 
@@ -238,18 +302,29 @@ def main():
     print(f"\n[2/4] Período: {label_mes(cur_ini)} (dia≤{cur_day}) vs {label_mes(prev_ini)}")
 
     stmts = {}
+    # 6 queries visão principal
     for periodo, ini, fim in [("cur", cur_ini, cur_fim), ("prev", prev_ini, prev_fim)]:
         for nome, sql in [("antecip",SQL_ANTECIP),("novas",SQL_NOVAS),("abertura",SQL_ABERTURA)]:
             stmts[f"{nome}_{periodo}"] = submit(w, fmt(sql, ini, fim, cur_day))
-    print(f"   {len(stmts)} queries submetidas em paralelo")
+    # 6 queries réplica sem GDF/RJ
+    for periodo, ini, fim in [("cur", cur_ini, cur_fim), ("prev", prev_ini, prev_fim)]:
+        for nome, sql in [("antecip2",SQL_ANTECIP2),("novas2",SQL_NOVAS2),("abertura2",SQL_ABERTURA2)]:
+            stmts[f"{nome}_{periodo}"] = submit(w, fmt(sql, ini, fim, cur_day))
+    print(f"   {len(stmts)} queries submetidas em paralelo (6 + 6)")
 
     raw = poll_all(w, stmts)
 
     print("\n[3/4] Transformando dados...")
+    # Visão principal
     data = build_data(raw, cur_ini, prev_ini, cur_day)
     for sk, d in data['setores'].items():
         print(f"   {sk}: vidas={d['vidas']:,} antecip={d['antecipacoes']:,} tpv=R${d['tpv']:,.0f} abertura={d['abertura']:,} novas={d['vidas_novas']:,}")
-    generate_html(data)
+    # Réplica sem GDF/RJ — remap keys: antecip2_* → antecip_* etc
+    raw2 = {k.replace('antecip2_','antecip_').replace('novas2_','novas_').replace('abertura2_','abertura_'): v
+            for k, v in raw.items() if '2_' in k}
+    data2 = build_data(raw2, cur_ini, prev_ini, cur_day)
+    print(f"   [sem GDF/RJ] público: {data2['setores'].get('public',{}).get('antecipacoes',0):,} antecip")
+    generate_html(data, data2)
 
     print("\n[4/4] Publicando...")
     git_push()
