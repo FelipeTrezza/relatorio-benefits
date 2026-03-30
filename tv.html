@@ -105,6 +105,16 @@
   .dot.active{background:var(--greenl)}
   .progress-bar-wrap{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
   .progress-bar-fill{height:100%;background:var(--greenl);border-radius:2px;width:0%;transition:width linear}
+  /* ── FULLSCREEN BUTTON ─────────────────────────────────── */
+  .btn-fullscreen{
+    position:fixed;bottom:18px;right:18px;z-index:999;
+    background:var(--surf2);border:1px solid var(--border);
+    color:var(--text);width:38px;height:38px;border-radius:50%;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:all .2s;opacity:.55;
+  }
+  .btn-fullscreen:hover{opacity:1;border-color:var(--green);color:var(--greenl);background:#1a2a22}
+  .btn-fullscreen svg{flex-shrink:0}
 </style>
 </head>
 <body>
@@ -175,7 +185,38 @@
   </div>
 </div>
 
+<!-- ── BOTÃO FULLSCREEN ──────────────────────────────────── -->
+<button class="btn-fullscreen" id="btn-fs" onclick="toggleFullscreen()" title="Modo apresentação (F11)">
+  <svg id="fs-icon-enter" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+    <path d="M1.5 1h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 1zm9 0h4A1.5 1.5 0 0 1 16 2.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1 0-1zM.5 9.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>
+  </svg>
+  <svg id="fs-icon-exit" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="display:none">
+    <path d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5zM0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zm10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4z"/>
+  </svg>
+</button>
 <script>
+// ================================================================
+// FULLSCREEN
+// ================================================================
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen();
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  const full = !!document.fullscreenElement;
+  document.getElementById('fs-icon-enter').style.display = full ? 'none' : '';
+  document.getElementById('fs-icon-exit').style.display  = full ? ''     : 'none';
+  document.getElementById('btn-fs').title = full ? 'Sair (Esc)' : 'Modo apresentação (F)';
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  if (e.key === 'ArrowRight' || e.key === ' ') goToSlide(currentSlide + 1);
+  if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
+});
+
 // ================================================================
 // DADOS — injetados por atualizar_antecipacoes.py + atualizar_pix.py
 // ================================================================
@@ -341,7 +382,7 @@ const DATA_PIX = {
     }
   }
 };
-const UPDATED  = '30/03/2026 11:18';
+const UPDATED  = '30/03/2026 11:27';
 
 const SLIDES_DATA = [DATA, DATA2, DATA_PIX];
 const INTERVAL_MS = 60000; // 1 minuto por slide
