@@ -91,7 +91,7 @@
     min-height:0;overflow:hidden;
   }
   .mc-lbl{font-size:clamp(9px,0.75vw,12px);font-weight:600;color:var(--muted);letter-spacing:.1px;line-height:1.2}
-  .mc-val{font-size:clamp(14px,1.6vw,24px);font-weight:800;color:var(--greenl);line-height:1.1;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mc-val{font-size:clamp(11px,1.2vw,19px);font-weight:800;color:var(--greenl);line-height:1.1;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .mc-delta{font-size:clamp(9px,0.8vw,13px);font-weight:700}
   .mc-delta.up{color:var(--greenl)} .mc-delta.dn{color:var(--red)} .mc-delta.fl{color:var(--muted)}
 
@@ -382,7 +382,7 @@ const DATA_PIX = {
     }
   }
 };
-const UPDATED  = '30/03/2026 11:34';
+const UPDATED  = '30/03/2026 11:36';
 
 const SLIDES_DATA = [DATA, DATA2, DATA_PIX];
 const INTERVAL_MS = 60000; // 1 minuto por slide
@@ -401,9 +401,9 @@ function fmtVal(n) {
 function fmtBRL(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
   const abs = Math.abs(n);
-  if (abs >= 1e6) return 'R$ ' + (n/1e6).toFixed(1).replace('.',',') + 'Mi';
-  if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(1).replace('.',',') + 'K';
-  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
+  if (abs >= 1e6) return 'R$ ' + (n/1e6).toFixed(1).replace('.',',') + 'Mi';
+  if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(1).replace('.',',') + 'K';
+  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
 }
 function fmtInt(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
