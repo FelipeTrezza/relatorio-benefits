@@ -90,7 +90,7 @@
     display:flex;flex-direction:column;justify-content:space-between;
     min-height:0;overflow:hidden;
   }
-  .mc-lbl{font-size:18px;font-weight:600;color:var(--muted);letter-spacing:.1px;line-height:1.2;text-align:left;align-self:flex-start}
+  .mc-lbl{font-size:14px;font-weight:600;color:var(--muted);letter-spacing:.1px;line-height:1.2;text-align:left;align-self:flex-start;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
   .mc-val{font-size:30px;font-weight:800;color:var(--greenl);line-height:1.1;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;align-self:flex-start}
   .mc-delta{font-size:18px;font-weight:700;text-align:left;align-self:flex-start}
   .mc-delta.up{color:var(--greenl)} .mc-delta.dn{color:var(--red)} .mc-delta.fl{color:var(--muted)}
@@ -382,7 +382,7 @@ const DATA_PIX = {
     }
   }
 };
-const UPDATED  = '30/03/2026 11:48';
+const UPDATED  = '30/03/2026 11:50';
 
 const SLIDES_DATA = [DATA, DATA2, DATA_PIX];
 const INTERVAL_MS = 60000; // 1 minuto por slide
