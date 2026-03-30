@@ -262,13 +262,15 @@ def generate_html(data, data2):
 
 # ── git push ──────────────────────────────────────────────────────────────────
 def git_push():
+    import os
+    env = {**os.environ, "PATH": "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:" + os.environ.get("PATH","") }
     now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
     for cmd in [
         ["git","-C",str(SCRIPT_DIR),"add","antecipacoes.html","tv.html"],
         ["git","-C",str(SCRIPT_DIR),"commit","-m",f"chore: antecipacoes — {now_str}"],
         ["git","-C",str(SCRIPT_DIR),"push","origin","main"],
     ]:
-        r = subprocess.run(cmd, capture_output=True, text=True)
+        r = subprocess.run(cmd, capture_output=True, text=True, env=env)
         if r.returncode != 0:
             if "nothing to commit" in r.stdout+r.stderr: print("   (sem mudanças)"); break
             print(f"   ⚠️  {r.stderr.strip()}")

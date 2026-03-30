@@ -40,12 +40,15 @@ SCRIPTS = {
 }
 
 def run_script(name):
+    import os, shutil
     script = SCRIPTS.get(name)
     if not script or not Path(script).exists():
         return False, f"Script não encontrado: {script}"
+    python_bin = shutil.which("python3") or "/usr/bin/python3"
+    env = {**os.environ, "PATH": "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:" + os.environ.get("PATH","")}
     result = subprocess.run(
-        ["python3", "-W", "ignore", str(script)],
-        capture_output=True, text=True, timeout=600
+        [python_bin, "-W", "ignore", str(script)],
+        capture_output=True, text=True, timeout=600, env=env
     )
     output = result.stdout + result.stderr
     return result.returncode == 0, output
