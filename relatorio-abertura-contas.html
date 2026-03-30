@@ -5,7 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Abertura de Contas — Relatório</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"><\/script>')</script>
+<script>
+if(typeof Chart === 'undefined'){
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
+  document.head.appendChild(s);
+}
+</script>
 <style>
   :root {
     --bg:      #0d1117;
@@ -104,6 +110,11 @@
   .bars-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
 
   footer{text-align:center;padding:22px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:4px}
+  /* NAV TABS */
+  .nav-tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;display:flex;gap:0}
+  .nav-tab{padding:12px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:7px}
+  .nav-tab:hover{color:var(--text)}
+  .nav-tab.active{color:var(--text);border-bottom-color:var(--green);font-weight:600}
 </style>
 </head>
 <body>
@@ -128,6 +139,21 @@
     </button>
   </div>
 </header>
+
+<nav class="nav-tabs">
+  <a class="nav-tab active" href="index.html">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 2c1.29 0 2.49.38 3.5 1.03L3.03 11.5A5.97 5.97 0 0 1 2 8c0-3.31 2.69-6 6-6zm0 12c-1.29 0-2.49-.38-3.5-1.03l8.47-8.47A5.97 5.97 0 0 1 14 8c0 3.31-2.69 6-6 6z"/></svg>
+    Abertura de Contas
+  </a>
+  <a class="nav-tab" href="antecipacoes.html">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>
+    Antecipações
+  </a>
+  <a class="nav-tab" href="pix.html">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 2a.5.5 0 0 1 .5.5V6h3.5a.5.5 0 0 1 0 1H10v3.5a.5.5 0 0 1-1 0V7H5.5a.5.5 0 0 1 0-1H9V2.5a.5.5 0 0 1 .5-.5z"/></svg>
+    PIX
+  </a>
+</nav>
 
 <main>
 
