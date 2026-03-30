@@ -277,6 +277,41 @@ def git_push():
         elif "push" in cmd:
             print(f"✅ {GITHUB_PAGES_URL}")
 
+# ── gerar tv.html (chamado após generate_html) ────────────────────────────────
+def generate_tv(data, data2):
+    """Gera tv.html com DATA + DATA2 + DATA_PIX do pix.html atual."""
+    import re as _re
+    TV_TEMPLATE = SCRIPT_DIR / "tv_template.html"
+    TV_OUTPUT   = SCRIPT_DIR / "tv.html"
+    PIX_HTML    = SCRIPT_DIR / "pix.html"
+
+    if not TV_TEMPLATE.exists():
+        print("   ⚠️  tv_template.html não encontrado, pulando tv.html")
+        return
+
+    def extract(html, varname):
+        m = _re.search(rf'const {varname}\s*=\s*(\{{[\s\S]*?\n\}});', html)
+        return m.group(1) if m else 'null'
+
+    # DATA_PIX vem do pix.html já gerado
+    pix_html = PIX_HTML.read_text(encoding="utf-8") if PIX_HTML.exists() else ""
+    data_pix = extract(pix_html, 'DATA') if pix_html else 'null'
+
+    now_str  = datetime.now().strftime('%d/%m/%Y %H:%M')
+    template = TV_TEMPLATE.read_text(encoding="utf-8")
+
+    data_block  = json.dumps(data,  ensure_ascii=False, indent=2)
+    data2_block = json.dumps(data2, ensure_ascii=False, indent=2)
+
+    tv_html = (template
+        .replace('%%DATA%%',     data_block)
+        .replace('%%DATA2%%',    data2_block)
+        .replace('%%DATA_PIX%%', data_pix)
+        .replace('%%UPDATED%%',  now_str))
+
+    TV_OUTPUT.write_text(tv_html, encoding="utf-8")
+    print(f"📺 tv.html gerado ({TV_OUTPUT.stat().st_size//1024} KB)")
+
 # ── main ──────────────────────────────────────────────────────────────────────
 def main():
     print("="*55)
@@ -335,38 +370,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# ── gerar tv.html (chamado após generate_html) ────────────────────────────────
-def generate_tv(data, data2):
-    """Gera tv.html com DATA + DATA2 + DATA_PIX do pix.html atual."""
-    import re as _re
-    TV_TEMPLATE = SCRIPT_DIR / "tv_template.html"
-    TV_OUTPUT   = SCRIPT_DIR / "tv.html"
-    PIX_HTML    = SCRIPT_DIR / "pix.html"
-
-    if not TV_TEMPLATE.exists():
-        print("   ⚠️  tv_template.html não encontrado, pulando tv.html")
-        return
-
-    def extract(html, varname):
-        m = _re.search(rf'const {varname}\s*=\s*(\{{[\s\S]*?\n\}});', html)
-        return m.group(1) if m else 'null'
-
-    # DATA_PIX vem do pix.html já gerado
-    pix_html = PIX_HTML.read_text(encoding="utf-8") if PIX_HTML.exists() else ""
-    data_pix = extract(pix_html, 'DATA') if pix_html else 'null'
-
-    now_str  = datetime.now().strftime('%d/%m/%Y %H:%M')
-    template = TV_TEMPLATE.read_text(encoding="utf-8")
-
-    data_block  = json.dumps(data,  ensure_ascii=False, indent=2)
-    data2_block = json.dumps(data2, ensure_ascii=False, indent=2)
-
-    tv_html = (template
-        .replace('%%DATA%%',     data_block)
-        .replace('%%DATA2%%',    data2_block)
-        .replace('%%DATA_PIX%%', data_pix)
-        .replace('%%UPDATED%%',  now_str))
-
-    TV_OUTPUT.write_text(tv_html, encoding="utf-8")
-    print(f"📺 tv.html gerado ({TV_OUTPUT.stat().st_size//1024} KB)")
