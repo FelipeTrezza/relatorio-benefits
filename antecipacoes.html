@@ -41,19 +41,17 @@
   .hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
   .hdr-right{display:flex;align-items:center;gap:10px}
   .badge-periodo{background:var(--greend);color:var(--greenl);font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;border:1px solid var(--green)}
-  .btn-refresh{display:flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;white-space:nowrap}
+  .btn-refresh{display:flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:7px 13px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;white-space:nowrap;text-decoration:none}
   .btn-refresh:hover{border-color:var(--green);color:var(--greenl);background:#1a2a22}
   .btn-refresh svg{transition:transform .6s}
   .btn-refresh.spinning svg{animation:spin .8s linear infinite}
-  .btn-refresh .upd-ts{font-size:10px;color:var(--muted);font-weight:400}
   @keyframes spin{to{transform:rotate(360deg)}}
 
   /* ── MAIN ─────────────────────────────────────────────────── */
   main{max-width:1520px;margin:0 auto;padding:22px 28px}
 
   /* ── PERIODO LABEL ───────────────────────────────────────── */
-  .sec-lbl{font-size:15px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center}
-  .sec-lbl::before{content:'';display:inline-block;width:4px;height:16px;background:var(--green);border-radius:2px}
+  .periodo-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
   .periodo-title{font-size:13px;font-weight:700;color:var(--text)}
   .periodo-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
@@ -83,9 +81,14 @@
   .pill-privado{background:linear-gradient(135deg,#3a8a52,#4db870)}
   .pill-grupo  {background:linear-gradient(135deg,#5aa668,#7ec87e)}
 
-  /* ── GRID DE MÉTRICAS ────────────────────────────────────── */
+  /* ── GRID DE MÉTRICAS: 2 colunas dentro de cada setor ──────── */
+  .metrics-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
 
-  /* ── METRIC CARD ─────────────────────────────────────────── */
+  /* ── METRIC CARD (estilo da foto: canto arredondado, fundo claro) */
   .mc{
     background:var(--card-bg);
     border:1px solid var(--card-border);
@@ -94,16 +97,7 @@
     display:flex;
     flex-direction:column;
     gap:5px;
-    height:100px;          /* altura fixa igual em todos */
-    box-sizing:border-box;
-  }
-  /* grid alinha as linhas pela maior célula → todos ficam igual */
-  .metrics-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    grid-auto-rows:1fr;    /* linhas de altura uniforme */
-    gap:10px;
-    align-items:stretch;
+    min-height:90px;
   }
   .mc-lbl{
     font-size:10px;
@@ -148,14 +142,10 @@
   </div>
   <div class="hdr-right">
     <span class="badge-periodo" id="badge-periodo">—</span>
-    <button class="btn-refresh" id="btn-refresh" onclick="refreshData()" title="Atualizar dados">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
-        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-      </svg>
+    <a class="btn-refresh" id="btn-refresh" href="antecipacoes.html">
+      <svg id="refresh-icon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
       Atualizar
-      <span class="upd-ts" id="upd-ts"></span>
-    </button>
+    </a>
   </div>
 </header>
 
@@ -169,17 +159,11 @@
     <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>
     Antecipações
   </a>
-
-  <a class="nav-tab" href="pix.html">
-    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 2a.5.5 0 0 1 .5.5V6h3.5a.5.5 0 0 1 0 1H10v3.5a.5.5 0 0 1-1 0V7H5.5a.5.5 0 0 1 0-1H9V2.5a.5.5 0 0 1 .5-.5z"/></svg>
-    PIX
-  </a>
 </nav>
 
 <main>
 
   <!-- PERIODO BAR -->
-  <div class="sec-lbl">Todas as Antecipações</div>
   <div class="periodo-bar">
     <div>
       <div class="periodo-title" id="periodo-title">— vs —</div>
@@ -190,20 +174,6 @@
   <!-- DASHBOARD GRID -->
   <div class="dashboard-grid" id="dashboard-grid">
     <!-- preenchido por renderDashboard() -->
-  </div>
-
-  <!-- ── RÉPLICA SEM GDF E RJ ──────────────────────── -->
-  <div style="margin-top:32px">
-    <div class="sec-lbl">Excluindo GDF e RJ</div>
-    <div class="periodo-bar">
-      <div>
-        <div class="periodo-title" id="periodo-title-2">— vs —</div>
-        <div class="periodo-sub">Excluindo GDF (892) e RJ (1817) · MTD mesma janela de dias</div>
-      </div>
-    </div>
-    <div class="dashboard-grid" id="dashboard-grid-2">
-      <!-- preenchido por renderDashboard2() -->
-    </div>
   </div>
 
 </main>
@@ -221,40 +191,40 @@ const DATA = {
   "prev_label": "Fev/26",
   "setores": {
     "public": {
-      "vidas": 27229,
-      "vidas_prv": 41450,
-      "antecipacoes": 96680,
-      "antecip_prv": 218479,
-      "tpv": 18519478.48,
-      "tpv_prv": 49836419.96,
-      "abertura": 2090,
-      "abertura_prv": 2136,
-      "vidas_novas": 1627,
-      "vidas_novas_prv": 1943
+      "vidas": 27483,
+      "vidas_prv": 41624,
+      "antecipacoes": 97817,
+      "antecip_prv": 219180,
+      "tpv": 18798252.59,
+      "tpv_prv": 50127373.45,
+      "abertura": 2319,
+      "abertura_prv": 2191,
+      "vidas_novas": 1700,
+      "vidas_novas_prv": 1980
     },
     "private": {
-      "vidas": 1907,
-      "vidas_prv": 2019,
-      "antecipacoes": 7712,
-      "antecip_prv": 8355,
-      "tpv": 600446.02,
-      "tpv_prv": 691675.48,
-      "abertura": 521,
-      "abertura_prv": 503,
-      "vidas_novas": 240,
-      "vidas_novas_prv": 289
+      "vidas": 1959,
+      "vidas_prv": 2049,
+      "antecipacoes": 8490,
+      "antecip_prv": 8626,
+      "tpv": 656007.31,
+      "tpv_prv": 716842.59,
+      "abertura": 591,
+      "abertura_prv": 522,
+      "vidas_novas": 253,
+      "vidas_novas_prv": 298
     },
     "grupo": {
-      "vidas": 51574,
-      "vidas_prv": 50086,
-      "antecipacoes": 202335,
-      "antecip_prv": 190298,
-      "tpv": 27564384.3,
-      "tpv_prv": 26966850.96,
-      "abertura": 1894,
-      "abertura_prv": 2400,
-      "vidas_novas": 4184,
-      "vidas_novas_prv": 4176
+      "vidas": 51618,
+      "vidas_prv": 50116,
+      "antecipacoes": 203288,
+      "antecip_prv": 190626,
+      "tpv": 27684441.36,
+      "tpv_prv": 27019855.06,
+      "abertura": 1994,
+      "abertura_prv": 2501,
+      "vidas_novas": 4189,
+      "vidas_novas_prv": 4179
     },
     "INSS": {
       "vidas": 0,
@@ -263,63 +233,8 @@ const DATA = {
       "antecip_prv": 0,
       "tpv": 0.0,
       "tpv_prv": 0.0,
-      "abertura": 777,
-      "abertura_prv": 427,
-      "vidas_novas": 0,
-      "vidas_novas_prv": 0
-    }
-  }
-};
-
-const DATA2 = {
-  "cur_label": "Mar/26",
-  "prev_label": "Fev/26",
-  "setores": {
-    "public": {
-      "vidas": 21313,
-      "vidas_prv": 19594,
-      "antecipacoes": 81999,
-      "antecip_prv": 74837,
-      "tpv": 15837156.34,
-      "tpv_prv": 15680138.4,
-      "abertura": 1207,
-      "abertura_prv": 1151,
-      "vidas_novas": 1601,
-      "vidas_novas_prv": 1719
-    },
-    "private": {
-      "vidas": 1909,
-      "vidas_prv": 2019,
-      "antecipacoes": 7749,
-      "antecip_prv": 8355,
-      "tpv": 602790.94,
-      "tpv_prv": 691675.48,
-      "abertura": 521,
-      "abertura_prv": 503,
-      "vidas_novas": 240,
-      "vidas_novas_prv": 289
-    },
-    "grupo": {
-      "vidas": 51577,
-      "vidas_prv": 50086,
-      "antecipacoes": 202363,
-      "antecip_prv": 190298,
-      "tpv": 27567542.98,
-      "tpv_prv": 26966850.96,
-      "abertura": 1894,
-      "abertura_prv": 2400,
-      "vidas_novas": 4185,
-      "vidas_novas_prv": 4176
-    },
-    "INSS": {
-      "vidas": 0,
-      "vidas_prv": 0,
-      "antecipacoes": 0,
-      "antecip_prv": 0,
-      "tpv": 0.0,
-      "tpv_prv": 0.0,
-      "abertura": 776,
-      "abertura_prv": 427,
+      "abertura": 861,
+      "abertura_prv": 459,
       "vidas_novas": 0,
       "vidas_novas_prv": 0
     }
@@ -333,24 +248,20 @@ function fmtVal(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
   const abs = Math.abs(n);
   if (abs >= 1e9) return (n/1e9).toFixed(1).replace('.',',') + 'Bi';
-  if (abs >= 1e6) return (n/1e6).toFixed(1).replace('.',',') + 'Mi';
-  if (abs >= 1e3) return (n/1e3).toFixed(1).replace('.',',') + 'k';
-  return n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
+  if (abs >= 1e6) return (n/1e6).toFixed(0) + 'Mi';
+  if (abs >= 1e3) return (n/1e3).toFixed(0) + 'k';
+  return n.toLocaleString('pt-BR');
 }
 function fmtBRL(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
   const abs = Math.abs(n);
-  if (abs >= 1e6) return 'R$ ' + (n/1e6).toFixed(1).replace('.',',') + 'Mi';
-  if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(1).replace('.',',') + 'K';
-  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
+  if (abs >= 1e6) return 'R$ ' + (n/1e6).toFixed(0) + 'Mi';
+  if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(0) + 'K';
+  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function fmtTicket(n) {
   if (!n) return '—';
-  return n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
-}
-function fmtInt(n) {
-  if (n === null || n === undefined || isNaN(n)) return '—';
-  return Math.round(n).toLocaleString('pt-BR');
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function delta(cur, prv) {
   if (!prv) return {cls:'fl', txt:'—'};
@@ -425,65 +336,12 @@ function renderDashboard() {
         ${mc('Vidas Antecipando #',    s.vidas,          s.vidas_prv,       fmtVal)}
         ${mc('Antecipações #',         s.antecipacoes,   s.antecip_prv,     fmtVal)}
         ${mc('TPV R$',                 s.tpv,            s.tpv_prv,         fmtBRL)}
-        ${mc('Ticket Médio R$',        tk_cur,           tk_prv,            fmtBRL)}
+        ${mc('Ticket Médio R$',        tk_cur,           tk_prv,            fmtTicket)}
         ${mc('Abertura de Conta #',    s.abertura,       s.abertura_prv,    fmtVal)}
-        ${mc('Vidas Novas Antecipando #', s.vidas_novas, s.vidas_novas_prv, fmtInt)}
+        ${mc('Vidas Novas Antecipando #', s.vidas_novas, s.vidas_novas_prv, fmtVal)}
       </div>
     </div>`;
     grid.insertAdjacentHTML('beforeend', html);
-  });
-}
-
-// ================================================================
-// RÉPLICA — sem accounts 1817 e 892
-// ================================================================
-function renderDashboard2() {
-  const D = DATA2;
-  if (!D || !D.setores) return;
-
-  const CL = D.cur_label  || DATA.cur_label  || 'Atual';
-  const PL = D.prev_label || DATA.prev_label || 'Ant.';
-  document.getElementById('periodo-title-2').textContent = `${CL} vs ${PL}`;
-
-  const COLS = [
-    { key: 'total',   label: 'Total',   pill: 'pill-total'   },
-    { key: 'public',  label: 'Público', pill: 'pill-publico' },
-    { key: 'private', label: 'Privado', pill: 'pill-privado' },
-    { key: 'grupo',   label: 'Grupo',   pill: 'pill-grupo'   },
-  ];
-
-  const allSetores = ['public','private','grupo','INSS'];
-  function sumField(field) {
-    return allSetores.reduce((s,k) => s + ((D.setores[k] && D.setores[k][field]) || 0), 0);
-  }
-  D.setores.total = {
-    vidas: sumField('vidas'), vidas_prv: sumField('vidas_prv'),
-    antecipacoes: sumField('antecipacoes'), antecip_prv: sumField('antecip_prv'),
-    tpv: sumField('tpv'), tpv_prv: sumField('tpv_prv'),
-    abertura: sumField('abertura'), abertura_prv: sumField('abertura_prv'),
-    vidas_novas: sumField('vidas_novas'), vidas_novas_prv: sumField('vidas_novas_prv'),
-  };
-
-  const grid = document.getElementById('dashboard-grid-2');
-  grid.innerHTML = '';
-
-  COLS.forEach(col => {
-    const s = D.setores[col.key];
-    if (!s) return;
-    const tk_cur = s.antecipacoes > 0 ? s.tpv / s.antecipacoes : 0;
-    const tk_prv = s.antecip_prv  > 0 ? s.tpv_prv / s.antecip_prv : 0;
-    grid.insertAdjacentHTML('beforeend', `
-    <div class="setor-col">
-      <div class="pill-header ${col.pill}">${col.label}</div>
-      <div class="metrics-grid">
-        ${mc('Vidas Antecipando #',       s.vidas,          s.vidas_prv,       fmtVal)}
-        ${mc('Antecipações #',            s.antecipacoes,   s.antecip_prv,     fmtVal)}
-        ${mc('TPV R$',                    s.tpv,            s.tpv_prv,         fmtBRL)}
-        ${mc('Ticket Médio R$',           tk_cur,           tk_prv,            fmtBRL)}
-        ${mc('Abertura de Conta #',       s.abertura,       s.abertura_prv,    fmtVal)}
-        ${mc('Vidas Novas Antecipando #', s.vidas_novas,    s.vidas_novas_prv, fmtInt)}
-      </div>
-    </div>`);
   });
 }
 
@@ -497,23 +355,13 @@ document.addEventListener('DOMContentLoaded', () => {
     now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
   renderDashboard();
-  renderDashboard2();
+
+  document.getElementById('btn-refresh').addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('btn-refresh').classList.add('spinning');
+    setTimeout(() => window.location.reload(true), 400);
+  });
 });
-
-function refreshData() {
-  const btn = document.getElementById('btn-refresh');
-  btn.classList.add('spinning');
-  btn.disabled = true;
-  btn.title = 'Recarregando...';
-  setTimeout(() => { window.location.reload(); }, 800);
-}
-
-(function setUpdTs(){
-  const el = document.getElementById('upd-ts');
-  if (!el) return;
-  const now = new Date();
-  el.textContent = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-})();
 </script>
 </body>
 </html>
