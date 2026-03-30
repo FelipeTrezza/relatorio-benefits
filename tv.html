@@ -71,8 +71,8 @@
 
   /* ── PILL HEADER ───────────────────────────────────────── */
   .pill-header{
-    border-radius:40px;padding:9px 0;text-align:center;
-    font-size:clamp(14px,1.4vw,22px);font-weight:800;color:#fff;letter-spacing:.3px;flex-shrink:0;
+    border-radius:40px;padding:7px 0;text-align:center;
+    font-size:clamp(12px,1.1vw,18px);font-weight:800;color:#fff;letter-spacing:.3px;flex-shrink:0;
   }
   .pill-total  {background:linear-gradient(135deg,#1a6640,#21a366)}
   .pill-publico{background:linear-gradient(135deg,#1f7a45,#27b96a)}
@@ -86,13 +86,13 @@
   }
   .mc{
     background:var(--card-bg);border:1px solid var(--card-border);
-    border-radius:12px;padding:10px 12px;
+    border-radius:12px;padding:8px 10px;
     display:flex;flex-direction:column;justify-content:space-between;
     min-height:0;overflow:hidden;
   }
-  .mc-lbl{font-size:clamp(10px,0.9vw,15px);font-weight:600;color:var(--muted);letter-spacing:.1px;line-height:1.2}
-  .mc-val{font-size:clamp(20px,2.6vw,38px);font-weight:800;color:var(--greenl);line-height:1;letter-spacing:-0.5px}
-  .mc-delta{font-size:clamp(11px,1vw,16px);font-weight:700}
+  .mc-lbl{font-size:clamp(9px,0.75vw,12px);font-weight:600;color:var(--muted);letter-spacing:.1px;line-height:1.2}
+  .mc-val{font-size:clamp(14px,1.6vw,24px);font-weight:800;color:var(--greenl);line-height:1.1;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mc-delta{font-size:clamp(9px,0.8vw,13px);font-weight:700}
   .mc-delta.up{color:var(--greenl)} .mc-delta.dn{color:var(--red)} .mc-delta.fl{color:var(--muted)}
 
   /* ── PROGRESS BAR ──────────────────────────────────────── */
@@ -382,7 +382,7 @@ const DATA_PIX = {
     }
   }
 };
-const UPDATED  = '30/03/2026 11:32';
+const UPDATED  = '30/03/2026 11:34';
 
 const SLIDES_DATA = [DATA, DATA2, DATA_PIX];
 const INTERVAL_MS = 60000; // 1 minuto por slide
