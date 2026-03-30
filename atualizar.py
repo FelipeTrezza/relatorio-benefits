@@ -194,12 +194,19 @@ def run_query():
 def generate_html(data):
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     data_json = json.dumps(data, ensure_ascii=False)
-    now_str   = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    # Badge: data mais recente nos dados (campo dia: yyyy-MM-dd → dd/MM/yyyy)
+    dias = sorted([r["dia"] for r in data if r.get("dia")], reverse=True)
+    if dias:
+        y, m, d = dias[0].split("-")
+        data_str = f"{d}/{m}/{y}"
+    else:
+        data_str = datetime.now().strftime("%d/%m/%Y")
+
     html = template.replace("%%DADOS%%", data_json)
-    # Injeta data de geração no badge
-    html = html.replace("Últimos 5 meses", f"Atualizado {now_str}")
+    html = html.replace("Últimos 5 meses", f"Atualizado {data_str}")
     OUTPUT_PATH.write_text(html, encoding="utf-8")
-    print(f"📄 HTML gerado: {OUTPUT_PATH}")
+    print(f"📄 HTML gerado: {OUTPUT_PATH} | dados até {data_str}")
 
 # ─── UPLOAD ───────────────────────────────────────────────────────────────────
 def upload_html():
