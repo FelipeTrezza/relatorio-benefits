@@ -36,6 +36,7 @@ SCRIPTS = {
     "antecipacoes": BASE_DIR / "atualizar_antecipacoes.py",
     "pix":          BASE_DIR / "atualizar_pix.py",
     "contas":       CONTAS_SCRIPT,
+    "tv":           BASE_DIR / "atualizar_antecipacoes.py",  # tv.html é gerado junto
 }
 
 def run_script(name):

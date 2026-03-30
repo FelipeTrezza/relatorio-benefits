@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="refresh" content="300"/><!-- recarrega a cada 5 min para pegar dados novos -->
+<title>Benefits Analytics — TV</title>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --surf2:   #1c2330;
+    --border:  #30363d;
+    --green:   #21a366;
+    --greenl:  #2dc974;
+    --greend:  #177a4d;
+    --text:    #e6edf3;
+    --muted:   #8b949e;
+    --inss:    #58a6ff;
+    --priv:    #f0883e;
+    --grupo:   #bc8cff;
+    --red:     #f85149;
+    --yellow:  #e3b341;
+    --card-bg: #1c2330;
+    --card-border: #30363d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+
+  /* ── SLIDE ENGINE ──────────────────────────────────────── */
+  .slide{
+    position:absolute;top:0;left:0;right:0;bottom:0;
+    display:flex;flex-direction:column;padding:24px 32px 16px;
+    opacity:0;transition:opacity .8s ease;pointer-events:none;
+  }
+  .slide.active{opacity:1;pointer-events:auto}
+
+  /* ── HEADER ────────────────────────────────────────────── */
+  .tv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0}
+  .tv-brand{display:flex;align-items:center;gap:12px}
+  .tv-logo{width:36px;height:36px}
+  .tv-title{font-size:18px;font-weight:700}
+  .tv-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .tv-meta{text-align:right}
+  .tv-periodo{font-size:22px;font-weight:800;color:var(--greenl)}
+  .tv-updated{font-size:11px;color:var(--muted);margin-top:3px}
+
+  /* ── SLIDE TITLE ───────────────────────────────────────── */
+  .slide-title{
+    font-size:20px;font-weight:800;color:var(--text);
+    text-transform:uppercase;letter-spacing:1.2px;
+    text-align:center;margin-bottom:14px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .slide-title::before,.slide-title::after{
+    content:'';display:inline-block;height:3px;width:60px;
+    background:linear-gradient(90deg,transparent,var(--green));border-radius:2px;
+  }
+  .slide-title::after{background:linear-gradient(90deg,var(--green),transparent)}
+
+  /* ── DASHBOARD GRID ────────────────────────────────────── */
+  .dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    flex:1;
+    min-height:0;
+  }
+  .setor-col{display:flex;flex-direction:column;gap:8px;min-height:0}
+
+  /* ── PILL HEADER ───────────────────────────────────────── */
+  .pill-header{
+    border-radius:40px;padding:9px 0;text-align:center;
+    font-size:15px;font-weight:800;color:#fff;letter-spacing:.3px;flex-shrink:0;
+  }
+  .pill-total  {background:linear-gradient(135deg,#1a6640,#21a366)}
+  .pill-publico{background:linear-gradient(135deg,#1f7a45,#27b96a)}
+  .pill-privado{background:linear-gradient(135deg,#3a8a52,#4db870)}
+  .pill-grupo  {background:linear-gradient(135deg,#5aa668,#7ec87e)}
+
+  /* ── METRICS GRID ──────────────────────────────────────── */
+  .metrics-grid{
+    display:grid;grid-template-columns:1fr 1fr;
+    grid-auto-rows:1fr;gap:8px;flex:1;min-height:0;
+  }
+  .mc{
+    background:var(--card-bg);border:1px solid var(--card-border);
+    border-radius:12px;padding:10px 12px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    min-height:0;overflow:hidden;
+  }
+  .mc-lbl{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.1px;line-height:1.2}
+  .mc-val{font-size:clamp(16px,2vw,26px);font-weight:800;color:var(--greenl);line-height:1;letter-spacing:-0.5px}
+  .mc-delta{font-size:10px;font-weight:700}
+  .mc-delta.up{color:var(--greenl)} .mc-delta.dn{color:var(--red)} .mc-delta.fl{color:var(--muted)}
+
+  /* ── PROGRESS BAR ──────────────────────────────────────── */
+  .tv-progress{
+    flex-shrink:0;margin-top:10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .progress-dots{display:flex;gap:8px;justify-content:center;flex:1}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .3s}
+  .dot.active{background:var(--greenl)}
+  .progress-bar-wrap{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+  .progress-bar-fill{height:100%;background:var(--greenl);border-radius:2px;width:0%;transition:width linear}
+</style>
+</head>
+<body>
+
+<!-- ── SLIDE 1: Todas as Antecipações ───────────────────── -->
+<div class="slide active" id="slide-0">
+  <div class="tv-header">
+    <div class="tv-brand">
+      <svg class="tv-logo" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#21a366"/><text x="18" y="24" text-anchor="middle" font-size="16" font-weight="bold" fill="white">P</text></svg>
+      <div>
+        <div class="tv-sub">Benefits · Antecipações de Salário</div>
+        <div class="tv-title">Relatório Gerencial</div>
+      </div>
+    </div>
+    <div class="tv-meta">
+      <div class="tv-periodo" id="s0-periodo">—</div>
+      <div class="tv-updated" id="s0-updated">—</div>
+    </div>
+  </div>
+  <div class="slide-title">Todas as Antecipações</div>
+  <div class="dashboard-grid" id="grid-0"></div>
+  <div class="tv-progress">
+    <div class="progress-dots" id="progress-dots"></div>
+  </div>
+</div>
+
+<!-- ── SLIDE 2: Excluindo GDF e RJ ──────────────────────── -->
+<div class="slide" id="slide-1">
+  <div class="tv-header">
+    <div class="tv-brand">
+      <svg class="tv-logo" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#21a366"/><text x="18" y="24" text-anchor="middle" font-size="16" font-weight="bold" fill="white">P</text></svg>
+      <div>
+        <div class="tv-sub">Benefits · Antecipações de Salário</div>
+        <div class="tv-title">Relatório Gerencial</div>
+      </div>
+    </div>
+    <div class="tv-meta">
+      <div class="tv-periodo" id="s1-periodo">—</div>
+      <div class="tv-updated" id="s1-updated">—</div>
+    </div>
+  </div>
+  <div class="slide-title">Excluindo GDF e RJ</div>
+  <div class="dashboard-grid" id="grid-1"></div>
+  <div class="tv-progress">
+    <div class="progress-dots"></div>
+  </div>
+</div>
+
+<!-- ── SLIDE 3: PIX ──────────────────────────────────────── -->
+<div class="slide" id="slide-2">
+  <div class="tv-header">
+    <div class="tv-brand">
+      <svg class="tv-logo" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#21a366"/><text x="18" y="24" text-anchor="middle" font-size="16" font-weight="bold" fill="white">P</text></svg>
+      <div>
+        <div class="tv-sub">Benefits · Antecipações PIX</div>
+        <div class="tv-title">Relatório Gerencial</div>
+      </div>
+    </div>
+    <div class="tv-meta">
+      <div class="tv-periodo" id="s2-periodo">—</div>
+      <div class="tv-updated" id="s2-updated">—</div>
+    </div>
+  </div>
+  <div class="slide-title">PIX</div>
+  <div class="dashboard-grid" id="grid-2"></div>
+  <div class="tv-progress">
+    <div class="progress-dots"></div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// DADOS — injetados por atualizar_antecipacoes.py + atualizar_pix.py
+// ================================================================
+const DATA     = {
+  "cur_label": "Mar/26",
+  "prev_label": "Fev/26",
+  "setores": {
+    "public": {
+      "vidas": 27491,
+      "vidas_prv": 41624,
+      "antecipacoes": 97835,
+      "antecip_prv": 219180,
+      "tpv": 18805377.27,
+      "tpv_prv": 50127373.45,
+      "abertura": 2319,
+      "abertura_prv": 2191,
+      "vidas_novas": 1702,
+      "vidas_novas_prv": 1980
+    },
+    "private": {
+      "vidas": 1959,
+      "vidas_prv": 2049,
+      "antecipacoes": 8503,
+      "antecip_prv": 8626,
+      "tpv": 656954.12,
+      "tpv_prv": 716842.59,
+      "abertura": 591,
+      "abertura_prv": 522,
+      "vidas_novas": 253,
+      "vidas_novas_prv": 298
+    },
+    "grupo": {
+      "vidas": 51620,
+      "vidas_prv": 50116,
+      "antecipacoes": 203303,
+      "antecip_prv": 190626,
+      "tpv": 27685900.99,
+      "tpv_prv": 27019855.06,
+      "abertura": 1994,
+      "abertura_prv": 2501,
+      "vidas_novas": 4189,
+      "vidas_novas_prv": 4179
+    },
+    "INSS": {
+      "vidas": 0,
+      "vidas_prv": 0,
+      "antecipacoes": 0,
+      "antecip_prv": 0,
+      "tpv": 0.0,
+      "tpv_prv": 0.0,
+      "abertura": 861,
+      "abertura_prv": 459,
+      "vidas_novas": 0,
+      "vidas_novas_prv": 0
+    }
+  }
+};
+const DATA2    = {
+  "cur_label": "Mar/26",
+  "prev_label": "Fev/26",
+  "setores": {
+    "public": {
+      "vidas": 21560,
+      "vidas_prv": 19715,
+      "antecipacoes": 83104,
+      "antecip_prv": 75151,
+      "tpv": 16108962.78,
+      "tpv_prv": 15818680.54,
+      "abertura": 1321,
+      "abertura_prv": 1180,
+      "vidas_novas": 1668,
+      "vidas_novas_prv": 1753
+    },
+    "private": {
+      "vidas": 1959,
+      "vidas_prv": 2049,
+      "antecipacoes": 8503,
+      "antecip_prv": 8626,
+      "tpv": 656954.12,
+      "tpv_prv": 716842.59,
+      "abertura": 591,
+      "abertura_prv": 522,
+      "vidas_novas": 253,
+      "vidas_novas_prv": 298
+    },
+    "grupo": {
+      "vidas": 51620,
+      "vidas_prv": 50116,
+      "antecipacoes": 203303,
+      "antecip_prv": 190626,
+      "tpv": 27685900.99,
+      "tpv_prv": 27019855.06,
+      "abertura": 1994,
+      "abertura_prv": 2501,
+      "vidas_novas": 4189,
+      "vidas_novas_prv": 4179
+    },
+    "INSS": {
+      "vidas": 0,
+      "vidas_prv": 0,
+      "antecipacoes": 0,
+      "antecip_prv": 0,
+      "tpv": 0.0,
+      "tpv_prv": 0.0,
+      "abertura": 860,
+      "abertura_prv": 459,
+      "vidas_novas": 0,
+      "vidas_novas_prv": 0
+    }
+  }
+};
+const DATA_PIX = {
+  "cur_label": "Mar/26",
+  "prev_label": "Fev/26",
+  "setores": {
+    "public": {
+      "vidas": 2758,
+      "vidas_prv": 3780,
+      "antecipacoes": 12198,
+      "antecip_prv": 14781,
+      "tpv": 937996.15,
+      "tpv_prv": 1455561.47,
+      "abertura": 2319,
+      "abertura_prv": 2191,
+      "vidas_novas": 300,
+      "vidas_novas_prv": 308
+    },
+    "private": {
+      "vidas": 281,
+      "vidas_prv": 295,
+      "antecipacoes": 1392,
+      "antecip_prv": 1474,
+      "tpv": 54324.05,
+      "tpv_prv": 47598.91,
+      "abertura": 591,
+      "abertura_prv": 522,
+      "vidas_novas": 34,
+      "vidas_novas_prv": 56
+    },
+    "grupo": {
+      "vidas": 6659,
+      "vidas_prv": 4872,
+      "antecipacoes": 27432,
+      "antecip_prv": 18364,
+      "tpv": 1504229.94,
+      "tpv_prv": 993344.29,
+      "abertura": 1994,
+      "abertura_prv": 2501,
+      "vidas_novas": 838,
+      "vidas_novas_prv": 617
+    },
+    "INSS": {
+      "vidas": 0,
+      "vidas_prv": 0,
+      "antecipacoes": 0,
+      "antecip_prv": 0,
+      "tpv": 0.0,
+      "tpv_prv": 0.0,
+      "abertura": 861,
+      "abertura_prv": 459,
+      "vidas_novas": 0,
+      "vidas_novas_prv": 0
+    }
+  }
+};
+const UPDATED  = '30/03/2026 11:18';
+
+const SLIDES_DATA = [DATA, DATA2, DATA_PIX];
+const INTERVAL_MS = 60000; // 1 minuto por slide
+
+// ================================================================
+// HELPERS
+// ================================================================
+function fmtVal(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return (n/1e9).toFixed(1).replace('.',',') + 'Bi';
+  if (abs >= 1e6) return (n/1e6).toFixed(1).replace('.',',') + 'Mi';
+  if (abs >= 1e3) return (n/1e3).toFixed(1).replace('.',',') + 'k';
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
+}
+function fmtBRL(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e6) return 'R$ ' + (n/1e6).toFixed(1).replace('.',',') + 'Mi';
+  if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(1).replace('.',',') + 'K';
+  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
+}
+function fmtInt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return Math.round(n).toLocaleString('pt-BR');
+}
+function delta(cur, prv) {
+  if (!prv) return {cls:'fl', txt:'—'};
+  const p = (cur - prv) / prv * 100;
+  return {cls: p>0?'up':p<0?'dn':'fl', txt: (p>=0?'↑ +':'↓ ')+Math.abs(p).toFixed(2).replace('.',',')+'%'};
+}
+function mc(label, valCur, valPrv, fmt) {
+  const v = fmt(valCur);
+  const d = delta(valCur, valPrv);
+  return `<div class="mc">
+    <div class="mc-lbl">${label}</div>
+    <div class="mc-val">${v}</div>
+    <div class="mc-delta ${d.cls}">${d.txt}</div>
+  </div>`;
+}
+
+// ================================================================
+// RENDER SLIDE
+// ================================================================
+function renderGrid(gridId, D) {
+  const COLS = [
+    {key:'total',   label:'Total',   pill:'pill-total'},
+    {key:'public',  label:'Público', pill:'pill-publico'},
+    {key:'private', label:'Privado', pill:'pill-privado'},
+    {key:'grupo',   label:'Grupo',   pill:'pill-grupo'},
+  ];
+
+  const allSetores = ['public','private','grupo','INSS'];
+  const sum = f => allSetores.reduce((s,k) => s + ((D.setores[k]&&D.setores[k][f])||0), 0);
+  D.setores.total = {
+    vidas:sum('vidas'), vidas_prv:sum('vidas_prv'),
+    antecipacoes:sum('antecipacoes'), antecip_prv:sum('antecip_prv'),
+    tpv:sum('tpv'), tpv_prv:sum('tpv_prv'),
+    abertura:sum('abertura'), abertura_prv:sum('abertura_prv'),
+    vidas_novas:sum('vidas_novas'), vidas_novas_prv:sum('vidas_novas_prv'),
+  };
+
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+
+  COLS.forEach(col => {
+    const s = D.setores[col.key];
+    if (!s) return;
+    const tk_c = s.antecipacoes > 0 ? s.tpv / s.antecipacoes : 0;
+    const tk_p = s.antecip_prv  > 0 ? s.tpv_prv / s.antecip_prv : 0;
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="setor-col">
+        <div class="pill-header ${col.pill}">${col.label}</div>
+        <div class="metrics-grid">
+          ${mc('Vidas Antecipando #',       s.vidas,        s.vidas_prv,       fmtVal)}
+          ${mc('Antecipações #',            s.antecipacoes, s.antecip_prv,     fmtVal)}
+          ${mc('TPV R$',                    s.tpv,          s.tpv_prv,         fmtBRL)}
+          ${mc('Ticket Médio R$',           tk_c,           tk_p,              fmtBRL)}
+          ${mc('Abertura de Conta #',       s.abertura,     s.abertura_prv,    fmtVal)}
+          ${mc('Vidas Novas Antecipando #', s.vidas_novas,  s.vidas_novas_prv, fmtInt)}
+        </div>
+      </div>`);
+  });
+}
+
+// ================================================================
+// SLIDE ENGINE
+// ================================================================
+let currentSlide = 0;
+let progressTimer = null;
+const TOTAL = 3;
+
+function initDots() {
+  // Cria dots apenas no primeiro slide (visível)
+  const dotsEl = document.getElementById('progress-dots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goToSlide(i);
+    d.style.cursor = 'pointer';
+    dotsEl.appendChild(d);
+  }
+}
+
+function updateDots(idx) {
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+}
+
+function goToSlide(idx) {
+  document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+  currentSlide = idx % TOTAL;
+  document.getElementById(`slide-${currentSlide}`).classList.add('active');
+  updateDots(currentSlide);
+  restartProgress();
+}
+
+function restartProgress() {
+  if (progressTimer) clearInterval(progressTimer);
+  const start = Date.now();
+  progressTimer = setInterval(() => {
+    const elapsed = Date.now() - start;
+    if (elapsed >= INTERVAL_MS) {
+      clearInterval(progressTimer);
+      goToSlide(currentSlide + 1);
+    }
+  }, 500);
+}
+
+// ================================================================
+// INIT
+// ================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Renderiza os 3 grids
+  renderGrid('grid-0', DATA);
+  renderGrid('grid-1', DATA2);
+  renderGrid('grid-2', DATA_PIX);
+
+  // Preenche período e updated em cada slide
+  [DATA, DATA2, DATA_PIX].forEach((d, i) => {
+    const per = `${d.cur_label} vs ${d.prev_label}`;
+    document.getElementById(`s${i}-periodo`).textContent = per;
+    document.getElementById(`s${i}-updated`).textContent = `Atualizado em ${UPDATED}`;
+  });
+
+  initDots();
+  restartProgress();
+});
+</script>
+</body>
+</html>
