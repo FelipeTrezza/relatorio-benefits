@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Antecipações PIX — Benefits</title>
+<title>Antecipações — Benefits</title>
 <style>
   :root {
     --bg:      #0d1117;
@@ -52,6 +52,8 @@
   main{max-width:1520px;margin:0 auto;padding:22px 28px}
 
   /* ── PERIODO LABEL ───────────────────────────────────────── */
+  .sec-lbl{font-size:15px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+  .sec-lbl::before{content:'';display:inline-block;width:4px;height:16px;background:var(--green);border-radius:2px}
   .periodo-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
   .periodo-title{font-size:13px;font-weight:700;color:var(--text)}
   .periodo-sub{font-size:11px;color:var(--muted);margin-top:2px}
@@ -141,7 +143,7 @@
   <div class="hdr-left">
     <svg class="hdr-logo" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#21a366"/><text x="16" y="21" text-anchor="middle" font-size="14" font-weight="bold" fill="white">P</text></svg>
     <div>
-      <div class="hdr-sub">Benefits · Antecipações PIX</div>
+      <div class="hdr-sub">Benefits · Antecipações</div>
       <div class="hdr-title">Relatório Gerencial</div>
     </div>
   </div>
@@ -164,24 +166,25 @@
     <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 2c1.29 0 2.49.38 3.5 1.03L3.03 11.5A5.97 5.97 0 0 1 2 8c0-3.31 2.69-6 6-6zm0 12c-1.29 0-2.49-.38-3.5-1.03l8.47-8.47A5.97 5.97 0 0 1 14 8c0 3.31-2.69 6-6 6z"/></svg>
     Abertura de Contas
   </a>
-  <a class="nav-tab active" href="antecipacoes.html">
+  <a class="nav-tab" href="antecipacoes.html">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>
     Antecipações
   </a>
 
   <a class="nav-tab active" href="pix.html">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 2a.5.5 0 0 1 .5.5V6h3.5a.5.5 0 0 1 0 1H10v3.5a.5.5 0 0 1-1 0V7H5.5a.5.5 0 0 1 0-1H9V2.5a.5.5 0 0 1 .5-.5z"/></svg>
-    Antecipações PIX
+    Antecipações
   </a>
 </nav>
 
 <main>
 
   <!-- PERIODO BAR -->
+  <div class="sec-lbl">PIX</div>
   <div class="periodo-bar">
     <div>
       <div class="periodo-title" id="periodo-title">— vs —</div>
-      <div class="periodo-sub">Antecipações realizadas via PIX · MTD mesma janela de dias</div>
+      <div class="periodo-sub">Comparativo MTD — mesma janela de dias</div>
     </div>
   </div>
 
@@ -322,12 +325,77 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDashboard();
 });
 
+const REFRESH_ENDPOINT = '/atualizar/pix';
+
 function refreshData() {
   const btn = document.getElementById('btn-refresh');
-  btn.classList.add('spinning');
-  btn.disabled = true;
-  btn.title = 'Recarregando...';
-  setTimeout(() => { window.location.reload(); }, 800);
+  const SERVER = 'http://localhost:5001';
+  const endpoint = REFRESH_ENDPOINT;  // definido por cada página
+
+  // Verifica se o servidor está rodando
+  fetch(SERVER + '/status', { signal: AbortSignal.timeout(2000) })
+    .then(r => r.json())
+    .then(status => {
+      if (status.running) {
+        alert('⏳ Já existe uma atualização em andamento. Aguarde...');
+        return;
+      }
+      // Inicia a atualização
+      btn.classList.add('spinning');
+      btn.disabled = true;
+      btn.title = 'Atualizando dados...';
+      document.getElementById('upd-ts').textContent = '...';
+
+      fetch(SERVER + endpoint, { method: 'POST' })
+        .then(r => r.json())
+        .then(() => pollStatus(SERVER))
+        .catch(err => { showError(err); });
+    })
+    .catch(() => {
+      // Servidor não está rodando
+      const msg = 'Servidor local não encontrado.
+
+' +
+        'Para ativar o botão Atualizar, abra um terminal e rode:
+
+' +
+        '  cd ~/relatorio-benefits && python3 server.py
+
+' +
+        'Deixe o terminal aberto enquanto usa os relatórios.';
+      alert(msg);
+    });
+}
+
+function pollStatus(SERVER) {
+  const btn = document.getElementById('btn-refresh');
+  const interval = setInterval(() => {
+    fetch(SERVER + '/status')
+      .then(r => r.json())
+      .then(s => {
+        if (!s.running) {
+          clearInterval(interval);
+          btn.classList.remove('spinning');
+          btn.disabled = false;
+          if (s.last_status === 'success') {
+            document.getElementById('upd-ts').textContent = 'atualizado!';
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            btn.title = 'Erro na atualização — veja o terminal';
+            document.getElementById('upd-ts').textContent = 'erro';
+            alert('❌ Erro na atualização. Veja o terminal do servidor.');
+          }
+        }
+      });
+  }, 3000);  // poll a cada 3s
+}
+
+function showError(err) {
+  const btn = document.getElementById('btn-refresh');
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+  document.getElementById('upd-ts').textContent = 'erro';
+  console.error(err);
 }
 
 (function setUpdTs(){
