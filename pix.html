@@ -375,12 +375,77 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDashboard();
 });
 
+const REFRESH_ENDPOINT = '/atualizar/pix';
+
 function refreshData() {
   const btn = document.getElementById('btn-refresh');
-  btn.classList.add('spinning');
-  btn.disabled = true;
-  btn.title = 'Recarregando...';
-  setTimeout(() => { window.location.reload(); }, 800);
+  const SERVER = 'http://localhost:5001';
+  const endpoint = REFRESH_ENDPOINT;  // definido por cada página
+
+  // Verifica se o servidor está rodando
+  fetch(SERVER + '/status', { signal: AbortSignal.timeout(2000) })
+    .then(r => r.json())
+    .then(status => {
+      if (status.running) {
+        alert('⏳ Já existe uma atualização em andamento. Aguarde...');
+        return;
+      }
+      // Inicia a atualização
+      btn.classList.add('spinning');
+      btn.disabled = true;
+      btn.title = 'Atualizando dados...';
+      document.getElementById('upd-ts').textContent = '...';
+
+      fetch(SERVER + endpoint, { method: 'POST' })
+        .then(r => r.json())
+        .then(() => pollStatus(SERVER))
+        .catch(err => { showError(err); });
+    })
+    .catch(() => {
+      // Servidor não está rodando
+      const msg = 'Servidor local não encontrado.
+
+' +
+        'Para ativar o botão Atualizar, abra um terminal e rode:
+
+' +
+        '  cd ~/relatorio-benefits && python3 server.py
+
+' +
+        'Deixe o terminal aberto enquanto usa os relatórios.';
+      alert(msg);
+    });
+}
+
+function pollStatus(SERVER) {
+  const btn = document.getElementById('btn-refresh');
+  const interval = setInterval(() => {
+    fetch(SERVER + '/status')
+      .then(r => r.json())
+      .then(s => {
+        if (!s.running) {
+          clearInterval(interval);
+          btn.classList.remove('spinning');
+          btn.disabled = false;
+          if (s.last_status === 'success') {
+            document.getElementById('upd-ts').textContent = 'atualizado!';
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            btn.title = 'Erro na atualização — veja o terminal';
+            document.getElementById('upd-ts').textContent = 'erro';
+            alert('❌ Erro na atualização. Veja o terminal do servidor.');
+          }
+        }
+      });
+  }, 3000);  // poll a cada 3s
+}
+
+function showError(err) {
+  const btn = document.getElementById('btn-refresh');
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+  document.getElementById('upd-ts').textContent = 'erro';
+  console.error(err);
 }
 
 (function setUpdTs(){
