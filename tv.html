@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta http-equiv="refresh" content="300"/><!-- recarrega a cada 5 min para pegar dados novos -->
+<!-- auto-refresh via JS — só recarrega fora do fullscreen -->
 <title>Benefits Analytics — TV</title>
 <style>
   :root {
@@ -211,6 +211,13 @@ document.addEventListener('fullscreenchange', () => {
   document.getElementById('fs-icon-exit').style.display  = full ? ''     : 'none';
   document.getElementById('btn-fs').title = full ? 'Sair (Esc)' : 'Modo apresentação (F)';
 });
+// Auto-refresh a cada 5 min — só quando NÃO está em fullscreen
+setInterval(() => {
+  if (!document.fullscreenElement) {
+    window.location.reload();
+  }
+}, 300000);
+
 document.addEventListener('keydown', e => {
   if (e.key === 'f' || e.key === 'F') toggleFullscreen();
   if (e.key === 'ArrowRight' || e.key === ' ') goToSlide(currentSlide + 1);
@@ -382,7 +389,7 @@ const DATA_PIX = {
     }
   }
 };
-const UPDATED  = '31/03/2026 07:15';
+const UPDATED  = '31/03/2026 07:24';
 
 const SLIDES_DATA = [DATA, DATA2, DATA_PIX];
 const INTERVAL_MS = 60000; // 1 minuto por slide
