@@ -389,7 +389,7 @@ const DATA_PIX = {
     }
   }
 };
-const UPDATED  = '31/03/2026 07:30';
+const UPDATED  = '31/03/2026 08:33';
 
 const SLIDES_DATA = [DATA, DATA2, DATA_PIX];
 const INTERVAL_MS = 60000; // 1 minuto por slide
@@ -510,15 +510,10 @@ function goToSlide(idx) {
 }
 
 function restartProgress() {
-  if (progressTimer) clearInterval(progressTimer);
-  const start = Date.now();
-  progressTimer = setInterval(() => {
-    const elapsed = Date.now() - start;
-    if (elapsed >= INTERVAL_MS) {
-      clearInterval(progressTimer);
-      goToSlide(currentSlide + 1);
-    }
-  }, 500);
+  if (progressTimer) clearTimeout(progressTimer);
+  progressTimer = setTimeout(() => {
+    goToSlide(currentSlide + 1);
+  }, INTERVAL_MS);
 }
 
 // ================================================================

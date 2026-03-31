@@ -351,15 +351,10 @@ function goToSlide(idx) {
 }
 
 function restartProgress() {
-  if (progressTimer) clearInterval(progressTimer);
-  const start = Date.now();
-  progressTimer = setInterval(() => {
-    const elapsed = Date.now() - start;
-    if (elapsed >= INTERVAL_MS) {
-      clearInterval(progressTimer);
-      goToSlide(currentSlide + 1);
-    }
-  }, 500);
+  if (progressTimer) clearTimeout(progressTimer);
+  progressTimer = setTimeout(() => {
+    goToSlide(currentSlide + 1);
+  }, INTERVAL_MS);
 }
 
 // ================================================================
