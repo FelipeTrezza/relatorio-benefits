@@ -949,57 +949,127 @@ window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)
   <div class="sec-title">🏢 Análise por Setor — Dados Reais</div>
   <div class="sec-sub">Público domina em volume mas tem a menor taxa de ativação. Grupo tem quase 100% de conta aberta e lidera em antecipação absoluta.</div>
   <div class="g3">
+    <!-- PÚBLICO -->
     <div class="setor-card" style="border-top:3px solid var(--blue)">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
         <span class="sb sb-pub">🏛️ Público</span>
         <span style="font-size:15px;font-weight:700">Público</span>
       </div>
       <div class="sr"><span class="sr-lbl">Total Vidas</span><span class="sr-val">1.14M</span></div>
-      <div class="sr"><span class="sr-lbl">Com Conta</span><span class="sr-val">340.1k <span class="td-m">(29%)</span></span></div>
-      <div class="sr"><span class="sr-lbl">Sem Conta</span><span class="sr-val" style="color:var(--red)">796.8k</span></div>
-      <div class="sr"><span class="sr-lbl">Com Margem</span><span class="sr-val">127.9k</span></div>
-      <div class="sr"><span class="sr-lbl">MAU 30d</span><span class="sr-val">114.5k</span></div>
+      <div class="sr"><span class="sr-lbl">Com Conta</span><span class="sr-val">320.2k <span class="td-m">(28%)</span></span></div>
+      <div class="sr"><span class="sr-lbl">Sem Conta</span><span class="sr-val" style="color:var(--red)">816.8k</span></div>
+      <!-- Com conta: sem/com margem -->
+      <div style="display:flex;gap:6px;margin:6px 0 2px;padding:7px 10px;background:rgba(88,166,255,.07);border-radius:7px;border:1px solid rgba(88,166,255,.15)">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--green)">318.0k</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--yellow)">2.2k</div>
+        </div>
+      </div>
+      <div class="sr" style="margin-top:6px"><span class="sr-lbl">MAU geral (90d)</span><span class="sr-val">168.4k</span></div>
+      <!-- MAU geral: sem/com margem -->
+      <div style="display:flex;gap:6px;margin:4px 0 6px;padding:7px 10px;background:rgba(88,166,255,.07);border-radius:7px;border:1px solid rgba(88,166,255,.15)">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--green)">167.2k</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--yellow)">1.2k</div>
+        </div>
+      </div>
       <div class="sr"><span class="sr-lbl">Antecipando</span><span class="sr-val" style="color:var(--blue)">27.6k</span></div>
       <div class="sfunnel">
-        <div class="sfr"><span class="sfr-l">Ativação</span><div class="sfr-bw"><div class="sfr-b" style="width:29%;background:var(--blue)"></div></div><span class="sfr-p" style="color:var(--blue)">29%</span></div>
-        <div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:37%;background:var(--blue)88"></div></div><span class="sfr-p" style="color:var(--blue)">37%</span></div>
-        <div class="sfr"><span class="sfr-l">MAU</span><div class="sfr-bw"><div class="sfr-b" style="width:33%;background:var(--blue)66"></div></div><span class="sfr-p" style="color:var(--blue)">33%</span></div>
+        <div class="sfr"><span class="sfr-l">Ativação</span><div class="sfr-bw"><div class="sfr-b" style="width:28%;background:var(--blue)"></div></div><span class="sfr-p" style="color:var(--blue)">28%</span></div>
+        <div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:99%;background:var(--blue)88"></div></div><span class="sfr-p" style="color:var(--blue)">99%</span></div>
+        <div class="sfr"><span class="sfr-l">MAU geral</span><div class="sfr-bw"><div class="sfr-b" style="width:53%;background:var(--blue)66"></div></div><span class="sfr-p" style="color:var(--blue)">53%</span></div>
         <div class="sfr"><span class="sfr-l">Antecipou</span><div class="sfr-bw"><div class="sfr-b" style="width:60%;background:var(--greenl)"></div></div><span class="sfr-p" style="color:var(--greenl)">60%</span></div>
       </div>
     </div>
+
+    <!-- GRUPO -->
     <div class="setor-card" style="border-top:3px solid var(--purple)">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
         <span class="sb sb-grp">🏗️ Grupo</span>
         <span style="font-size:15px;font-weight:700">Grupo</span>
       </div>
       <div class="sr"><span class="sr-lbl">Total Vidas</span><span class="sr-val">185.3k</span></div>
-      <div class="sr"><span class="sr-lbl">Com Conta</span><span class="sr-val">179.9k <span class="td-m">(97%)</span></span></div>
+      <div class="sr"><span class="sr-lbl">Com Conta</span><span class="sr-val">187.6k <span class="td-m">(101%*)</span></span></div>
       <div class="sr"><span class="sr-lbl">Sem Conta</span><span class="sr-val" style="color:var(--red)">5.4k</span></div>
-      <div class="sr"><span class="sr-lbl">Com Margem</span><span class="sr-val">130.9k</span></div>
-      <div class="sr"><span class="sr-lbl">MAU 30d</span><span class="sr-val">172.4k</span></div>
+      <div style="display:flex;gap:6px;margin:6px 0 2px;padding:7px 10px;background:rgba(188,140,255,.07);border-radius:7px;border:1px solid rgba(188,140,255,.15)">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--green)">156.7k</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--yellow)">31.1k</div>
+        </div>
+      </div>
+      <div class="sr" style="margin-top:6px"><span class="sr-lbl">MAU geral (90d)</span><span class="sr-val">180.9k</span></div>
+      <div style="display:flex;gap:6px;margin:4px 0 6px;padding:7px 10px;background:rgba(188,140,255,.07);border-radius:7px;border:1px solid rgba(188,140,255,.15)">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--green)">155.6k</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--yellow)">25.4k</div>
+        </div>
+      </div>
       <div class="sr"><span class="sr-lbl">Antecipando</span><span class="sr-val" style="color:var(--purple)">50.3k</span></div>
       <div class="sfunnel">
         <div class="sfr"><span class="sfr-l">Ativação</span><div class="sfr-bw"><div class="sfr-b" style="width:97%;background:var(--purple)"></div></div><span class="sfr-p" style="color:var(--purple)">97%</span></div>
-        <div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:72%;background:var(--purple)88"></div></div><span class="sfr-p" style="color:var(--purple)">72%</span></div>
-        <div class="sfr"><span class="sfr-l">MAU</span><div class="sfr-bw"><div class="sfr-b" style="width:95%;background:var(--purple)66"></div></div><span class="sfr-p" style="color:var(--purple)">95%</span></div>
+        <div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:83%;background:var(--purple)88"></div></div><span class="sfr-p" style="color:var(--purple)">83%</span></div>
+        <div class="sfr"><span class="sfr-l">MAU geral</span><div class="sfr-bw"><div class="sfr-b" style="width:96%;background:var(--purple)66"></div></div><span class="sfr-p" style="color:var(--purple)">96%</span></div>
         <div class="sfr"><span class="sfr-l">Antecipou</span><div class="sfr-bw"><div class="sfr-b" style="width:38%;background:var(--greenl)"></div></div><span class="sfr-p" style="color:var(--greenl)">38%</span></div>
       </div>
     </div>
+
+    <!-- PRIVADO -->
     <div class="setor-card" style="border-top:3px solid var(--orange)">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
         <span class="sb sb-pri">🏭 Privado</span>
         <span style="font-size:15px;font-weight:700">Privado</span>
       </div>
       <div class="sr"><span class="sr-lbl">Total Vidas</span><span class="sr-val">32.7k</span></div>
-      <div class="sr"><span class="sr-lbl">Com Conta</span><span class="sr-val">24.1k <span class="td-m">(73%)</span></span></div>
+      <div class="sr"><span class="sr-lbl">Com Conta</span><span class="sr-val">54.0k <span class="td-m">(165%*)</span></span></div>
       <div class="sr"><span class="sr-lbl">Sem Conta</span><span class="sr-val" style="color:var(--red)">8.6k</span></div>
-      <div class="sr"><span class="sr-lbl">Com Margem</span><span class="sr-val">10.4k</span></div>
-      <div class="sr"><span class="sr-lbl">MAU 30d</span><span class="sr-val">13.0k</span></div>
+      <div style="display:flex;gap:6px;margin:6px 0 2px;padding:7px 10px;background:rgba(240,136,62,.07);border-radius:7px;border:1px solid rgba(240,136,62,.15)">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--green)">20.3k</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--yellow)">33.7k</div>
+        </div>
+      </div>
+      <div class="sr" style="margin-top:6px"><span class="sr-lbl">MAU geral (90d)</span><span class="sr-val">37.4k</span></div>
+      <div style="display:flex;gap:6px;margin:4px 0 6px;padding:7px 10px;background:rgba(240,136,62,.07);border-radius:7px;border:1px solid rgba(240,136,62,.15)">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--green)">13.7k</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
+          <div style="font-size:13px;font-weight:800;color:var(--yellow)">23.7k</div>
+        </div>
+      </div>
       <div class="sr"><span class="sr-lbl">Antecipando</span><span class="sr-val" style="color:var(--orange)">1.9k</span></div>
       <div class="sfunnel">
         <div class="sfr"><span class="sfr-l">Ativação</span><div class="sfr-bw"><div class="sfr-b" style="width:73%;background:var(--orange)"></div></div><span class="sfr-p" style="color:var(--orange)">73%</span></div>
-        <div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:43%;background:var(--orange)88"></div></div><span class="sfr-p" style="color:var(--orange)">43%</span></div>
-        <div class="sfr"><span class="sfr-l">MAU</span><div class="sfr-bw"><div class="sfr-b" style="width:53%;background:var(--orange)66"></div></div><span class="sfr-p" style="color:var(--orange)">53%</span></div>
+        <div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:38%;background:var(--orange)88"></div></div><span class="sfr-p" style="color:var(--orange)">38%</span></div>
+        <div class="sfr"><span class="sfr-l">MAU geral</span><div class="sfr-bw"><div class="sfr-b" style="width:69%;background:var(--orange)66"></div></div><span class="sfr-p" style="color:var(--orange)">69%</span></div>
         <div class="sfr"><span class="sfr-l">Antecipou</span><div class="sfr-bw"><div class="sfr-b" style="width:32%;background:var(--greenl)"></div></div><span class="sfr-p" style="color:var(--greenl)">32%</span></div>
       </div>
     </div>
@@ -1486,91 +1556,84 @@ function setTMP(s){
       <div id="dia-footer" style="margin-top:10px;font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap"></div>
     </div>
     <div class="card">
-      <div class="chart-title">Ticket Médio por Dia do Mês (R$)</div>
-      <div class="bar-chart">
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 30</div>
-          <div class="bc-bw"><div class="bc-b" style="width:100%;background:var(--yellow)">R$ 341</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 23</div>
-          <div class="bc-bw"><div class="bc-b" style="width:89%;background:var(--yellow)">R$ 307</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 29</div>
-          <div class="bc-bw"><div class="bc-b" style="width:89%;background:var(--yellow)">R$ 305</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 31</div>
-          <div class="bc-bw"><div class="bc-b" style="width:88%;background:var(--yellow)">R$ 302</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 26</div>
-          <div class="bc-bw"><div class="bc-b" style="width:88%;background:var(--yellow)">R$ 301</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 27</div>
-          <div class="bc-bw"><div class="bc-b" style="width:87%;background:var(--yellow)">R$ 300</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 22</div>
-          <div class="bc-bw"><div class="bc-b" style="width:87%;background:var(--yellow)">R$ 298</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 21</div>
-          <div class="bc-bw"><div class="bc-b" style="width:87%;background:var(--yellow)">R$ 298</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 28</div>
-          <div class="bc-bw"><div class="bc-b" style="width:87%;background:var(--yellow)">R$ 297</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 24</div>
-          <div class="bc-bw"><div class="bc-b" style="width:86%;background:var(--yellow)">R$ 295</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 25</div>
-          <div class="bc-bw"><div class="bc-b" style="width:85%;background:var(--yellow)">R$ 292</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 15</div>
-          <div class="bc-bw"><div class="bc-b" style="width:71%;background:var(--yellow)">R$ 245</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 20</div>
-          <div class="bc-bw"><div class="bc-b" style="width:70%;background:var(--yellow)">R$ 241</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 16</div>
-          <div class="bc-bw"><div class="bc-b" style="width:70%;background:var(--yellow)">R$ 241</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">Dia 12</div>
-          <div class="bc-bw"><div class="bc-b" style="width:68%;background:var(--yellow)">R$ 235</div></div>
-          <div class="bc-val td-m"></div>
-        </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div class="chart-title">Ticket Médio por Dia do Mês (R$)</div>
+        <div style="font-size:10px;color:var(--muted)">todos os dias · filtro sincronizado</div>
       </div>
+      <div class="bar-chart" id="ticket-dia-chart"></div>
     </div>
   </div>
   <div class="ins-list" style="margin-top:16px"><div class="ins warn"><span class="ins-ic">⚠️</span><span class="ins-txt"><strong>Dias 1-10 concentram ~65% do volume</strong> mas com ticket médio mais baixo (R$60-230). São antecipações de necessidade imediata — ciclo rápido.</span></div>
 <div class="ins tip"><span class="ins-ic">💡</span><span class="ins-txt"><strong>Dias 20-31 têm ticket 3-5x maior</strong> (R$290-430) com volume menor. Perfil: colaborador que antecipa por planejamento, não por urgência.</span></div>
 <div class="ins goal"><span class="ins-ic">🎯</span><span class="ins-txt"><strong>Dia 10 é o pico absoluto</strong>: ~41.500 antecipações/mês em média. Comunicação push no dia 9 pode capturar intenção antes do horário de pico.</span></div>
 <div class="ins tip"><span class="ins-ic">💡</span><span class="ins-txt"><strong>Dias 4-5 abril/25 tiveram ~95k antecipações</strong> — outlier histórico. Verificar evento especial (pagamento retroativo, 13º adiantado?).</span></div>
+  </div>
 
+  <!-- TOP CONVÊNIOS DIA 10 -->
+  <div style="margin-top:20px">
+    <div class="chart-title" style="margin-bottom:4px">🏆 Top Convênios que Puxam o Dia 10</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Convênios com maior volume de antecipações no dia 10 — últimos 90 dias</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px">
+
+      <!-- Grupo -->
+      <div class="card" style="padding:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">🏗️ Grupo</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11px;color:var(--text)">SEARA ALIMENTOS</span>
+            <span style="font-size:12px;font-weight:800;color:var(--purple)">5.698</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="width:100%;height:100%;background:var(--purple);border-radius:2px;opacity:.7"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+            <span style="font-size:11px;color:var(--text)">SEARA ALI - DOURADOS</span>
+            <span style="font-size:12px;font-weight:800;color:var(--purple)">3.650</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="width:64%;height:100%;background:var(--purple);border-radius:2px;opacity:.7"></div></div>
+        </div>
+      </div>
+
+      <!-- Público -->
+      <div class="card" style="padding:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">🏛️ Público</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11px;color:var(--text)">PIAUÍ SEC. EDUCAÇÃO</span>
+            <span style="font-size:12px;font-weight:800;color:var(--blue)">4.627</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="width:100%;height:100%;background:var(--blue);border-radius:2px;opacity:.7"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+            <span style="font-size:11px;color:var(--text)">ESTADO DO CEARÁ</span>
+            <span style="font-size:12px;font-weight:800;color:var(--blue)">3.485</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="width:75%;height:100%;background:var(--blue);border-radius:2px;opacity:.7"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+            <span style="font-size:11px;color:var(--text)">SEC. POL. MILITAR RJ</span>
+            <span style="font-size:12px;font-weight:800;color:var(--blue)">3.214</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="width:69%;height:100%;background:var(--blue);border-radius:2px;opacity:.7"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+            <span style="font-size:11px;color:var(--text)">SEC. EDUCAÇÃO DF</span>
+            <span style="font-size:12px;font-weight:800;color:var(--blue)">2.929</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="width:63%;height:100%;background:var(--blue);border-radius:2px;opacity:.7"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+            <span style="font-size:11px;color:var(--text)">MUNICÍPIO BOA VISTA</span>
+            <span style="font-size:12px;font-weight:800;color:var(--blue)">2.203</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="width:48%;height:100%;background:var(--blue);border-radius:2px;opacity:.7"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+            <span style="font-size:11px;color:var(--text)">PIAUÍ SEC. SAÚDE</span>
+            <span style="font-size:12px;font-weight:800;color:var(--blue)">2.127</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="width:46%;height:100%;background:var(--blue);border-radius:2px;opacity:.7"></div></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="ins-list" style="margin-top:12px">
+      <div class="ins goal"><span class="ins-ic">🎯</span><span class="ins-txt"><strong>Piauí domina o dia 10 no setor Público</strong> — SEC. Educação + SEC. Saúde somam 6.754 antecipações no dia 10. Timing de campanha por estado pode dobrar conversão.</span></div>
+      <div class="ins tip"><span class="ins-ic">💡</span><span class="ins-txt"><strong>SEARA (Grupo) lidera absoluto</strong> com 5.698 no dia 10 — o dobro do segundo colocado. Alta frequência + margem elevada. Público ideal para comunicação D-1 (dia 9).</span></div>
+    </div>
   </div>
 </section>
 <div class="divider"></div>
@@ -2495,6 +2558,26 @@ function setDIA(s){
     `🔥 Pico: <strong style="color:#e3b341">Dia ${topV.dia}</strong> (${fmtN(topV.qtd)})
      &nbsp;&nbsp;💰 Maior ticket: <strong style="color:#e3b341">Dia ${topT.dia}</strong> (R$${topT.ticket})`;
   document.getElementById('dia-sub').textContent='Volume — '+SNOM[s];
+
+  // Ticket médio — todos os 31 dias em ordem, zero-fill (mostra todos os dias)
+  const ticketChart=document.getElementById('ticket-dia-chart');
+  if(ticketChart){
+    // Zero-fill: garantir dias 1-31 mesmo sem dados
+    const diasMap={};
+    rows.forEach(r=>{ diasMap[r.dia]=r.ticket; });
+    const allDias=Array.from({length:31},(_,i)=>({dia:i+1,ticket:diasMap[i+1]||0}));
+    const maxT=Math.max(...allDias.map(r=>r.ticket))||1;
+    ticketChart.innerHTML=allDias.map(r=>{
+      const w=Math.max(2,Math.round(r.ticket/maxT*100));
+      const cor=r.dia<=10?'var(--green)':r.dia<=20?'var(--blue)':'var(--yellow)';
+      const label=r.ticket>0?`R$ ${Math.round(r.ticket)}`:'—';
+      return `<div class="bc-row">
+        <div class="bc-lbl" style="min-width:42px">Dia ${r.dia}</div>
+        <div class="bc-bw"><div class="bc-b" style="width:${w}%;background:${cor};font-size:10px">${label}</div></div>
+        <div class="bc-val td-m"></div>
+      </div>`;
+    }).join('');
+  }
 }
 
 function setDEST(s){
