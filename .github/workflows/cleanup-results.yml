@@ -1,0 +1,40 @@
+name: Limpeza de resultados antigos
+
+on:
+  schedule:
+    # Roda todo dia às 3h UTC
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Remover resultados com mais de 24h
+        run: |
+          cd results
+          DELETED=0
+          for f in *.json; do
+            [ "$f" = ".gitkeep" ] && continue
+            [ -f "$f" ] || continue
+            # Checar idade pelo timestamp do arquivo
+            AGE=$(( $(date +%s) - $(date -r "$f" +%s 2>/dev/null || echo 0) ))
+            if [ "$AGE" -gt 86400 ]; then
+              rm "$f"
+              DELETED=$((DELETED+1))
+            fi
+          done
+          echo "Removidos: $DELETED arquivos"
+
+      - name: Commit limpeza
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add results/
+          git diff --staged --quiet || git commit -m "chore: limpar resultados antigos"
+          git push || true

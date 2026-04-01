@@ -447,18 +447,16 @@ tbody td{padding:9px 14px;font-size:12px}
   <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
 
   <!-- BANNER OFFLINE -->
-  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:var(--surf2);border:1px solid rgba(248,81,73,.3);border-radius:10px;padding:16px">
-    <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:12px">⚠️ Servidor local necessário para consultar o Databricks</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">
-      Cole o comando abaixo no Terminal e pressione Enter. O servidor sobe automaticamente.<br>
-      <span style="font-size:11px">Depois de rodar, clique em <strong style="color:var(--green)">🔓 Abrir em http://</strong> para usar o funil.</span>
+  <div id="fmkt-offline-banner" style="display:none"></div>
+  <div style="margin-bottom:16px;background:var(--surf2);border:1px solid rgba(88,166,255,.2);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
+    <span style="font-size:18px;line-height:1">⚡</span>
+    <div>
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:4px">Query via GitHub Actions — sem servidor local</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">
+        Ao clicar em <strong style="color:var(--text)">Buscar</strong>, um workflow é disparado no GitHub Actions que executa a query no Databricks e publica o resultado aqui.<br>
+        <strong style="color:var(--yellow)">⏱ Tempo estimado: 60–120s</strong> por campanha. Aguarde o resultado aparecer automaticamente.
+      </div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
-      <code style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 14px;font-size:11px;color:var(--green);min-width:200px;display:block">bash &lt;(curl -sL https://felipetrezza.github.io/relatorio-benefits/setup.sh)</code>
-      <button onclick="copiarComando()" style="background:var(--surf3);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📋 Copiar</button>
-      <button onclick="abrirHttp()" style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🔓 Abrir em http://</button>
-    </div>
-    <div style="font-size:11px;color:var(--muted)">Já instalou antes? Rode <code style="background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--green)">servidor-benefits</code> no terminal e clique em 🔓 Abrir em http://</div>
   </div>
 
   <!-- FILTROS -->
@@ -760,7 +758,101 @@ function copiarComando(){
   });
 }
 
-// ── BUSCAR PRINCIPAL ────────────────────────────────────────────
+// ── CONFIG GITHUB ACTIONS ───────────────────────────────────────
+var GH_TOKEN  = '%%GH_DISPATCH_TOKEN%%'; // substituído no build pelo workflow
+var GH_REPO   = 'FelipeTrezza/relatorio-benefits';
+var GH_PAGES  = 'https://felipetrezza.github.io/relatorio-benefits';
+var POLL_IDS  = {}; // request_id → intervalId (para cancelar polls)
+
+function genRequestId(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+
+// ── DISPARAR WORKFLOW ───────────────────────────────────────────
+function dispatchWorkflow(activity, dateFrom, dateTo, requestId){
+  return fetch('https://api.github.com/repos/' + GH_REPO + '/dispatches', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'token ' + GH_TOKEN,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      event_type: 'funil-query',
+      client_payload: {
+        activity:   activity,
+        date_from:  dateFrom || '',
+        date_to:    dateTo   || '',
+        request_id: requestId
+      }
+    })
+  });
+}
+
+// ── POLLING NO GITHUB PAGES ─────────────────────────────────────
+function pollResult(requestId, onSuccess, onTimeout){
+  var url      = GH_PAGES + '/results/' + requestId + '.json';
+  var attempts = 0;
+  var maxAttempts = 48; // 48 × 5s = 4 minutos
+
+  var id = setInterval(function(){
+    attempts++;
+    // Cache-bust para garantir que não pega versão antiga
+    fetch(url + '?t=' + Date.now())
+      .then(function(r){
+        if(r.ok) return r.json();
+        if(r.status === 404 && attempts < maxAttempts) return null; // ainda não pronto
+        if(attempts >= maxAttempts){ clearInterval(id); onTimeout(); return null; }
+        return null;
+      })
+      .then(function(data){
+        if(!data) return;
+        clearInterval(id);
+        delete POLL_IDS[requestId];
+        onSuccess(data);
+      })
+      .catch(function(){
+        if(attempts >= maxAttempts){ clearInterval(id); onTimeout(); }
+      });
+  }, 5000);
+
+  POLL_IDS[requestId] = id;
+  return id;
+}
+
+// ── RENDERIZAR RESULTADO ────────────────────────────────────────
+function renderResult(data){
+  var btn = document.getElementById('fmkt-btn');
+  btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+
+  if(!data.ok){
+    fmktStatus('❌ Erro: ' + (data.error||'desconhecido'), 'var(--red)');
+    return;
+  }
+
+  FMKT_RESULTS[data.activity_name] = data;
+
+  var ok = Object.keys(FMKT_RESULTS).length;
+  fmktStatus('✅ ' + ok + ' campanha' + (ok>1?'s carregadas':' carregada'), 'var(--green)');
+
+  if(!ok){ fmktStatus('❌ Nenhum resultado.','var(--red)'); return; }
+  FMKT_CAMP_AT = Object.keys(FMKT_RESULTS)[0];
+  buildCampTabs(); buildCanalTabs();
+  ['total','grupo','publico','privado'].forEach(function(x){
+    document.getElementById('fmkt-tab-'+x).classList.toggle('active', x==='total');
+  });
+  document.querySelectorAll('.fmkt-atab').forEach(function(b){
+    b.classList.toggle('active', b.dataset.act===FMKT_CAMP_AT);
+  });
+  document.getElementById('fmkt-activity-label').textContent = FMKT_CAMP_AT;
+  var fr = FMKT_RESULTS[FMKT_CAMP_AT];
+  if(fr) setPeriodInputs(fr.date_from||'', fr.date_to||'');
+  document.getElementById('fmkt-result').style.display  = 'block';
+  document.getElementById('fmkt-filtros').style.display = 'block';
+  redrawAll();
+}
+
+// ── BUSCAR PRINCIPAL (via GitHub Actions) ───────────────────────
 function buscarFunil(customDateFrom, customDateTo){
   var activities = getActivities();
   if(!activities.length){
@@ -768,77 +860,68 @@ function buscarFunil(customDateFrom, customDateTo){
     return;
   }
 
-  // HTTPS bloqueia localhost — mostrar banner e parar
-  if(location.protocol==='https:'){
-    document.getElementById('fmkt-offline-banner').style.display='block';
-    document.getElementById('fmkt-offline-banner').scrollIntoView({behavior:'smooth',block:'nearest'});
-    return;
-  }
+  var btn = document.getElementById('fmkt-btn');
+  btn.disabled=true; btn.style.opacity='.5'; btn.textContent='⏳ Enviando…';
+  FMKT_RESULTS = {}; FMKT_SETOR_AT='total'; FMKT_CANAL_AT='todos';
+  document.getElementById('fmkt-result').style.display   = 'none';
+  document.getElementById('fmkt-filtros').style.display  = 'none';
+  document.getElementById('fmkt-offline-banner').style.display = 'none';
 
-  var btn=document.getElementById('fmkt-btn');
-  btn.disabled=true;btn.style.opacity='.5';btn.textContent='⏳ Buscando…';
-  var n=activities.length;
-  fmktStatus('🔄 Consultando '+n+' campanha'+(n>1?'s':'')+' no Databricks… (~'+(n>1?'30-60':'30')+'s)','var(--blue)');
-  document.getElementById('fmkt-result').style.display='none';
-  document.getElementById('fmkt-filtros').style.display='none';
-  document.getElementById('fmkt-offline-banner').style.display='none';
+  var total     = activities.length;
+  var concluido = 0;
+  var erros     = 0;
 
-  fetch('http://localhost:5001/funil',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({activities:activities, date_from:customDateFrom||'', date_to:customDateTo||''})
-  })
-  .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.error||'Erro '+r.status);});return r.json();})
-  .then(function(data){
-    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
-    FMKT_RESULTS={};FMKT_SETOR_AT='total';FMKT_CANAL_AT='todos';
+  fmktStatus(
+    '⏳ Disparando ' + total + ' workflow' + (total>1?'s':'') +
+    ' no GitHub Actions… aguarde ~90s por campanha.',
+    'var(--blue)'
+  );
 
-    if(data.multi){
-      Object.assign(FMKT_RESULTS,data.results||{});
-      var errs=Object.keys(data.errors||{});
-      var ok=Object.keys(FMKT_RESULTS).length;
-      fmktStatus('✅ '+ok+' campanha'+(ok>1?'s carregadas':' carregada')+(errs.length?' — ⚠️ '+errs.length+' com erro':''),'var(--green)');
-    } else {
-      FMKT_RESULTS[data.activity_name]=data;
-      fmktStatus('✅ Dados carregados.','var(--green)');
-    }
+  // Atualizar progress no status a cada segundo
+  var elapsed = 0;
+  var progressId = setInterval(function(){
+    elapsed++;
+    var eta = Math.max(0, 90 - elapsed);
+    fmktStatus(
+      '⏳ Processando ' + total + ' campanha' + (total>1?'s':'') +
+      ' no Databricks… (' + elapsed + 's' + (eta>0?' — ~'+eta+'s restantes':'') + ')',
+      'var(--blue)'
+    );
+  }, 1000);
 
-    if(!Object.keys(FMKT_RESULTS).length){fmktStatus('❌ Nenhum resultado.','var(--red)');return;}
-    FMKT_CAMP_AT=Object.keys(FMKT_RESULTS)[0];
-    buildCampTabs();buildCanalTabs();
-    ['total','grupo','publico','privado'].forEach(function(x){document.getElementById('fmkt-tab-'+x).classList.toggle('active',x==='total');});
-    document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===FMKT_CAMP_AT);});
-    document.getElementById('fmkt-activity-label').textContent=FMKT_CAMP_AT;
-    var fr=FMKT_RESULTS[FMKT_CAMP_AT];
-    if(fr) setPeriodInputs(fr.date_from||'',fr.date_to||'');
-    document.getElementById('fmkt-result').style.display='block';
-    document.getElementById('fmkt-filtros').style.display='block';
-    redrawAll();
-  })
-  .catch(function(err){
-    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
-    document.getElementById('fmkt-offline-banner').style.display='block';
-    fmktStatus('❌ Servidor offline ou inacessível.','var(--red)');
+  activities.forEach(function(act){
+    var rid = genRequestId();
+
+    dispatchWorkflow(act, customDateFrom||'', customDateTo||'', rid)
+      .then(function(r){
+        if(!r.ok) throw new Error('dispatch HTTP ' + r.status);
+
+        // Polling até o resultado aparecer no GitHub Pages
+        pollResult(rid,
+          function(data){
+            concluido++;
+            clearInterval(progressId);
+            renderResult(data);
+            if(concluido + erros === total){
+              btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+            }
+          },
+          function(){
+            erros++;
+            clearInterval(progressId);
+            fmktStatus('⚠️ Timeout para "' + act + '". Tente novamente.', 'var(--yellow)');
+            btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+          }
+        );
+      })
+      .catch(function(err){
+        erros++;
+        clearInterval(progressId);
+        fmktStatus('❌ Erro ao disparar workflow: ' + err.message, 'var(--red)');
+        btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+      });
   });
 }
-
-// Detecta servidor ao carregar — em HTTPS sempre mostra banner
-(function(){
-  if(location.protocol==='https:'){
-    document.getElementById('fmkt-offline-banner').style.display='block';
-    return;
-  }
-  // Em HTTP: testa o servidor
-  fetch('http://localhost:5001/status',{method:'GET'})
-  .then(function(r){return r.json();})
-  .catch(function(){document.getElementById('fmkt-offline-banner').style.display='block';});
-  // Poll a cada 5s para detectar quando servidor subir
-  setInterval(function(){
-    if(location.protocol!=='http:') return;
-    fetch('http://localhost:5001/status',{method:'GET'})
-    .then(function(){document.getElementById('fmkt-offline-banner').style.display='none';})
-    .catch(function(){});
-  },5000);
-})();
 
 window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)redrawFunil();});
 </script>

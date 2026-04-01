@@ -1,0 +1,44 @@
+name: Funil de Campanha — Query Databricks
+
+on:
+  repository_dispatch:
+    types: [funil-query]
+
+jobs:
+  query:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: pip install -q databricks-sdk
+
+      - name: Executar query
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          ACTIVITY_NAME: ${{ github.event.client_payload.activity }}
+          DATE_FROM: ${{ github.event.client_payload.date_from }}
+          DATE_TO: ${{ github.event.client_payload.date_to }}
+          REQUEST_ID: ${{ github.event.client_payload.request_id }}
+        run: |
+          python3 funil_query_helper_ci.py > results/$REQUEST_ID.json
+          echo "Query concluída — $(cat results/$REQUEST_ID.json | python3 -c 'import sys,json; d=json.load(sys.stdin); print(f\"{len(d.get(chr(114)+chr(111)+chr(119)+chr(115),[]))} rows\" if d.get(\"ok\") else d.get(\"error\",\"erro\"))')"
+
+      - name: Commit resultado
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add results/
+          git commit -m "result: ${{ github.event.client_payload.request_id }}" || echo "nada a commitar"
+          git push
