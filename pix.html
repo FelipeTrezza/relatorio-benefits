@@ -184,11 +184,11 @@
 <main>
 
   <!-- PERIODO BAR -->
-  <div class="sec-lbl">Fechamento Mar/26 — PIX</div>
+  <div class="sec-lbl">PIX</div>
   <div class="periodo-bar">
     <div>
       <div class="periodo-title" id="periodo-title">— vs —</div>
-      <div class="periodo-sub">Fechamento completo Mar/26 vs Fev/26</div>
+      <div class="periodo-sub">Comparativo MTD — mesma janela de dias</div>
     </div>
   </div>
 
@@ -208,44 +208,44 @@
 // DADOS — injetados por atualizar_antecipacoes.py
 // ================================================================
 const DATA = {
-  "cur_label": "Mar/26",
-  "prev_label": "Fev/26",
+  "cur_label": "Abr/26",
+  "prev_label": "Mar/26",
   "setores": {
     "public": {
-      "vidas": 2792,
-      "vidas_prv": 3780,
-      "antecipacoes": 12469,
-      "antecip_prv": 14781,
-      "tpv": 966040.81,
-      "tpv_prv": 1455561.47,
-      "abertura": 2512,
-      "abertura_prv": 2191,
-      "vidas_novas": 312,
-      "vidas_novas_prv": 308
+      "vidas": 0,
+      "vidas_prv": 115,
+      "antecipacoes": 0,
+      "antecip_prv": 142,
+      "tpv": 0.0,
+      "tpv_prv": 5034.88,
+      "abertura": 0,
+      "abertura_prv": 55,
+      "vidas_novas": 0,
+      "vidas_novas_prv": 7
     },
     "private": {
-      "vidas": 292,
-      "vidas_prv": 295,
-      "antecipacoes": 1480,
-      "antecip_prv": 1474,
-      "tpv": 57424.07,
-      "tpv_prv": 47598.91,
-      "abertura": 639,
-      "abertura_prv": 523,
-      "vidas_novas": 36,
-      "vidas_novas_prv": 56
+      "vidas": 0,
+      "vidas_prv": 11,
+      "antecipacoes": 0,
+      "antecip_prv": 11,
+      "tpv": 0.0,
+      "tpv_prv": 167.7,
+      "abertura": 0,
+      "abertura_prv": 15,
+      "vidas_novas": 0,
+      "vidas_novas_prv": 0
     },
     "grupo": {
-      "vidas": 6673,
-      "vidas_prv": 4872,
-      "antecipacoes": 27597,
-      "antecip_prv": 18364,
-      "tpv": 1515293.97,
-      "tpv_prv": 993344.29,
-      "abertura": 2145,
-      "abertura_prv": 2701,
-      "vidas_novas": 838,
-      "vidas_novas_prv": 617
+      "vidas": 0,
+      "vidas_prv": 874,
+      "antecipacoes": 0,
+      "antecip_prv": 1223,
+      "tpv": 0.0,
+      "tpv_prv": 36076.0,
+      "abertura": 0,
+      "abertura_prv": 63,
+      "vidas_novas": 0,
+      "vidas_novas_prv": 100
     },
     "INSS": {
       "vidas": 0,
@@ -254,8 +254,8 @@ const DATA = {
       "antecip_prv": 0,
       "tpv": 0.0,
       "tpv_prv": 0.0,
-      "abertura": 906,
-      "abertura_prv": 459,
+      "abertura": 0,
+      "abertura_prv": 32,
       "vidas_novas": 0,
       "vidas_novas_prv": 0
     }
@@ -393,14 +393,23 @@ function refreshData() {
   btn.disabled = true;
   if (ts) ts.textContent = '...';
 
-  // Tenta conectar; se falhar aguarda 3s e tenta de novo (servidor pode estar subindo)
-  function tryConnect(attempts) {
+  // Tenta conectar; se servidor estiver running aguarda até 5 min antes de desistir
+  function tryConnect(attempts, waitRunning) {
+    if (waitRunning === undefined) waitRunning = 100;
     fetch(SERVER + '/status', { signal: AbortSignal.timeout(3000) })
       .then(r => r.json())
       .then(status => {
         if (status.running) {
+          if (waitRunning <= 0) {
+            fetch(SERVER + '/reset', { method: 'POST' }).catch(() => {});
+            btn.classList.remove('spinning');
+            btn.disabled = false;
+            if (ts) ts.textContent = 'erro';
+            alert('Servidor travado. Clique novamente para tentar.');
+            return;
+          }
           if (ts) ts.textContent = 'aguarde...';
-          setTimeout(() => tryConnect(attempts), 3000);
+          setTimeout(() => tryConnect(attempts, waitRunning - 1), 3000);
           return;
         }
         if (ts) ts.textContent = '...';
@@ -411,19 +420,17 @@ function refreshData() {
       })
       .catch(() => {
         if (attempts > 0) {
-          // Servidor ainda subindo, aguarda e tenta de novo
           if (ts) ts.textContent = 'iniciando...';
-          setTimeout(() => tryConnect(attempts - 1), 2000);
+          setTimeout(() => tryConnect(attempts - 1, waitRunning), 2000);
         } else {
-          // Desiste após tentativas
           btn.classList.remove('spinning');
           btn.disabled = false;
           if (ts) ts.textContent = 'erro';
-          alert('Servidor local indispon\u00edvel.\\n\\nRode: servidor-benefits');
+          alert('Servidor local indisponível.\n\nRode: servidor-benefits');
         }
       });
   }
-  tryConnect(5); // tenta por até 10s
+  tryConnect(5);
 }
 
 function pollStatus(SERVER) {
