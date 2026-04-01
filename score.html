@@ -447,46 +447,18 @@ tbody td{padding:9px 14px;font-size:12px}
   <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
 
   <!-- BANNER OFFLINE -->
-  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:var(--surf2);border:1px solid rgba(248,81,73,.3);border-radius:10px;overflow:hidden">
-    <!-- Header -->
-    <div style="background:rgba(248,81,73,.08);padding:10px 16px;border-bottom:1px solid rgba(248,81,73,.15);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-      <span style="font-size:13px;font-weight:700;color:var(--red)">⚠️ Para usar o Funil de Campanha, o servidor local precisa estar rodando</span>
-      <button onclick="abrirHttp()"
-        style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">
-        🔓 Já rodando? Abrir em http://
-      </button>
+  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:var(--surf2);border:1px solid rgba(248,81,73,.3);border-radius:10px;padding:16px">
+    <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:12px">⚠️ Servidor local necessário para consultar o Databricks</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">
+      Cole o comando abaixo no Terminal e pressione Enter. O servidor sobe automaticamente.<br>
+      <span style="font-size:11px">Depois de rodar, clique em <strong style="color:var(--green)">🔓 Abrir em http://</strong> para usar o funil.</span>
     </div>
-    <!-- Passos -->
-    <div style="padding:16px">
-      <!-- Passo 1: comando único -->
-      <div style="margin-bottom:14px">
-        <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">
-          📋 Passo 1 — Cole este comando no Terminal e pressione Enter <span style="font-weight:400;color:var(--muted)">(só na primeira vez)</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <code id="fmkt-setup-cmd" style="flex:1;display:block;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 14px;font-size:11px;color:var(--green);word-break:break-all;min-width:200px">bash &lt;(curl -sL https://felipetrezza.github.io/relatorio-benefits/setup.sh)</code>
-          <button onclick="copiarComando()"
-            style="background:var(--surf3);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">
-            📋 Copiar
-          </button>
-        </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:5px">O comando instala as dependências, faz login no Databricks e já inicia o servidor automaticamente.</div>
-      </div>
-      <!-- Passo 2: abrir em http -->
-      <div style="background:var(--surf3);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="font-size:11px;font-weight:700;color:var(--text)">📋 Passo 2 —</span>
-        <span style="font-size:11px;color:var(--muted)">Com o servidor rodando no terminal, clique em</span>
-        <button onclick="abrirHttp()"
-          style="background:var(--green);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">
-          🔓 Abrir em http://
-        </button>
-        <span style="font-size:11px;color:var(--muted)">(obrigatório — browsers bloqueiam <code style="font-size:10px">localhost</code> em <code style="font-size:10px">https://</code>)</span>
-      </div>
-      <!-- Já tem servidor -->
-      <div style="margin-top:10px;font-size:11px;color:var(--muted)">
-        Já instalou antes? Rode <code style="background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--green);font-size:11px">servidor-benefits</code> no terminal e clique em <strong style="color:var(--text)">🔓 Abrir em http://</strong>
-      </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+      <code style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 14px;font-size:11px;color:var(--green);min-width:200px;display:block">bash &lt;(curl -sL https://felipetrezza.github.io/relatorio-benefits/setup.sh)</code>
+      <button onclick="copiarComando()" style="background:var(--surf3);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📋 Copiar</button>
+      <button onclick="abrirHttp()" style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🔓 Abrir em http://</button>
     </div>
+    <div style="font-size:11px;color:var(--muted)">Já instalou antes? Rode <code style="background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--green)">servidor-benefits</code> no terminal e clique em 🔓 Abrir em http://</div>
   </div>
 
   <!-- FILTROS -->
