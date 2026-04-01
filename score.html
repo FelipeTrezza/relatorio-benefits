@@ -417,6 +417,28 @@ tbody td{padding:9px 14px;font-size:12px}
   <div class="sec-title">📣 Funil de Campanha</div>
   <div class="sec-sub">Cole um ou mais <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">activity_name</code> para visualizar e comparar funis. Use <strong>Enter</strong> ou <strong>vírgula</strong> para adicionar cada um.</div>
 
+  <!-- BANNER SERVIDOR OFFLINE (aparece automaticamente) -->
+  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.25);border-radius:10px;padding:14px 16px">
+    <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:4px">⚠️ Servidor local offline</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">
+          O funil consulta o Databricks via servidor local.<br>
+          <strong style="color:var(--text)">Primeira vez?</strong> Baixe e dê duplo clique no arquivo abaixo.<br>
+          <strong style="color:var(--text)">Já configurou?</strong> Rode <code style="background:var(--surf2);padding:1px 6px;border-radius:4px;font-size:11px">servidor-benefits</code> no terminal.
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0">
+        <a href="https://felipetrezza.github.io/relatorio-benefits/iniciar-servidor.command"
+           download="iniciar-servidor.command"
+           style="display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#fff;text-decoration:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;white-space:nowrap">
+          ⬇️ Baixar iniciar-servidor.command
+        </a>
+        <span style="font-size:10px;color:var(--muted);text-align:right">Mac: duplo clique para iniciar · Deixe o terminal aberto</span>
+      </div>
+    </div>
+  </div>
+
   <!-- INPUT MULTI-TAG -->
   <div id="fmkt-input-area"
     style="background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:46px;cursor:text;transition:border-color .2s"
@@ -922,19 +944,15 @@ function buscarFunil(customDateFrom, customDateTo) {
       }
     });
     if (servidorOffline && !Object.keys(FMKT_RESULTS).length) {
-      fmktStatus(
-        '❌ <strong>Servidor local offline.</strong><br>' +
-        '👉 Você precisa rodar o servidor na sua máquina para consultar o Databricks.<br>' +
-        '<span style="color:var(--text)">1. Abra o terminal &nbsp; 2. Digite: <code style="background:var(--surf3);padding:2px 6px;border-radius:4px">servidor-benefits</code> &nbsp; 3. Deixe aberto e tente novamente.</span><br>' +
-        '<span style="font-size:10px;color:var(--muted)">Primeira vez? Peça o script de setup para o Felipe Trezza.</span>',
-        'var(--red)'
-      );
+      document.getElementById('fmkt-offline-banner').style.display = 'block';
+      document.getElementById('fmkt-status').style.display = 'none';
       return;
     }
 
     var ok = Object.keys(FMKT_RESULTS).length;
     if (!ok) { fmktStatus('❌ Nenhum resultado. Verifique os activity_names.', 'var(--red)'); return; }
 
+    document.getElementById('fmkt-offline-banner').style.display = 'none';
     var msg = '✅ ' + ok + ' campanha' + (ok > 1 ? 's carregadas' : ' carregada');
     if (erros.length) msg += ' — ⚠️ ' + erros.length + ' com erro';
     fmktStatus(msg, 'var(--green)');
@@ -956,6 +974,17 @@ function buscarFunil(customDateFrom, customDateTo) {
   });
 }
 window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)redrawFunil();});
+
+// Verifica se servidor local está online ao carregar a página
+(function checkServerOnLoad(){
+  fetch('http://localhost:5001/status',{method:'GET'})
+  .then(function(r){ return r.json(); })
+  .then(function(){ /* online — não mostrar nada */ })
+  .catch(function(){
+    var b=document.getElementById('fmkt-offline-banner');
+    if(b) b.style.display='block';
+  });
+})();
 
 // ── Período: popula inputs e re-busca ───────────────────
 function setPeriodInputs(from, to){
