@@ -956,49 +956,7 @@ function setPeriodInputs(from, to){
 }
 
 function reaplicarPeriodo(){
-  var from = (document.getElementById('fmkt-date-from')||{}).value||'';
-  var to   = (document.getElementById('fmkt-date-to')||{}).value||'';
-  if(!from||!to){ fmktStatus('⚠️ Preencha as duas datas para filtrar.','var(--yellow)'); return; }
-  if(!FMKT_ACTIVITIES.length){ fmktStatus('⚠️ Nenhuma campanha na lista.','var(--yellow)'); return; }
-  document.getElementById('fmkt-funil-wrap').innerHTML='';
-  document.getElementById('fmkt-compare-wrap').style.display='none';
-  buscarFunil(from, to);
-}).value||'';
-  var to   = (document.getElementById('fmkt-date-to')||{}).value||'';
-  if(!from||!to){ fmktStatus('⚠️ Preencha as duas datas para filtrar.','var(--yellow)'); return; }
-  if(FMKT_ACTIVITIES.length===0){ fmktStatus('⚠️ Nenhuma campanha carregada.','var(--yellow)'); return; }
-
-  var btn=document.getElementById('fmkt-btn');
-  btn.disabled=true; btn.style.opacity='.5'; btn.textContent='⏳ Buscando…';
-  fmktStatus('🔄 Re-consultando com período '+from+' → '+to+'…','var(--blue)');
-  document.getElementById('fmkt-funil-wrap').innerHTML='';
-  document.getElementById('fmkt-compare-wrap').style.display='none';
-
-  fetch('http://localhost:5001/funil',{
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({activities:FMKT_ACTIVITIES, date_from:from, date_to:to})
-  })
-  .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.error||'Erro '+r.status);});return r.json();})
-  .then(function(data){
-    btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
-    FMKT_RESULTS={};
-    if(data.multi){ Object.assign(FMKT_RESULTS,data.results||{}); }
-    else { FMKT_RESULTS[data.activity_name]=data; }
-    if(!Object.keys(FMKT_RESULTS).length){ fmktStatus('❌ Nenhum resultado.','var(--red)'); return; }
-    FMKT_CAMP_AT=Object.keys(FMKT_RESULTS)[0];
-    // atualiza period label com o que foi usado
-    var firstResult=FMKT_RESULTS[FMKT_CAMP_AT];
-    setPeriodInputs(firstResult.date_from||from, firstResult.date_to||to);
-    buildCampTabs(); buildCanalTabs();
-    document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===FMKT_CAMP_AT);});
-    document.getElementById('fmkt-activity-label').textContent=FMKT_CAMP_AT;
-    fmktStatus('✅ Período '+from+' → '+to+' aplicado.','var(--green)');
-    redrawAll();
-  })
-  .catch(function(err){
-    btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
-    fmktStatus('❌ '+err.message,'var(--red)');
-  });
+  var from = (document.getElementById('fmkt-date-from')||{
 }
 </script>
 
