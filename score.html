@@ -863,27 +863,30 @@ function buildPeriodSQL(activity) {
 }
 
 function runActivityFunil(activity, dateFrom, dateTo) {
-  // Se não tem período, detecta primeiro
-  var periodPromise = (dateFrom && dateTo)
-    ? Promise.resolve({ date_from: dateFrom, date_to: dateTo })
-    : dbxQuery(buildPeriodSQL(activity), 60000).then(function(r) {
-        var row = r.rows && r.rows[0];
-        if (!row || !row[0]) throw new Error('Nenhum registro encontrado para: ' + activity);
-        return { date_from: row[0], date_to: row[1] };
-      });
-
-  return periodPromise.then(function(period) {
-    return dbxQuery(buildFunilSQL(activity, period.date_from, period.date_to), 120000)
-      .then(function(r) {
-        return {
-          ok: true,
-          activity_name: activity,
-          date_from: period.date_from,
-          date_to:   period.date_to,
-          columns:   r.columns,
-          rows:      r.rows
-        };
-      });
+  // Chama o servidor local (localhost:5001) que tem autenticação Databricks configurada
+  return fetch('http://localhost:5001/funil', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      activities: [activity],
+      date_from: dateFrom || '',
+      date_to:   dateTo   || ''
+    })
+  })
+  .then(function(r) {
+    if (!r.ok) return r.json().then(function(e){ throw new Error(e.error || 'Erro '+r.status); });
+    return r.json();
+  })
+  .then(function(data) {
+    // single result
+    return {
+      ok:            true,
+      activity_name: activity,
+      date_from:     data.date_from || dateFrom || '',
+      date_to:       data.date_to   || dateTo   || '',
+      columns:       data.columns   || [],
+      rows:          data.rows      || []
+    };
   });
 }
 
@@ -892,15 +895,10 @@ function buscarFunil(customDateFrom, customDateTo) {
   if (inp.value.trim()) fmktAddActivity(inp.value);
   if (!FMKT_ACTIVITIES.length) { fmktStatus('⚠️ Adicione pelo menos um activity_name.', 'var(--yellow)'); return; }
 
-  if (DBX_TOKEN === 'COLE_O_TOKEN_AQUI') {
-    fmktStatus('⚠️ Configure o token do Databricks no HTML para habilitar as consultas.', 'var(--yellow)');
-    return;
-  }
-
   var btn = document.getElementById('fmkt-btn');
   btn.disabled = true; btn.style.opacity = '.5'; btn.textContent = '⏳ Buscando…';
   var n = FMKT_ACTIVITIES.length;
-  fmktStatus('🔄 Consultando ' + n + ' campanha' + (n > 1 ? 's' : '') + ' no Databricks…', 'var(--blue)');
+  fmktStatus('🔄 Consultando ' + n + ' campanha' + (n > 1 ? 's' : '') + ' no Databricks…' + (n > 1 ? ' (~30-60s)' : ' (~30s)'), 'var(--blue)');
   document.getElementById('fmkt-result').style.display   = 'none';
   document.getElementById('fmkt-filtros').style.display  = 'none';
 
@@ -915,10 +913,24 @@ function buscarFunil(customDateFrom, customDateTo) {
     FMKT_RESULTS = {}; FMKT_SETOR_AT = 'total'; FMKT_CANAL_AT = 'todos';
 
     var erros = [];
+    var servidorOffline = false;
     results.forEach(function(r) {
       if (r.ok) FMKT_RESULTS[r.activity_name] = r;
-      else erros.push(r.activity_name);
+      else {
+        if (r.error && (r.error.indexOf('Failed to fetch') > -1 || r.error.indexOf('servidor') > -1 || r.error.indexOf('NetworkError') > -1)) servidorOffline = true;
+        erros.push(r.activity_name);
+      }
     });
+    if (servidorOffline && !Object.keys(FMKT_RESULTS).length) {
+      fmktStatus(
+        '❌ <strong>Servidor local offline.</strong><br>' +
+        '👉 Você precisa rodar o servidor na sua máquina para consultar o Databricks.<br>' +
+        '<span style="color:var(--text)">1. Abra o terminal &nbsp; 2. Digite: <code style="background:var(--surf3);padding:2px 6px;border-radius:4px">servidor-benefits</code> &nbsp; 3. Deixe aberto e tente novamente.</span><br>' +
+        '<span style="font-size:10px;color:var(--muted)">Primeira vez? Peça o script de setup para o Felipe Trezza.</span>',
+        'var(--red)'
+      );
+      return;
+    }
 
     var ok = Object.keys(FMKT_RESULTS).length;
     if (!ok) { fmktStatus('❌ Nenhum resultado. Verifique os activity_names.', 'var(--red)'); return; }
