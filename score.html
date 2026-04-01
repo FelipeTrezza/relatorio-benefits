@@ -1926,12 +1926,9 @@ function setDST(s){
     />
   </div>
 
-  <!-- AÇÕES -->
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;margin-bottom:18px">
     <button id="fmkt-btn" onclick="buscarFunil()"
-      style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s">
-      🔍 Buscar
-    </button>
+      style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s">🔍 Buscar</button>
     <button onclick="fmktAddExample()"
       style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer"
       onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">+ Exemplo</button>
@@ -1941,10 +1938,8 @@ function setDST(s){
     <span id="fmkt-count" style="font-size:11px;color:var(--muted)"></span>
   </div>
 
-  <!-- STATUS -->
   <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:18px;padding:9px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
 
-  <!-- FILTROS -->
   <div id="fmkt-filtros" style="display:none;margin-bottom:24px">
     <div style="display:flex;gap:28px;flex-wrap:wrap">
       <div>
@@ -1963,28 +1958,21 @@ function setDST(s){
     </div>
   </div>
 
-  <!-- RESULTADO -->
   <div id="fmkt-result" style="display:none">
     <div style="margin-bottom:18px;padding:8px 14px;background:var(--surf2);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;gap:10px">
       <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;font-weight:600">Activity</span>
       <span id="fmkt-activity-label" style="font-size:11px;font-family:monospace;color:var(--blue);word-break:break-all;opacity:.85"></span>
     </div>
-    <!-- abas campanha -->
     <div id="fmkt-camp-tabs-wrap" style="display:none;margin-bottom:20px">
       <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600">Campanha</div>
       <div id="fmkt-camp-tabs" class="rfm-tabs" style="flex-wrap:wrap"></div>
     </div>
-    <!-- FUNIL -->
     <div id="fmkt-funil-wrap"></div>
-    <!-- COMPARATIVO -->
     <div id="fmkt-compare-wrap" style="display:none;margin-top:32px"></div>
   </div>
 </section>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  FUNIL CAMPANHA MKT — modelo trapézio com badges laterais
-// ═══════════════════════════════════════════════════════
 var FMKT_ACTIVITIES=[], FMKT_RESULTS={}, FMKT_SETOR_AT='total', FMKT_CANAL_AT='todos', FMKT_CAMP_AT=null;
 var CANAL_DOT={INAPP:'#bc8cff',PUSH:'#58a6ff',DM:'#f0883e',EMAIL:'#e3b341',WHATSAPP:'#21c25e',SMS:'#8b949e'};
 var CAMP_COLORS=['#21a366','#58a6ff','#bc8cff','#f0883e','#e3b341','#ff7b72'];
@@ -1992,14 +1980,13 @@ function campColor(i){return CAMP_COLORS[i%CAMP_COLORS.length];}
 
 function fmtN(v){
   v=parseInt(v)||0;
-  if(v>=1e6)return (v/1e6).toFixed(1)+'M';
-  if(v>=1e3)return (v/1e3).toFixed(1)+'k';
+  if(v>=1e6)return(v/1e6).toFixed(1)+'M';
+  if(v>=1e3)return(v/1e3).toFixed(1)+'k';
   return v.toLocaleString('pt-BR');
 }
 function pct(a,b){a=parseInt(a)||0;b=parseInt(b)||0;return b?(a/b*100).toFixed(1)+'%':'—';}
 function fmktStatus(msg,cor){var el=document.getElementById('fmkt-status');el.style.display='block';el.style.borderLeftColor=cor||'var(--green)';el.innerHTML=msg;}
 
-// ── Tags input ─────────────────────────────────────────────────
 function renderTags(){
   var area=document.getElementById('fmkt-input-area');
   area.querySelectorAll('.fmkt-tag').forEach(function(t){t.remove();});
@@ -2007,9 +1994,7 @@ function renderTags(){
     var tag=document.createElement('span');tag.className='fmkt-tag';
     var short=act.split('-').slice(-3).join('-');
     tag.style.cssText='display:inline-flex;align-items:center;background:rgba(33,163,102,.1);border:1px solid rgba(33,163,102,.25);color:var(--text);border-radius:20px;padding:3px 8px 3px 10px;gap:4px;max-width:300px;font-size:11px;font-family:monospace';
-    tag.innerHTML='<span style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+act+'">'+short+'</span>'+
-      '<span onclick="fmktRemove('+i+')" style="cursor:pointer;color:var(--muted);font-size:14px;line-height:1;flex-shrink:0" '+
-      'onmouseover="this.style.color=\'var(--red)\'" onmouseout="this.style.color=\'var(--muted)\'">×</span>';
+    tag.innerHTML='<span style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+act+'">'+short+'</span><span onclick="fmktRemove('+i+')" style="cursor:pointer;color:var(--muted);font-size:14px;line-height:1;flex-shrink:0" onmouseover="this.style.color=\'var(--red)\'" onmouseout="this.style.color=\'var(--muted)\'">×</span>';
     area.insertBefore(tag,document.getElementById('fmkt-input'));
   });
   document.getElementById('fmkt-count').textContent=FMKT_ACTIVITIES.length?FMKT_ACTIVITIES.length+' campanha'+(FMKT_ACTIVITIES.length>1?'s':''):'';
@@ -2019,25 +2004,15 @@ function fmktRemove(i){FMKT_ACTIVITIES.splice(i,1);renderTags();}
 function fmktClearAll(){FMKT_ACTIVITIES=[];FMKT_RESULTS={};FMKT_CAMP_AT=null;renderTags();['fmkt-result','fmkt-filtros','fmkt-status'].forEach(function(id){document.getElementById(id).style.display='none';});document.getElementById('fmkt-input').value='';}
 function fmktInputKey(e){var inp=document.getElementById('fmkt-input');if(e.key==='Enter'||e.key===','||e.key===';'){e.preventDefault();fmktAddActivity(inp.value.replace(/[,;]/g,''));}else if(e.key==='Backspace'&&inp.value===''&&FMKT_ACTIVITIES.length){fmktRemove(FMKT_ACTIVITIES.length-1);}}
 function fmktInputPaste(e){e.preventDefault();var t=(e.clipboardData||window.clipboardData).getData('text');t.split(/[\n,;]+/).forEach(function(v){fmktAddActivity(v);});}
-function fmktAddExample(){
-  fmktAddActivity('20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial');
-  fmktAddActivity('20250912-id-10038283435-pf-context-acp-sic-ept-rent-cdt-pushntf-antecipacaosalario_bau');
-}
+function fmktAddExample(){fmktAddActivity('20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial');fmktAddActivity('20250912-id-10038283435-pf-context-acp-sic-ept-rent-cdt-pushntf-antecipacaosalario_bau');}
 
-// ── Filtros ────────────────────────────────────────────────────
 function setFMKT(val,tipo){
   if(tipo==='setor'){FMKT_SETOR_AT=val;['total','grupo','publico','privado'].forEach(function(x){document.getElementById('fmkt-tab-'+x).classList.toggle('active',x===val);});}
   else{FMKT_CANAL_AT=val;document.querySelectorAll('.fmkt-ctab').forEach(function(b){b.classList.toggle('active',b.dataset.canal===val);});}
   if(Object.keys(FMKT_RESULTS).length)redrawAll();
 }
-function setFMKTCamp(act){
-  FMKT_CAMP_AT=act;
-  document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===act);});
-  document.getElementById('fmkt-activity-label').textContent=act;
-  redrawFunil();
-}
+function setFMKTCamp(act){FMKT_CAMP_AT=act;document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===act);});document.getElementById('fmkt-activity-label').textContent=act;redrawFunil();}
 
-// ── Agregação ──────────────────────────────────────────────────
 function getAgg(activityName){
   var data=FMKT_RESULTS[activityName];if(!data)return null;
   var cols=data.columns||[],idx={};cols.forEach(function(c,i){idx[c]=i;});
@@ -2047,146 +2022,139 @@ function getAgg(activityName){
     return(FMKT_SETOR_AT==='total'||setor===FMKT_SETOR_AT)&&(FMKT_CANAL_AT==='todos'||ch===FMKT_CANAL_AT);
   });
   var t={enviados:0,entregues:0,abriram:0,clicaram:0,anteciparam:0};
-  rows.forEach(function(row){
-    t.enviados   +=parseInt(row[idx['enviados']])||0;
-    t.entregues  +=parseInt(row[idx['entregues']])||0;
-    t.abriram    +=parseInt(row[idx['abriram']])||0;
-    t.clicaram   +=parseInt(row[idx['clicaram']])||0;
-    t.anteciparam+=parseInt(row[idx['anteciparam']])||0;
-  });
+  rows.forEach(function(row){t.enviados+=parseInt(row[idx['enviados']])||0;t.entregues+=parseInt(row[idx['entregues']])||0;t.abriram+=parseInt(row[idx['abriram']])||0;t.clicaram+=parseInt(row[idx['clicaram']])||0;t.anteciparam+=parseInt(row[idx['anteciparam']])||0;});
   return t;
 }
 
-// ══════════════════════════════════════════════════════════════
-//  FUNIL SVG — trapézios com labels inline + badges laterais
-// ══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  FUNIL SVG — réplica fiel do modelo (trapézios + seta + badges)
+// ═══════════════════════════════════════════════════════════════
 function renderFunilHTML(d, cor){
-  if(!d||!d.enviados)return '<div style="color:var(--muted);padding:24px 0;font-size:13px;text-align:center">Sem dados para este filtro.</div>';
+  if(!d||!d.enviados) return '<div style="color:var(--muted);padding:24px 0;font-size:13px;text-align:center">Sem dados para este filtro.</div>';
   cor=cor||'#21a366';
 
-  // Deriva cor mais escura para a seta/divisor
-  // usa a mesma cor com mais opacidade
   var steps=[
-    {label:'Enviados',    val:d.enviados,    prevVal:null,         badge:null},
-    {label:'Entregues',   val:d.entregues,   prevVal:d.enviados,   badge:pct(d.entregues,d.enviados)},
-    {label:'Abertos',     val:d.abriram,     prevVal:d.entregues,  badge:pct(d.abriram,d.entregues)},
-    {label:'Clicados',    val:d.clicaram,    prevVal:d.abriram,    badge:pct(d.clicaram,d.abriram)},
-    {label:'Anteciparam', val:d.anteciparam, prevVal:d.enviados,   badge:pct(d.anteciparam,d.enviados)},
+    {label:'Enviados',    val:d.enviados,    prev:null},
+    {label:'Entregues',   val:d.entregues,   prev:d.enviados},
+    {label:'Abertos',     val:d.abriram,     prev:d.entregues},
+    {label:'Clicados',    val:d.clicaram,    prev:d.abriram},
+    {label:'Anteciparam', val:d.anteciparam, prev:d.enviados},
   ];
-
-  // ── dimensões SVG ──
-  // Cada trapézio tem largura que vai diminuindo
-  // W_TOP[i], W_BOT[i] em % do viewBox (600px)
-  var VW=600, LAYER_H=52, ARROW_H=16, GAP=0;
   var N=steps.length;
-  // Larguras dos topos: 100% → vai diminuindo linearmente
-  // Topo da camada i = Bot da camada i-1
-  // Camada 0: topo=100%, bot=83%
-  // ...incremento de 17% por nível
-  var TOPS=[1.00, 0.83, 0.66, 0.49, 0.32];
-  var BOTS=[0.83, 0.66, 0.49, 0.32, 0.15];
 
-  var totalH = N*(LAYER_H+ARROW_H)+8;
-  var BADGE_W=54, BADGE_H=26;
-  // Padding lateral para os badges
-  var PAD=BADGE_W+16;
-  var SVG_W=VW+PAD*2;
-
-  // Cor base hex → rgb components
-  function hexRgb(h){
-    h=h.replace('#','');
-    return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];
-  }
+  // Converte hex → rgb
+  function hexRgb(h){h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
   var rgb=cor.startsWith('#')?hexRgb(cor):[33,163,102];
   var R=rgb[0],G=rgb[1],B=rgb[2];
+  function fill(a){return'rgba('+R+','+G+','+B+','+a+')';}
+  function stroke(a){return'rgba('+R+','+G+','+B+','+a+')';}
 
-  // Gera cor de preenchimento para cada camada: opacidade 30%→90%
-  function layerFill(i){
-    var a=(0.28+i*0.155).toFixed(2);
-    return 'rgba('+R+','+G+','+B+','+a+')';
-  }
-  // Cor da borda/seta: mais saturada
-  var strokeCol='rgba('+R+','+G+','+B+',.7)';
-  var arrowFill='rgba('+R+','+G+','+B+',.85)';
+  // ── Geometria ──────────────────────────────────────────────
+  // SVG total width = 560. Badge área = 90px de cada lado.
+  // Cone ocupa o centro: 380px de largura.
+  var CONE_W=380;   // largura máxima do trapézio (camada 0)
+  var SH=58;        // altura de cada camada
+  var AH=18;        // altura da seta entre camadas
+  var BADGE_W=64, BADGE_H=28, BADGE_R=14;
+  var PAD=90;       // espaço para badges laterais
+  var SVG_W=CONE_W+PAD*2;
+  var SVG_H=N*SH+(N-1)*AH+AH+8; // +AH para pontinha final
 
-  var lines='';
+  // Largura do topo e base de cada camada (fração de CONE_W)
+  // camada 0: topo=1.0, bot=0.82
+  // cada camada estreita ~0.18
+  var STEP=0.182;
+  function topW(i){return CONE_W*(1-i*STEP);}
+  function botW(i){return CONE_W*(1-(i+1)*STEP);}
+  function xTop(i){return PAD+(CONE_W-topW(i))/2;}
+  function xBot(i){return PAD+(CONE_W-botW(i))/2;}
 
+  var g=''; // SVG content
+
+  // ── Camadas ────────────────────────────────────────────────
   steps.forEach(function(s,i){
-    var wTop=VW*TOPS[i], wBot=VW*BOTS[i];
-    var xTop=(VW-wTop)/2+PAD, xBot=(VW-wBot)/2+PAD;
-    var yTop=i*(LAYER_H+ARROW_H);
-    var yBot=yTop+LAYER_H;
+    var xt=xTop(i), xb=xBot(i);
+    var wt=topW(i), wb=botW(i);
+    var yt=i*(SH+AH);
+    var yb=yt+SH;
 
-    // ── Trapézio ──
-    var pts=xTop+','+yTop+' '+(xTop+wTop)+','+yTop+' '+(xBot+wBot)+','+yBot+' '+xBot+','+yBot;
-    lines+='<polygon points="'+pts+'" fill="'+layerFill(i)+'" stroke="'+strokeCol+'" stroke-width="1.2"/>';
+    // Preenchimento: opacidade cresce com profundidade
+    var alpha=(0.22+i*0.16).toFixed(2);
+    var pts=xt+','+yt+' '+(xt+wt)+','+yt+' '+(xb+wb)+','+yb+' '+xb+','+yb;
+    g+='<polygon points="'+pts+'" fill="'+fill(alpha)+'"/>';
 
-    // ── Label + valor DENTRO do trapézio ──
-    var yMid=yTop+LAYER_H/2+1;
-    var innerW=Math.min(wTop,wBot)*0.88;
-    var xL=xTop+wTop*0.06, xR=xTop+wTop-wTop*0.06;
-    // label à esquerda
-    lines+='<text x="'+(xTop+18)+'" y="'+(yMid-7)+'" fill="rgba(230,237,243,.9)" font-size="10.5" font-weight="700" font-family="Inter,system-ui,sans-serif" letter-spacing=".2" dominant-baseline="middle">'+s.label.toUpperCase()+'</text>';
-    // valor à direita
-    lines+='<text x="'+(xTop+wTop-18)+'" y="'+yMid+'" fill="rgba(230,237,243,.95)" font-size="14" font-weight="800" font-family="Inter,system-ui,sans-serif" text-anchor="end" dominant-baseline="middle">'+fmtN(s.val)+'</text>';
+    // Borda superior (só na 1ª camada)
+    if(i===0){
+      g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+(xt+wt)+'" y2="'+yt+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
+    }
+    // Bordas laterais
+    g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+xb+'" y2="'+yb+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
+    g+='<line x1="'+(xt+wt)+'" y1="'+yt+'" x2="'+(xb+wb)+'" y2="'+yb+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
 
-    // ── Seta triangular entre camadas ──
+    // Linha divisória inferior entre camadas (destaca o "degrau")
+    g+='<line x1="'+xb+'" y1="'+yb+'" x2="'+(xb+wb)+'" y2="'+yb+'" stroke="'+stroke(.25)+'" stroke-width="1"/>';
+
+    // ── Label (esquerda) e Valor (direita) dentro do trapézio ──
+    var ymid=yt+SH/2;
+    var xLabelLeft=xt+14;
+    var xValRight=xt+wt-14;
+    g+='<text x="'+xLabelLeft+'" y="'+(ymid-5)+'" dominant-baseline="middle" fill="rgba(230,237,243,.7)" font-size="10" font-weight="700" font-family="Inter,system-ui,sans-serif" letter-spacing=".8">'+s.label.toUpperCase()+'</text>';
+    g+='<text x="'+xValRight+'" y="'+(ymid+6)+'" dominant-baseline="middle" text-anchor="end" fill="rgba(230,237,243,.95)" font-size="16" font-weight="800" font-family="Inter,system-ui,sans-serif">'+fmtN(s.val)+'</text>';
+
+    // ── Seta triangular entre camadas ──────────────────────
     if(i<N-1){
-      var ax1=xBot, ax2=xBot+wBot, axMid=xBot+wBot/2;
-      var ay1=yBot, ay2=yBot+ARROW_H;
-      lines+='<polygon points="'+ax1+','+ay1+' '+ax2+','+ay1+' '+axMid+','+ay2+'" fill="'+arrowFill+'"/>';
+      var ax1=xb, ax2=xb+wb, aym=yb+AH;
+      var axm=(ax1+ax2)/2;
+      g+='<polygon points="'+ax1+','+yb+' '+ax2+','+yb+' '+axm+','+aym+'" fill="'+fill((alpha*1+0.1).toFixed(2))+'"/>';
+      // Bordas laterais da seta
+      g+='<line x1="'+ax1+'" y1="'+yb+'" x2="'+axm+'" y2="'+aym+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
+      g+='<line x1="'+ax2+'" y1="'+yb+'" x2="'+axm+'" y2="'+aym+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
     }
 
-    // ── Badge lateral com % do passo anterior ──
-    if(s.badge){
-      // alterna esquerda/direita por índice
-      var badgeSide=i%2===0?'right':'left';
-      var bx, lineX1, lineX2;
-      if(badgeSide==='right'){
-        // badge à direita
-        bx=xTop+wTop+12;
-        lineX1=xTop+wTop; lineX2=bx;
-      } else {
-        // badge à esquerda
-        bx=xTop-BADGE_W-12;
-        lineX1=xTop; lineX2=bx+BADGE_W;
-      }
-      var by=yTop+(LAYER_H-BADGE_H)/2;
-      var byMid=by+BADGE_H/2;
-
-      // linha conectora
-      lines+='<line x1="'+lineX1+'" y1="'+(yTop+LAYER_H/2)+'" x2="'+lineX2+'" y2="'+byMid+'" stroke="'+strokeCol+'" stroke-width="1" stroke-dasharray="3,2"/>';
+    // ── Badge lateral com % ─────────────────────────────────
+    if(s.prev!==null){
+      var badgeVal=pct(s.val,s.prev);
+      // alterna lado: índices pares = esquerda, ímpares = direita
+      var side=i%2===0?'left':'right';
+      var bx=side==='right'?(xt+wt+12):(xt-BADGE_W-12);
+      var by=ymid-BADGE_H/2;
+      var bxm=bx+BADGE_W/2;
+      var bym=by+BADGE_H/2;
+      // linha tracejada até o trapézio
+      var lx1=side==='right'?(xt+wt):xt;
+      var lx2=side==='right'?bx:(bx+BADGE_W);
+      g+='<line x1="'+lx1+'" y1="'+ymid+'" x2="'+lx2+'" y2="'+bym+'" stroke="'+stroke(.35)+'" stroke-width="1" stroke-dasharray="4,3"/>';
       // badge pill
-      lines+='<rect x="'+bx+'" y="'+by+'" width="'+BADGE_W+'" height="'+BADGE_H+'" rx="13" fill="'+layerFill(i)+'" stroke="'+strokeCol+'" stroke-width="1.2"/>';
-      lines+='<text x="'+(bx+BADGE_W/2)+'" y="'+(byMid+1)+'" text-anchor="middle" dominant-baseline="middle" fill="rgba(230,237,243,.95)" font-size="11" font-weight="800" font-family="Inter,system-ui,sans-serif">'+s.badge+'</text>';
+      g+='<rect x="'+bx+'" y="'+by+'" width="'+BADGE_W+'" height="'+BADGE_H+'" rx="'+BADGE_R+'" fill="'+fill((alpha*1+0.15).toFixed(2))+'" stroke="'+stroke(.45)+'" stroke-width="1.2"/>';
+      g+='<text x="'+bxm+'" y="'+(bym+1)+'" text-anchor="middle" dominant-baseline="middle" fill="rgba(230,237,243,.95)" font-size="11.5" font-weight="800" font-family="Inter,system-ui,sans-serif">'+badgeVal+'</text>';
     }
   });
 
-  // Pontinha final
-  var lastI=N-1;
-  var wBot=VW*BOTS[lastI];
-  var xBot=(VW-wBot)/2+PAD;
-  var yBot=lastI*(LAYER_H+ARROW_H)+LAYER_H;
-  var axMid=xBot+wBot/2;
-  lines+='<polygon points="'+xBot+','+yBot+' '+(xBot+wBot)+','+yBot+' '+axMid+','+(yBot+ARROW_H)+'" fill="'+arrowFill+'"/>';
+  // ── Pontinha final ──────────────────────────────────────
+  var li=N-1;
+  var xb=xBot(li), wb=botW(li);
+  var yb=li*(SH+AH)+SH;
+  var axm=xb+wb/2;
+  g+='<polygon points="'+xb+','+yb+' '+(xb+wb)+','+yb+' '+axm+','+(yb+AH)+'" fill="'+fill(.75)+'"/>';
+  g+='<line x1="'+xb+'" y1="'+yb+'" x2="'+axm+'" y2="'+(yb+AH)+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
+  g+='<line x1="'+(xb+wb)+'" y1="'+yb+'" x2="'+axm+'" y2="'+(yb+AH)+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
 
-  var svgH=totalH+ARROW_H+4;
+  // ── SVG final ───────────────────────────────────────────
+  var svgOut='<svg width="'+SVG_W+'" height="'+SVG_H+'" viewBox="0 0 '+SVG_W+' '+SVG_H+'" style="max-width:100%;display:block;overflow:visible">'+g+'</svg>';
 
-  var html='<div style="display:flex;justify-content:center;width:100%;overflow-x:auto">';
-  html+='<svg width="'+SVG_W+'" height="'+svgH+'" viewBox="0 0 '+SVG_W+' '+svgH+'" style="max-width:100%;display:block">'+lines+'</svg>';
-  html+='</div>';
+  var html='<div style="display:flex;justify-content:center;width:100%;overflow-x:auto;padding:8px 0">'+svgOut+'</div>';
 
-  // ── KPI cards abaixo ──
+  // ── KPI cards ───────────────────────────────────────────
   var kpis=[
     {l:'Taxa de Entrega',  v:pct(d.entregues,d.enviados),   c:'var(--blue)'},
     {l:'Taxa de Abertura', v:pct(d.abriram,d.entregues),    c:'var(--purple)'},
     {l:'Taxa de Clique',   v:pct(d.clicaram,d.abriram),     c:'var(--orange)'},
     {l:'Conv. Antecip.',   v:pct(d.anteciparam,d.enviados), c:cor},
   ];
-  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:24px;max-width:640px;margin-left:auto;margin-right:auto">';
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto">';
   kpis.forEach(function(k){
-    html+='<div style="background:var(--surf2);border:1px solid var(--border);border-top:2px solid '+k.c+';border-radius:10px;padding:12px 14px;text-align:center">';
-    html+='<div style="font-size:22px;font-weight:800;color:'+k.c+';letter-spacing:-.03em;line-height:1">'+k.v+'</div>';
+    html+='<div style="background:var(--surf2);border:1px solid var(--border);border-top:2px solid '+k.c+';border-radius:10px;padding:14px;text-align:center">';
+    html+='<div style="font-size:24px;font-weight:800;color:'+k.c+';letter-spacing:-.03em;line-height:1">'+k.v+'</div>';
     html+='<div style="font-size:10px;color:var(--muted);margin-top:4px;font-weight:500">'+k.l+'</div>';
     html+='</div>';
   });
@@ -2195,12 +2163,12 @@ function renderFunilHTML(d, cor){
   return html;
 }
 
-// ── Comparativo ────────────────────────────────────────────────
+// ── Comparativo ─────────────────────────────────────────────
 function renderCompare(){
   var acts=Object.keys(FMKT_RESULTS);
   if(acts.length<2){document.getElementById('fmkt-compare-wrap').style.display='none';return;}
   var steps=[{key:'enviados',label:'Enviados'},{key:'entregues',label:'Entregues'},{key:'abriram',label:'Abertos'},{key:'clicaram',label:'Clicados'},{key:'anteciparam',label:'Anteciparam'}];
-  var html='<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;padding-top:20px;border-top:1px solid var(--border)">Comparativo entre campanhas</div>';
+  var html='<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;padding-top:20px;border-top:1px solid var(--border)">Comparativo</div>';
   html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
   html+='<thead><tr><th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.4px">Step</th>';
   acts.forEach(function(act,i){html+='<th style="text-align:right;padding:8px 12px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:'+campColor(i)+'" title="'+act+'">'+act.split('-').slice(-3).join('-')+'</th>';});
@@ -2211,13 +2179,8 @@ function renderCompare(){
     html+='<tr style="border-bottom:1px solid rgba(48,54,61,.35)"><td style="padding:10px 12px;color:var(--muted);font-size:11px">'+step.label+'</td>';
     acts.forEach(function(act,i){
       var d=getAgg(act);if(!d){html+='<td style="text-align:right;padding:10px 12px;color:var(--muted)">—</td>';return;}
-      var val=parseInt(d[step.key])||0;var bw=Math.round(val/maxV*100);var cor=campColor(i);
-      html+='<td style="text-align:right;padding:10px 12px;vertical-align:middle">';
-      html+='<div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">';
-      html+='<div style="width:72px;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+bw+'%;background:'+cor+';border-radius:2px;opacity:.8"></div></div>';
-      html+='<span style="font-weight:700;color:var(--text);min-width:38px;text-align:right">'+fmtN(val)+'</span>';
-      html+='<span style="font-size:10px;color:'+cor+';min-width:44px;text-align:right">'+pct(val,parseInt(d.enviados)||1)+'</span>';
-      html+='</div></td>';
+      var val=parseInt(d[step.key])||0,bw=Math.round(val/maxV*100),cor=campColor(i);
+      html+='<td style="text-align:right;padding:10px 12px;vertical-align:middle"><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px"><div style="width:72px;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+bw+'%;background:'+cor+';border-radius:2px;opacity:.8"></div></div><span style="font-weight:700;color:var(--text);min-width:38px;text-align:right">'+fmtN(val)+'</span><span style="font-size:10px;color:'+cor+';min-width:44px;text-align:right">'+pct(val,parseInt(d.enviados)||1)+'</span></div></td>';
     });
     html+='</tr>';
   });
@@ -2226,10 +2189,8 @@ function renderCompare(){
 }
 
 function redrawFunil(){
-  var act=FMKT_CAMP_AT;
-  if(!act||!FMKT_RESULTS[act]){document.getElementById('fmkt-funil-wrap').innerHTML='';return;}
-  var idx=Object.keys(FMKT_RESULTS).indexOf(act);
-  document.getElementById('fmkt-funil-wrap').innerHTML=renderFunilHTML(getAgg(act),campColor(idx));
+  var act=FMKT_CAMP_AT;if(!act||!FMKT_RESULTS[act]){document.getElementById('fmkt-funil-wrap').innerHTML='';return;}
+  document.getElementById('fmkt-funil-wrap').innerHTML=renderFunilHTML(getAgg(act),campColor(Object.keys(FMKT_RESULTS).indexOf(act)));
 }
 function redrawAll(){redrawFunil();renderCompare();}
 
@@ -2239,54 +2200,33 @@ function buildCampTabs(){
   if(acts.length<=1){wrap.style.display='none';return;}
   wrap.style.display='block';
   var h='';
-  acts.forEach(function(act,i){
-    var cor=campColor(i);
-    h+='<button class="rtab fmkt-atab" data-act="'+act+'" onclick="setFMKTCamp(\''+act.replace(/'/g,"\\'")+'\')"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+cor+';margin-right:5px;vertical-align:middle"></span>'+act.split('-').slice(-3).join('-')+'</button>';
-  });
+  acts.forEach(function(act,i){var cor=campColor(i);h+='<button class="rtab fmkt-atab" data-act="'+act+'" onclick="setFMKTCamp(\''+act.replace(/'/g,"\\'")+'\')"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+cor+';margin-right:5px;vertical-align:middle"></span>'+act.split('-').slice(-3).join('-')+'</button>';});
   document.getElementById('fmkt-camp-tabs').innerHTML=h;
 }
-
 function buildCanalTabs(){
   var chSet={};
-  Object.values(FMKT_RESULTS).forEach(function(data){
-    var cols=data.columns||[],idx={};cols.forEach(function(c,i){idx[c]=i;});
-    (data.rows||[]).forEach(function(row){chSet[(row[idx['channel']]||'?').toUpperCase()]=1;});
-  });
+  Object.values(FMKT_RESULTS).forEach(function(data){var cols=data.columns||[],idx={};cols.forEach(function(c,i){idx[c]=i;});(data.rows||[]).forEach(function(row){chSet[(row[idx['channel']]||'?').toUpperCase()]=1;});});
   var h='<button class="rtab fmkt-ctab active" data-canal="todos" onclick="setFMKT(\'todos\',\'canal\')">Todos</button>';
-  Object.keys(chSet).sort().forEach(function(ch){
-    var dot=CANAL_DOT[ch]||'#8b949e';
-    h+='<button class="rtab fmkt-ctab" data-canal="'+ch+'" onclick="setFMKT(\''+ch+'\',\'canal\')"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+dot+';margin-right:5px;vertical-align:middle"></span>'+ch+'</button>';
-  });
+  Object.keys(chSet).sort().forEach(function(ch){var dot=CANAL_DOT[ch]||'#8b949e';h+='<button class="rtab fmkt-ctab" data-canal="'+ch+'" onclick="setFMKT(\''+ch+'\',\'canal\')"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+dot+';margin-right:5px;vertical-align:middle"></span>'+ch+'</button>';});
   document.getElementById('fmkt-canal-tabs').innerHTML=h;
 }
 
 function buscarFunil(){
-  var inp=document.getElementById('fmkt-input');
-  if(inp.value.trim())fmktAddActivity(inp.value);
+  var inp=document.getElementById('fmkt-input');if(inp.value.trim())fmktAddActivity(inp.value);
   if(!FMKT_ACTIVITIES.length){fmktStatus('⚠️ Adicione pelo menos um activity_name.','var(--yellow)');return;}
   var btn=document.getElementById('fmkt-btn');
   btn.disabled=true;btn.style.opacity='.5';btn.textContent='⏳ Buscando…';
   var n=FMKT_ACTIVITIES.length;
-  fmktStatus('🔄 Consultando '+n+' campanha'+(n>1?'s':'')+' no Databricks…'+(n>1?' Rodando em paralelo, pode levar ~30-60s.':' Pode levar ~30s.'),'var(--blue)');
+  fmktStatus('🔄 Consultando '+n+' campanha'+(n>1?'s':'')+' no Databricks…'+(n>1?' Paralelo, ~30-60s.':' ~30s.'),'var(--blue)');
   document.getElementById('fmkt-result').style.display='none';
   document.getElementById('fmkt-filtros').style.display='none';
-
-  fetch('http://localhost:5001/funil',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({activities:FMKT_ACTIVITIES})
-  })
+  fetch('http://localhost:5001/funil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activities:FMKT_ACTIVITIES})})
   .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.error||'Erro '+r.status);});return r.json();})
   .then(function(data){
     btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
     FMKT_RESULTS={};FMKT_SETOR_AT='total';FMKT_CANAL_AT='todos';
-    if(data.multi){
-      Object.assign(FMKT_RESULTS,data.results||{});
-      var errs=Object.keys(data.errors||{});var ok=Object.keys(FMKT_RESULTS).length;
-      fmktStatus('✅ '+ok+' campanha'+(ok>1?'s carregadas':' carregada')+(errs.length?' — ⚠️ '+errs.length+' com erro':''),'var(--green)');
-    } else {
-      FMKT_RESULTS[data.activity_name]=data;
-      fmktStatus('✅ Dados carregados — '+(data.rows?data.rows.length:0)+' combinações.','var(--green)');
-    }
+    if(data.multi){Object.assign(FMKT_RESULTS,data.results||{});var errs=Object.keys(data.errors||{});var ok=Object.keys(FMKT_RESULTS).length;fmktStatus('✅ '+ok+' campanha'+(ok>1?'s carregadas':' carregada')+(errs.length?' — ⚠️ '+errs.length+' com erro':''),'var(--green)');}
+    else{FMKT_RESULTS[data.activity_name]=data;fmktStatus('✅ Dados carregados.','var(--green)');}
     if(!Object.keys(FMKT_RESULTS).length){fmktStatus('❌ Nenhum resultado.','var(--red)');return;}
     FMKT_CAMP_AT=Object.keys(FMKT_RESULTS)[0];
     buildCampTabs();buildCanalTabs();
@@ -2299,12 +2239,10 @@ function buscarFunil(){
   })
   .catch(function(err){
     btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
-    if(err.message.indexOf('fetch')>-1||err.message.indexOf('Failed')>-1){
-      fmktStatus('❌ Servidor offline. Rode: <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">servidor-benefits</code>','var(--red)');
-    } else {fmktStatus('❌ '+err.message,'var(--red)');}
+    if(err.message.indexOf('fetch')>-1||err.message.indexOf('Failed')>-1){fmktStatus('❌ Servidor offline. Rode: <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">servidor-benefits</code>','var(--red)');}
+    else{fmktStatus('❌ '+err.message,'var(--red)');}
   });
 }
-
 window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)redrawFunil();});
 </script>
 
