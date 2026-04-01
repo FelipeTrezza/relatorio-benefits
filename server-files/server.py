@@ -115,7 +115,28 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/status":
-            self.send_json(200, state)
+            self.send_json(200, {"ok": True, "status": state["last_status"]})
+        elif self.path in ("/", "/score", "/score.html", "/index.html"):
+            # Serve o HTML do relatório localmente (evita bloqueio HTTPS→localhost)
+            html_candidates = [
+                Path.home() / "score-antecipacoes" / "index.html",
+                Path.home() / "relatorio-benefits" / "score.html",
+            ]
+            html_path = None
+            for p in html_candidates:
+                if p.exists():
+                    html_path = p
+                    break
+            if html_path:
+                content = html_path.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", len(content))
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(content)
+            else:
+                self.send_json(404, {"error": "HTML não encontrado"})
         else:
             self.send_json(404, {"error": "not found"})
 
@@ -197,10 +218,13 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print("╔══════════════════════════════════════════╗")
-    print(f"║  Benefits Analytics — Servidor Local     ║")
-    print(f"║  http://localhost:{PORT}                    ║")
-    print("║  Ctrl+C para encerrar                    ║")
-    print("╚══════════════════════════════════════════╝")
+    print("╔════════════════════════════════════════════════════╗")
+    print(f"║  Score Antecipações — Servidor Local               ║")
+    print(f"║                                                    ║")
+    print(f"║  📊 Abra o relatório em:                          ║")
+    print(f"║  👉 http://localhost:{PORT}/score                    ║")
+    print(f"║                                                    ║")
+    print(f"║  Deixe esta janela aberta. Ctrl+C para encerrar.  ║")
+    print("╚════════════════════════════════════════════════════╝")
     server = HTTPServer(("localhost", PORT), Handler)
     server.serve_forever()
