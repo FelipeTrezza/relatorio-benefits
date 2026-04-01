@@ -240,6 +240,7 @@ tbody td{padding:9px 14px;font-size:12px}
     <button class="nb" onclick="gs('rfm')">RFM</button>
     <button class="nb" onclick="gs('semelhancas')">Semelhanças</button>
     <button class="nb" onclick="gs('destino')">Destino</button>
+    <button class="nb" onclick="gs('funil-mkt')">📣 Funil Campanha</button>
     <button class="nb" onclick="gs('insights')">Insights</button>
     <button class="nb" onclick="gs('conta')">Com×Sem Conta</button>
   </nav>
@@ -1901,6 +1902,286 @@ function setDST(s){
     document.getElementById('dst-'+x).style.display = x===s?'block':'none';
     document.getElementById('dtab-'+x).classList.toggle('active', x===s);
   });
+}
+</script>
+
+<div class="divider"></div>
+
+<!-- FUNIL CAMPANHA MKT -->
+<section id="funil-mkt">
+  <div class="sec-title">📣 Funil de Campanha por Activity</div>
+  <div class="sec-sub">Cole um <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">activity_name</code> da tabela <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">marketing.consumers_campaigns_communications</code> e visualize o funil: <strong>Enviados → Entregues → Abertos → Clicados → Anteciparam</strong>, com filtro por setor.</div>
+
+  <!-- INPUT -->
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px">
+    <input id="fmkt-input"
+      type="text"
+      placeholder="Ex: 20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial"
+      style="flex:1;min-width:280px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:12px;outline:none;font-family:monospace"
+      onkeydown="if(event.key==='Enter')buscarFunil()"
+    />
+    <button id="fmkt-btn"
+      onclick="buscarFunil()"
+      style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .2s"
+    >🔍 Buscar</button>
+    <button onclick="usarExemplo()"
+      style="background:var(--surf2);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;cursor:pointer;white-space:nowrap"
+    >Usar exemplo</button>
+  </div>
+
+  <!-- STATUS -->
+  <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
+
+  <!-- RESULTADO -->
+  <div id="fmkt-result" style="display:none">
+
+    <!-- Título da campanha -->
+    <div style="margin-bottom:16px;padding:12px 16px;background:var(--surf2);border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Activity Name</div>
+      <div id="fmkt-activity-label" style="font-size:12px;font-family:monospace;color:var(--blue);word-break:break-all"></div>
+    </div>
+
+    <!-- Filtro setor -->
+    <div class="rfm-tabs" id="fmkt-tabs" style="margin-bottom:20px">
+      <button class="rtab active" id="fmkt-tab-total"   onclick="setFMKT('total')"   >📊 Total</button>
+      <button class="rtab"        id="fmkt-tab-grupo"   onclick="setFMKT('grupo')"   >🏭 Grupo</button>
+      <button class="rtab"        id="fmkt-tab-publico" onclick="setFMKT('publico')" >🏛️ Público</button>
+      <button class="rtab"        id="fmkt-tab-privado" onclick="setFMKT('privado')" >🏢 Privado</button>
+    </div>
+
+    <!-- Painéis por setor -->
+    <div id="fmkt-panel-total"><!-- injetado via JS --></div>
+    <div id="fmkt-panel-grupo"   style="display:none"><!-- injetado via JS --></div>
+    <div id="fmkt-panel-publico" style="display:none"><!-- injetado via JS --></div>
+    <div id="fmkt-panel-privado" style="display:none"><!-- injetado via JS --></div>
+
+  </div>
+</section>
+
+<script>
+// ──────────────────────────────────────────────
+// FUNIL CAMPANHA MKT — lógica JS
+// ──────────────────────────────────────────────
+
+var FMKT_DATA = null; // dados retornados pelo servidor
+
+function usarExemplo() {
+  document.getElementById('fmkt-input').value =
+    '20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial';
+}
+
+function setFMKT(s) {
+  ['total','grupo','publico','privado'].forEach(function(x) {
+    document.getElementById('fmkt-panel-'+x).style.display = x===s ? 'block' : 'none';
+    document.getElementById('fmkt-tab-'+x).classList.toggle('active', x===s);
+  });
+}
+
+function fmktStatus(msg, color) {
+  var el = document.getElementById('fmkt-status');
+  el.style.display = 'block';
+  el.style.borderLeftColor = color || 'var(--green)';
+  el.innerHTML = msg;
+}
+
+function fmtN(v) {
+  v = parseInt(v) || 0;
+  if (v >= 1e6) return (v/1e6).toFixed(1)+'M';
+  if (v >= 1e3) return (v/1e3).toFixed(1)+'k';
+  return v.toString();
+}
+function fmtPct(a, b) {
+  b = parseInt(b) || 0;
+  a = parseInt(a) || 0;
+  if (!b) return '—';
+  return (a/b*100).toFixed(1)+'%';
+}
+
+// Cores por canal
+var CANAL_COR = {
+  'INAPP':    '#bc8cff',
+  'PUSH':     '#58a6ff',
+  'DM':       '#f0883e',
+  'EMAIL':    '#e3b341',
+  'WHATSAPP': '#21c25e',
+  'SMS':      '#8b949e',
+};
+function corCanal(ch) { return CANAL_COR[ch] || '#8b949e'; }
+
+function renderFunilPainel(rows) {
+  // rows: array de {setor, channel, enviados, entregues, abriram, clicaram, anteciparam}
+  if (!rows || !rows.length) {
+    return '<div style="color:var(--muted);font-size:13px;padding:20px 0">Sem dados para este setor nesta campanha.</div>';
+  }
+
+  // Agrupa por canal
+  var canais = {};
+  rows.forEach(function(r) {
+    var ch = r.channel;
+    if (!canais[ch]) canais[ch] = {enviados:0,entregues:0,abriram:0,clicaram:0,anteciparam:0};
+    canais[ch].enviados    += parseInt(r.enviados)    || 0;
+    canais[ch].entregues   += parseInt(r.entregues)   || 0;
+    canais[ch].abriram     += parseInt(r.abriram)     || 0;
+    canais[ch].clicaram    += parseInt(r.clicaram)    || 0;
+    canais[ch].anteciparam += parseInt(r.anteciparam) || 0;
+  });
+
+  // Totais para o resumo de todos os canais
+  var tot = {enviados:0,entregues:0,abriram:0,clicaram:0,anteciparam:0};
+  Object.values(canais).forEach(function(c) {
+    tot.enviados    += c.enviados;
+    tot.entregues   += c.entregues;
+    tot.abriram     += c.abriram;
+    tot.clicaram    += c.clicaram;
+    tot.anteciparam += c.anteciparam;
+  });
+
+  var html = '';
+
+  // ── FUNIL CONSOLIDADO ──
+  html += '<div style="margin-bottom:28px">';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Todos os Canais — Funil Consolidado</div>';
+  html += renderFunilSteps(tot);
+  html += '</div>';
+
+  // ── POR CANAL ──
+  var ordCanais = Object.keys(canais).sort(function(a,b){
+    return canais[b].enviados - canais[a].enviados;
+  });
+
+  html += '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Por Canal</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">';
+  ordCanais.forEach(function(ch) {
+    var c = canais[ch];
+    var cor = corCanal(ch);
+    html += '<div class="card" style="border-top:3px solid '+cor+'">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">';
+    html += '<span style="font-size:10px;font-weight:800;background:'+cor+'22;color:'+cor+';padding:3px 10px;border-radius:20px;letter-spacing:.5px">'+ch+'</span>';
+    html += '<span style="font-size:11px;color:var(--muted)">'+fmtN(c.enviados)+' enviados</span>';
+    html += '</div>';
+    html += renderFunilSteps(c);
+    html += '</div>';
+  });
+  html += '</div>';
+
+  return html;
+}
+
+function renderFunilSteps(c) {
+  var steps = [
+    {label:'Enviados',    val:c.enviados,    prev:null,          cor:'var(--blue)'},
+    {label:'Entregues',   val:c.entregues,   prev:c.enviados,    cor:'var(--purple)'},
+    {label:'Abertos',     val:c.abriram,     prev:c.entregues,   cor:'var(--orange)'},
+    {label:'Clicados',    val:c.clicaram,    prev:c.abriram,     cor:'var(--yellow)'},
+    {label:'Anteciparam', val:c.anteciparam, prev:c.enviados,    cor:'var(--green)'},
+  ];
+  var html = '';
+  var maxVal = steps[0].val || 1;
+  steps.forEach(function(s, i) {
+    var pct = s.prev !== null ? fmtPct(s.val, s.prev) : '100%';
+    var barW = Math.max(1, Math.round(s.val / maxVal * 100));
+    html += '<div style="margin-bottom:8px">';
+    // label + valor
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">';
+    html += '<span style="font-size:11px;color:var(--muted)">'+s.label+'</span>';
+    html += '<span style="font-size:12px;font-weight:700;color:'+s.cor+'">';
+    html += fmtN(s.val);
+    if (s.prev !== null) html += ' <span style="font-size:10px;font-weight:400;color:var(--muted)">('+pct+')</span>';
+    html += '</span>';
+    html += '</div>';
+    // barra
+    html += '<div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">';
+    html += '<div style="height:100%;width:'+barW+'%;background:'+s.cor+';border-radius:3px;transition:width .4s"></div>';
+    html += '</div>';
+    // seta entre steps
+    if (i < steps.length-1 && i < 3) {
+      html += '<div style="text-align:center;color:var(--border);font-size:10px;margin:2px 0">▼</div>';
+    }
+    html += '</div>';
+  });
+  return html;
+}
+
+function buscarFunil() {
+  var activity = document.getElementById('fmkt-input').value.trim();
+  if (!activity) {
+    fmktStatus('⚠️ Cole um activity_name para buscar.', 'var(--yellow)');
+    return;
+  }
+
+  var btn = document.getElementById('fmkt-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Buscando...';
+  fmktStatus('🔄 Consultando Databricks... isso pode levar ~30 segundos.', 'var(--blue)');
+  document.getElementById('fmkt-result').style.display = 'none';
+
+  fetch('http://localhost:5001/funil', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({activity_name: activity})
+  })
+  .then(function(r) {
+    if (!r.ok) return r.json().then(function(e){ throw new Error(e.error || 'Erro '+r.status); });
+    return r.json();
+  })
+  .then(function(data) {
+    btn.disabled = false;
+    btn.textContent = '🔍 Buscar';
+    FMKT_DATA = data;
+    renderFunil(data);
+  })
+  .catch(function(err) {
+    btn.disabled = false;
+    btn.textContent = '🔍 Buscar';
+    if (err.message.includes('fetch') || err.message.includes('Failed')) {
+      fmktStatus(
+        '❌ Servidor local não encontrado. <br>👉 Abra o terminal e rode: <code style="background:#0d1117;padding:2px 6px;border-radius:4px">servidor-benefits</code>',
+        'var(--red)'
+      );
+    } else {
+      fmktStatus('❌ Erro: ' + err.message, 'var(--red)');
+    }
+  });
+}
+
+function renderFunil(data) {
+  document.getElementById('fmkt-activity-label').textContent = data.activity_name;
+  document.getElementById('fmkt-result').style.display = 'block';
+  fmktStatus(
+    '✅ Dados carregados — ' + (data.rows ? data.rows.length : 0) + ' combinações setor×canal.',
+    'var(--green)'
+  );
+
+  // Monta objeto por setor
+  var cols = data.columns || [];
+  var idx = {};
+  cols.forEach(function(c,i){ idx[c] = i; });
+
+  var porSetor = {total:[],grupo:[],publico:[],privado:[]};
+  (data.rows || []).forEach(function(row) {
+    var setor = (row[idx['setor']] || '').toLowerCase().normalize('NFD').replace(/[^\w]/g,'');
+    var obj = {
+      setor:     row[idx['setor']],
+      channel:   row[idx['channel']],
+      enviados:  row[idx['enviados']],
+      entregues: row[idx['entregues']],
+      abriram:   row[idx['abriram']],
+      clicaram:  row[idx['clicaram']],
+      anteciparam: row[idx['anteciparam']],
+    };
+    porSetor.total.push(obj);
+    if (setor === 'grupo')   porSetor.grupo.push(obj);
+    if (setor === 'publico') porSetor.publico.push(obj);
+    if (setor === 'privado') porSetor.privado.push(obj);
+    // INSS e sem vínculo só aparecem no total
+  });
+
+  document.getElementById('fmkt-panel-total').innerHTML   = renderFunilPainel(porSetor.total);
+  document.getElementById('fmkt-panel-grupo').innerHTML   = renderFunilPainel(porSetor.grupo);
+  document.getElementById('fmkt-panel-publico').innerHTML = renderFunilPainel(porSetor.publico);
+  document.getElementById('fmkt-panel-privado').innerHTML = renderFunilPainel(porSetor.privado);
+
+  setFMKT('total');
 }
 </script>
 
