@@ -609,49 +609,72 @@ function renderFunilHTML(d,cor){
   var R=rgb[0],G=rgb[1],B=rgb[2];
   function fill(a){return'rgba('+R+','+G+','+B+','+a+')';}
   function stroke(a){return'rgba('+R+','+G+','+B+','+a+')';}
-  var N=steps.length,CONE_W=380,SH=58,AH=18,BADGE_W=64,BADGE_H=28,BADGE_R=14,PAD=90;
+
+  // ── Dimensões ─────────────────────────────────────────────────
+  var N=steps.length,CONE_W=360,SH=62,AH=14,PAD=100;
+  var BADGE_W=68,BADGE_H=30,BADGE_R=15;
   var SVG_W=CONE_W+PAD*2;
-  var SVG_H=N*SH+(N-1)*AH+AH+8;
-  var STEP=0.182;
+  var SVG_H=N*(SH+AH)+AH+12;
+  var STEP=0.175;
   function topW(i){return CONE_W*(1-i*STEP);}
   function botW(i){return CONE_W*(1-(i+1)*STEP);}
   function xTop(i){return PAD+(CONE_W-topW(i))/2;}
   function xBot(i){return PAD+(CONE_W-botW(i))/2;}
+
   var g='';
+
   steps.forEach(function(s,i){
     var xt=xTop(i),xb=xBot(i),wt=topW(i),wb=botW(i);
     var yt=i*(SH+AH),yb=yt+SH;
-    var alpha=(0.22+i*0.16).toFixed(2);
+    // Opacidade alta e crescente — trapézios bem visíveis
+    var alpha=(0.55+i*0.09).toFixed(2);
     var pts=xt+','+yt+' '+(xt+wt)+','+yt+' '+(xb+wb)+','+yb+' '+xb+','+yb;
+
+    // Trapézio sólido
     g+='<polygon points="'+pts+'" fill="'+fill(alpha)+'"/>';
-    if(i===0)g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+(xt+wt)+'" y2="'+yt+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
-    g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+xb+'" y2="'+yb+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
-    g+='<line x1="'+(xt+wt)+'" y1="'+yt+'" x2="'+(xb+wb)+'" y2="'+yb+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
-    g+='<line x1="'+xb+'" y1="'+yb+'" x2="'+(xb+wb)+'" y2="'+yb+'" stroke="'+stroke(.25)+'" stroke-width="1"/>';
+
+    // Borda superior nítida apenas no primeiro
+    if(i===0) g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+(xt+wt)+'" y2="'+yt+'" stroke="'+stroke(.9)+'" stroke-width="2"/>';
+    // Bordas laterais nítidas
+    g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+xb+'" y2="'+yb+'" stroke="'+stroke(.8)+'" stroke-width="2"/>';
+    g+='<line x1="'+(xt+wt)+'" y1="'+yt+'" x2="'+(xb+wb)+'" y2="'+yb+'" stroke="'+stroke(.8)+'" stroke-width="2"/>';
+
     var ymid=yt+SH/2;
-    g+='<text x="'+(xt+14)+'" y="'+(ymid-5)+'" dominant-baseline="middle" fill="rgba(230,237,243,.7)" font-size="10" font-weight="700" font-family="Inter,system-ui,sans-serif" letter-spacing=".8">'+s.label.toUpperCase()+'</text>';
-    g+='<text x="'+(xt+wt-14)+'" y="'+(ymid+6)+'" dominant-baseline="middle" text-anchor="end" fill="rgba(230,237,243,.95)" font-size="16" font-weight="800" font-family="Inter,system-ui,sans-serif">'+fmtN(s.val)+'</text>';
+    // Label pequeno à esquerda — branco puro
+    g+='<text x="'+(xt+16)+'" y="'+(ymid-8)+'" dominant-baseline="middle" fill="rgba(255,255,255,.75)" font-size="10" font-weight="700" font-family="Inter,system-ui,sans-serif" letter-spacing="1">'+s.label.toUpperCase()+'</text>';
+    // Valor grande à direita — branco puro, máximo contraste
+    g+='<text x="'+(xt+wt-16)+'" y="'+(ymid+7)+'" dominant-baseline="middle" text-anchor="end" fill="#ffffff" font-size="19" font-weight="900" font-family="Inter,system-ui,sans-serif">'+fmtN(s.val)+'</text>';
+
+    // Seta entre camadas
     if(i<N-1){
       var ax1=xb,ax2=xb+wb,aym=yb+AH,axm=(ax1+ax2)/2;
-      g+='<polygon points="'+ax1+','+yb+' '+ax2+','+yb+' '+axm+','+aym+'" fill="'+fill((parseFloat(alpha)+0.1).toFixed(2))+'"/>';
-      g+='<line x1="'+ax1+'" y1="'+yb+'" x2="'+axm+'" y2="'+aym+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
-      g+='<line x1="'+ax2+'" y1="'+yb+'" x2="'+axm+'" y2="'+aym+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
+      g+='<polygon points="'+ax1+','+yb+' '+ax2+','+yb+' '+axm+','+aym+'" fill="'+fill((parseFloat(alpha)+0.08).toFixed(2))+'"/>';
+      g+='<line x1="'+ax1+'" y1="'+yb+'" x2="'+axm+'" y2="'+aym+'" stroke="'+stroke(.7)+'" stroke-width="2"/>';
+      g+='<line x1="'+ax2+'" y1="'+yb+'" x2="'+axm+'" y2="'+aym+'" stroke="'+stroke(.7)+'" stroke-width="2"/>';
     }
+
+    // Badge lateral com % — fundo sólido para máxima legibilidade
     if(s.prev!==null){
       var badgeVal=pct(s.val,s.prev);
-      var side=i%2===0?'left':'right';
-      var bx=side==='right'?(xt+wt+12):(xt-BADGE_W-12);
+      var side=i%2===0?'right':'left';
+      var bx=side==='right'?(xt+wt+14):(xt-BADGE_W-14);
       var by=ymid-BADGE_H/2,bxm=bx+BADGE_W/2,bym=by+BADGE_H/2;
-      var lx1=side==='right'?(xt+wt):xt,lx2=side==='right'?bx:(bx+BADGE_W);
-      g+='<line x1="'+lx1+'" y1="'+ymid+'" x2="'+lx2+'" y2="'+bym+'" stroke="'+stroke(.35)+'" stroke-width="1" stroke-dasharray="4,3"/>';
-      g+='<rect x="'+bx+'" y="'+by+'" width="'+BADGE_W+'" height="'+BADGE_H+'" rx="'+BADGE_R+'" fill="'+fill((parseFloat(alpha)+0.15).toFixed(2))+'" stroke="'+stroke(.45)+'" stroke-width="1.2"/>';
-      g+='<text x="'+bxm+'" y="'+(bym+1)+'" text-anchor="middle" dominant-baseline="middle" fill="rgba(230,237,243,.95)" font-size="11.5" font-weight="800" font-family="Inter,system-ui,sans-serif">'+badgeVal+'</text>';
+      var lx1=side==='right'?(xt+wt+2):xt,lx2=side==='right'?bx:(bx+BADGE_W);
+      // Linha tracejada
+      g+='<line x1="'+lx1+'" y1="'+ymid+'" x2="'+lx2+'" y2="'+bym+'" stroke="'+stroke(.55)+'" stroke-width="1.5" stroke-dasharray="5,3"/>';
+      // Badge com fundo sólido e borda nítida
+      g+='<rect x="'+bx+'" y="'+by+'" width="'+BADGE_W+'" height="'+BADGE_H+'" rx="'+BADGE_R+'" fill="'+fill(parseFloat(alpha)+0.15)+'" stroke="'+stroke(.9)+'" stroke-width="1.8"/>';
+      // Texto branco puro no badge
+      g+='<text x="'+bxm+'" y="'+(bym+1)+'" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="12.5" font-weight="900" font-family="Inter,system-ui,sans-serif">'+badgeVal+'</text>';
     }
   });
+
+  // Ponta final do funil
   var li=N-1,xbf=xBot(li),wbf=botW(li),ybf=li*(SH+AH)+SH,axmf=xbf+wbf/2;
-  g+='<polygon points="'+xbf+','+ybf+' '+(xbf+wbf)+','+ybf+' '+axmf+','+(ybf+AH)+'" fill="'+fill(.75)+'"/>';
-  g+='<line x1="'+xbf+'" y1="'+ybf+'" x2="'+axmf+'" y2="'+(ybf+AH)+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
-  g+='<line x1="'+(xbf+wbf)+'" y1="'+ybf+'" x2="'+axmf+'" y2="'+(ybf+AH)+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
+  g+='<polygon points="'+xbf+','+ybf+' '+(xbf+wbf)+','+ybf+' '+axmf+','+(ybf+AH)+'" fill="'+fill(.85)+'"/>';
+  g+='<line x1="'+xbf+'" y1="'+ybf+'" x2="'+axmf+'" y2="'+(ybf+AH)+'" stroke="'+stroke(.8)+'" stroke-width="2"/>';
+  g+='<line x1="'+(xbf+wbf)+'" y1="'+ybf+'" x2="'+axmf+'" y2="'+(ybf+AH)+'" stroke="'+stroke(.8)+'" stroke-width="2"/>';
+
   var html='<div style="display:flex;justify-content:center;width:100%;overflow-x:auto;padding:8px 0"><svg width="'+SVG_W+'" height="'+SVG_H+'" viewBox="0 0 '+SVG_W+' '+SVG_H+'" style="max-width:100%;display:block;overflow:visible">'+g+'</svg></div>';
   var kpis=[
     {l:'Taxa de Entrega',v:pct(d.entregues,d.enviados),c:'var(--blue)'},
