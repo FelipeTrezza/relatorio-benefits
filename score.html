@@ -1909,339 +1909,292 @@ function setDST(s){
 
 <!-- FUNIL CAMPANHA MKT -->
 <section id="funil-mkt">
-  <div class="sec-title">📣 Funil de Campanha por Activity</div>
-  <div class="sec-sub">Cole um <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">activity_name</code> da <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">marketing.consumers_campaigns_communications</code> e visualize o funil <strong>Enviados → Entregues → Abertos → Clicados → Anteciparam</strong> por setor e canal.</div>
+  <div class="sec-title">📣 Funil de Campanha</div>
+  <div class="sec-sub">Cole um <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">activity_name</code> da <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">marketing.consumers_campaigns_communications</code> para visualizar o funil completo por setor e canal.</div>
 
-  <!-- LINHA 1: input + botões -->
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+  <!-- BUSCA -->
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
     <input id="fmkt-input" type="text"
-      placeholder="Cole o activity_name aqui (ou clique em Usar exemplo)"
-      style="flex:1;min-width:260px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:12px;outline:none;font-family:monospace"
+      placeholder="Cole o activity_name aqui…"
+      style="flex:1;min-width:260px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-size:12px;outline:none;font-family:monospace;transition:border-color .2s"
+      onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"
       onkeydown="if(event.key==='Enter')buscarFunil()"
     />
     <button id="fmkt-btn" onclick="buscarFunil()"
-      style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">
+      style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s">
       🔍 Buscar
     </button>
     <button onclick="usarExemplo()"
-      style="background:var(--surf2);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;cursor:pointer;white-space:nowrap">
+      style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;white-space:nowrap;transition:color .15s"
+      onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
       Usar exemplo
     </button>
   </div>
 
-  <!-- LINHA 2: filtros setor + canal (aparecem após resultado) -->
-  <div id="fmkt-filtros" style="display:none;margin-bottom:20px">
-    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
-      <!-- Setores -->
+  <!-- STATUS -->
+  <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:16px;padding:9px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
+
+  <!-- FILTROS (aparecem após resultado) -->
+  <div id="fmkt-filtros" style="display:none;margin-bottom:24px">
+    <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
       <div>
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Setor</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600">Setor</div>
         <div class="rfm-tabs">
-          <button class="rtab active" id="fmkt-tab-total"   onclick="setFMKT('total','setor')"  >📊 Total</button>
-          <button class="rtab"        id="fmkt-tab-grupo"   onclick="setFMKT('grupo','setor')"  >🏭 Grupo</button>
-          <button class="rtab"        id="fmkt-tab-publico" onclick="setFMKT('publico','setor')">🏛️ Público</button>
-          <button class="rtab"        id="fmkt-tab-privado" onclick="setFMKT('privado','setor')">🏢 Privado</button>
+          <button class="rtab active" id="fmkt-tab-total"   onclick="setFMKT('total','setor')"  >Total</button>
+          <button class="rtab"        id="fmkt-tab-grupo"   onclick="setFMKT('grupo','setor')"  >Grupo</button>
+          <button class="rtab"        id="fmkt-tab-publico" onclick="setFMKT('publico','setor')">Público</button>
+          <button class="rtab"        id="fmkt-tab-privado" onclick="setFMKT('privado','setor')">Privado</button>
         </div>
       </div>
-      <!-- Canais (dinâmico) -->
       <div>
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Canal</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600">Canal</div>
         <div id="fmkt-canal-tabs" class="rfm-tabs"></div>
       </div>
     </div>
   </div>
 
-  <!-- STATUS -->
-  <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
-
   <!-- RESULTADO -->
   <div id="fmkt-result" style="display:none">
-    <!-- Título da campanha -->
-    <div style="margin-bottom:20px;padding:10px 16px;background:var(--surf2);border-radius:8px;border:1px solid var(--border)">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px">Activity Name</div>
-      <div id="fmkt-activity-label" style="font-size:11px;font-family:monospace;color:var(--blue);word-break:break-all"></div>
+    <!-- label campanha -->
+    <div style="margin-bottom:22px;padding:9px 14px;background:var(--surf2);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;gap:10px">
+      <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap">Activity</span>
+      <span id="fmkt-activity-label" style="font-size:11px;font-family:monospace;color:var(--blue);word-break:break-all"></span>
     </div>
-    <!-- Funil triangular (canvas) -->
-    <div id="fmkt-funil-wrap" style="position:relative;width:100%;max-width:860px;margin:0 auto"></div>
+    <!-- funil -->
+    <div id="fmkt-funil-wrap"></div>
   </div>
 </section>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// FUNIL CAMPANHA MKT — design triangular invertido
-// ═══════════════════════════════════════════════════════════════
-var FMKT_DATA      = null;
-var FMKT_SETOR_AT  = 'total';
-var FMKT_CANAL_AT  = 'todos';
-var FMKT_CANAIS    = [];
+// ═══════════════════════════════════════════
+//  FUNIL CAMPANHA MKT
+// ═══════════════════════════════════════════
+var FMKT_DATA     = null;
+var FMKT_SETOR_AT = 'total';
+var FMKT_CANAL_AT = 'todos';
 
-// Gradiente de 5 camadas: vermelho-coral → laranja → amarelo → ciano → verde
-var LAYER_COLORS = ['#E05555','#E07C35','#D4A017','#2AABB0','#21A366'];
-var LAYER_LABELS = ['ENVIADOS','ENTREGUES','ABERTOS','CLICADOS','ANTECIPARAM'];
+var CANAL_DOT = {
+  INAPP:'#bc8cff', PUSH:'#58a6ff', DM:'#f0883e',
+  EMAIL:'#e3b341', WHATSAPP:'#21c25e', SMS:'#8b949e'
+};
 
-var CANAL_COR = {INAPP:'#bc8cff',PUSH:'#58a6ff',DM:'#f0883e',EMAIL:'#e3b341',WHATSAPP:'#21c25e',SMS:'#8b949e'};
-
-function usarExemplo() {
+function usarExemplo(){
   document.getElementById('fmkt-input').value =
     '20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial';
 }
 
-function fmktStatus(msg, color) {
-  var el = document.getElementById('fmkt-status');
-  el.style.display = 'block';
-  el.style.borderLeftColor = color || 'var(--green)';
-  el.innerHTML = msg;
+function fmktStatus(msg,cor){
+  var el=document.getElementById('fmkt-status');
+  el.style.display='block'; el.style.borderLeftColor=cor||'var(--green)'; el.innerHTML=msg;
 }
 
-function fmtN(v) {
-  v = parseInt(v)||0;
-  if (v>=1e6) return (v/1e6).toFixed(1)+'M';
-  if (v>=1e3) return (v/1e3).toFixed(1)+'k';
+function fmtN(v){
+  v=parseInt(v)||0;
+  if(v>=1e6) return (v/1e6).toFixed(1)+'M';
+  if(v>=1e3) return (v/1e3).toFixed(1)+'k';
   return v.toString();
 }
-function fmtPct(a,b) {
-  a=parseInt(a)||0; b=parseInt(b)||0;
-  if (!b) return '—';
-  return (a/b*100).toFixed(1)+'%';
-}
+function pct(a,b){ a=parseInt(a)||0; b=parseInt(b)||0; return b?(a/b*100).toFixed(1)+'%':'—'; }
 
-// ── Filtros setor / canal ──────────────────────────────────────
-function setFMKT(val, tipo) {
-  if (tipo === 'setor') {
-    FMKT_SETOR_AT = val;
+// ── filtros ─────────────────────────────────
+function setFMKT(val,tipo){
+  if(tipo==='setor'){
+    FMKT_SETOR_AT=val;
     ['total','grupo','publico','privado'].forEach(function(x){
-      document.getElementById('fmkt-tab-'+x).classList.toggle('active', x===val);
+      document.getElementById('fmkt-tab-'+x).classList.toggle('active',x===val);
     });
   } else {
-    FMKT_CANAL_AT = val;
+    FMKT_CANAL_AT=val;
     document.querySelectorAll('.fmkt-ctab').forEach(function(b){
-      b.classList.toggle('active', b.dataset.canal===val);
+      b.classList.toggle('active',b.dataset.canal===val);
     });
   }
-  if (FMKT_DATA) redrawFunil();
+  if(FMKT_DATA) redrawFunil();
 }
 
-// ── Agrega dados do setor+canal atual ─────────────────────────
-function getAggregated() {
-  if (!FMKT_DATA) return null;
-  var cols = FMKT_DATA.columns || [];
-  var idx = {}; cols.forEach(function(c,i){ idx[c]=i; });
-
-  var rows = (FMKT_DATA.rows||[]).filter(function(row){
-    var setor = (row[idx['setor']]||'').toLowerCase().normalize('NFD').replace(/[^\w]/g,'');
-    var ch    = (row[idx['channel']]||'').toUpperCase();
-    var setorOk = FMKT_SETOR_AT === 'total' || setor === FMKT_SETOR_AT;
-    var canalOk = FMKT_CANAL_AT === 'todos' || ch === FMKT_CANAL_AT;
-    return setorOk && canalOk;
+// ── agrega ──────────────────────────────────
+function getAgg(){
+  if(!FMKT_DATA) return null;
+  var cols=FMKT_DATA.columns||[], idx={};
+  cols.forEach(function(c,i){idx[c]=i;});
+  var rows=(FMKT_DATA.rows||[]).filter(function(row){
+    var setor=(row[idx['setor']]||'').toLowerCase().normalize('NFD').replace(/[^\w]/g,'');
+    var ch=(row[idx['channel']]||'').toUpperCase();
+    return (FMKT_SETOR_AT==='total'||setor===FMKT_SETOR_AT) &&
+           (FMKT_CANAL_AT==='todos'||ch===FMKT_CANAL_AT);
   });
-
-  var tot = {enviados:0,entregues:0,abriram:0,clicaram:0,anteciparam:0};
+  var t={enviados:0,entregues:0,abriram:0,clicaram:0,anteciparam:0};
   rows.forEach(function(row){
-    tot.enviados    += parseInt(row[idx['enviados']])    ||0;
-    tot.entregues   += parseInt(row[idx['entregues']])   ||0;
-    tot.abriram     += parseInt(row[idx['abriram']])     ||0;
-    tot.clicaram    += parseInt(row[idx['clicaram']])    ||0;
-    tot.anteciparam += parseInt(row[idx['anteciparam']]) ||0;
+    t.enviados    +=parseInt(row[idx['enviados']])    ||0;
+    t.entregues   +=parseInt(row[idx['entregues']])   ||0;
+    t.abriram     +=parseInt(row[idx['abriram']])     ||0;
+    t.clicaram    +=parseInt(row[idx['clicaram']])    ||0;
+    t.anteciparam +=parseInt(row[idx['anteciparam']]) ||0;
   });
-  return tot;
+  return t;
 }
 
-// ── RENDERIZAÇÃO PRINCIPAL DO FUNIL ────────────────────────────
-function redrawFunil() {
-  var agg = getAggregated();
-  if (!agg) return;
-
-  var steps = [
-    {label:'ENVIADOS',    val:agg.enviados,    prev:null,           pct:null},
-    {label:'ENTREGUES',   val:agg.entregues,   prev:agg.enviados,   pct:fmtPct(agg.entregues,agg.enviados)},
-    {label:'ABERTOS',     val:agg.abriram,     prev:agg.entregues,  pct:fmtPct(agg.abriram,agg.entregues)},
-    {label:'CLICADOS',    val:agg.clicaram,    prev:agg.abriram,    pct:fmtPct(agg.clicaram,agg.abriram)},
-    {label:'ANTECIPARAM', val:agg.anteciparam, prev:agg.enviados,   pct:fmtPct(agg.anteciparam,agg.enviados)},
+// ── desenha funil ────────────────────────────
+function redrawFunil(){
+  var d=getAgg(); if(!d) return;
+  var steps=[
+    {key:'enviados',    label:'Enviados',    val:d.enviados,    prev:null,         icon:'📤'},
+    {key:'entregues',   label:'Entregues',   val:d.entregues,   prev:d.enviados,   icon:'📬'},
+    {key:'abertos',     label:'Abertos',     val:d.abriram,     prev:d.entregues,  icon:'👁'},
+    {key:'clicados',    label:'Clicados',    val:d.clicaram,    prev:d.abriram,    icon:'🖱'},
+    {key:'anteciparam', label:'Anteciparam', val:d.anteciparam, prev:d.enviados,   icon:'💰'},
   ];
+  var base=steps[0].val||1;
+  // Larguras do funil: 100% → 78% → 56% → 34% → 16%
+  var WS=[100,78,56,34,16];
+  // Opacidade verde crescente do topo para baixo
+  var ALPHAS=['0.10','0.20','0.32','0.48','0.70'];
 
-  var maxVal = steps[0].val || 1;
+  var html='';
 
-  // Larguras relativas para cada camada (100% → estreita no fundo)
-  // Camada 0 = mais larga (topo), camada 4 = mais estreita (base)
-  var WIDTHS = [100, 82, 64, 46, 28]; // % da largura total
+  // ── FUNIL CENTRAL ──
+  html+='<div style="display:flex;gap:0;align-items:stretch">';
 
-  // Altura de cada camada (px)
-  var LAYER_H = 72;
-  var totalH  = LAYER_H * 5 + 12; // + gap final
-
-  var wrap = document.getElementById('fmkt-funil-wrap');
-  var W    = Math.min(wrap.offsetWidth || 760, 860);
-  var SIDE = 220; // largura da coluna lateral direita
-  var CONE_W = W - SIDE - 20; // largura da área do cone
-
-  var html = '';
-  html += '<div style="display:flex;gap:0;align-items:stretch;width:100%;position:relative">';
-
-  // ── LADO ESQUERDO: labels com conectores ──
-  html += '<div style="width:160px;flex-shrink:0;position:relative;display:flex;flex-direction:column;justify-content:space-around;padding:6px 0">';
-  steps.forEach(function(s, i) {
-    var cor = LAYER_COLORS[i];
-    html += '<div style="display:flex;align-items:center;justify-content:flex-end;height:'+LAYER_H+'px;gap:6px;position:relative">';
-    // mini funil icon
-    html += '<div style="text-align:right">';
-    html += '<div style="font-size:10px;font-weight:700;color:'+cor+';letter-spacing:.3px;line-height:1.2">'+s.label+'</div>';
-    html += '<div style="font-size:18px;font-weight:800;color:#fff;line-height:1.1">'+fmtN(s.val)+'</div>';
-    if (s.pct) html += '<div style="font-size:11px;color:#aaa">'+s.pct+' do anterior</div>';
-    html += '</div>';
-    // conector horizontal
-    html += '<div style="width:16px;height:2px;background:'+cor+';opacity:.6;flex-shrink:0"></div>';
-    html += '</div>';
+  // coluna esquerda — labels
+  html+='<div style="flex:1;display:flex;flex-direction:column;gap:3px;justify-content:center;padding-right:20px">';
+  steps.forEach(function(s,i){
+    var p=s.prev!==null?pct(s.val,s.prev):null;
+    html+='<div style="display:flex;flex-direction:column;justify-content:center;height:64px;text-align:right">';
+    html+='<div style="font-size:11px;color:var(--muted);font-weight:500;margin-bottom:2px">'+s.label+'</div>';
+    html+='<div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1">'+fmtN(s.val)+'</div>';
+    if(p) html+='<div style="font-size:10px;color:var(--muted);margin-top:1px">'+p+' do anterior</div>';
+    html+='</div>';
   });
-  html += '</div>';
+  html+='</div>';
 
-  // ── CENTRO: triângulo invertido em SVG ──
-  var svgH = LAYER_H * 5 + 8;
-  html += '<div style="flex:1;min-width:0;position:relative">';
-  html += '<svg width="100%" height="'+svgH+'" viewBox="0 0 400 '+svgH+'" preserveAspectRatio="none" style="display:block">';
-
-  // Cada camada é um trapézio
-  // Topo do triângulo = camada 0 (largura 100%)
-  // Base do triângulo = camada 4 (largura 28%)
-  var topW  = 400; // SVG units
-  steps.forEach(function(s, i) {
-    var wTop = topW * WIDTHS[i]   / 100;
-    var wBot = topW * WIDTHS[i+1] / 100;
-    if (wBot === undefined) wBot = topW * 12 / 100; // pontinha
-    var xTop = (topW - wTop) / 2;
-    var xBot = (topW - wBot) / 2;
-    var yTop = i * LAYER_H;
-    var yBot = yTop + LAYER_H;
-    var cor  = LAYER_COLORS[i];
-
-    // Trapézio
-    var pts = xTop+','+yTop+' '+(xTop+wTop)+','+yTop+' '+(xBot+wBot)+','+yBot+' '+xBot+','+yBot;
-    html += '<polygon points="'+pts+'" fill="'+cor+'" opacity="0.92"/>';
-
-    // Linha divisória sutil
-    if (i < 4) {
-      html += '<line x1="'+xBot+'" y1="'+yBot+'" x2="'+(xBot+wBot)+'" y2="'+yBot+'" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>';
-    }
-
-    // Texto centralizado na camada
-    var yMid = yTop + LAYER_H/2;
-    html += '<text x="200" y="'+(yMid-7)+'" text-anchor="middle" fill="rgba(255,255,255,.95)" font-size="11" font-weight="700" font-family="Inter,sans-serif" letter-spacing="1">'+s.label+'</text>';
-    html += '<text x="200" y="'+(yMid+10)+'" text-anchor="middle" fill="rgba(255,255,255,.85)" font-size="13" font-weight="800" font-family="Inter,sans-serif">'+fmtN(s.val)+'</text>';
+  // coluna central — SVG funil
+  html+='<div style="width:220px;flex-shrink:0">';
+  html+='<svg width="220" height="'+(64*5+16)+'" viewBox="0 0 220 '+(64*5+16)+'" style="display:block">';
+  steps.forEach(function(s,i){
+    var wTop=220*WS[i]/100;
+    var wBot=i<4 ? 220*WS[i+1]/100 : 220*8/100;
+    var xTop=(220-wTop)/2, xBot=(220-wBot)/2;
+    var yTop=i*67, yBot=yTop+64;
+    var pts=xTop+','+yTop+' '+(xTop+wTop)+','+yTop+' '+(xBot+wBot)+','+yBot+' '+xBot+','+yBot;
+    // fundo da camada
+    html+='<polygon points="'+pts+'" fill="rgba(33,163,102,'+ALPHAS[i]+')" />';
+    // borda interna sutil
+    html+='<polygon points="'+pts+'" fill="none" stroke="rgba(33,163,102,.18)" stroke-width="1"/>';
+    // % do total centralizado
+    var pctTot=i===0?'100%':pct(s.val,base);
+    var yMid=yTop+32;
+    html+='<text x="110" y="'+(yMid-6)+'" text-anchor="middle" fill="rgba(230,237,243,.55)" font-size="9" font-family="Inter,system-ui,sans-serif" font-weight="600" letter-spacing=".5">'+s.label.toUpperCase()+'</text>';
+    html+='<text x="110" y="'+(yMid+10)+'" text-anchor="middle" fill="rgba(45,201,116,.9)" font-size="13" font-family="Inter,system-ui,sans-serif" font-weight="800">'+pctTot+'</text>';
   });
+  html+='</svg>';
+  html+='</div>';
 
-  html += '</svg>';
-  html += '</div>';
-
-  // ── LADO DIREITO: métricas de conversão ──
-  html += '<div style="width:'+SIDE+'px;flex-shrink:0;display:flex;flex-direction:column;justify-content:space-around;padding:6px 0 6px 16px">';
-  steps.forEach(function(s, i) {
-    var cor = LAYER_COLORS[i];
-    html += '<div style="display:flex;align-items:flex-start;gap:8px;height:'+LAYER_H+'px;padding-top:10px">';
-    // linha horizontal conectora
-    html += '<div style="width:16px;height:2px;background:'+cor+';opacity:.6;flex-shrink:0;margin-top:8px"></div>';
-    html += '<div>';
-    // ícone do passo
-    var icons = ['📤','📬','👁️','🖱️','💰'];
-    html += '<div style="font-size:18px;line-height:1">'+(icons[i]||'•')+'</div>';
-    // conversão acumulada do total (enviados base)
-    var pctTotal = s.val && agg.enviados ? (s.val/agg.enviados*100).toFixed(1)+'%' : '—';
-    html += '<div style="font-size:10px;font-weight:600;color:'+cor+';margin-top:2px">'+pctTotal+' dos enviados</div>';
-    if (s.pct && i>0) {
-      html += '<div style="font-size:10px;color:#666">'+s.pct+' do passo anterior</div>';
-    }
-    html += '</div>';
-    html += '</div>';
+  // coluna direita — métricas passo a passo
+  html+='<div style="flex:1;display:flex;flex-direction:column;gap:3px;justify-content:center;padding-left:20px">';
+  steps.forEach(function(s,i){
+    var pctPrev=s.prev!==null?pct(s.val,s.prev):null;
+    var pctTotal=pct(s.val,base);
+    var dropPct=s.prev!==null&&s.prev>0?((1-(s.val/s.prev))*100).toFixed(1)+'%':'—';
+    html+='<div style="height:64px;display:flex;flex-direction:column;justify-content:center">';
+    html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
+    html+='<span style="font-size:14px">'+s.icon+'</span>';
+    html+='<span style="font-size:11px;font-weight:700;color:var(--text)">'+fmtN(s.val)+'</span>';
+    if(i>0) html+='<span style="font-size:10px;color:var(--red);font-weight:500">▼ '+dropPct+'</span>';
+    html+='</div>';
+    // mini barra de progresso
+    var barW=Math.max(2,Math.round(s.val/base*100));
+    html+='<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;width:100%;max-width:180px">';
+    html+='<div style="height:100%;width:'+barW+'%;background:var(--green);border-radius:2px;opacity:.8"></div>';
+    html+='</div>';
+    if(pctPrev) html+='<div style="font-size:10px;color:var(--muted);margin-top:3px">'+pctPrev+' entregou → abriu/clicou</div>';
+    html+='</div>';
   });
-  html += '</div>';
+  html+='</div>';
 
-  html += '</div>'; // flex container
+  html+='</div>'; // flex
 
-  // ── LINHA TOTAL DE CONVERSÃO ──
-  var convFinal = fmtPct(agg.anteciparam, agg.enviados);
-  html += '<div style="margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">';
-  var kpis = [
-    {label:'Taxa de Entrega',   val:fmtPct(agg.entregues,agg.enviados),   cor:'#2AABB0'},
-    {label:'Taxa de Abertura',  val:fmtPct(agg.abriram,agg.entregues),    cor:'#D4A017'},
-    {label:'Taxa de Clique',    val:fmtPct(agg.clicaram,agg.abriram),     cor:'#E07C35'},
-    {label:'Conv. Antecipação', val:convFinal,                              cor:'#21A366'},
+  // ── KPI CARDS ──
+  var kpis=[
+    {l:'Entrega',        v:pct(d.entregues,d.enviados),    c:'var(--blue)'},
+    {l:'Abertura',       v:pct(d.abriram,d.entregues),     c:'var(--purple)'},
+    {l:'Clique',         v:pct(d.clicaram,d.abriram),      c:'var(--orange)'},
+    {l:'Conv. Antecip.', v:pct(d.anteciparam,d.enviados),  c:'var(--green)'},
   ];
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px">';
   kpis.forEach(function(k){
-    html += '<div style="background:var(--surf2);border:1px solid var(--border);border-top:3px solid '+k.cor+';border-radius:10px;padding:10px 18px;text-align:center;min-width:130px">';
-    html += '<div style="font-size:22px;font-weight:800;color:'+k.cor+'">'+k.val+'</div>';
-    html += '<div style="font-size:10px;color:var(--muted);margin-top:2px">'+k.label+'</div>';
-    html += '</div>';
+    html+='<div style="background:var(--surf2);border:1px solid var(--border);border-top:2px solid '+k.c+';border-radius:8px;padding:12px 14px;text-align:center">';
+    html+='<div style="font-size:24px;font-weight:800;color:'+k.c+';letter-spacing:-.02em">'+k.v+'</div>';
+    html+='<div style="font-size:10px;color:var(--muted);margin-top:3px;font-weight:500">'+k.l+'</div>';
+    html+='</div>';
   });
-  html += '</div>';
+  html+='</div>';
 
-  wrap.innerHTML = html;
+  document.getElementById('fmkt-funil-wrap').innerHTML=html;
 }
 
-// ── Monta botões de canal dinamicamente ───────────────────────
-function buildCanalTabs(canais) {
-  FMKT_CANAIS = canais;
-  var container = document.getElementById('fmkt-canal-tabs');
-  var html = '<button class="rtab fmkt-ctab active" data-canal="todos" onclick="setFMKT(\'todos\',\'canal\')">Todos</button>';
+// ── canal tabs dinâmicos ─────────────────────
+function buildCanalTabs(canais){
+  var c=document.getElementById('fmkt-canal-tabs');
+  var h='<button class="rtab fmkt-ctab active" data-canal="todos" onclick="setFMKT(\'todos\',\'canal\')">Todos</button>';
   canais.forEach(function(ch){
-    var cor = CANAL_COR[ch] || '#8b949e';
-    html += '<button class="rtab fmkt-ctab" data-canal="'+ch+'" onclick="setFMKT(\''+ch+'\',\'canal\')" style="--tab-ac:'+cor+'">';
-    html += '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+cor+';margin-right:4px;vertical-align:middle"></span>'+ch;
-    html += '</button>';
+    var dot=CANAL_DOT[ch]||'#8b949e';
+    h+='<button class="rtab fmkt-ctab" data-canal="'+ch+'" onclick="setFMKT(\''+ch+'\',\'canal\')">';
+    h+='<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+dot+';margin-right:5px;vertical-align:middle"></span>'+ch;
+    h+='</button>';
   });
-  container.innerHTML = html;
+  c.innerHTML=h;
 }
 
-// ── Fetch + render ─────────────────────────────────────────────
-function buscarFunil() {
-  var activity = document.getElementById('fmkt-input').value.trim();
-  if (!activity) { fmktStatus('⚠️ Cole um activity_name para buscar.','var(--yellow)'); return; }
+// ── fetch ────────────────────────────────────
+function buscarFunil(){
+  var activity=document.getElementById('fmkt-input').value.trim();
+  if(!activity){fmktStatus('⚠️ Cole um activity_name para buscar.','var(--yellow)');return;}
 
-  var btn = document.getElementById('fmkt-btn');
-  btn.disabled = true; btn.textContent = '⏳ Buscando...';
-  fmktStatus('🔄 Consultando Databricks… isso pode levar ~30 segundos.','var(--blue)');
-  document.getElementById('fmkt-result').style.display   = 'none';
-  document.getElementById('fmkt-filtros').style.display  = 'none';
+  var btn=document.getElementById('fmkt-btn');
+  btn.disabled=true; btn.style.opacity='.5'; btn.textContent='⏳ Buscando…';
+  fmktStatus('🔄 Consultando Databricks… pode levar ~30 segundos.','var(--blue)');
+  document.getElementById('fmkt-result').style.display='none';
+  document.getElementById('fmkt-filtros').style.display='none';
 
   fetch('http://localhost:5001/funil',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({activity_name:activity})
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({activity_name:activity})
   })
-  .then(function(r){ if(!r.ok) return r.json().then(function(e){throw new Error(e.error||'Erro '+r.status);}); return r.json(); })
+  .then(function(r){if(!r.ok) return r.json().then(function(e){throw new Error(e.error||'Erro '+r.status);});return r.json();})
   .then(function(data){
-    btn.disabled=false; btn.textContent='🔍 Buscar';
-    FMKT_DATA    = data;
-    FMKT_SETOR_AT = 'total';
-    FMKT_CANAL_AT = 'todos';
+    btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+    FMKT_DATA=data; FMKT_SETOR_AT='total'; FMKT_CANAL_AT='todos';
 
-    // Descobre canais presentes
-    var cols = data.columns||[]; var idx={}; cols.forEach(function(c,i){idx[c]=i;});
-    var chSet = {};
-    (data.rows||[]).forEach(function(row){ chSet[row[idx['channel']]||'?']=1; });
-    var chList = Object.keys(chSet).sort();
+    // descobre canais
+    var cols=data.columns||[], idx={};
+    cols.forEach(function(c,i){idx[c]=i;});
+    var chSet={};
+    (data.rows||[]).forEach(function(row){chSet[row[idx['channel']]||'?']=1;});
+    var chList=Object.keys(chSet).sort();
 
-    document.getElementById('fmkt-activity-label').textContent = data.activity_name;
-    document.getElementById('fmkt-result').style.display  = 'block';
-    document.getElementById('fmkt-filtros').style.display = 'block';
+    document.getElementById('fmkt-activity-label').textContent=data.activity_name;
+    document.getElementById('fmkt-result').style.display='block';
+    document.getElementById('fmkt-filtros').style.display='block';
     buildCanalTabs(chList);
 
-    // Reseta tabs setor
     ['total','grupo','publico','privado'].forEach(function(x){
-      document.getElementById('fmkt-tab-'+x).classList.toggle('active', x==='total');
+      document.getElementById('fmkt-tab-'+x).classList.toggle('active',x==='total');
     });
 
-    fmktStatus('✅ Dados carregados — '+(data.rows?data.rows.length:0)+' combinações setor×canal.','var(--green)');
+    fmktStatus('✅ '+(data.rows?data.rows.length:0)+' combinações setor×canal carregadas.','var(--green)');
     redrawFunil();
   })
   .catch(function(err){
-    btn.disabled=false; btn.textContent='🔍 Buscar';
+    btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
     if(err.message.includes('fetch')||err.message.includes('Failed')){
-      fmktStatus('❌ Servidor local não encontrado.<br>👉 Abra o terminal e rode: <code style="background:#0d1117;padding:2px 6px;border-radius:4px">servidor-benefits</code>','var(--red)');
+      fmktStatus('❌ Servidor local offline. Rode no terminal: <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">servidor-benefits</code>','var(--red)');
     } else {
-      fmktStatus('❌ Erro: '+err.message,'var(--red)');
+      fmktStatus('❌ '+err.message,'var(--red)');
     }
   });
 }
 
-// Redesenha ao redimensionar
-window.addEventListener('resize', function(){ if(FMKT_DATA) redrawFunil(); });
+window.addEventListener('resize',function(){if(FMKT_DATA)redrawFunil();});
 </script>
 
 <div class="divider"></div>
