@@ -639,11 +639,12 @@ function renderFunilHTML(d,cor){
     g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+xb+'" y2="'+yb+'" stroke="'+stroke(.8)+'" stroke-width="2"/>';
     g+='<line x1="'+(xt+wt)+'" y1="'+yt+'" x2="'+(xb+wb)+'" y2="'+yb+'" stroke="'+stroke(.8)+'" stroke-width="2"/>';
 
+    // Centro horizontal do trapézio (média entre topo e base)
+    var xcTop=xt+wt/2, xcBot=xb+wb/2, xc=(xcTop+xcBot)/2;
     var ymid=yt+SH/2;
-    // Label pequeno à esquerda — branco puro
-    g+='<text x="'+(xt+16)+'" y="'+(ymid-8)+'" dominant-baseline="middle" fill="rgba(255,255,255,.75)" font-size="10" font-weight="700" font-family="Inter,system-ui,sans-serif" letter-spacing="1">'+s.label.toUpperCase()+'</text>';
-    // Valor grande à direita — branco puro, máximo contraste
-    g+='<text x="'+(xt+wt-16)+'" y="'+(ymid+7)+'" dominant-baseline="middle" text-anchor="end" fill="#ffffff" font-size="19" font-weight="900" font-family="Inter,system-ui,sans-serif">'+fmtN(s.val)+'</text>';
+    // Label e valor centralizados no meio do trapézio
+    g+='<text x="'+xc+'" y="'+(ymid-10)+'" dominant-baseline="middle" text-anchor="middle" fill="rgba(255,255,255,.80)" font-size="10" font-weight="700" font-family="Inter,system-ui,sans-serif" letter-spacing="1.2">'+s.label.toUpperCase()+'</text>';
+    g+='<text x="'+xc+'" y="'+(ymid+10)+'" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="900" font-family="Inter,system-ui,sans-serif">'+fmtN(s.val)+'</text>';
 
     // Seta entre camadas
     if(i<N-1){
