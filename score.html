@@ -741,39 +741,206 @@ function buildCanalTabs(){
   document.getElementById('fmkt-canal-tabs').innerHTML=h;
 }
 
-function buscarFunil(){
-  var inp=document.getElementById('fmkt-input');if(inp.value.trim())fmktAddActivity(inp.value);
-  if(!FMKT_ACTIVITIES.length){fmktStatus('⚠️ Adicione pelo menos um activity_name.','var(--yellow)');return;}
-  var btn=document.getElementById('fmkt-btn');
-  btn.disabled=true;btn.style.opacity='.5';btn.textContent='⏳ Buscando…';
-  var n=FMKT_ACTIVITIES.length;
-  fmktStatus('🔄 Consultando '+n+' campanha'+(n>1?'s':'')+' no Databricks…'+(n>1?' Paralelo, ~30-60s.':' ~30s.'),'var(--blue)');
-  document.getElementById('fmkt-result').style.display='none';
-  document.getElementById('fmkt-filtros').style.display='none';
-  fetch('http://localhost:5001/funil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activities:FMKT_ACTIVITIES})})
-  .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.error||'Erro '+r.status);});return r.json();})
-  .then(function(data){
-    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
-    FMKT_RESULTS={};FMKT_SETOR_AT='total';FMKT_CANAL_AT='todos';
-    if(data.multi){Object.assign(FMKT_RESULTS,data.results||{});var errs=Object.keys(data.errors||{});var ok=Object.keys(FMKT_RESULTS).length;fmktStatus('✅ '+ok+' campanha'+(ok>1?'s carregadas':' carregada')+(errs.length?' — ⚠️ '+errs.length+' com erro':''),'var(--green)');}
-    else{FMKT_RESULTS[data.activity_name]=data;fmktStatus('✅ Dados carregados.','var(--green)');}
-    if(!Object.keys(FMKT_RESULTS).length){fmktStatus('❌ Nenhum resultado.','var(--red)');return;}
-    FMKT_CAMP_AT=Object.keys(FMKT_RESULTS)[0];
-    buildCampTabs();buildCanalTabs();
-    ['total','grupo','publico','privado'].forEach(function(x){document.getElementById('fmkt-tab-'+x).classList.toggle('active',x==='total');});
-    document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===FMKT_CAMP_AT);});
-    document.getElementById('fmkt-activity-label').textContent=FMKT_CAMP_AT;
-    // Popular inputs de período com o detectado pelo servidor
-    var firstResult=FMKT_RESULTS[FMKT_CAMP_AT];
-    if(firstResult) setPeriodInputs(firstResult.date_from||'', firstResult.date_to||'');
-    document.getElementById('fmkt-result').style.display='block';
-    document.getElementById('fmkt-filtros').style.display='block';
-    redrawAll();
+// ═══════════════════════════════════════════════════════════════
+//  DATABRICKS REST API — chamada direta do browser
+//  Não precisa de servidor local. Funciona para qualquer pessoa.
+// ═══════════════════════════════════════════════════════════════
+var DBX_HOST  = 'https://picpay-principal.cloud.databricks.com';
+var DBX_WH    = '6077a99f149e0d70';
+// ⚠️ Token de serviço read-only — só leitura em benefits + marketing
+var DBX_TOKEN = 'COLE_O_TOKEN_AQUI';
+
+function dbxQuery(sql, timeout) {
+  timeout = timeout || 120000; // 2 min default
+  var headers = {
+    'Authorization': 'Bearer ' + DBX_TOKEN,
+    'Content-Type': 'application/json'
+  };
+
+  // Submete a query (async)
+  return fetch(DBX_HOST + '/api/2.0/sql/statements/', {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+      warehouse_id: DBX_WH,
+      statement: sql,
+      wait_timeout: '50s',
+      on_wait_timeout: 'CONTINUE'
+    })
   })
-  .catch(function(err){
-    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
-    if(err.message.indexOf('fetch')>-1||err.message.indexOf('Failed')>-1){fmktStatus('❌ Servidor offline. Rode: <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">servidor-benefits</code>','var(--red)');}
-    else{fmktStatus('❌ '+err.message,'var(--red)');}
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.status && data.status.state === 'SUCCEEDED') return parseDbxResult(data);
+    if (data.status && (data.status.state === 'FAILED' || data.status.state === 'CANCELED')) {
+      throw new Error(data.status.error ? data.status.error.message : 'Query falhou');
+    }
+    // Ainda rodando — poll
+    var sid = data.statement_id;
+    if (!sid) throw new Error('Sem statement_id: ' + JSON.stringify(data).slice(0,200));
+    return dbxPoll(sid, headers, Date.now() + timeout);
+  });
+}
+
+function dbxPoll(sid, headers, deadline) {
+  if (Date.now() > deadline) throw new Error('Timeout na query do Databricks');
+  return new Promise(function(resolve){ setTimeout(resolve, 3000); })
+  .then(function(){
+    return fetch(DBX_HOST + '/api/2.0/sql/statements/' + sid, { headers: headers });
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.status && data.status.state === 'SUCCEEDED') return parseDbxResult(data);
+    if (data.status && (data.status.state === 'FAILED' || data.status.state === 'CANCELED')) {
+      throw new Error(data.status.error ? data.status.error.message : 'Query falhou');
+    }
+    return dbxPoll(sid, headers, deadline);
+  });
+}
+
+function parseDbxResult(data) {
+  var cols = (data.manifest && data.manifest.schema && data.manifest.schema.columns || []).map(function(c){ return c.name; });
+  var rows = (data.result && data.result.data_array) || [];
+  return { columns: cols, rows: rows };
+}
+
+function buildFunilSQL(activity, dateFrom, dateTo) {
+  var actSafe = activity.replace(/'/g, "''");
+  var dateFilter = dateFrom && dateTo
+    ? "AND date(sent_at) BETWEEN '" + dateFrom + "' AND '" + dateTo + "'"
+    : '';
+  return [
+    "WITH",
+    "mapa_setor AS (",
+    "  SELECT co.consumer_id,",
+    "    CASE",
+    "      WHEN f.account_id = 1420 OR f.account_id IS NULL THEN 'INSS'",
+    "      WHEN f.account_id IN (6,52,57,58,60,62,65,73,100,3170,3675) THEN 'Grupo'",
+    "      WHEN co2.flag_company_sector = 'public' THEN 'Publico'",
+    "      ELSE 'Privado'",
+    "    END AS setor",
+    "  FROM benefits.collaborators co",
+    "  JOIN benefits.companies co2 ON co.company_id = co2.company_id",
+    "  LEFT JOIN benefits.accounts f ON co2.account_id = f.account_id",
+    "),",
+    "comms AS (",
+    "  SELECT consumer_id, channel, is_sent, is_delivered, is_opened, is_clicked, sent_at",
+    "  FROM marketing.consumers_campaigns_communications",
+    "  WHERE activity_name = '" + actSafe + "'",
+    "  " + dateFilter,
+    "),",
+    "antecip AS (",
+    "  SELECT DISTINCT consumer_id, date(created_at) AS dt_antecip",
+    "  FROM benefits.anticipation_request",
+    "  WHERE request_status = 'FINISH'",
+    "),",
+    "cruzado AS (",
+    "  SELECT DISTINCT c.consumer_id",
+    "  FROM comms c",
+    "  JOIN antecip a ON c.consumer_id = a.consumer_id",
+    "  WHERE date(c.sent_at) <= a.dt_antecip",
+    "    AND date(c.sent_at) >= a.dt_antecip - INTERVAL 30 DAYS",
+    ")",
+    "SELECT",
+    "  COALESCE(ms.setor, 'Sem vinculo') AS setor,",
+    "  c.channel,",
+    "  COUNT(DISTINCT c.consumer_id) AS enviados,",
+    "  COUNT(DISTINCT CASE WHEN c.is_delivered = true THEN c.consumer_id END) AS entregues,",
+    "  COUNT(DISTINCT CASE WHEN c.is_opened = true THEN c.consumer_id END) AS abriram,",
+    "  COUNT(DISTINCT CASE WHEN c.is_clicked = true THEN c.consumer_id END) AS clicaram,",
+    "  COUNT(DISTINCT cr.consumer_id) AS anteciparam",
+    "FROM comms c",
+    "LEFT JOIN mapa_setor ms ON c.consumer_id = ms.consumer_id",
+    "LEFT JOIN cruzado cr ON c.consumer_id = cr.consumer_id",
+    "GROUP BY COALESCE(ms.setor, 'Sem vinculo'), c.channel",
+    "ORDER BY setor, enviados DESC"
+  ].join('\n');
+}
+
+function buildPeriodSQL(activity) {
+  var actSafe = activity.replace(/'/g, "''");
+  return "SELECT date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, date_format(max(sent_at),'yyyy-MM-dd') AS dt_to " +
+         "FROM marketing.consumers_campaigns_communications WHERE activity_name = '" + actSafe + "'";
+}
+
+function runActivityFunil(activity, dateFrom, dateTo) {
+  // Se não tem período, detecta primeiro
+  var periodPromise = (dateFrom && dateTo)
+    ? Promise.resolve({ date_from: dateFrom, date_to: dateTo })
+    : dbxQuery(buildPeriodSQL(activity), 60000).then(function(r) {
+        var row = r.rows && r.rows[0];
+        if (!row || !row[0]) throw new Error('Nenhum registro encontrado para: ' + activity);
+        return { date_from: row[0], date_to: row[1] };
+      });
+
+  return periodPromise.then(function(period) {
+    return dbxQuery(buildFunilSQL(activity, period.date_from, period.date_to), 120000)
+      .then(function(r) {
+        return {
+          ok: true,
+          activity_name: activity,
+          date_from: period.date_from,
+          date_to:   period.date_to,
+          columns:   r.columns,
+          rows:      r.rows
+        };
+      });
+  });
+}
+
+function buscarFunil(customDateFrom, customDateTo) {
+  var inp = document.getElementById('fmkt-input');
+  if (inp.value.trim()) fmktAddActivity(inp.value);
+  if (!FMKT_ACTIVITIES.length) { fmktStatus('⚠️ Adicione pelo menos um activity_name.', 'var(--yellow)'); return; }
+
+  if (DBX_TOKEN === 'COLE_O_TOKEN_AQUI') {
+    fmktStatus('⚠️ Configure o token do Databricks no HTML para habilitar as consultas.', 'var(--yellow)');
+    return;
+  }
+
+  var btn = document.getElementById('fmkt-btn');
+  btn.disabled = true; btn.style.opacity = '.5'; btn.textContent = '⏳ Buscando…';
+  var n = FMKT_ACTIVITIES.length;
+  fmktStatus('🔄 Consultando ' + n + ' campanha' + (n > 1 ? 's' : '') + ' no Databricks…', 'var(--blue)');
+  document.getElementById('fmkt-result').style.display   = 'none';
+  document.getElementById('fmkt-filtros').style.display  = 'none';
+
+  // Roda todas as activities em paralelo
+  var promises = FMKT_ACTIVITIES.map(function(act) {
+    return runActivityFunil(act, customDateFrom || null, customDateTo || null)
+      .catch(function(err) { return { ok: false, activity_name: act, error: err.message }; });
+  });
+
+  Promise.all(promises).then(function(results) {
+    btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '🔍 Buscar';
+    FMKT_RESULTS = {}; FMKT_SETOR_AT = 'total'; FMKT_CANAL_AT = 'todos';
+
+    var erros = [];
+    results.forEach(function(r) {
+      if (r.ok) FMKT_RESULTS[r.activity_name] = r;
+      else erros.push(r.activity_name);
+    });
+
+    var ok = Object.keys(FMKT_RESULTS).length;
+    if (!ok) { fmktStatus('❌ Nenhum resultado. Verifique os activity_names.', 'var(--red)'); return; }
+
+    var msg = '✅ ' + ok + ' campanha' + (ok > 1 ? 's carregadas' : ' carregada');
+    if (erros.length) msg += ' — ⚠️ ' + erros.length + ' com erro';
+    fmktStatus(msg, 'var(--green)');
+
+    FMKT_CAMP_AT = Object.keys(FMKT_RESULTS)[0];
+    buildCampTabs(); buildCanalTabs();
+    ['total','grupo','publico','privado'].forEach(function(x){
+      document.getElementById('fmkt-tab-' + x).classList.toggle('active', x === 'total');
+    });
+    document.querySelectorAll('.fmkt-atab').forEach(function(b){
+      b.classList.toggle('active', b.dataset.act === FMKT_CAMP_AT);
+    });
+    document.getElementById('fmkt-activity-label').textContent = FMKT_CAMP_AT;
+    var fr = FMKT_RESULTS[FMKT_CAMP_AT];
+    if (fr) setPeriodInputs(fr.date_from || '', fr.date_to || '');
+    document.getElementById('fmkt-result').style.display  = 'block';
+    document.getElementById('fmkt-filtros').style.display = 'block';
+    redrawAll();
   });
 }
 window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)redrawFunil();});
@@ -790,6 +957,13 @@ function setPeriodInputs(from, to){
 
 function reaplicarPeriodo(){
   var from = (document.getElementById('fmkt-date-from')||{}).value||'';
+  var to   = (document.getElementById('fmkt-date-to')||{}).value||'';
+  if(!from||!to){ fmktStatus('⚠️ Preencha as duas datas para filtrar.','var(--yellow)'); return; }
+  if(!FMKT_ACTIVITIES.length){ fmktStatus('⚠️ Nenhuma campanha na lista.','var(--yellow)'); return; }
+  document.getElementById('fmkt-funil-wrap').innerHTML='';
+  document.getElementById('fmkt-compare-wrap').style.display='none';
+  buscarFunil(from, to);
+}).value||'';
   var to   = (document.getElementById('fmkt-date-to')||{}).value||'';
   if(!from||!to){ fmktStatus('⚠️ Preencha as duas datas para filtrar.','var(--yellow)'); return; }
   if(FMKT_ACTIVITIES.length===0){ fmktStatus('⚠️ Nenhuma campanha carregada.','var(--yellow)'); return; }
