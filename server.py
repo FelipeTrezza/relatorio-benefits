@@ -13,7 +13,7 @@ Endpoints:
   POST /funil                     → {"activity_name": "..."} → funil mkt x antecipações
 """
 
-import subprocess, json, threading, os, sys
+import subprocess, json, threading, os, sys, ssl
 from datetime import datetime
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
@@ -231,13 +231,26 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    CERT = BASE_DIR / "localhost.crt"
+    KEY  = BASE_DIR / "localhost.key"
+    use_https = CERT.exists() and KEY.exists()
+
+    server = HTTPServer(("localhost", PORT), Handler)
+
+    if use_https:
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(str(CERT), str(KEY))
+        server.socket = ctx.wrap_socket(server.socket, server_side=True)
+        proto = "https"
+    else:
+        proto = "http"
+
     print("╔════════════════════════════════════════════════════╗")
-    print(f"║  Score Antecipações — Servidor Local               ║")
+    print(f"║  Benefits Analytics — Servidor Local               ║")
     print(f"║                                                    ║")
-    print(f"║  📊 Abra o relatório em:                          ║")
-    print(f"║  👉 http://localhost:{PORT}/score                    ║")
+    print(f"║  📊 {'HTTPS ✅' if use_https else 'HTTP  ⚠️ '}                                  ║")
+    print(f"║  👉 {proto}://localhost:{PORT}/score                  ║")
     print(f"║                                                    ║")
     print(f"║  Deixe esta janela aberta. Ctrl+C para encerrar.  ║")
     print("╚════════════════════════════════════════════════════╝")
-    server = HTTPServer(("localhost", PORT), Handler)
     server.serve_forever()
