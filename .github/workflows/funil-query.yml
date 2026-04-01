@@ -40,18 +40,9 @@ jobs:
         run: python3 funil_query_helper_ci.py > results/${{ github.event.client_payload.request_id }}.json
 
       - name: Verificar resultado
-        run: |
-          python3 -c "
-import json, sys
-rid = '${{ github.event.client_payload.request_id }}'
-with open(f'results/{rid}.json') as f:
-    d = json.load(f)
-if d.get('ok'):
-    print('Query OK -', len(d.get('rows', [])), 'rows')
-else:
-    print('Erro:', d.get('error', 'desconhecido'))
-    sys.exit(1)
-"
+        env:
+          REQUEST_ID: ${{ github.event.client_payload.request_id }}
+        run: python3 verify_result.py
 
       - name: Commit resultado
         run: |
