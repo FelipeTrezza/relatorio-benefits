@@ -758,33 +758,25 @@ function copiarComando(){
   });
 }
 
-// ── CONFIG GITHUB ACTIONS ───────────────────────────────────────
-var GH_TOKEN  = atob('Z2hwX1l1dmFwTld6eGJWMEV1ckNkeDlmZUFnOTdpbnd0RzNvVmI3eA==');
-var GH_REPO   = 'FelipeTrezza/relatorio-benefits';
-var GH_PAGES  = 'https://felipetrezza.github.io/relatorio-benefits';
-var POLL_IDS  = {}; // request_id → intervalId (para cancelar polls)
+// ── CONFIG CLOUDFLARE WORKER ────────────────────────────────────
+var WORKER_URL = 'https://score-funil.felipetrezza.workers.dev';
+var GH_PAGES   = 'https://felipetrezza.github.io/relatorio-benefits';
+var POLL_IDS   = {}; // request_id → intervalId
 
 function genRequestId(){
   return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 }
 
-// ── DISPARAR WORKFLOW ───────────────────────────────────────────
+// ── DISPARAR WORKFLOW (via Worker — sem token no HTML) ──────────
 function dispatchWorkflow(activity, dateFrom, dateTo, requestId){
-  return fetch('https://api.github.com/repos/' + GH_REPO + '/dispatches', {
+  return fetch(WORKER_URL + '/funil', {
     method: 'POST',
-    headers: {
-      'Authorization': 'token ' + GH_TOKEN,
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      event_type: 'funil-query',
-      client_payload: {
-        activity:   activity,
-        date_from:  dateFrom || '',
-        date_to:    dateTo   || '',
-        request_id: requestId
-      }
+      activity:   activity,
+      date_from:  dateFrom || '',
+      date_to:    dateTo   || '',
+      request_id: requestId
     })
   });
 }
