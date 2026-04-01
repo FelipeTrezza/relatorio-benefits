@@ -516,24 +516,13 @@ function refreshData() {
   if (ts) ts.textContent = '...';
 
   // Tenta conectar; se falhar aguarda 3s e tenta de novo (servidor pode estar subindo)
-  // waitRunning: quantas vezes aguarda um running existente (100 × 3s = 5 min)
-  function tryConnect(attempts, waitRunning) {
-    if (waitRunning === undefined) waitRunning = 100;
+  function tryConnect(attempts) {
     fetch(SERVER + '/status', { signal: AbortSignal.timeout(3000) })
       .then(r => r.json())
       .then(status => {
         if (status.running) {
-          if (waitRunning <= 0) {
-            // running por mais de 5 min — força reset de estado no servidor e tenta de novo
-            fetch(SERVER + '/reset', { method: 'POST' }).catch(() => {});
-            btn.classList.remove('spinning');
-            btn.disabled = false;
-            if (ts) ts.textContent = 'erro';
-            alert('Servidor travado. Clique novamente para tentar.');
-            return;
-          }
           if (ts) ts.textContent = 'aguarde...';
-          setTimeout(() => tryConnect(attempts, waitRunning - 1), 3000);
+          setTimeout(() => tryConnect(attempts), 3000);
           return;
         }
         if (ts) ts.textContent = '...';
@@ -544,17 +533,19 @@ function refreshData() {
       })
       .catch(() => {
         if (attempts > 0) {
+          // Servidor ainda subindo, aguarda e tenta de novo
           if (ts) ts.textContent = 'iniciando...';
-          setTimeout(() => tryConnect(attempts - 1, waitRunning), 2000);
+          setTimeout(() => tryConnect(attempts - 1), 2000);
         } else {
+          // Desiste após tentativas
           btn.classList.remove('spinning');
           btn.disabled = false;
           if (ts) ts.textContent = 'erro';
-          alert('Servidor local indisponível.\n\nRode: servidor-benefits');
+          alert('Servidor local indispon\u00edvel.\\n\\nRode: servidor-benefits');
         }
       });
   }
-  tryConnect(5);
+  tryConnect(5); // tenta por até 10s
 }
 
 function pollStatus(SERVER) {
