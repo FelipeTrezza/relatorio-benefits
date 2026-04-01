@@ -551,7 +551,10 @@ function refreshData() {
 function pollStatus(SERVER) {
   const btn = document.getElementById('btn-refresh');
   const ts  = document.getElementById('upd-ts');
+  let attempts = 0;
+  const MAX_ATTEMPTS = 100; // 100 × 3s = 5 min timeout
   const iv = setInterval(() => {
+    attempts++;
     fetch(SERVER + '/status').then(r => r.json()).then(s => {
       if (!s.running) {
         clearInterval(iv);
@@ -564,6 +567,13 @@ function pollStatus(SERVER) {
           if (ts) ts.textContent = 'erro';
           alert('Erro na atualização. Veja o terminal.');
         }
+      } else if (attempts >= MAX_ATTEMPTS) {
+        // Servidor travado em running — libera UI
+        clearInterval(iv);
+        btn.classList.remove('spinning');
+        btn.disabled = false;
+        if (ts) ts.textContent = 'timeout';
+        alert('Atualização demorou mais que o esperado. Verifique o terminal.');
       }
     }).catch(() => { clearInterval(iv); btn.classList.remove('spinning'); btn.disabled = false; });
   }, 3000);
