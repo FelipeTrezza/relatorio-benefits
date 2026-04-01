@@ -13,24 +13,5 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GH_PAT }}
-
-      - name: Injetar GH_DISPATCH_TOKEN e publicar
-        env:
-          DISPATCH_TOKEN: ${{ secrets.GH_DISPATCH_TOKEN }}
-        run: |
-          # Substitui placeholder pelo token real — nunca fica no source
-          sed -i "s|%%GH_DISPATCH_TOKEN%%|${DISPATCH_TOKEN}|g" score.html
-
-          # Copiar results/ para pasta temporária antes do stash
-          mkdir -p /tmp/results_backup
-          cp -r results/. /tmp/results_backup/ 2>/dev/null || true
-
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Commitar score.html com token já injetado na branch main
-          git add score.html
-          git diff --staged --quiet || git commit -m "build: score.html com token injetado [skip ci]"
-          git push origin main
+      - name: Confirmar deploy
+        run: echo "score.html atualizado — GitHub Pages vai servir automaticamente"
