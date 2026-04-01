@@ -32,8 +32,19 @@ jobs:
           DATE_TO: ${{ github.event.client_payload.date_to }}
           REQUEST_ID: ${{ github.event.client_payload.request_id }}
         run: |
-          python3 funil_query_helper_ci.py > results/$REQUEST_ID.json
-          echo "Query concluída — $(cat results/$REQUEST_ID.json | python3 -c 'import sys,json; d=json.load(sys.stdin); print(f\"{len(d.get(chr(114)+chr(111)+chr(119)+chr(115),[]))} rows\" if d.get(\"ok\") else d.get(\"error\",\"erro\"))')"
+          # Rodar com stderr visível no log para debug
+          python3 funil_query_helper_ci.py 2>&1 | tee results/$REQUEST_ID.json
+          # Verificar se o JSON está ok
+          python3 -c "
+import json, sys
+with open('results/$REQUEST_ID.json') as f:
+    d = json.load(f)
+if d.get('ok'):
+    print(f'✅ Query OK — {len(d.get(\"rows\",[]))} rows')
+else:
+    print(f'❌ Erro: {d.get(\"error\",\"desconhecido\")}')
+    sys.exit(1)
+"
 
       - name: Commit resultado
         run: |
