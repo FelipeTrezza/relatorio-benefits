@@ -121,7 +121,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/status":
-            self.send_json(200, {"ok": True, "status": state["last_status"]})
+            self.send_json(200, {"ok": True, "status": state["last_status"], "running": state["running"]})
         elif self.path in ("/", "/score", "/score.html", "/index.html"):
             # Serve o HTML do relatório localmente (evita bloqueio HTTPS→localhost)
             html_candidates = [
@@ -147,6 +147,13 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(404, {"error": "not found"})
 
     def do_POST(self):
+        # Reset de emergência — desbloqueia estado running travado
+        if self.path == "/reset":
+            state["running"] = False
+            state["last_status"] = "idle"
+            self.send_json(200, {"ok": True, "message": "estado resetado"})
+            return
+
         # Endpoint funil é sempre síncrono (não bloqueia state)
         if self.path == "/funil":
             content_length = int(self.headers.get("Content-Length", 0))
