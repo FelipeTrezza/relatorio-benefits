@@ -401,9 +401,16 @@ document.addEventListener('DOMContentLoaded', () => {
 const REFRESH_ENDPOINT = '/atualizar/antecipacoes';
 
 function refreshData() {
+  // Se página está em HTTPS (GitHub Pages), abre servidor local numa nova aba
+  // O Mixed Content bloqueia fetch de HTTPS→HTTP
+  if (location.protocol === 'https:') {
+    window.open('http://localhost:5001/score', '_blank');
+    return;
+  }
+
   const btn = document.getElementById('btn-refresh');
   const ts  = document.getElementById('upd-ts');
-  const SERVER = 'https://localhost:5001';
+  const SERVER = 'http://localhost:5001';
 
   btn.classList.add('spinning');
   btn.disabled = true;

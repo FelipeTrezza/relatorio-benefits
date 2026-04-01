@@ -13,7 +13,7 @@ Endpoints:
   POST /funil                     → {"activity_name": "..."} → funil mkt x antecipações
 """
 
-import subprocess, json, threading, os, sys, ssl
+import subprocess, json, threading, os, sys
 from datetime import datetime
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
@@ -102,6 +102,19 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
 
+    def _serve_html(self, candidates):
+        html_path = next((p for p in candidates if Path(p).exists()), None)
+        if html_path:
+            content = Path(html_path).read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", len(content))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(content)
+        else:
+            self.send_json(404, {"error": "HTML não encontrado"})
+
     def send_json(self, code, data):
         body = json.dumps(data, ensure_ascii=False).encode()
         self.send_response(code)
@@ -122,27 +135,15 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/status":
             self.send_json(200, {"ok": True, "status": state["last_status"], "running": state["running"]})
-        elif self.path in ("/", "/score", "/score.html", "/index.html"):
-            # Serve o HTML do relatório localmente (evita bloqueio HTTPS→localhost)
+        elif self.path in ("/", "/score", "/score.html", "/index.html", "/antecipacoes", "/antecipacoes.html"):
             html_candidates = [
                 Path.home() / "score-antecipacoes" / "index.html",
-                Path.home() / "relatorio-benefits" / "score.html",
+                BASE_DIR / "antecipacoes.html",
+                BASE_DIR / "score.html",
             ]
-            html_path = None
-            for p in html_candidates:
-                if p.exists():
-                    html_path = p
-                    break
-            if html_path:
-                content = html_path.read_bytes()
-                self.send_response(200)
-                self.send_header("Content-Type", "text/html; charset=utf-8")
-                self.send_header("Content-Length", len(content))
-                self.send_header("Access-Control-Allow-Origin", "*")
-                self.end_headers()
-                self.wfile.write(content)
-            else:
-                self.send_json(404, {"error": "HTML não encontrado"})
+            self._serve_html(html_candidates)
+        elif self.path in ("/pix", "/pix.html"):
+            self._serve_html([BASE_DIR / "pix.html"])
         else:
             self.send_json(404, {"error": "not found"})
 
@@ -231,25 +232,11 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    CERT = BASE_DIR / "localhost.crt"
-    KEY  = BASE_DIR / "localhost.key"
-    use_https = CERT.exists() and KEY.exists()
-
     server = HTTPServer(("localhost", PORT), Handler)
-
-    if use_https:
-        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        ctx.load_cert_chain(str(CERT), str(KEY))
-        server.socket = ctx.wrap_socket(server.socket, server_side=True)
-        proto = "https"
-    else:
-        proto = "http"
-
     print("╔════════════════════════════════════════════════════╗")
     print(f"║  Benefits Analytics — Servidor Local               ║")
     print(f"║                                                    ║")
-    print(f"║  📊 {'HTTPS ✅' if use_https else 'HTTP  ⚠️ '}                                  ║")
-    print(f"║  👉 {proto}://localhost:{PORT}/score                  ║")
+    print(f"║  👉 http://localhost:{PORT}/score                    ║")
     print(f"║                                                    ║")
     print(f"║  Deixe esta janela aberta. Ctrl+C para encerrar.  ║")
     print("╚════════════════════════════════════════════════════╝")
