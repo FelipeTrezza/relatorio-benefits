@@ -1912,9 +1912,12 @@ function setDST(s){
   <div class="sec-title">📣 Funil de Campanha</div>
   <div class="sec-sub">Cole um ou mais <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">activity_name</code> para visualizar e comparar funis. Use <strong>Enter</strong> ou <strong>vírgula</strong> para adicionar cada um.</div>
 
-  <!-- ÁREA DE INPUT MULTI -->
-  <div id="fmkt-input-area" style="background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;min-height:48px;cursor:text" onclick="document.getElementById('fmkt-input').focus()">
-    <!-- tags injetadas aqui pelo JS -->
+  <!-- INPUT MULTI-TAG -->
+  <div id="fmkt-input-area"
+    style="background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:46px;cursor:text;transition:border-color .2s"
+    onclick="document.getElementById('fmkt-input').focus()"
+    onfocusin="this.style.borderColor='var(--green)'"
+    onfocusout="this.style.borderColor='var(--border)'">
     <input id="fmkt-input" type="text"
       placeholder="Cole um activity_name e pressione Enter…"
       style="flex:1;min-width:240px;background:none;border:none;outline:none;color:var(--text);font-size:12px;font-family:monospace;padding:2px 4px"
@@ -1923,31 +1926,27 @@ function setDST(s){
     />
   </div>
 
-  <!-- BOTÕES DE AÇÃO -->
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+  <!-- AÇÕES -->
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;margin-bottom:18px">
     <button id="fmkt-btn" onclick="buscarFunil()"
       style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s">
       🔍 Buscar
     </button>
     <button onclick="fmktAddExample()"
-      style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;white-space:nowrap"
-      onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
-      + Exemplo
-    </button>
+      style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer"
+      onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">+ Exemplo</button>
     <button onclick="fmktClearAll()"
-      style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;white-space:nowrap"
-      onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">
-      🗑 Limpar
-    </button>
+      style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer"
+      onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">🗑 Limpar</button>
     <span id="fmkt-count" style="font-size:11px;color:var(--muted)"></span>
   </div>
 
   <!-- STATUS -->
-  <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:16px;padding:9px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
+  <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:18px;padding:9px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
 
-  <!-- FILTROS (aparecem após busca) -->
-  <div id="fmkt-filtros" style="display:none;margin-bottom:22px">
-    <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+  <!-- FILTROS -->
+  <div id="fmkt-filtros" style="display:none;margin-bottom:24px">
+    <div style="display:flex;gap:28px;flex-wrap:wrap">
       <div>
         <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600">Setor</div>
         <div class="rfm-tabs">
@@ -1966,387 +1965,294 @@ function setDST(s){
 
   <!-- RESULTADO -->
   <div id="fmkt-result" style="display:none">
-    <!-- abas de campanha (multi) -->
+    <!-- label campanha ativa -->
+    <div style="margin-bottom:18px;padding:8px 14px;background:var(--surf2);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;gap:10px">
+      <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;font-weight:600">Activity</span>
+      <span id="fmkt-activity-label" style="font-size:11px;font-family:monospace;color:var(--blue);word-break:break-all;opacity:.85"></span>
+    </div>
+    <!-- abas campanha -->
     <div id="fmkt-camp-tabs-wrap" style="display:none;margin-bottom:20px">
       <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600">Campanha</div>
       <div id="fmkt-camp-tabs" class="rfm-tabs" style="flex-wrap:wrap"></div>
     </div>
-    <!-- painel do funil -->
+    <!-- FUNIL VISUAL -->
     <div id="fmkt-funil-wrap"></div>
-    <!-- comparação (só multi) -->
-    <div id="fmkt-compare-wrap" style="display:none;margin-top:28px"></div>
+    <!-- COMPARATIVO -->
+    <div id="fmkt-compare-wrap" style="display:none;margin-top:32px"></div>
   </div>
 </section>
 
+<style>
+/* ── Funil ────────────────────────── */
+.fn-wrap{display:flex;align-items:flex-start;gap:32px;max-width:900px;margin:0 auto}
+.fn-layers{display:flex;flex-direction:column;align-items:center;gap:0;flex:0 0 auto}
+.fn-layer{position:relative;display:flex;align-items:center;justify-content:center;cursor:default;transition:opacity .2s}
+.fn-layer:hover{opacity:.88}
+.fn-label-inside{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.55);pointer-events:none;user-select:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap}
+.fn-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;max-width:280px;margin-top:16px}
+.fn-kpi-card{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}
+.fn-kpi-val{font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.fn-kpi-lbl{font-size:10px;color:var(--muted);margin-top:3px;font-weight:500}
+.fn-steps{flex:1;display:flex;flex-direction:column;justify-content:space-around}
+.fn-step{display:flex;align-items:center;gap:12px;padding:0 0 0 4px}
+.fn-step-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.fn-step-info{flex:1}
+.fn-step-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.fn-step-val{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1.1}
+.fn-step-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.fn-step-bar-wrap{width:100%;height:3px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden}
+.fn-step-bar{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.fn-connector{width:2px;background:var(--border);height:8px;margin:0 auto;margin-left:calc(50% - 1px)}
+</style>
+
 <script>
-// ═══════════════════════════════════════════════════════
-//  FUNIL CAMPANHA MKT — multi activity
-// ═══════════════════════════════════════════════════════
-var FMKT_ACTIVITIES = [];   // lista de activity_names digitados
-var FMKT_RESULTS    = {};   // { activity_name: rows[] }
-var FMKT_SETOR_AT   = 'total';
-var FMKT_CANAL_AT   = 'todos';
-var FMKT_CAMP_AT    = null; // activity ativa na aba
+// ═══════════════════════════════════════════════
+//  FUNIL CAMPANHA MKT
+// ═══════════════════════════════════════════════
+var FMKT_ACTIVITIES=[], FMKT_RESULTS={}, FMKT_SETOR_AT='total', FMKT_CANAL_AT='todos', FMKT_CAMP_AT=null;
 
-var CANAL_DOT = {
-  INAPP:'#bc8cff',PUSH:'#58a6ff',DM:'#f0883e',
-  EMAIL:'#e3b341',WHATSAPP:'#21c25e',SMS:'#8b949e'
-};
+var CANAL_DOT={INAPP:'#bc8cff',PUSH:'#58a6ff',DM:'#f0883e',EMAIL:'#e3b341',WHATSAPP:'#21c25e',SMS:'#8b949e'};
+var CAMP_COLORS=['#21a366','#58a6ff','#bc8cff','#f0883e','#e3b341','#ff7b72'];
+function campColor(i){return CAMP_COLORS[i%CAMP_COLORS.length];}
 
-// ── Cores para identificar cada campanha no comparativo
-var CAMP_COLORS = ['var(--green)','var(--blue)','var(--purple)','var(--orange)','var(--yellow)','var(--pink)'];
-function campColor(i){ return CAMP_COLORS[i % CAMP_COLORS.length]; }
+function fmtN(v){v=parseInt(v)||0;if(v>=1e6)return(v/1e6).toFixed(1)+'M';if(v>=1e3)return(v/1e3).toFixed(1)+'k';return v.toString();}
+function pct(a,b){a=parseInt(a)||0;b=parseInt(b)||0;return b?(a/b*100).toFixed(1)+'%':'—';}
 
-// ── Helpers ──────────────────────────────────────────────
-function fmtN(v){
-  v=parseInt(v)||0;
-  if(v>=1e6) return (v/1e6).toFixed(1)+'M';
-  if(v>=1e3) return (v/1e3).toFixed(1)+'k';
-  return v.toString();
-}
-function pct(a,b){ a=parseInt(a)||0; b=parseInt(b)||0; return b?(a/b*100).toFixed(1)+'%':'—'; }
+function fmktStatus(msg,cor){var el=document.getElementById('fmkt-status');el.style.display='block';el.style.borderLeftColor=cor||'var(--green)';el.innerHTML=msg;}
 
-function fmktStatus(msg,cor){
-  var el=document.getElementById('fmkt-status');
-  el.style.display='block'; el.style.borderLeftColor=cor||'var(--green)'; el.innerHTML=msg;
-}
-
-// ── Input: adicionar/remover activity_names (tags) ───────
+// ── Tags ──
 function renderTags(){
-  var area = document.getElementById('fmkt-input-area');
-  // remove tags antigas
+  var area=document.getElementById('fmkt-input-area');
   area.querySelectorAll('.fmkt-tag').forEach(function(t){t.remove();});
-  FMKT_ACTIVITIES.forEach(function(act, i){
-    var tag = document.createElement('span');
-    tag.className = 'fmkt-tag';
-    var shortName = act.split('-').slice(-3).join('-'); // últimos 3 segmentos
-    tag.innerHTML =
-      '<span style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;font-size:11px;font-family:monospace" title="'+act+'">'+shortName+'</span>'+
-      '<span onclick="fmktRemove('+i+')" style="margin-left:6px;cursor:pointer;color:var(--muted);font-size:13px;line-height:1;vertical-align:middle" title="Remover">×</span>';
-    tag.style.cssText='display:inline-flex;align-items:center;background:rgba(33,163,102,.12);border:1px solid rgba(33,163,102,.3);color:var(--text);border-radius:20px;padding:3px 10px;gap:2px;max-width:320px';
-    area.insertBefore(tag, document.getElementById('fmkt-input'));
+  FMKT_ACTIVITIES.forEach(function(act,i){
+    var tag=document.createElement('span');
+    tag.className='fmkt-tag';
+    var short=act.split('-').slice(-3).join('-');
+    tag.style.cssText='display:inline-flex;align-items:center;background:rgba(33,163,102,.1);border:1px solid rgba(33,163,102,.25);color:var(--text);border-radius:20px;padding:3px 8px 3px 10px;gap:4px;max-width:300px;font-size:11px;font-family:monospace';
+    tag.innerHTML='<span style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+act+'">'+short+'</span><span onclick="fmktRemove('+i+')" style="cursor:pointer;color:var(--muted);font-size:14px;line-height:1;flex-shrink:0;transition:color .15s" onmouseover="this.style.color=\'var(--red)\'" onmouseout="this.style.color=\'var(--muted)\'">×</span>';
+    area.insertBefore(tag,document.getElementById('fmkt-input'));
   });
-  var cnt = document.getElementById('fmkt-count');
-  cnt.textContent = FMKT_ACTIVITIES.length > 0 ? FMKT_ACTIVITIES.length+' campanha'+(FMKT_ACTIVITIES.length>1?'s':'') : '';
+  document.getElementById('fmkt-count').textContent=FMKT_ACTIVITIES.length?FMKT_ACTIVITIES.length+' campanha'+(FMKT_ACTIVITIES.length>1?'s'):'';
 }
+function fmktAddActivity(val){val=val.trim();if(!val||FMKT_ACTIVITIES.indexOf(val)>-1)return;FMKT_ACTIVITIES.push(val);renderTags();document.getElementById('fmkt-input').value='';}
+function fmktRemove(i){FMKT_ACTIVITIES.splice(i,1);renderTags();}
+function fmktClearAll(){FMKT_ACTIVITIES=[];FMKT_RESULTS={};FMKT_CAMP_AT=null;renderTags();['fmkt-result','fmkt-filtros','fmkt-status'].forEach(function(id){document.getElementById(id).style.display='none';});document.getElementById('fmkt-input').value='';}
+function fmktInputKey(e){var inp=document.getElementById('fmkt-input');if(e.key==='Enter'||e.key===','||e.key===';'){e.preventDefault();fmktAddActivity(inp.value.replace(/[,;]/g,''));}else if(e.key==='Backspace'&&inp.value===''&&FMKT_ACTIVITIES.length){fmktRemove(FMKT_ACTIVITIES.length-1);}}
+function fmktInputPaste(e){e.preventDefault();var t=(e.clipboardData||window.clipboardData).getData('text');t.split(/[\n,;]+/).forEach(function(v){fmktAddActivity(v);});}
+function fmktAddExample(){fmktAddActivity('20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial');fmktAddActivity('20250912-id-10038283435-pf-context-acp-sic-ept-rent-cdt-pushntf-antecipacaosalario_bau');}
 
-function fmktAddActivity(val){
-  val = val.trim();
-  if(!val) return;
-  if(FMKT_ACTIVITIES.indexOf(val) === -1){
-    FMKT_ACTIVITIES.push(val);
-    renderTags();
-  }
-  document.getElementById('fmkt-input').value = '';
-}
-
-function fmktRemove(i){
-  FMKT_ACTIVITIES.splice(i,1);
-  renderTags();
-}
-
-function fmktClearAll(){
-  FMKT_ACTIVITIES = [];
-  FMKT_RESULTS = {};
-  FMKT_CAMP_AT = null;
-  renderTags();
-  document.getElementById('fmkt-result').style.display='none';
-  document.getElementById('fmkt-filtros').style.display='none';
-  document.getElementById('fmkt-status').style.display='none';
-  document.getElementById('fmkt-input').value='';
-}
-
-function fmktInputKey(e){
-  var input = document.getElementById('fmkt-input');
-  if(e.key==='Enter'||e.key===','||e.key===';'){
-    e.preventDefault();
-    fmktAddActivity(input.value.replace(/,|;/g,''));
-  } else if(e.key==='Backspace' && input.value==='' && FMKT_ACTIVITIES.length>0){
-    fmktRemove(FMKT_ACTIVITIES.length-1);
-  }
-}
-
-function fmktInputPaste(e){
-  e.preventDefault();
-  var text = (e.clipboardData||window.clipboardData).getData('text');
-  // suporta colar múltiplos separados por vírgula, quebra de linha ou ponto-e-vírgula
-  text.split(/[\n,;]+/).forEach(function(v){ fmktAddActivity(v); });
-}
-
-function fmktAddExample(){
-  fmktAddActivity('20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial');
-  fmktAddActivity('20250912-id-10038283435-pf-context-acp-sic-ept-rent-cdt-pushntf-antecipacaosalario_bau');
-}
-
-// ── Filtros ────────────────────────────────────────────
+// ── Filtros ──
 function setFMKT(val,tipo){
-  if(tipo==='setor'){
-    FMKT_SETOR_AT=val;
-    ['total','grupo','publico','privado'].forEach(function(x){
-      document.getElementById('fmkt-tab-'+x).classList.toggle('active',x===val);
-    });
-  } else {
-    FMKT_CANAL_AT=val;
-    document.querySelectorAll('.fmkt-ctab').forEach(function(b){
-      b.classList.toggle('active',b.dataset.canal===val);
-    });
-  }
-  if(Object.keys(FMKT_RESULTS).length) redrawAll();
+  if(tipo==='setor'){FMKT_SETOR_AT=val;['total','grupo','publico','privado'].forEach(function(x){document.getElementById('fmkt-tab-'+x).classList.toggle('active',x===val);});}
+  else{FMKT_CANAL_AT=val;document.querySelectorAll('.fmkt-ctab').forEach(function(b){b.classList.toggle('active',b.dataset.canal===val);});}
+  if(Object.keys(FMKT_RESULTS).length)redrawAll();
 }
+function setFMKTCamp(act){FMKT_CAMP_AT=act;document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===act);});document.getElementById('fmkt-activity-label').textContent=act;redrawFunil();}
 
-function setFMKTCamp(act){
-  FMKT_CAMP_AT=act;
-  document.querySelectorAll('.fmkt-atab').forEach(function(b){
-    b.classList.toggle('active', b.dataset.act===act);
-  });
-  redrawFunil();
-}
-
-// ── Agrega dados ───────────────────────────────────────
+// ── Agregação ──
 function getAgg(activityName){
-  var data = FMKT_RESULTS[activityName];
-  if(!data) return null;
-  var cols=data.columns||[], idx={};
-  cols.forEach(function(c,i){idx[c]=i;});
+  var data=FMKT_RESULTS[activityName];if(!data)return null;
+  var cols=data.columns||[],idx={};cols.forEach(function(c,i){idx[c]=i;});
   var rows=(data.rows||[]).filter(function(row){
     var setor=(row[idx['setor']]||'').toLowerCase().normalize('NFD').replace(/[^\w]/g,'');
     var ch=(row[idx['channel']]||'').toUpperCase();
-    return (FMKT_SETOR_AT==='total'||setor===FMKT_SETOR_AT) &&
-           (FMKT_CANAL_AT==='todos'||ch===FMKT_CANAL_AT);
+    return(FMKT_SETOR_AT==='total'||setor===FMKT_SETOR_AT)&&(FMKT_CANAL_AT==='todos'||ch===FMKT_CANAL_AT);
   });
   var t={enviados:0,entregues:0,abriram:0,clicaram:0,anteciparam:0};
-  rows.forEach(function(row){
-    t.enviados    +=parseInt(row[idx['enviados']])    ||0;
-    t.entregues   +=parseInt(row[idx['entregues']])   ||0;
-    t.abriram     +=parseInt(row[idx['abriram']])     ||0;
-    t.clicaram    +=parseInt(row[idx['clicaram']])    ||0;
-    t.anteciparam +=parseInt(row[idx['anteciparam']]) ||0;
-  });
+  rows.forEach(function(row){t.enviados+=parseInt(row[idx['enviados']])||0;t.entregues+=parseInt(row[idx['entregues']])||0;t.abriram+=parseInt(row[idx['abriram']])||0;t.clicaram+=parseInt(row[idx['clicaram']])||0;t.anteciparam+=parseInt(row[idx['anteciparam']])||0;});
   return t;
 }
 
-// ── Funil SVG + métricas ───────────────────────────────
-function renderFunilHTML(d, accentColor){
-  if(!d) return '<div style="color:var(--muted);padding:20px 0;font-size:13px">Sem dados para este filtro.</div>';
-  accentColor = accentColor || 'var(--green)';
+// ── FUNIL VISUAL ──────────────────────────────────────
+function renderFunilHTML(d, cor){
+  if(!d||!d.enviados) return '<div style="color:var(--muted);padding:24px 0;font-size:13px;text-align:center">Sem dados para este filtro.</div>';
+  cor=cor||'#21a366';
 
   var steps=[
-    {label:'Enviados',    val:d.enviados,    prev:null,         icon:'📤'},
-    {label:'Entregues',   val:d.entregues,   prev:d.enviados,   icon:'📬'},
-    {label:'Abertos',     val:d.abriram,     prev:d.entregues,  icon:'👁'},
-    {label:'Clicados',    val:d.clicaram,    prev:d.abriram,    icon:'🖱'},
-    {label:'Anteciparam', val:d.anteciparam, prev:d.enviados,   icon:'💰'},
+    {label:'Enviados',    val:d.enviados,    prev:null,        icon:'📤', key:'enviados'},
+    {label:'Entregues',   val:d.entregues,   prev:d.enviados,  icon:'📬', key:'entregues'},
+    {label:'Abertos',     val:d.abriram,     prev:d.entregues, icon:'👁', key:'abertos'},
+    {label:'Clicados',    val:d.clicaram,    prev:d.abriram,   icon:'🖱', key:'clicados'},
+    {label:'Anteciparam', val:d.anteciparam, prev:d.enviados,  icon:'💰', key:'anteciparam'},
   ];
   var base=steps[0].val||1;
-  var WS=[100,78,56,34,16];
-  // Opacidade crescente da cor de acento
-  var ALPHAS=['0.08','0.16','0.27','0.42','0.62'];
 
-  var html='<div style="display:flex;gap:0;align-items:stretch">';
+  // Larguras do trapézio em % (100 → 16), mapeadas para SVG width=260
+  var SW=260;
+  var WPTS=[1,.80,.60,.40,.20];
 
-  // ── esquerda ──
-  html+='<div style="flex:1;display:flex;flex-direction:column;gap:3px;justify-content:center;padding-right:18px">';
-  steps.forEach(function(s){
-    var p=s.prev!==null?pct(s.val,s.prev):null;
-    html+='<div style="display:flex;flex-direction:column;justify-content:center;height:64px;text-align:right">';
-    html+='<div style="font-size:10px;color:var(--muted);font-weight:600;margin-bottom:1px;text-transform:uppercase;letter-spacing:.3px">'+s.label+'</div>';
-    html+='<div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1.1">'+fmtN(s.val)+'</div>';
-    if(p) html+='<div style="font-size:10px;color:var(--muted);margin-top:1px">'+p+' do anterior</div>';
-    html+='</div>';
-  });
-  html+='</div>';
+  // ── SVG do funil ──
+  var LAYER_H=56, GAP=2;
+  var SVG_H=LAYER_H*5+GAP*4;
 
-  // ── centro SVG ──
-  var svgH=64*5+4;
-  html+='<div style="width:200px;flex-shrink:0">';
-  html+='<svg width="200" height="'+svgH+'" viewBox="0 0 200 '+svgH+'" style="display:block">';
+  // Parse cor para rgba
+  function hexToRgb(hex){
+    var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+    return r+','+g+','+b;
+  }
+  var rgb='33,163,102'; // fallback verde
+  if(cor&&cor.startsWith('#')&&cor.length===7) rgb=hexToRgb(cor);
+
+  var svgLines='';
   steps.forEach(function(s,i){
-    var wTop=200*WS[i]/100;
-    var wBot=200*(i<4?WS[i+1]:8)/100;
-    var xTop=(200-wTop)/2, xBot=(200-wBot)/2;
-    var yTop=i*66, yBot=yTop+63;
+    var wTop=SW*WPTS[i];
+    var wBot=i<4?SW*WPTS[i+1]:SW*0.08;
+    var xTop=(SW-wTop)/2, xBot=(SW-wBot)/2;
+    var yTop=i*(LAYER_H+GAP), yBot=yTop+LAYER_H;
     var pts=xTop+','+yTop+' '+(xTop+wTop)+','+yTop+' '+(xBot+wBot)+','+yBot+' '+xBot+','+yBot;
-    // preenchimento
-    html+='<polygon points="'+pts+'" fill="'+accentColor+'" opacity="'+ALPHAS[i]+'"/>';
-    // borda
-    html+='<polygon points="'+pts+'" fill="none" stroke="'+accentColor+'" stroke-width=".8" opacity=".25"/>';
-    // % do total
-    var yMid=yTop+31;
+    var alpha=(0.12+i*0.17).toFixed(2);
+
+    // Trapézio preenchido
+    svgLines+='<polygon points="'+pts+'" fill="rgba('+rgb+','+alpha+')" />';
+
+    // Borda superior da camada (linha fina)
+    if(i===0){
+      svgLines+='<line x1="'+xTop+'" y1="'+yTop+'" x2="'+(xTop+wTop)+'" y2="'+yTop+'" stroke="rgba('+rgb+',.35)" stroke-width="1.5"/>';
+    }
+    // Borda inferior (divisor entre camadas)
+    svgLines+='<line x1="'+xBot+'" y1="'+yBot+'" x2="'+(xBot+wBot)+'" y2="'+yBot+'" stroke="rgba('+rgb+',.2)" stroke-width="1"/>';
+
+    // Borda lateral esquerda e direita
+    svgLines+='<line x1="'+xTop+'" y1="'+yTop+'" x2="'+xBot+'" y2="'+yBot+'" stroke="rgba('+rgb+',.2)" stroke-width="1"/>';
+    svgLines+='<line x1="'+(xTop+wTop)+'" y1="'+yTop+'" x2="'+(xBot+wBot)+'" y2="'+yBot+'" stroke="rgba('+rgb+',.2)" stroke-width="1"/>';
+
+    // % dentro do trapézio
+    var yMid=yTop+LAYER_H/2;
     var pctTot=i===0?'100%':pct(s.val,base);
-    html+='<text x="100" y="'+(yMid-5)+'" text-anchor="middle" fill="rgba(230,237,243,.45)" font-size="8.5" font-family="Inter,system-ui,sans-serif" font-weight="600" letter-spacing=".6">'+s.label.toUpperCase()+'</text>';
-    html+='<text x="100" y="'+(yMid+9)+'" text-anchor="middle" fill="'+accentColor+'" font-size="12" font-family="Inter,system-ui,sans-serif" font-weight="800" opacity=".9">'+pctTot+'</text>';
+    svgLines+='<text x="'+(SW/2)+'" y="'+(yMid+4)+'" text-anchor="middle" fill="rgba('+rgb+',0.85)" font-size="13" font-weight="800" font-family="Inter,system-ui,sans-serif">'+pctTot+'</text>';
   });
-  html+='</svg></div>';
 
-  // ── direita ──
-  html+='<div style="flex:1;display:flex;flex-direction:column;gap:3px;justify-content:center;padding-left:18px">';
+  var svgEl='<svg width="'+SW+'" height="'+SVG_H+'" viewBox="0 0 '+SW+' '+SVG_H+'" style="display:block;overflow:visible">'+svgLines+'</svg>';
+
+  // ── Steps laterais ──
+  var stepsHTML='<div class="fn-steps" style="height:'+(SVG_H)+'px">';
   steps.forEach(function(s,i){
-    var drop=s.prev&&s.prev>0?((1-s.val/s.prev)*100).toFixed(1)+'%':null;
-    html+='<div style="height:64px;display:flex;flex-direction:column;justify-content:center">';
-    html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">';
-    html+='<span style="font-size:13px">'+s.icon+'</span>';
-    html+='<span style="font-size:12px;font-weight:700;color:var(--text)">'+fmtN(s.val)+'</span>';
-    if(drop) html+='<span style="font-size:10px;color:var(--red);font-weight:500">▼ '+drop+'</span>';
-    html+='</div>';
-    var bw=Math.max(2,Math.round(s.val/base*100));
-    html+='<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;max-width:180px">';
-    html+='<div style="height:100%;width:'+bw+'%;background:'+accentColor+';border-radius:2px;opacity:.75;transition:width .4s"></div>';
-    html+='</div>';
-    html+='</div>';
+    var barW=Math.max(2,Math.round(s.val/base*100));
+    var dropPct=s.prev&&s.prev>0?'−'+((1-s.val/s.prev)*100).toFixed(1)+'%':null;
+    var pctPrev=s.prev!==null?pct(s.val,s.prev):null;
+
+    stepsHTML+='<div class="fn-step">';
+    stepsHTML+='<div class="fn-step-dot" style="background:'+cor+';opacity:'+(0.35+i*0.13)+'"></div>';
+    stepsHTML+='<div class="fn-step-info">';
+    stepsHTML+='<div class="fn-step-lbl">'+s.label+'</div>';
+    stepsHTML+='<div style="display:flex;align-items:baseline;gap:8px">';
+    stepsHTML+='<div class="fn-step-val">'+fmtN(s.val)+'</div>';
+    if(dropPct) stepsHTML+='<div style="font-size:10px;color:var(--red);font-weight:600">'+dropPct+'</div>';
+    stepsHTML+='</div>';
+    if(pctPrev) stepsHTML+='<div class="fn-step-sub">'+pctPrev+' do passo anterior</div>';
+    stepsHTML+='<div class="fn-step-bar-wrap"><div class="fn-step-bar" style="width:'+barW+'%;background:'+cor+'"></div></div>';
+    stepsHTML+='</div>';
+    stepsHTML+='</div>';
   });
-  html+='</div>';
+  stepsHTML+='</div>';
 
-  html+='</div>'; // flex principal
-
-  // ── KPIs ──
+  // ── KPI cards ──
   var kpis=[
-    {l:'Taxa Entrega',  v:pct(d.entregues,d.enviados),   c:'var(--blue)'},
-    {l:'Taxa Abertura', v:pct(d.abriram,d.entregues),    c:'var(--purple)'},
-    {l:'Taxa Clique',   v:pct(d.clicaram,d.abriram),     c:'var(--orange)'},
-    {l:'Conv. Antecip.',v:pct(d.anteciparam,d.enviados), c:accentColor},
+    {l:'Taxa de Entrega',  v:pct(d.entregues,d.enviados),   c:'var(--blue)'},
+    {l:'Taxa de Abertura', v:pct(d.abriram,d.entregues),    c:'var(--purple)'},
+    {l:'Taxa de Clique',   v:pct(d.clicaram,d.abriram),     c:'var(--orange)'},
+    {l:'Conv. Antecip.',   v:pct(d.anteciparam,d.enviados), c:cor},
   ];
-  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px">';
+  var kpiHTML='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px">';
   kpis.forEach(function(k){
-    html+='<div style="background:var(--surf2);border:1px solid var(--border);border-top:2px solid '+k.c+';border-radius:8px;padding:10px 12px;text-align:center">';
-    html+='<div style="font-size:22px;font-weight:800;color:'+k.c+';letter-spacing:-.02em">'+k.v+'</div>';
-    html+='<div style="font-size:10px;color:var(--muted);margin-top:2px">'+k.l+'</div>';
-    html+='</div>';
+    kpiHTML+='<div style="background:var(--surf2);border:1px solid var(--border);border-top:2px solid '+k.c+';border-radius:10px;padding:12px 14px;text-align:center">';
+    kpiHTML+='<div style="font-size:24px;font-weight:800;color:'+k.c+';letter-spacing:-.03em;line-height:1">'+k.v+'</div>';
+    kpiHTML+='<div style="font-size:10px;color:var(--muted);margin-top:4px;font-weight:500">'+k.l+'</div>';
+    kpiHTML+='</div>';
   });
-  html+='</div>';
+  kpiHTML+='</div>';
 
-  return html;
+  return '<div class="fn-wrap">'+
+    '<div style="display:flex;flex-direction:column;align-items:center"><div>'+svgEl+'</div></div>'+
+    stepsHTML+
+    '</div>'+kpiHTML;
 }
 
-// ── Comparativo side-by-side ──────────────────────────
+// ── Comparativo ──
 function renderCompare(){
-  var acts = Object.keys(FMKT_RESULTS);
-  if(acts.length < 2){ document.getElementById('fmkt-compare-wrap').style.display='none'; return; }
-
+  var acts=Object.keys(FMKT_RESULTS);
+  if(acts.length<2){document.getElementById('fmkt-compare-wrap').style.display='none';return;}
   var steps=[
-    {key:'enviados',    label:'Enviados'},
-    {key:'entregues',   label:'Entregues'},
-    {key:'abriram',     label:'Abertos'},
-    {key:'clicaram',    label:'Clicados'},
-    {key:'anteciparam', label:'Anteciparam'},
+    {key:'enviados',label:'Enviados'},
+    {key:'entregues',label:'Entregues'},
+    {key:'abriram',label:'Abertos'},
+    {key:'clicaram',label:'Clicados'},
+    {key:'anteciparam',label:'Anteciparam'},
   ];
-
-  var html='';
-  html+='<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Comparativo entre campanhas</div>';
-  html+='<div style="overflow-x:auto">';
-  html+='<table style="width:100%;border-collapse:collapse;font-size:12px">';
-
-  // cabeçalho
-  html+='<thead><tr>';
-  html+='<th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.4px">Step</th>';
+  var html='<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;padding-top:20px;border-top:1px solid var(--border)">Comparativo entre campanhas</div>';
+  html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+  html+='<thead><tr><th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">Step</th>';
   acts.forEach(function(act,i){
-    var shortName=act.split('-').slice(-3).join('-');
-    var cor=campColor(i);
-    html+='<th style="text-align:right;padding:8px 12px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:.3px;color:'+cor+'" title="'+act+'">'+shortName+'</th>';
+    var short=act.split('-').slice(-3).join('-');
+    html+='<th style="text-align:right;padding:8px 12px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:'+campColor(i)+'" title="'+act+'">'+short+'</th>';
   });
-  html+='</tr></thead>';
-
-  // linhas
-  html+='<tbody>';
-  steps.forEach(function(step, si){
-    // calcula max para barra relativa
-    var vals = acts.map(function(act){
-      var d=getAgg(act);
-      return d ? (parseInt(d[step.key])||0) : 0;
-    });
-    var maxVal = Math.max.apply(null,vals)||1;
-    var base0  = acts.map(function(act){
-      var d=getAgg(act); return d?(parseInt(d.enviados)||0):1;
-    });
-
-    html+='<tr style="border-bottom:1px solid rgba(48,54,61,.4)">';
+  html+='</tr></thead><tbody>';
+  steps.forEach(function(step){
+    var vals=acts.map(function(a){var d=getAgg(a);return d?parseInt(d[step.key])||0:0;});
+    var maxV=Math.max.apply(null,vals)||1;
+    html+='<tr style="border-bottom:1px solid rgba(48,54,61,.35)">';
     html+='<td style="padding:10px 12px;color:var(--muted);font-size:11px;white-space:nowrap">'+step.label+'</td>';
     acts.forEach(function(act,i){
-      var d=getAgg(act); if(!d){html+='<td style="text-align:right;padding:10px 12px">—</td>';return;}
+      var d=getAgg(act);if(!d){html+='<td style="text-align:right;padding:10px 12px;color:var(--muted)">—</td>';return;}
       var val=parseInt(d[step.key])||0;
-      var barW=Math.round(val/maxVal*100);
-      var pctTot=si===0?'100%':pct(val,parseInt(d.enviados)||1);
+      var bw=Math.round(val/maxV*100);
+      var pctTot=pct(val,parseInt(d.enviados)||1);
       var cor=campColor(i);
       html+='<td style="text-align:right;padding:10px 12px;vertical-align:middle">';
-      html+='<div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">';
-      html+='<div style="width:80px;height:4px;background:var(--border);border-radius:2px;overflow:hidden">';
-      html+='<div style="height:100%;width:'+barW+'%;background:'+cor+';border-radius:2px;opacity:.75"></div>';
-      html+='</div>';
-      html+='<span style="font-weight:700;color:var(--text);min-width:40px;text-align:right">'+fmtN(val)+'</span>';
-      html+='<span style="font-size:10px;color:'+cor+';min-width:46px;text-align:right">'+pctTot+'</span>';
-      html+='</div>';
-      html+='</td>';
+      html+='<div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">';
+      html+='<div style="width:72px;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+bw+'%;background:'+cor+';border-radius:2px;opacity:.8"></div></div>';
+      html+='<span style="font-weight:700;color:var(--text);min-width:38px;text-align:right">'+fmtN(val)+'</span>';
+      html+='<span style="font-size:10px;color:'+cor+';min-width:44px;text-align:right">'+pctTot+'</span>';
+      html+='</div></td>';
     });
     html+='</tr>';
   });
   html+='</tbody></table></div>';
-
-  var cw=document.getElementById('fmkt-compare-wrap');
-  cw.style.display='block';
-  cw.innerHTML=html;
+  var cw=document.getElementById('fmkt-compare-wrap');cw.style.display='block';cw.innerHTML=html;
 }
 
-// ── Redesenha funil ativo ─────────────────────────────
 function redrawFunil(){
   var act=FMKT_CAMP_AT;
-  if(!act||!FMKT_RESULTS[act]){ document.getElementById('fmkt-funil-wrap').innerHTML=''; return; }
+  if(!act||!FMKT_RESULTS[act]){document.getElementById('fmkt-funil-wrap').innerHTML='';return;}
   var idx=Object.keys(FMKT_RESULTS).indexOf(act);
-  var cor=campColor(idx);
-  var d=getAgg(act);
-  document.getElementById('fmkt-funil-wrap').innerHTML=renderFunilHTML(d, cor);
+  document.getElementById('fmkt-funil-wrap').innerHTML=renderFunilHTML(getAgg(act),campColor(idx));
 }
+function redrawAll(){redrawFunil();renderCompare();}
 
-function redrawAll(){ redrawFunil(); renderCompare(); }
-
-// ── Abas de campanha ──────────────────────────────────
 function buildCampTabs(){
   var acts=Object.keys(FMKT_RESULTS);
   var wrap=document.getElementById('fmkt-camp-tabs-wrap');
-  var tabs=document.getElementById('fmkt-camp-tabs');
-  if(acts.length<=1){ wrap.style.display='none'; return; }
+  if(acts.length<=1){wrap.style.display='none';return;}
   wrap.style.display='block';
   var h='';
   acts.forEach(function(act,i){
-    var shortName=act.split('-').slice(-3).join('-');
-    var cor=campColor(i);
-    h+='<button class="rtab fmkt-atab" data-act="'+act+'" onclick="setFMKTCamp(\''+act.replace(/'/g,"\\'")+'\')" title="'+act+'">';
-    h+='<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+cor+';margin-right:5px;vertical-align:middle"></span>';
-    h+=shortName+'</button>';
+    var short=act.split('-').slice(-3).join('-');var cor=campColor(i);
+    h+='<button class="rtab fmkt-atab" data-act="'+act+'" onclick="setFMKTCamp(\''+act.replace(/'/g,"\\'")+'\')"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+cor+';margin-right:5px;vertical-align:middle"></span>'+short+'</button>';
   });
-  tabs.innerHTML=h;
+  document.getElementById('fmkt-camp-tabs').innerHTML=h;
 }
 
-// ── Canal tabs ────────────────────────────────────────
 function buildCanalTabs(){
   var chSet={};
   Object.values(FMKT_RESULTS).forEach(function(data){
-    var cols=data.columns||[], idx={};
-    cols.forEach(function(c,i){idx[c]=i;});
-    (data.rows||[]).forEach(function(row){ chSet[(row[idx['channel']]||'?').toUpperCase()]=1; });
+    var cols=data.columns||[],idx={};cols.forEach(function(c,i){idx[c]=i;});
+    (data.rows||[]).forEach(function(row){chSet[(row[idx['channel']]||'?').toUpperCase()]=1;});
   });
   var chList=Object.keys(chSet).sort();
-  var c=document.getElementById('fmkt-canal-tabs');
   var h='<button class="rtab fmkt-ctab active" data-canal="todos" onclick="setFMKT(\'todos\',\'canal\')">Todos</button>';
   chList.forEach(function(ch){
     var dot=CANAL_DOT[ch]||'#8b949e';
-    h+='<button class="rtab fmkt-ctab" data-canal="'+ch+'" onclick="setFMKT(\''+ch+'\',\'canal\')">';
-    h+='<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+dot+';margin-right:5px;vertical-align:middle"></span>'+ch;
-    h+='</button>';
+    h+='<button class="rtab fmkt-ctab" data-canal="'+ch+'" onclick="setFMKT(\''+ch+'\',\'canal\')"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+dot+';margin-right:5px;vertical-align:middle"></span>'+ch+'</button>';
   });
-  c.innerHTML=h;
+  document.getElementById('fmkt-canal-tabs').innerHTML=h;
 }
 
-// ── Busca ─────────────────────────────────────────────
 function buscarFunil(){
-  // captura o que está no input mas ainda não foi adicionado
-  var inputEl=document.getElementById('fmkt-input');
-  if(inputEl.value.trim()) fmktAddActivity(inputEl.value);
-
-  if(FMKT_ACTIVITIES.length===0){
-    fmktStatus('⚠️ Adicione pelo menos um activity_name.','var(--yellow)'); return;
-  }
-
+  var inp=document.getElementById('fmkt-input');
+  if(inp.value.trim())fmktAddActivity(inp.value);
+  if(!FMKT_ACTIVITIES.length){fmktStatus('⚠️ Adicione pelo menos um activity_name.','var(--yellow)');return;}
   var btn=document.getElementById('fmkt-btn');
-  btn.disabled=true; btn.style.opacity='.5'; btn.textContent='⏳ Buscando…';
+  btn.disabled=true;btn.style.opacity='.5';btn.textContent='⏳ Buscando…';
   var n=FMKT_ACTIVITIES.length;
   fmktStatus('🔄 Consultando '+n+' campanha'+(n>1?'s':'')+' no Databricks…'+
     (n>1?' Rodando em paralelo, pode levar ~30-60s.':' Pode levar ~30s.'),'var(--blue)');
@@ -2354,59 +2260,37 @@ function buscarFunil(){
   document.getElementById('fmkt-filtros').style.display='none';
 
   fetch('http://localhost:5001/funil',{
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({activities: FMKT_ACTIVITIES})
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({activities:FMKT_ACTIVITIES})
   })
-  .then(function(r){ if(!r.ok) return r.json().then(function(e){throw new Error(e.error||'Erro '+r.status);}); return r.json(); })
+  .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.error||'Erro '+r.status);});return r.json();})
   .then(function(data){
-    btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
-    FMKT_RESULTS={};
-    FMKT_SETOR_AT='total'; FMKT_CANAL_AT='todos';
-
-    if(data.multi){
-      // múltiplos
-      Object.assign(FMKT_RESULTS, data.results||{});
-      var errs=Object.keys(data.errors||{});
-      var ok=Object.keys(FMKT_RESULTS).length;
-      var msg='✅ '+ok+' campanha'+(ok>1?'s':'')+' carregada'+(ok>1?'s':'');
-      if(errs.length) msg+=' | ⚠️ '+errs.length+' com erro: '+errs.map(function(e){return e.split('-').slice(-2).join('-');}).join(', ');
+    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
+    FMKT_RESULTS={};FMKT_SETOR_AT='total';FMKT_CANAL_AT='todos';
+    if(data.multi){Object.assign(FMKT_RESULTS,data.results||{});
+      var errs=Object.keys(data.errors||{});var ok=Object.keys(FMKT_RESULTS).length;
+      var msg='✅ '+ok+' campanha'+(ok>1?'s carregadas':' carregada');
+      if(errs.length)msg+=' — ⚠️ '+errs.length+' com erro';
       fmktStatus(msg,'var(--green)');
-    } else {
-      // simples (backward compat)
-      FMKT_RESULTS[data.activity_name]=data;
-      fmktStatus('✅ Dados carregados — '+(data.rows?data.rows.length:0)+' combinações setor×canal.','var(--green)');
-    }
-
-    if(!Object.keys(FMKT_RESULTS).length){ fmktStatus('❌ Nenhum resultado retornado.','var(--red)'); return; }
-
+    }else{FMKT_RESULTS[data.activity_name]=data;fmktStatus('✅ Dados carregados.','var(--green)');}
+    if(!Object.keys(FMKT_RESULTS).length){fmktStatus('❌ Nenhum resultado.','var(--red)');return;}
     FMKT_CAMP_AT=Object.keys(FMKT_RESULTS)[0];
-    buildCampTabs();
-    buildCanalTabs();
-
-    ['total','grupo','publico','privado'].forEach(function(x){
-      document.getElementById('fmkt-tab-'+x).classList.toggle('active',x==='total');
-    });
-
-    // ativa primeira aba
-    document.querySelectorAll('.fmkt-atab').forEach(function(b){
-      b.classList.toggle('active', b.dataset.act===FMKT_CAMP_AT);
-    });
-
+    buildCampTabs();buildCanalTabs();
+    ['total','grupo','publico','privado'].forEach(function(x){document.getElementById('fmkt-tab-'+x).classList.toggle('active',x==='total');});
+    document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===FMKT_CAMP_AT);});
+    document.getElementById('fmkt-activity-label').textContent=FMKT_CAMP_AT;
     document.getElementById('fmkt-result').style.display='block';
     document.getElementById('fmkt-filtros').style.display='block';
     redrawAll();
   })
   .catch(function(err){
-    btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
     if(err.message.indexOf('fetch')>-1||err.message.indexOf('Failed')>-1){
-      fmktStatus('❌ Servidor local offline. Rode no terminal: <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">servidor-benefits</code>','var(--red)');
-    } else {
-      fmktStatus('❌ '+err.message,'var(--red)');
-    }
+      fmktStatus('❌ Servidor offline. Rode: <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">servidor-benefits</code>','var(--red)');
+    }else{fmktStatus('❌ '+err.message,'var(--red)');}
   });
 }
-
-window.addEventListener('resize',function(){ if(Object.keys(FMKT_RESULTS).length) redrawFunil(); });
+window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)redrawFunil();});
 </script>
 
 <div class="divider"></div>
