@@ -23,26 +23,57 @@ jobs:
       - name: Instalar dependências
         run: pip install -q databricks-sdk
 
+      - name: Obter access token via refresh token
+        id: dbx_token
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_REFRESH_TOKEN: ${{ secrets.DATABRICKS_REFRESH_TOKEN }}
+        run: |
+          # Renovar access token usando refresh token OAuth
+          ACCESS_TOKEN=$(python3 - << 'PYEOF'
+import urllib.request, urllib.parse, json, os
+
+host          = os.environ["DATABRICKS_HOST"]
+refresh_token = os.environ["DATABRICKS_REFRESH_TOKEN"]
+
+# Databricks CLI usa client_id "databricks-cli"
+data = urllib.parse.urlencode({
+    "grant_type":    "refresh_token",
+    "refresh_token": refresh_token,
+    "client_id":     "databricks-cli",
+}).encode()
+
+req = urllib.request.Request(
+    f"{host}/oidc/v1/token",
+    data=data,
+    headers={"Content-Type": "application/x-www-form-urlencoded"}
+)
+with urllib.request.urlopen(req) as r:
+    d = json.loads(r.read())
+    print(d["access_token"])
+PYEOF
+)
+          echo "DATABRICKS_ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+          echo "✅ Token renovado"
+
       - name: Executar query
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_ACCESS_TOKEN }}
           ACTIVITY_NAME: ${{ github.event.client_payload.activity }}
           DATE_FROM: ${{ github.event.client_payload.date_from }}
           DATE_TO: ${{ github.event.client_payload.date_to }}
           REQUEST_ID: ${{ github.event.client_payload.request_id }}
         run: |
-          # Rodar com stderr visível no log para debug
           python3 funil_query_helper_ci.py 2>&1 | tee results/$REQUEST_ID.json
-          # Verificar se o JSON está ok
           python3 -c "
 import json, sys
-with open('results/$REQUEST_ID.json') as f:
+with open('results/${{ github.event.client_payload.request_id }}.json') as f:
     d = json.load(f)
 if d.get('ok'):
-    print(f'✅ Query OK — {len(d.get(\"rows\",[]))} rows')
+    print(f'✅ Query OK — {len(d.get(chr(114)+chr(111)+chr(119)+chr(115),[]))} rows')
 else:
-    print(f'❌ Erro: {d.get(\"error\",\"desconhecido\")}')
+    print(f'❌ Erro: {d.get(chr(101)+chr(114)+chr(114)+chr(111)+chr(114),\"desconhecido\")}')
     sys.exit(1)
 "
 
