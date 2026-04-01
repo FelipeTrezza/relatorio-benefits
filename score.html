@@ -418,23 +418,41 @@ tbody td{padding:9px 14px;font-size:12px}
   <div class="sec-sub">Cole um ou mais <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">activity_name</code> para visualizar e comparar funis. Use <strong>Enter</strong> ou <strong>vírgula</strong> para adicionar cada um.</div>
 
   <!-- BANNER SERVIDOR OFFLINE (aparece automaticamente) -->
-  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.25);border-radius:10px;padding:14px 16px">
-    <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
-      <div style="flex:1;min-width:220px">
-        <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:4px">⚠️ Servidor local offline</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6">
-          O funil consulta o Databricks via servidor local.<br>
-          <strong style="color:var(--text)">Primeira vez?</strong> Baixe e dê duplo clique no arquivo abaixo.<br>
-          <strong style="color:var(--text)">Já configurou?</strong> Rode <code style="background:var(--surf2);padding:1px 6px;border-radius:4px;font-size:11px">servidor-benefits</code> no terminal.
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0">
-        <a href="https://felipetrezza.github.io/relatorio-benefits/iniciar-servidor.command"
+  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2);border-radius:10px;overflow:hidden">
+    <!-- Cabeçalho -->
+    <div style="background:rgba(248,81,73,.12);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(248,81,73,.15)">
+      <span style="font-size:13px;font-weight:700;color:var(--red)">⚠️ Configuração necessária para usar o Funil de Campanha</span>
+    </div>
+    <!-- Passos -->
+    <div style="padding:14px 16px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+      <!-- Passo 1: baixar -->
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Passo 1 — Instalar o servidor (só uma vez)</div>
+        <a id="fmkt-download-btn"
+           href="https://felipetrezza.github.io/relatorio-benefits/iniciar-servidor.command"
            download="iniciar-servidor.command"
-           style="display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#fff;text-decoration:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;white-space:nowrap">
+           style="display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#fff;text-decoration:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;white-space:nowrap;margin-bottom:6px">
           ⬇️ Baixar iniciar-servidor.command
         </a>
-        <span style="font-size:10px;color:var(--muted);text-align:right">Mac: duplo clique para iniciar · Deixe o terminal aberto</span>
+        <div style="font-size:11px;color:var(--muted)">Dê <strong style="color:var(--text)">duplo clique</strong> no arquivo baixado e aguarde o terminal abrir.</div>
+      </div>
+      <!-- Passo 2: abrir em HTTP -->
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Passo 2 — Abrir o relatório em HTTP</div>
+        <a id="fmkt-http-btn"
+           href="#"
+           onclick="abrirHttp(); return false;"
+           style="display:inline-flex;align-items:center;gap:7px;background:var(--surf2);color:var(--text);text-decoration:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;white-space:nowrap;border:1px solid var(--border);margin-bottom:6px">
+          🔓 Abrir em http://
+        </a>
+        <div style="font-size:11px;color:var(--muted)">O browser bloqueia conexões locais em <code style="font-size:10px">https://</code>. Você precisa usar a versão <code style="font-size:10px">http://</code>.</div>
+      </div>
+      <!-- Passo 3: já tem servidor -->
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Já instalou antes?</div>
+        <div style="font-size:11px;color:var(--text);margin-bottom:4px">Rode no terminal:</div>
+        <code style="display:block;background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--green)">servidor-benefits</code>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Depois clique em <strong>🔓 Abrir em http://</strong></div>
       </div>
     </div>
   </div>
@@ -917,6 +935,13 @@ function buscarFunil(customDateFrom, customDateTo) {
   if (inp.value.trim()) fmktAddActivity(inp.value);
   if (!FMKT_ACTIVITIES.length) { fmktStatus('⚠️ Adicione pelo menos um activity_name.', 'var(--yellow)'); return; }
 
+  // Se HTTPS, não consegue chamar localhost — orientar usuário
+  if (location.protocol === 'https:') {
+    document.getElementById('fmkt-offline-banner').style.display = 'block';
+    document.getElementById('fmkt-offline-banner').scrollIntoView({behavior:'smooth', block:'nearest'});
+    return;
+  }
+
   var btn = document.getElementById('fmkt-btn');
   btn.disabled = true; btn.style.opacity = '.5'; btn.textContent = '⏳ Buscando…';
   var n = FMKT_ACTIVITIES.length;
@@ -975,14 +1000,50 @@ function buscarFunil(customDateFrom, customDateTo) {
 }
 window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)redrawFunil();});
 
-// Verifica se servidor local está online ao carregar a página
-(function checkServerOnLoad(){
+function abrirHttp(){
+  // Redireciona para versão HTTP do mesmo relatório (permite localhost)
+  var httpUrl = location.href.replace('https://', 'http://');
+  window.open(httpUrl, '_blank');
+}
+
+// Esconde banner quando servidor responde (só em HTTP)
+function fmktCheckServer(){
+  if(location.protocol !== 'http:') return;
   fetch('http://localhost:5001/status',{method:'GET'})
   .then(function(r){ return r.json(); })
-  .then(function(){ /* online — não mostrar nada */ })
-  .catch(function(){
+  .then(function(){
     var b=document.getElementById('fmkt-offline-banner');
-    if(b) b.style.display='block';
+    if(b) b.style.display='none';
+  })
+  .catch(function(){});
+}
+// Poll a cada 5s para detectar quando servidor subir
+setInterval(fmktCheckServer, 5000);
+fmktCheckServer();
+
+// Verifica se servidor local está online ao carregar a página
+// NOTA: browsers bloqueiam http://localhost em páginas HTTPS (Mixed Content)
+// Solução: mostrar banner imediatamente se HTTPS, com botão para abrir versão HTTP
+(function checkServerOnLoad(){
+  var isHttps = location.protocol === 'https:';
+  if (isHttps) {
+    // Em HTTPS não conseguimos chamar localhost — mostrar banner sempre
+    var b = document.getElementById('fmkt-offline-banner');
+    if (b) b.style.display = 'block';
+    return;
+  }
+  // Em HTTP, testar normalmente
+  fetch('http://localhost:5001/status', {method:'GET'})
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d && d.ok !== false) {
+      var b = document.getElementById('fmkt-offline-banner');
+      if (b) b.style.display = 'none';
+    }
+  })
+  .catch(function(){
+    var b = document.getElementById('fmkt-offline-banner');
+    if (b) b.style.display = 'block';
   });
 })();
 
