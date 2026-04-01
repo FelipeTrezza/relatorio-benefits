@@ -447,32 +447,44 @@ tbody td{padding:9px 14px;font-size:12px}
   <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
 
   <!-- BANNER OFFLINE -->
-  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:var(--surf2);border:1px solid rgba(248,81,73,.35);border-radius:10px;overflow:hidden">
-    <div style="background:rgba(248,81,73,.1);padding:10px 16px;border-bottom:1px solid rgba(248,81,73,.2)">
-      <span style="font-size:13px;font-weight:700;color:var(--red)">⚠️ Servidor local necessário</span>
+  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:var(--surf2);border:1px solid rgba(248,81,73,.3);border-radius:10px;overflow:hidden">
+    <!-- Header -->
+    <div style="background:rgba(248,81,73,.08);padding:10px 16px;border-bottom:1px solid rgba(248,81,73,.15);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span style="font-size:13px;font-weight:700;color:var(--red)">⚠️ Para usar o Funil de Campanha, o servidor local precisa estar rodando</span>
+      <button onclick="abrirHttp()"
+        style="background:var(--green);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">
+        🔓 Já rodando? Abrir em http://
+      </button>
     </div>
-    <div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
-      <div>
-        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">1 — Baixar e instalar (só 1x)</div>
-        <a href="https://felipetrezza.github.io/relatorio-benefits/iniciar-servidor.command"
-           download="iniciar-servidor.command"
-           style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;text-decoration:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700">
-          ⬇️ iniciar-servidor.command
-        </a>
-        <div style="font-size:11px;color:var(--muted);margin-top:6px">Dê <strong style="color:var(--text)">duplo clique</strong> no arquivo baixado</div>
+    <!-- Passos -->
+    <div style="padding:16px">
+      <!-- Passo 1: comando único -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">
+          📋 Passo 1 — Cole este comando no Terminal e pressione Enter <span style="font-weight:400;color:var(--muted)">(só na primeira vez)</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <code id="fmkt-setup-cmd" style="flex:1;display:block;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 14px;font-size:11px;color:var(--green);word-break:break-all;min-width:200px">bash &lt;(curl -sL https://felipetrezza.github.io/relatorio-benefits/setup.sh)</code>
+          <button onclick="copiarComando()"
+            style="background:var(--surf3);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">
+            📋 Copiar
+          </button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:5px">O comando instala as dependências, faz login no Databricks e já inicia o servidor automaticamente.</div>
       </div>
-      <div>
-        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">2 — Abrir em http://</div>
+      <!-- Passo 2: abrir em http -->
+      <div style="background:var(--surf3);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;color:var(--text)">📋 Passo 2 —</span>
+        <span style="font-size:11px;color:var(--muted)">Com o servidor rodando no terminal, clique em</span>
         <button onclick="abrirHttp()"
-          style="display:inline-flex;align-items:center;gap:6px;background:var(--surf3);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">
-          🔓 Abrir versão http://
+          style="background:var(--green);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">
+          🔓 Abrir em http://
         </button>
-        <div style="font-size:11px;color:var(--muted);margin-top:6px">Browsers bloqueiam <code style="font-size:10px">localhost</code> em <code style="font-size:10px">https://</code></div>
+        <span style="font-size:11px;color:var(--muted)">(obrigatório — browsers bloqueiam <code style="font-size:10px">localhost</code> em <code style="font-size:10px">https://</code>)</span>
       </div>
-      <div>
-        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Já instalou antes?</div>
-        <code style="display:block;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--green);margin-bottom:6px">servidor-benefits</code>
-        <div style="font-size:11px;color:var(--muted)">Rode no terminal, depois clique em <strong style="color:var(--text)">🔓 Abrir versão http://</strong></div>
+      <!-- Já tem servidor -->
+      <div style="margin-top:10px;font-size:11px;color:var(--muted)">
+        Já instalou antes? Rode <code style="background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--green);font-size:11px">servidor-benefits</code> no terminal e clique em <strong style="color:var(--text)">🔓 Abrir em http://</strong>
       </div>
     </div>
   </div>
@@ -762,6 +774,18 @@ function buildCanalTabs(){
 
 function abrirHttp(){
   window.open(location.href.replace('https://','http://'), '_blank');
+}
+function copiarComando(){
+  var cmd="bash <(curl -sL https://felipetrezza.github.io/relatorio-benefits/setup.sh)";
+  navigator.clipboard.writeText(cmd).then(function(){
+    var btn=event.target;
+    btn.textContent='✅ Copiado!';btn.style.color='var(--green)';
+    setTimeout(function(){btn.textContent='📋 Copiar';btn.style.color='var(--text)';},2000);
+  }).catch(function(){
+    // fallback
+    var ta=document.createElement('textarea');ta.value=cmd;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    event.target.textContent='✅ Copiado!';setTimeout(function(){event.target.textContent='📋 Copiar';},2000);
+  });
 }
 
 // ── BUSCAR PRINCIPAL ────────────────────────────────────────────
