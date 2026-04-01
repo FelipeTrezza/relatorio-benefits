@@ -415,77 +415,70 @@ tbody td{padding:9px 14px;font-size:12px}
 <!-- FUNIL CAMPANHA MKT -->
 <section id="funil-mkt">
   <div class="sec-title">📣 Funil de Campanha</div>
-  <div class="sec-sub">Cole um ou mais <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">activity_name</code> para visualizar e comparar funis. Use <strong>Enter</strong> ou <strong>vírgula</strong> para adicionar cada um.</div>
+  <div class="sec-sub">Cole um <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">activity_name</code> e clique em <strong>Buscar</strong>. Para múltiplos, separe por vírgula.</div>
 
-  <!-- BANNER SERVIDOR OFFLINE (aparece automaticamente) -->
-  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2);border-radius:10px;overflow:hidden">
-    <!-- Cabeçalho -->
-    <div style="background:rgba(248,81,73,.12);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(248,81,73,.15)">
-      <span style="font-size:13px;font-weight:700;color:var(--red)">⚠️ Configuração necessária para usar o Funil de Campanha</span>
-    </div>
-    <!-- Passos -->
-    <div style="padding:14px 16px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
-      <!-- Passo 1: baixar -->
-      <div style="flex:1;min-width:200px">
-        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Passo 1 — Instalar o servidor (só uma vez)</div>
-        <a id="fmkt-download-btn"
-           href="https://felipetrezza.github.io/relatorio-benefits/iniciar-servidor.command"
-           download="iniciar-servidor.command"
-           style="display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#fff;text-decoration:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;white-space:nowrap;margin-bottom:6px">
-          ⬇️ Baixar iniciar-servidor.command
-        </a>
-        <div style="font-size:11px;color:var(--muted)">Dê <strong style="color:var(--text)">duplo clique</strong> no arquivo baixado e aguarde o terminal abrir.</div>
-      </div>
-      <!-- Passo 2: abrir em HTTP -->
-      <div style="flex:1;min-width:200px">
-        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Passo 2 — Abrir o relatório em HTTP</div>
-        <a id="fmkt-http-btn"
-           href="#"
-           onclick="abrirHttp(); return false;"
-           style="display:inline-flex;align-items:center;gap:7px;background:var(--surf2);color:var(--text);text-decoration:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;white-space:nowrap;border:1px solid var(--border);margin-bottom:6px">
-          🔓 Abrir em http://
-        </a>
-        <div style="font-size:11px;color:var(--muted)">O browser bloqueia conexões locais em <code style="font-size:10px">https://</code>. Você precisa usar a versão <code style="font-size:10px">http://</code>.</div>
-      </div>
-      <!-- Passo 3: já tem servidor -->
-      <div style="flex:1;min-width:180px">
-        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Já instalou antes?</div>
-        <div style="font-size:11px;color:var(--text);margin-bottom:4px">Rode no terminal:</div>
-        <code style="display:block;background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--green)">servidor-benefits</code>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Depois clique em <strong>🔓 Abrir em http://</strong></div>
-      </div>
-    </div>
+  <!-- INPUT SIMPLES -->
+  <div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;margin-bottom:12px">
+    <textarea id="fmkt-input"
+      rows="2"
+      placeholder="Cole o activity_name aqui. Para múltiplos, separe por vírgula ou Enter."
+      style="flex:1;min-width:260px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:12px;font-family:monospace;outline:none;resize:vertical;line-height:1.5;transition:border-color .2s"
+      onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"
+    ></textarea>
   </div>
-
-  <!-- INPUT MULTI-TAG -->
-  <div id="fmkt-input-area"
-    style="background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:46px;cursor:text;transition:border-color .2s"
-    onclick="document.getElementById('fmkt-input').focus()"
-    onfocusin="this.style.borderColor='var(--green)'"
-    onfocusout="this.style.borderColor='var(--border)'">
-    <input id="fmkt-input" type="text"
-      placeholder="Cole um activity_name e pressione Enter…"
-      style="flex:1;min-width:240px;background:none;border:none;outline:none;color:var(--text);font-size:12px;font-family:monospace;padding:2px 4px"
-      onkeydown="fmktInputKey(event)"
-      onpaste="fmktInputPaste(event)"
-    />
-  </div>
-
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;margin-bottom:18px">
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
     <button id="fmkt-btn" onclick="buscarFunil()"
-      style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s">🔍 Buscar</button>
-    <button onclick="fmktAddExample()"
-      style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer"
-      onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">+ Exemplo</button>
-    <button onclick="fmktClearAll()"
-      style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer"
-      onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">🗑 Limpar</button>
-    <span id="fmkt-count" style="font-size:11px;color:var(--muted)"></span>
+      style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">
+      🔍 Buscar
+    </button>
+    <button onclick="fmktExemplo()"
+      style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;cursor:pointer"
+      onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+      + Exemplo
+    </button>
+    <button onclick="document.getElementById('fmkt-input').value='';fmktReset()"
+      style="background:none;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;cursor:pointer"
+      onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">
+      🗑 Limpar
+    </button>
   </div>
 
-  <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:18px;padding:9px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
+  <!-- STATUS -->
+  <div id="fmkt-status" style="display:none;font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 14px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--green)"></div>
 
-  <div id="fmkt-filtros" style="display:none;margin-bottom:24px">
+  <!-- BANNER OFFLINE -->
+  <div id="fmkt-offline-banner" style="display:none;margin-bottom:16px;background:var(--surf2);border:1px solid rgba(248,81,73,.35);border-radius:10px;overflow:hidden">
+    <div style="background:rgba(248,81,73,.1);padding:10px 16px;border-bottom:1px solid rgba(248,81,73,.2)">
+      <span style="font-size:13px;font-weight:700;color:var(--red)">⚠️ Servidor local necessário</span>
+    </div>
+    <div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">1 — Baixar e instalar (só 1x)</div>
+        <a href="https://felipetrezza.github.io/relatorio-benefits/iniciar-servidor.command"
+           download="iniciar-servidor.command"
+           style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;text-decoration:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700">
+          ⬇️ iniciar-servidor.command
+        </a>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">Dê <strong style="color:var(--text)">duplo clique</strong> no arquivo baixado</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">2 — Abrir em http://</div>
+        <button onclick="abrirHttp()"
+          style="display:inline-flex;align-items:center;gap:6px;background:var(--surf3);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">
+          🔓 Abrir versão http://
+        </button>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">Browsers bloqueiam <code style="font-size:10px">localhost</code> em <code style="font-size:10px">https://</code></div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Já instalou antes?</div>
+        <code style="display:block;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--green);margin-bottom:6px">servidor-benefits</code>
+        <div style="font-size:11px;color:var(--muted)">Rode no terminal, depois clique em <strong style="color:var(--text)">🔓 Abrir versão http://</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div id="fmkt-filtros" style="display:none;margin-bottom:22px">
     <div style="display:flex;gap:28px;flex-wrap:wrap">
       <div>
         <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600">Setor</div>
@@ -503,34 +496,28 @@ tbody td{padding:9px 14px;font-size:12px}
     </div>
   </div>
 
+  <!-- RESULTADO -->
   <div id="fmkt-result" style="display:none">
-    <!-- activity + período -->
     <div style="margin-bottom:18px;background:var(--surf2);border-radius:8px;border:1px solid var(--border);overflow:hidden">
-      <!-- linha 1: activity name -->
       <div style="padding:8px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)">
         <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;font-weight:600">Activity</span>
         <span id="fmkt-activity-label" style="font-size:11px;font-family:monospace;color:var(--blue);word-break:break-all;opacity:.85"></span>
       </div>
-      <!-- linha 2: período detectado + inputs editáveis -->
       <div style="padding:8px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;white-space:nowrap">Período</span>
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <input id="fmkt-date-from" type="date"
-            style="background:var(--surf3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;outline:none;cursor:pointer;transition:border-color .2s;color-scheme:dark"
-            onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"
-          />
-          <span style="color:var(--muted);font-size:12px">→</span>
-          <input id="fmkt-date-to" type="date"
-            style="background:var(--surf3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;outline:none;cursor:pointer;transition:border-color .2s;color-scheme:dark"
-            onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"
-          />
-          <button onclick="reaplicarPeriodo()"
-            style="background:var(--surf3);color:var(--green);border:1px solid rgba(33,163,102,.3);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s"
-            onmouseover="this.style.background='rgba(33,163,102,.12)'" onmouseout="this.style.background='var(--surf3)'">
-            ↺ Aplicar
-          </button>
-          <span id="fmkt-period-label" style="font-size:11px;color:var(--muted)"></span>
-        </div>
+        <input id="fmkt-date-from" type="date"
+          style="background:var(--surf3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;outline:none;color-scheme:dark"
+          onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"
+        />
+        <span style="color:var(--muted);font-size:12px">→</span>
+        <input id="fmkt-date-to" type="date"
+          style="background:var(--surf3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;outline:none;color-scheme:dark"
+          onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"
+        />
+        <button onclick="reaplicarPeriodo()"
+          style="background:var(--surf3);color:var(--green);border:1px solid rgba(33,163,102,.3);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer">
+          ↺ Aplicar
+        </button>
       </div>
     </div>
     <div id="fmkt-camp-tabs-wrap" style="display:none;margin-bottom:20px">
@@ -543,46 +530,68 @@ tbody td{padding:9px 14px;font-size:12px}
 </section>
 
 <script>
-var FMKT_ACTIVITIES=[], FMKT_RESULTS={}, FMKT_SETOR_AT='total', FMKT_CANAL_AT='todos', FMKT_CAMP_AT=null;
-var CANAL_DOT={INAPP:'#bc8cff',PUSH:'#58a6ff',DM:'#f0883e',EMAIL:'#e3b341',WHATSAPP:'#21c25e',SMS:'#8b949e'};
+// ═══════════════════════════════════════════════════════════════════
+//  FUNIL DE CAMPANHA — v4 (simples, robusto, sem dependência de tags)
+// ═══════════════════════════════════════════════════════════════════
+var FMKT_RESULTS={}, FMKT_SETOR_AT='total', FMKT_CANAL_AT='todos', FMKT_CAMP_AT=null;
 var CAMP_COLORS=['#21a366','#58a6ff','#bc8cff','#f0883e','#e3b341','#ff7b72'];
+var CANAL_DOT={INAPP:'#bc8cff',PUSH:'#58a6ff',DM:'#f0883e',EMAIL:'#e3b341',WHATSAPP:'#21c25e',SMS:'#8b949e'};
 function campColor(i){return CAMP_COLORS[i%CAMP_COLORS.length];}
 
-function fmtN(v){
-  v=parseInt(v)||0;
-  if(v>=1e6)return(v/1e6).toFixed(1)+'M';
-  if(v>=1e3)return(v/1e3).toFixed(1)+'k';
-  return v.toLocaleString('pt-BR');
-}
+function fmtN(v){v=parseInt(v)||0;if(v>=1e6)return(v/1e6).toFixed(1)+'M';if(v>=1e3)return(v/1e3).toFixed(1)+'k';return v.toLocaleString('pt-BR');}
 function pct(a,b){a=parseInt(a)||0;b=parseInt(b)||0;return b?(a/b*100).toFixed(1)+'%':'—';}
-function fmktStatus(msg,cor){var el=document.getElementById('fmkt-status');el.style.display='block';el.style.borderLeftColor=cor||'var(--green)';el.innerHTML=msg;}
 
-function renderTags(){
-  var area=document.getElementById('fmkt-input-area');
-  area.querySelectorAll('.fmkt-tag').forEach(function(t){t.remove();});
-  FMKT_ACTIVITIES.forEach(function(act,i){
-    var tag=document.createElement('span');tag.className='fmkt-tag';
-    var short=act.split('-').slice(-3).join('-');
-    tag.style.cssText='display:inline-flex;align-items:center;background:rgba(33,163,102,.1);border:1px solid rgba(33,163,102,.25);color:var(--text);border-radius:20px;padding:3px 8px 3px 10px;gap:4px;max-width:300px;font-size:11px;font-family:monospace';
-    tag.innerHTML='<span style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+act+'">'+short+'</span><span onclick="fmktRemove('+i+')" style="cursor:pointer;color:var(--muted);font-size:14px;line-height:1;flex-shrink:0" onmouseover="this.style.color=\'var(--red)\'" onmouseout="this.style.color=\'var(--muted)\'">×</span>';
-    area.insertBefore(tag,document.getElementById('fmkt-input'));
+function fmktStatus(msg,cor){
+  var el=document.getElementById('fmkt-status');
+  el.style.display='block';el.style.borderLeftColor=cor||'var(--green)';el.innerHTML=msg;
+}
+function fmktReset(){
+  FMKT_RESULTS={};FMKT_CAMP_AT=null;
+  ['fmkt-result','fmkt-filtros','fmkt-status'].forEach(function(id){
+    document.getElementById(id).style.display='none';
   });
-  document.getElementById('fmkt-count').textContent=FMKT_ACTIVITIES.length?FMKT_ACTIVITIES.length+' campanha'+(FMKT_ACTIVITIES.length>1?'s':''):'';
 }
-function fmktAddActivity(val){val=val.trim();if(!val||FMKT_ACTIVITIES.indexOf(val)>-1)return;FMKT_ACTIVITIES.push(val);renderTags();document.getElementById('fmkt-input').value='';}
-function fmktRemove(i){FMKT_ACTIVITIES.splice(i,1);renderTags();}
-function fmktClearAll(){FMKT_ACTIVITIES=[];FMKT_RESULTS={};FMKT_CAMP_AT=null;renderTags();['fmkt-result','fmkt-filtros','fmkt-status'].forEach(function(id){document.getElementById(id).style.display='none';});document.getElementById('fmkt-input').value='';}
-function fmktInputKey(e){var inp=document.getElementById('fmkt-input');if(e.key==='Enter'||e.key===','||e.key===';'){e.preventDefault();fmktAddActivity(inp.value.replace(/[,;]/g,''));}else if(e.key==='Backspace'&&inp.value===''&&FMKT_ACTIVITIES.length){fmktRemove(FMKT_ACTIVITIES.length-1);}}
-function fmktInputPaste(e){e.preventDefault();var t=(e.clipboardData||window.clipboardData).getData('text');t.split(/[\n,;]+/).forEach(function(v){fmktAddActivity(v);});}
-function fmktAddExample(){fmktAddActivity('20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial');fmktAddActivity('20250912-id-10038283435-pf-context-acp-sic-ept-rent-cdt-pushntf-antecipacaosalario_bau');}
+function fmktExemplo(){
+  document.getElementById('fmkt-input').value=
+    '20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial';
+}
 
+// ── Utilidades para extrair lista do textarea ──────────────────
+function getActivities(){
+  var val = document.getElementById('fmkt-input').value;
+  // Divide por vírgula, ponto-e-vírgula ou quebra de linha
+  var parts = val.split(/[\n,;]+/);
+  var result = [];
+  parts.forEach(function(p){
+    p = p.trim();
+    if(p && result.indexOf(p)===-1) result.push(p);
+  });
+  return result;
+}
+
+// ── Filtros ────────────────────────────────────────────────────
 function setFMKT(val,tipo){
-  if(tipo==='setor'){FMKT_SETOR_AT=val;['total','grupo','publico','privado'].forEach(function(x){document.getElementById('fmkt-tab-'+x).classList.toggle('active',x===val);});}
-  else{FMKT_CANAL_AT=val;document.querySelectorAll('.fmkt-ctab').forEach(function(b){b.classList.toggle('active',b.dataset.canal===val);});}
-  if(Object.keys(FMKT_RESULTS).length)redrawAll();
+  if(tipo==='setor'){
+    FMKT_SETOR_AT=val;
+    ['total','grupo','publico','privado'].forEach(function(x){
+      document.getElementById('fmkt-tab-'+x).classList.toggle('active',x===val);
+    });
+  } else {
+    FMKT_CANAL_AT=val;
+    document.querySelectorAll('.fmkt-ctab').forEach(function(b){
+      b.classList.toggle('active',b.dataset.canal===val);
+    });
+  }
+  if(Object.keys(FMKT_RESULTS).length) redrawAll();
 }
-function setFMKTCamp(act){FMKT_CAMP_AT=act;document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===act);});document.getElementById('fmkt-activity-label').textContent=act;redrawFunil();}
+function setFMKTCamp(act){
+  FMKT_CAMP_AT=act;
+  document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===act);});
+  document.getElementById('fmkt-activity-label').textContent=act;
+  redrawFunil();
+}
 
+// ── Agregação ──────────────────────────────────────────────────
 function getAgg(activityName){
   var data=FMKT_RESULTS[activityName];if(!data)return null;
   var cols=data.columns||[],idx={};cols.forEach(function(c,i){idx[c]=i;});
@@ -592,134 +601,81 @@ function getAgg(activityName){
     return(FMKT_SETOR_AT==='total'||setor===FMKT_SETOR_AT)&&(FMKT_CANAL_AT==='todos'||ch===FMKT_CANAL_AT);
   });
   var t={enviados:0,entregues:0,abriram:0,clicaram:0,anteciparam:0};
-  rows.forEach(function(row){t.enviados+=parseInt(row[idx['enviados']])||0;t.entregues+=parseInt(row[idx['entregues']])||0;t.abriram+=parseInt(row[idx['abriram']])||0;t.clicaram+=parseInt(row[idx['clicaram']])||0;t.anteciparam+=parseInt(row[idx['anteciparam']])||0;});
+  rows.forEach(function(row){
+    t.enviados   +=parseInt(row[idx['enviados']])||0;
+    t.entregues  +=parseInt(row[idx['entregues']])||0;
+    t.abriram    +=parseInt(row[idx['abriram']])||0;
+    t.clicaram   +=parseInt(row[idx['clicaram']])||0;
+    t.anteciparam+=parseInt(row[idx['anteciparam']])||0;
+  });
   return t;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  FUNIL SVG — réplica fiel do modelo (trapézios + seta + badges)
-// ═══════════════════════════════════════════════════════════════
-function renderFunilHTML(d, cor){
-  if(!d||!d.enviados) return '<div style="color:var(--muted);padding:24px 0;font-size:13px;text-align:center">Sem dados para este filtro.</div>';
+// ── Funil SVG ──────────────────────────────────────────────────
+function renderFunilHTML(d,cor){
+  if(!d||!d.enviados)return'<div style="color:var(--muted);padding:24px 0;text-align:center;font-size:13px">Sem dados para este filtro.</div>';
   cor=cor||'#21a366';
-
   var steps=[
-    {label:'Enviados',    val:d.enviados,    prev:null},
-    {label:'Entregues',   val:d.entregues,   prev:d.enviados},
-    {label:'Abertos',     val:d.abriram,     prev:d.entregues},
-    {label:'Clicados',    val:d.clicaram,    prev:d.abriram},
-    {label:'Anteciparam', val:d.anteciparam, prev:d.enviados},
+    {label:'Enviados',   val:d.enviados,   prev:null},
+    {label:'Entregues',  val:d.entregues,  prev:d.enviados},
+    {label:'Abertos',    val:d.abriram,    prev:d.entregues},
+    {label:'Clicados',   val:d.clicaram,   prev:d.abriram},
+    {label:'Anteciparam',val:d.anteciparam,prev:d.enviados},
   ];
-  var N=steps.length;
-
-  // Converte hex → rgb
   function hexRgb(h){h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
   var rgb=cor.startsWith('#')?hexRgb(cor):[33,163,102];
   var R=rgb[0],G=rgb[1],B=rgb[2];
   function fill(a){return'rgba('+R+','+G+','+B+','+a+')';}
   function stroke(a){return'rgba('+R+','+G+','+B+','+a+')';}
-
-  // ── Geometria ──────────────────────────────────────────────
-  // SVG total width = 560. Badge área = 90px de cada lado.
-  // Cone ocupa o centro: 380px de largura.
-  var CONE_W=380;   // largura máxima do trapézio (camada 0)
-  var SH=58;        // altura de cada camada
-  var AH=18;        // altura da seta entre camadas
-  var BADGE_W=64, BADGE_H=28, BADGE_R=14;
-  var PAD=90;       // espaço para badges laterais
+  var N=steps.length,CONE_W=380,SH=58,AH=18,BADGE_W=64,BADGE_H=28,BADGE_R=14,PAD=90;
   var SVG_W=CONE_W+PAD*2;
-  var SVG_H=N*SH+(N-1)*AH+AH+8; // +AH para pontinha final
-
-  // Largura do topo e base de cada camada (fração de CONE_W)
-  // camada 0: topo=1.0, bot=0.82
-  // cada camada estreita ~0.18
+  var SVG_H=N*SH+(N-1)*AH+AH+8;
   var STEP=0.182;
   function topW(i){return CONE_W*(1-i*STEP);}
   function botW(i){return CONE_W*(1-(i+1)*STEP);}
   function xTop(i){return PAD+(CONE_W-topW(i))/2;}
   function xBot(i){return PAD+(CONE_W-botW(i))/2;}
-
-  var g=''; // SVG content
-
-  // ── Camadas ────────────────────────────────────────────────
+  var g='';
   steps.forEach(function(s,i){
-    var xt=xTop(i), xb=xBot(i);
-    var wt=topW(i), wb=botW(i);
-    var yt=i*(SH+AH);
-    var yb=yt+SH;
-
-    // Preenchimento: opacidade cresce com profundidade
+    var xt=xTop(i),xb=xBot(i),wt=topW(i),wb=botW(i);
+    var yt=i*(SH+AH),yb=yt+SH;
     var alpha=(0.22+i*0.16).toFixed(2);
     var pts=xt+','+yt+' '+(xt+wt)+','+yt+' '+(xb+wb)+','+yb+' '+xb+','+yb;
     g+='<polygon points="'+pts+'" fill="'+fill(alpha)+'"/>';
-
-    // Borda superior (só na 1ª camada)
-    if(i===0){
-      g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+(xt+wt)+'" y2="'+yt+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
-    }
-    // Bordas laterais
+    if(i===0)g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+(xt+wt)+'" y2="'+yt+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
     g+='<line x1="'+xt+'" y1="'+yt+'" x2="'+xb+'" y2="'+yb+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
     g+='<line x1="'+(xt+wt)+'" y1="'+yt+'" x2="'+(xb+wb)+'" y2="'+yb+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
-
-    // Linha divisória inferior entre camadas (destaca o "degrau")
     g+='<line x1="'+xb+'" y1="'+yb+'" x2="'+(xb+wb)+'" y2="'+yb+'" stroke="'+stroke(.25)+'" stroke-width="1"/>';
-
-    // ── Label (esquerda) e Valor (direita) dentro do trapézio ──
     var ymid=yt+SH/2;
-    var xLabelLeft=xt+14;
-    var xValRight=xt+wt-14;
-    g+='<text x="'+xLabelLeft+'" y="'+(ymid-5)+'" dominant-baseline="middle" fill="rgba(230,237,243,.7)" font-size="10" font-weight="700" font-family="Inter,system-ui,sans-serif" letter-spacing=".8">'+s.label.toUpperCase()+'</text>';
-    g+='<text x="'+xValRight+'" y="'+(ymid+6)+'" dominant-baseline="middle" text-anchor="end" fill="rgba(230,237,243,.95)" font-size="16" font-weight="800" font-family="Inter,system-ui,sans-serif">'+fmtN(s.val)+'</text>';
-
-    // ── Seta triangular entre camadas ──────────────────────
+    g+='<text x="'+(xt+14)+'" y="'+(ymid-5)+'" dominant-baseline="middle" fill="rgba(230,237,243,.7)" font-size="10" font-weight="700" font-family="Inter,system-ui,sans-serif" letter-spacing=".8">'+s.label.toUpperCase()+'</text>';
+    g+='<text x="'+(xt+wt-14)+'" y="'+(ymid+6)+'" dominant-baseline="middle" text-anchor="end" fill="rgba(230,237,243,.95)" font-size="16" font-weight="800" font-family="Inter,system-ui,sans-serif">'+fmtN(s.val)+'</text>';
     if(i<N-1){
-      var ax1=xb, ax2=xb+wb, aym=yb+AH;
-      var axm=(ax1+ax2)/2;
-      g+='<polygon points="'+ax1+','+yb+' '+ax2+','+yb+' '+axm+','+aym+'" fill="'+fill((alpha*1+0.1).toFixed(2))+'"/>';
-      // Bordas laterais da seta
+      var ax1=xb,ax2=xb+wb,aym=yb+AH,axm=(ax1+ax2)/2;
+      g+='<polygon points="'+ax1+','+yb+' '+ax2+','+yb+' '+axm+','+aym+'" fill="'+fill((parseFloat(alpha)+0.1).toFixed(2))+'"/>';
       g+='<line x1="'+ax1+'" y1="'+yb+'" x2="'+axm+'" y2="'+aym+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
       g+='<line x1="'+ax2+'" y1="'+yb+'" x2="'+axm+'" y2="'+aym+'" stroke="'+stroke(.4)+'" stroke-width="1.5"/>';
     }
-
-    // ── Badge lateral com % ─────────────────────────────────
     if(s.prev!==null){
       var badgeVal=pct(s.val,s.prev);
-      // alterna lado: índices pares = esquerda, ímpares = direita
       var side=i%2===0?'left':'right';
       var bx=side==='right'?(xt+wt+12):(xt-BADGE_W-12);
-      var by=ymid-BADGE_H/2;
-      var bxm=bx+BADGE_W/2;
-      var bym=by+BADGE_H/2;
-      // linha tracejada até o trapézio
-      var lx1=side==='right'?(xt+wt):xt;
-      var lx2=side==='right'?bx:(bx+BADGE_W);
+      var by=ymid-BADGE_H/2,bxm=bx+BADGE_W/2,bym=by+BADGE_H/2;
+      var lx1=side==='right'?(xt+wt):xt,lx2=side==='right'?bx:(bx+BADGE_W);
       g+='<line x1="'+lx1+'" y1="'+ymid+'" x2="'+lx2+'" y2="'+bym+'" stroke="'+stroke(.35)+'" stroke-width="1" stroke-dasharray="4,3"/>';
-      // badge pill
-      g+='<rect x="'+bx+'" y="'+by+'" width="'+BADGE_W+'" height="'+BADGE_H+'" rx="'+BADGE_R+'" fill="'+fill((alpha*1+0.15).toFixed(2))+'" stroke="'+stroke(.45)+'" stroke-width="1.2"/>';
+      g+='<rect x="'+bx+'" y="'+by+'" width="'+BADGE_W+'" height="'+BADGE_H+'" rx="'+BADGE_R+'" fill="'+fill((parseFloat(alpha)+0.15).toFixed(2))+'" stroke="'+stroke(.45)+'" stroke-width="1.2"/>';
       g+='<text x="'+bxm+'" y="'+(bym+1)+'" text-anchor="middle" dominant-baseline="middle" fill="rgba(230,237,243,.95)" font-size="11.5" font-weight="800" font-family="Inter,system-ui,sans-serif">'+badgeVal+'</text>';
     }
   });
-
-  // ── Pontinha final ──────────────────────────────────────
-  var li=N-1;
-  var xb=xBot(li), wb=botW(li);
-  var yb=li*(SH+AH)+SH;
-  var axm=xb+wb/2;
-  g+='<polygon points="'+xb+','+yb+' '+(xb+wb)+','+yb+' '+axm+','+(yb+AH)+'" fill="'+fill(.75)+'"/>';
-  g+='<line x1="'+xb+'" y1="'+yb+'" x2="'+axm+'" y2="'+(yb+AH)+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
-  g+='<line x1="'+(xb+wb)+'" y1="'+yb+'" x2="'+axm+'" y2="'+(yb+AH)+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
-
-  // ── SVG final ───────────────────────────────────────────
-  var svgOut='<svg width="'+SVG_W+'" height="'+SVG_H+'" viewBox="0 0 '+SVG_W+' '+SVG_H+'" style="max-width:100%;display:block;overflow:visible">'+g+'</svg>';
-
-  var html='<div style="display:flex;justify-content:center;width:100%;overflow-x:auto;padding:8px 0">'+svgOut+'</div>';
-
-  // ── KPI cards ───────────────────────────────────────────
+  var li=N-1,xbf=xBot(li),wbf=botW(li),ybf=li*(SH+AH)+SH,axmf=xbf+wbf/2;
+  g+='<polygon points="'+xbf+','+ybf+' '+(xbf+wbf)+','+ybf+' '+axmf+','+(ybf+AH)+'" fill="'+fill(.75)+'"/>';
+  g+='<line x1="'+xbf+'" y1="'+ybf+'" x2="'+axmf+'" y2="'+(ybf+AH)+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
+  g+='<line x1="'+(xbf+wbf)+'" y1="'+ybf+'" x2="'+axmf+'" y2="'+(ybf+AH)+'" stroke="'+stroke(.5)+'" stroke-width="1.5"/>';
+  var html='<div style="display:flex;justify-content:center;width:100%;overflow-x:auto;padding:8px 0"><svg width="'+SVG_W+'" height="'+SVG_H+'" viewBox="0 0 '+SVG_W+' '+SVG_H+'" style="max-width:100%;display:block;overflow:visible">'+g+'</svg></div>';
   var kpis=[
-    {l:'Taxa de Entrega',  v:pct(d.entregues,d.enviados),   c:'var(--blue)'},
-    {l:'Taxa de Abertura', v:pct(d.abriram,d.entregues),    c:'var(--purple)'},
-    {l:'Taxa de Clique',   v:pct(d.clicaram,d.abriram),     c:'var(--orange)'},
-    {l:'Conv. Antecip.',   v:pct(d.anteciparam,d.enviados), c:cor},
+    {l:'Taxa de Entrega',v:pct(d.entregues,d.enviados),c:'var(--blue)'},
+    {l:'Taxa de Abertura',v:pct(d.abriram,d.entregues),c:'var(--purple)'},
+    {l:'Taxa de Clique',v:pct(d.clicaram,d.abriram),c:'var(--orange)'},
+    {l:'Conv. Antecip.',v:pct(d.anteciparam,d.enviados),c:cor},
   ];
   html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto">';
   kpis.forEach(function(k){
@@ -729,18 +685,17 @@ function renderFunilHTML(d, cor){
     html+='</div>';
   });
   html+='</div>';
-
   return html;
 }
 
-// ── Comparativo ─────────────────────────────────────────────
+// ── Comparativo ────────────────────────────────────────────────
 function renderCompare(){
   var acts=Object.keys(FMKT_RESULTS);
   if(acts.length<2){document.getElementById('fmkt-compare-wrap').style.display='none';return;}
   var steps=[{key:'enviados',label:'Enviados'},{key:'entregues',label:'Entregues'},{key:'abriram',label:'Abertos'},{key:'clicaram',label:'Clicados'},{key:'anteciparam',label:'Anteciparam'}];
   var html='<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;padding-top:20px;border-top:1px solid var(--border)">Comparativo</div>';
   html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
-  html+='<thead><tr><th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.4px">Step</th>';
+  html+='<thead><tr><th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase">Step</th>';
   acts.forEach(function(act,i){html+='<th style="text-align:right;padding:8px 12px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:'+campColor(i)+'" title="'+act+'">'+act.split('-').slice(-3).join('-')+'</th>';});
   html+='</tr></thead><tbody>';
   steps.forEach(function(step){
@@ -764,304 +719,133 @@ function redrawFunil(){
 }
 function redrawAll(){redrawFunil();renderCompare();}
 
+function setPeriodInputs(from,to){
+  var df=document.getElementById('fmkt-date-from');
+  var dt=document.getElementById('fmkt-date-to');
+  if(df) df.value=from||'';
+  if(dt) dt.value=to||'';
+}
+
+function reaplicarPeriodo(){
+  var from=(document.getElementById('fmkt-date-from')||{}).value||'';
+  var to=(document.getElementById('fmkt-date-to')||{}).value||'';
+  if(!from||!to){fmktStatus('⚠️ Preencha as duas datas.','var(--yellow)');return;}
+  buscarFunil(from,to);
+}
+
 function buildCampTabs(){
   var acts=Object.keys(FMKT_RESULTS);
   var wrap=document.getElementById('fmkt-camp-tabs-wrap');
   if(acts.length<=1){wrap.style.display='none';return;}
   wrap.style.display='block';
   var h='';
-  acts.forEach(function(act,i){var cor=campColor(i);h+='<button class="rtab fmkt-atab" data-act="'+act+'" onclick="setFMKTCamp(\''+act.replace(/'/g,"\\'")+'\')"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+cor+';margin-right:5px;vertical-align:middle"></span>'+act.split('-').slice(-3).join('-')+'</button>';});
+  acts.forEach(function(act,i){
+    var cor=campColor(i);
+    h+='<button class="rtab fmkt-atab" data-act="'+act+'" onclick="setFMKTCamp(\''+act.replace(/'/g,"\\'")+'\')"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+cor+';margin-right:5px;vertical-align:middle"></span>'+act.split('-').slice(-3).join('-')+'</button>';
+  });
   document.getElementById('fmkt-camp-tabs').innerHTML=h;
 }
+
 function buildCanalTabs(){
   var chSet={};
-  Object.values(FMKT_RESULTS).forEach(function(data){var cols=data.columns||[],idx={};cols.forEach(function(c,i){idx[c]=i;});(data.rows||[]).forEach(function(row){chSet[(row[idx['channel']]||'?').toUpperCase()]=1;});});
+  Object.values(FMKT_RESULTS).forEach(function(data){
+    var cols=data.columns||[],idx={};cols.forEach(function(c,i){idx[c]=i;});
+    (data.rows||[]).forEach(function(row){chSet[(row[idx['channel']]||'?').toUpperCase()]=1;});
+  });
   var h='<button class="rtab fmkt-ctab active" data-canal="todos" onclick="setFMKT(\'todos\',\'canal\')">Todos</button>';
-  Object.keys(chSet).sort().forEach(function(ch){var dot=CANAL_DOT[ch]||'#8b949e';h+='<button class="rtab fmkt-ctab" data-canal="'+ch+'" onclick="setFMKT(\''+ch+'\',\'canal\')"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+dot+';margin-right:5px;vertical-align:middle"></span>'+ch+'</button>';});
+  Object.keys(chSet).sort().forEach(function(ch){
+    var dot=CANAL_DOT[ch]||'#8b949e';
+    h+='<button class="rtab fmkt-ctab" data-canal="'+ch+'" onclick="setFMKT(\''+ch+'\',\'canal\')"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+dot+';margin-right:5px;vertical-align:middle"></span>'+ch+'</button>';
+  });
   document.getElementById('fmkt-canal-tabs').innerHTML=h;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  DATABRICKS REST API — chamada direta do browser
-//  Não precisa de servidor local. Funciona para qualquer pessoa.
-// ═══════════════════════════════════════════════════════════════
-var DBX_HOST  = 'https://picpay-principal.cloud.databricks.com';
-var DBX_WH    = '6077a99f149e0d70';
-// ⚠️ Token de serviço read-only — só leitura em benefits + marketing
-var DBX_TOKEN = 'COLE_O_TOKEN_AQUI';
-
-function dbxQuery(sql, timeout) {
-  timeout = timeout || 120000; // 2 min default
-  var headers = {
-    'Authorization': 'Bearer ' + DBX_TOKEN,
-    'Content-Type': 'application/json'
-  };
-
-  // Submete a query (async)
-  return fetch(DBX_HOST + '/api/2.0/sql/statements/', {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({
-      warehouse_id: DBX_WH,
-      statement: sql,
-      wait_timeout: '50s',
-      on_wait_timeout: 'CONTINUE'
-    })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    if (data.status && data.status.state === 'SUCCEEDED') return parseDbxResult(data);
-    if (data.status && (data.status.state === 'FAILED' || data.status.state === 'CANCELED')) {
-      throw new Error(data.status.error ? data.status.error.message : 'Query falhou');
-    }
-    // Ainda rodando — poll
-    var sid = data.statement_id;
-    if (!sid) throw new Error('Sem statement_id: ' + JSON.stringify(data).slice(0,200));
-    return dbxPoll(sid, headers, Date.now() + timeout);
-  });
-}
-
-function dbxPoll(sid, headers, deadline) {
-  if (Date.now() > deadline) throw new Error('Timeout na query do Databricks');
-  return new Promise(function(resolve){ setTimeout(resolve, 3000); })
-  .then(function(){
-    return fetch(DBX_HOST + '/api/2.0/sql/statements/' + sid, { headers: headers });
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    if (data.status && data.status.state === 'SUCCEEDED') return parseDbxResult(data);
-    if (data.status && (data.status.state === 'FAILED' || data.status.state === 'CANCELED')) {
-      throw new Error(data.status.error ? data.status.error.message : 'Query falhou');
-    }
-    return dbxPoll(sid, headers, deadline);
-  });
-}
-
-function parseDbxResult(data) {
-  var cols = (data.manifest && data.manifest.schema && data.manifest.schema.columns || []).map(function(c){ return c.name; });
-  var rows = (data.result && data.result.data_array) || [];
-  return { columns: cols, rows: rows };
-}
-
-function buildFunilSQL(activity, dateFrom, dateTo) {
-  var actSafe = activity.replace(/'/g, "''");
-  var dateFilter = dateFrom && dateTo
-    ? "AND date(sent_at) BETWEEN '" + dateFrom + "' AND '" + dateTo + "'"
-    : '';
-  return [
-    "WITH",
-    "mapa_setor AS (",
-    "  SELECT co.consumer_id,",
-    "    CASE",
-    "      WHEN f.account_id = 1420 OR f.account_id IS NULL THEN 'INSS'",
-    "      WHEN f.account_id IN (6,52,57,58,60,62,65,73,100,3170,3675) THEN 'Grupo'",
-    "      WHEN co2.flag_company_sector = 'public' THEN 'Publico'",
-    "      ELSE 'Privado'",
-    "    END AS setor",
-    "  FROM benefits.collaborators co",
-    "  JOIN benefits.companies co2 ON co.company_id = co2.company_id",
-    "  LEFT JOIN benefits.accounts f ON co2.account_id = f.account_id",
-    "),",
-    "comms AS (",
-    "  SELECT consumer_id, channel, is_sent, is_delivered, is_opened, is_clicked, sent_at",
-    "  FROM marketing.consumers_campaigns_communications",
-    "  WHERE activity_name = '" + actSafe + "'",
-    "  " + dateFilter,
-    "),",
-    "antecip AS (",
-    "  SELECT DISTINCT consumer_id, date(created_at) AS dt_antecip",
-    "  FROM benefits.anticipation_request",
-    "  WHERE request_status = 'FINISH'",
-    "),",
-    "cruzado AS (",
-    "  SELECT DISTINCT c.consumer_id",
-    "  FROM comms c",
-    "  JOIN antecip a ON c.consumer_id = a.consumer_id",
-    "  WHERE date(c.sent_at) <= a.dt_antecip",
-    "    AND date(c.sent_at) >= a.dt_antecip - INTERVAL 30 DAYS",
-    ")",
-    "SELECT",
-    "  COALESCE(ms.setor, 'Sem vinculo') AS setor,",
-    "  c.channel,",
-    "  COUNT(DISTINCT c.consumer_id) AS enviados,",
-    "  COUNT(DISTINCT CASE WHEN c.is_delivered = true THEN c.consumer_id END) AS entregues,",
-    "  COUNT(DISTINCT CASE WHEN c.is_opened = true THEN c.consumer_id END) AS abriram,",
-    "  COUNT(DISTINCT CASE WHEN c.is_clicked = true THEN c.consumer_id END) AS clicaram,",
-    "  COUNT(DISTINCT cr.consumer_id) AS anteciparam",
-    "FROM comms c",
-    "LEFT JOIN mapa_setor ms ON c.consumer_id = ms.consumer_id",
-    "LEFT JOIN cruzado cr ON c.consumer_id = cr.consumer_id",
-    "GROUP BY COALESCE(ms.setor, 'Sem vinculo'), c.channel",
-    "ORDER BY setor, enviados DESC"
-  ].join('\n');
-}
-
-function buildPeriodSQL(activity) {
-  var actSafe = activity.replace(/'/g, "''");
-  return "SELECT date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, date_format(max(sent_at),'yyyy-MM-dd') AS dt_to " +
-         "FROM marketing.consumers_campaigns_communications WHERE activity_name = '" + actSafe + "'";
-}
-
-function runActivityFunil(activity, dateFrom, dateTo) {
-  // Chama o servidor local (localhost:5001) que tem autenticação Databricks configurada
-  return fetch('http://localhost:5001/funil', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      activities: [activity],
-      date_from: dateFrom || '',
-      date_to:   dateTo   || ''
-    })
-  })
-  .then(function(r) {
-    if (!r.ok) return r.json().then(function(e){ throw new Error(e.error || 'Erro '+r.status); });
-    return r.json();
-  })
-  .then(function(data) {
-    // single result
-    return {
-      ok:            true,
-      activity_name: activity,
-      date_from:     data.date_from || dateFrom || '',
-      date_to:       data.date_to   || dateTo   || '',
-      columns:       data.columns   || [],
-      rows:          data.rows      || []
-    };
-  });
-}
-
-function buscarFunil(customDateFrom, customDateTo) {
-  var inp = document.getElementById('fmkt-input');
-  if (inp.value.trim()) fmktAddActivity(inp.value);
-  if (!FMKT_ACTIVITIES.length) { fmktStatus('⚠️ Adicione pelo menos um activity_name.', 'var(--yellow)'); return; }
-
-  // Se HTTPS, não consegue chamar localhost — orientar usuário
-  if (location.protocol === 'https:') {
-    document.getElementById('fmkt-offline-banner').style.display = 'block';
-    document.getElementById('fmkt-offline-banner').scrollIntoView({behavior:'smooth', block:'nearest'});
-    return;
-  }
-
-  var btn = document.getElementById('fmkt-btn');
-  btn.disabled = true; btn.style.opacity = '.5'; btn.textContent = '⏳ Buscando…';
-  var n = FMKT_ACTIVITIES.length;
-  fmktStatus('🔄 Consultando ' + n + ' campanha' + (n > 1 ? 's' : '') + ' no Databricks…' + (n > 1 ? ' (~30-60s)' : ' (~30s)'), 'var(--blue)');
-  document.getElementById('fmkt-result').style.display   = 'none';
-  document.getElementById('fmkt-filtros').style.display  = 'none';
-
-  // Roda todas as activities em paralelo
-  var promises = FMKT_ACTIVITIES.map(function(act) {
-    return runActivityFunil(act, customDateFrom || null, customDateTo || null)
-      .catch(function(err) { return { ok: false, activity_name: act, error: err.message }; });
-  });
-
-  Promise.all(promises).then(function(results) {
-    btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '🔍 Buscar';
-    FMKT_RESULTS = {}; FMKT_SETOR_AT = 'total'; FMKT_CANAL_AT = 'todos';
-
-    var erros = [];
-    var servidorOffline = false;
-    results.forEach(function(r) {
-      if (r.ok) FMKT_RESULTS[r.activity_name] = r;
-      else {
-        if (r.error && (r.error.indexOf('Failed to fetch') > -1 || r.error.indexOf('servidor') > -1 || r.error.indexOf('NetworkError') > -1)) servidorOffline = true;
-        erros.push(r.activity_name);
-      }
-    });
-    if (servidorOffline && !Object.keys(FMKT_RESULTS).length) {
-      document.getElementById('fmkt-offline-banner').style.display = 'block';
-      document.getElementById('fmkt-status').style.display = 'none';
-      return;
-    }
-
-    var ok = Object.keys(FMKT_RESULTS).length;
-    if (!ok) { fmktStatus('❌ Nenhum resultado. Verifique os activity_names.', 'var(--red)'); return; }
-
-    document.getElementById('fmkt-offline-banner').style.display = 'none';
-    var msg = '✅ ' + ok + ' campanha' + (ok > 1 ? 's carregadas' : ' carregada');
-    if (erros.length) msg += ' — ⚠️ ' + erros.length + ' com erro';
-    fmktStatus(msg, 'var(--green)');
-
-    FMKT_CAMP_AT = Object.keys(FMKT_RESULTS)[0];
-    buildCampTabs(); buildCanalTabs();
-    ['total','grupo','publico','privado'].forEach(function(x){
-      document.getElementById('fmkt-tab-' + x).classList.toggle('active', x === 'total');
-    });
-    document.querySelectorAll('.fmkt-atab').forEach(function(b){
-      b.classList.toggle('active', b.dataset.act === FMKT_CAMP_AT);
-    });
-    document.getElementById('fmkt-activity-label').textContent = FMKT_CAMP_AT;
-    var fr = FMKT_RESULTS[FMKT_CAMP_AT];
-    if (fr) setPeriodInputs(fr.date_from || '', fr.date_to || '');
-    document.getElementById('fmkt-result').style.display  = 'block';
-    document.getElementById('fmkt-filtros').style.display = 'block';
-    redrawAll();
-  });
-}
-window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)redrawFunil();});
-
 function abrirHttp(){
-  // Redireciona para versão HTTP do mesmo relatório (permite localhost)
-  var httpUrl = location.href.replace('https://', 'http://');
-  window.open(httpUrl, '_blank');
+  window.open(location.href.replace('https://','http://'), '_blank');
 }
 
-// Esconde banner quando servidor responde (só em HTTP)
-function fmktCheckServer(){
-  if(location.protocol !== 'http:') return;
-  fetch('http://localhost:5001/status',{method:'GET'})
-  .then(function(r){ return r.json(); })
-  .then(function(){
-    var b=document.getElementById('fmkt-offline-banner');
-    if(b) b.style.display='none';
-  })
-  .catch(function(){});
-}
-// Poll a cada 5s para detectar quando servidor subir
-setInterval(fmktCheckServer, 5000);
-fmktCheckServer();
-
-// Verifica se servidor local está online ao carregar a página
-// NOTA: browsers bloqueiam http://localhost em páginas HTTPS (Mixed Content)
-// Solução: mostrar banner imediatamente se HTTPS, com botão para abrir versão HTTP
-(function checkServerOnLoad(){
-  var isHttps = location.protocol === 'https:';
-  if (isHttps) {
-    // Em HTTPS não conseguimos chamar localhost — mostrar banner sempre
-    var b = document.getElementById('fmkt-offline-banner');
-    if (b) b.style.display = 'block';
+// ── BUSCAR PRINCIPAL ────────────────────────────────────────────
+function buscarFunil(customDateFrom, customDateTo){
+  var activities = getActivities();
+  if(!activities.length){
+    fmktStatus('⚠️ Cole um activity_name no campo acima.','var(--yellow)');
     return;
   }
-  // Em HTTP, testar normalmente
-  fetch('http://localhost:5001/status', {method:'GET'})
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if (d && d.ok !== false) {
-      var b = document.getElementById('fmkt-offline-banner');
-      if (b) b.style.display = 'none';
-    }
+
+  // HTTPS bloqueia localhost — mostrar banner e parar
+  if(location.protocol==='https:'){
+    document.getElementById('fmkt-offline-banner').style.display='block';
+    document.getElementById('fmkt-offline-banner').scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+
+  var btn=document.getElementById('fmkt-btn');
+  btn.disabled=true;btn.style.opacity='.5';btn.textContent='⏳ Buscando…';
+  var n=activities.length;
+  fmktStatus('🔄 Consultando '+n+' campanha'+(n>1?'s':'')+' no Databricks… (~'+(n>1?'30-60':'30')+'s)','var(--blue)');
+  document.getElementById('fmkt-result').style.display='none';
+  document.getElementById('fmkt-filtros').style.display='none';
+  document.getElementById('fmkt-offline-banner').style.display='none';
+
+  fetch('http://localhost:5001/funil',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({activities:activities, date_from:customDateFrom||'', date_to:customDateTo||''})
   })
-  .catch(function(){
-    var b = document.getElementById('fmkt-offline-banner');
-    if (b) b.style.display = 'block';
+  .then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.error||'Erro '+r.status);});return r.json();})
+  .then(function(data){
+    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
+    FMKT_RESULTS={};FMKT_SETOR_AT='total';FMKT_CANAL_AT='todos';
+
+    if(data.multi){
+      Object.assign(FMKT_RESULTS,data.results||{});
+      var errs=Object.keys(data.errors||{});
+      var ok=Object.keys(FMKT_RESULTS).length;
+      fmktStatus('✅ '+ok+' campanha'+(ok>1?'s carregadas':' carregada')+(errs.length?' — ⚠️ '+errs.length+' com erro':''),'var(--green)');
+    } else {
+      FMKT_RESULTS[data.activity_name]=data;
+      fmktStatus('✅ Dados carregados.','var(--green)');
+    }
+
+    if(!Object.keys(FMKT_RESULTS).length){fmktStatus('❌ Nenhum resultado.','var(--red)');return;}
+    FMKT_CAMP_AT=Object.keys(FMKT_RESULTS)[0];
+    buildCampTabs();buildCanalTabs();
+    ['total','grupo','publico','privado'].forEach(function(x){document.getElementById('fmkt-tab-'+x).classList.toggle('active',x==='total');});
+    document.querySelectorAll('.fmkt-atab').forEach(function(b){b.classList.toggle('active',b.dataset.act===FMKT_CAMP_AT);});
+    document.getElementById('fmkt-activity-label').textContent=FMKT_CAMP_AT;
+    var fr=FMKT_RESULTS[FMKT_CAMP_AT];
+    if(fr) setPeriodInputs(fr.date_from||'',fr.date_to||'');
+    document.getElementById('fmkt-result').style.display='block';
+    document.getElementById('fmkt-filtros').style.display='block';
+    redrawAll();
+  })
+  .catch(function(err){
+    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔍 Buscar';
+    document.getElementById('fmkt-offline-banner').style.display='block';
+    fmktStatus('❌ Servidor offline ou inacessível.','var(--red)');
   });
+}
+
+// Detecta servidor ao carregar — em HTTPS sempre mostra banner
+(function(){
+  if(location.protocol==='https:'){
+    document.getElementById('fmkt-offline-banner').style.display='block';
+    return;
+  }
+  // Em HTTP: testa o servidor
+  fetch('http://localhost:5001/status',{method:'GET'})
+  .then(function(r){return r.json();})
+  .catch(function(){document.getElementById('fmkt-offline-banner').style.display='block';});
+  // Poll a cada 5s para detectar quando servidor subir
+  setInterval(function(){
+    if(location.protocol!=='http:') return;
+    fetch('http://localhost:5001/status',{method:'GET'})
+    .then(function(){document.getElementById('fmkt-offline-banner').style.display='none';})
+    .catch(function(){});
+  },5000);
 })();
 
-// ── Período: popula inputs e re-busca ───────────────────
-function setPeriodInputs(from, to){
-  var df=document.getElementById('fmkt-date-from');
-  var dt=document.getElementById('fmkt-date-to');
-  var pl=document.getElementById('fmkt-period-label');
-  if(df) df.value = from||'';
-  if(dt) dt.value = to||'';
-  if(pl) pl.textContent = (from&&to) ? '('+from+' → '+to+')' : '';
-}
-
-function reaplicarPeriodo(){
-  var from = (document.getElementById('fmkt-date-from')||{
-}
+window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)redrawFunil();});
 </script>
-
 
 <div class="divider"></div>
 
