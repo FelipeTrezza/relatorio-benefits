@@ -948,136 +948,144 @@ window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)
 <section id="setores">
   <div class="sec-title">🏢 Análise por Setor — Dados Reais</div>
   <div class="sec-sub">Público domina em volume mas tem a menor taxa de ativação. Grupo tem quase 100% de conta aberta e lidera em antecipação absoluta.</div>
-  <div class="g3">
-    <!-- PÚBLICO -->
-    <div class="setor-card" style="border-top:3px solid var(--blue)">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <span class="sb sb-pub">🏛️ Público</span>
-        <span style="font-size:15px;font-weight:700">Público</span>
-      </div>
-      <div class="sr"><span class="sr-lbl">Total Vidas</span><span class="sr-val">1.14M</span></div>
-      <div class="sr"><span class="sr-lbl">Com Conta</span><span class="sr-val">320.2k <span class="td-m">(28%)</span></span></div>
-      <div class="sr"><span class="sr-lbl">Sem Conta</span><span class="sr-val" style="color:var(--red)">816.8k</span></div>
-      <!-- Com conta: sem/com margem -->
-      <div style="display:flex;gap:6px;margin:6px 0 2px;padding:7px 10px;background:rgba(88,166,255,.07);border-radius:7px;border:1px solid rgba(88,166,255,.15)">
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--green)">318.0k</div>
-        </div>
-        <div style="width:1px;background:var(--border)"></div>
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--yellow)">2.2k</div>
-        </div>
-      </div>
-      <div class="sr" style="margin-top:6px"><span class="sr-lbl">MAU geral (90d)</span><span class="sr-val">168.4k</span></div>
-      <!-- MAU geral: sem/com margem -->
-      <div style="display:flex;gap:6px;margin:4px 0 6px;padding:7px 10px;background:rgba(88,166,255,.07);border-radius:7px;border:1px solid rgba(88,166,255,.15)">
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--green)">167.2k</div>
-        </div>
-        <div style="width:1px;background:var(--border)"></div>
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--yellow)">1.2k</div>
-        </div>
-      </div>
-      <div class="sr"><span class="sr-lbl">Antecipando</span><span class="sr-val" style="color:var(--blue)">27.6k</span></div>
-      <div class="sfunnel">
-        <div class="sfr"><span class="sfr-l">Ativação</span><div class="sfr-bw"><div class="sfr-b" style="width:28%;background:var(--blue)"></div></div><span class="sfr-p" style="color:var(--blue)">28%</span></div>
-        <div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:99%;background:var(--blue)88"></div></div><span class="sfr-p" style="color:var(--blue)">99%</span></div>
-        <div class="sfr"><span class="sfr-l">MAU geral</span><div class="sfr-bw"><div class="sfr-b" style="width:53%;background:var(--blue)66"></div></div><span class="sfr-p" style="color:var(--blue)">53%</span></div>
-        <div class="sfr"><span class="sfr-l">Antecipou</span><div class="sfr-bw"><div class="sfr-b" style="width:60%;background:var(--greenl)"></div></div><span class="sfr-p" style="color:var(--greenl)">60%</span></div>
-      </div>
-    </div>
 
-    <!-- GRUPO -->
-    <div class="setor-card" style="border-top:3px solid var(--purple)">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <span class="sb sb-grp">🏗️ Grupo</span>
-        <span style="font-size:15px;font-weight:700">Grupo</span>
-      </div>
-      <div class="sr"><span class="sr-lbl">Total Vidas</span><span class="sr-val">185.3k</span></div>
-      <div class="sr"><span class="sr-lbl">Com Conta</span><span class="sr-val">187.6k <span class="td-m">(101%*)</span></span></div>
-      <div class="sr"><span class="sr-lbl">Sem Conta</span><span class="sr-val" style="color:var(--red)">5.4k</span></div>
-      <div style="display:flex;gap:6px;margin:6px 0 2px;padding:7px 10px;background:rgba(188,140,255,.07);border-radius:7px;border:1px solid rgba(188,140,255,.15)">
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--green)">156.7k</div>
-        </div>
-        <div style="width:1px;background:var(--border)"></div>
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--yellow)">31.1k</div>
-        </div>
-      </div>
-      <div class="sr" style="margin-top:6px"><span class="sr-lbl">MAU geral (90d)</span><span class="sr-val">180.9k</span></div>
-      <div style="display:flex;gap:6px;margin:4px 0 6px;padding:7px 10px;background:rgba(188,140,255,.07);border-radius:7px;border:1px solid rgba(188,140,255,.15)">
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--green)">155.6k</div>
-        </div>
-        <div style="width:1px;background:var(--border)"></div>
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--yellow)">25.4k</div>
-        </div>
-      </div>
-      <div class="sr"><span class="sr-lbl">Antecipando</span><span class="sr-val" style="color:var(--purple)">50.3k</span></div>
-      <div class="sfunnel">
-        <div class="sfr"><span class="sfr-l">Ativação</span><div class="sfr-bw"><div class="sfr-b" style="width:97%;background:var(--purple)"></div></div><span class="sfr-p" style="color:var(--purple)">97%</span></div>
-        <div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:83%;background:var(--purple)88"></div></div><span class="sfr-p" style="color:var(--purple)">83%</span></div>
-        <div class="sfr"><span class="sfr-l">MAU geral</span><div class="sfr-bw"><div class="sfr-b" style="width:96%;background:var(--purple)66"></div></div><span class="sfr-p" style="color:var(--purple)">96%</span></div>
-        <div class="sfr"><span class="sfr-l">Antecipou</span><div class="sfr-bw"><div class="sfr-b" style="width:38%;background:var(--greenl)"></div></div><span class="sfr-p" style="color:var(--greenl)">38%</span></div>
-      </div>
-    </div>
-
-    <!-- PRIVADO -->
-    <div class="setor-card" style="border-top:3px solid var(--orange)">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <span class="sb sb-pri">🏭 Privado</span>
-        <span style="font-size:15px;font-weight:700">Privado</span>
-      </div>
-      <div class="sr"><span class="sr-lbl">Total Vidas</span><span class="sr-val">32.7k</span></div>
-      <div class="sr"><span class="sr-lbl">Com Conta</span><span class="sr-val">54.0k <span class="td-m">(165%*)</span></span></div>
-      <div class="sr"><span class="sr-lbl">Sem Conta</span><span class="sr-val" style="color:var(--red)">8.6k</span></div>
-      <div style="display:flex;gap:6px;margin:6px 0 2px;padding:7px 10px;background:rgba(240,136,62,.07);border-radius:7px;border:1px solid rgba(240,136,62,.15)">
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--green)">20.3k</div>
-        </div>
-        <div style="width:1px;background:var(--border)"></div>
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--yellow)">33.7k</div>
-        </div>
-      </div>
-      <div class="sr" style="margin-top:6px"><span class="sr-lbl">MAU geral (90d)</span><span class="sr-val">37.4k</span></div>
-      <div style="display:flex;gap:6px;margin:4px 0 6px;padding:7px 10px;background:rgba(240,136,62,.07);border-radius:7px;border:1px solid rgba(240,136,62,.15)">
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">c/ margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--green)">13.7k</div>
-        </div>
-        <div style="width:1px;background:var(--border)"></div>
-        <div style="flex:1;text-align:center">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">sem margem</div>
-          <div style="font-size:13px;font-weight:800;color:var(--yellow)">23.7k</div>
-        </div>
-      </div>
-      <div class="sr"><span class="sr-lbl">Antecipando</span><span class="sr-val" style="color:var(--orange)">1.9k</span></div>
-      <div class="sfunnel">
-        <div class="sfr"><span class="sfr-l">Ativação</span><div class="sfr-bw"><div class="sfr-b" style="width:73%;background:var(--orange)"></div></div><span class="sfr-p" style="color:var(--orange)">73%</span></div>
-        <div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:38%;background:var(--orange)88"></div></div><span class="sfr-p" style="color:var(--orange)">38%</span></div>
-        <div class="sfr"><span class="sfr-l">MAU geral</span><div class="sfr-bw"><div class="sfr-b" style="width:69%;background:var(--orange)66"></div></div><span class="sfr-p" style="color:var(--orange)">69%</span></div>
-        <div class="sfr"><span class="sfr-l">Antecipou</span><div class="sfr-bw"><div class="sfr-b" style="width:32%;background:var(--greenl)"></div></div><span class="sfr-p" style="color:var(--greenl)">32%</span></div>
-      </div>
-    </div>
+  <!-- Filtros de setor -->
+  <div class="rfm-tabs" style="margin-bottom:16px">
+    <button class="rtab active" onclick="setSetor('total')"   id="stab-total">📊 Total</button>
+    <button class="rtab"        onclick="setSetor('publico')" id="stab-publico">🏛️ Público</button>
+    <button class="rtab"        onclick="setSetor('grupo')"   id="stab-grupo">🏗️ Grupo</button>
+    <button class="rtab"        onclick="setSetor('privado')" id="stab-privado">🏭 Privado</button>
   </div>
+
+  <!-- Card único dinâmico -->
+  <div id="setor-card-wrap"></div>
+
 </section>
 <div class="divider"></div>
 
 <!-- TEMPORAL -->
+
+<script>
+var SETOR_DATA = {
+  total: {
+    label:'Total', icon:'📊', cor:'var(--green)',
+    vidas:'1.36M', conta:'909.7k', semConta:'449.7k', pctConta:'67%',
+    comMargem:'654.9k', semMargem:'254.8k',
+    mau:'685.0k', mauComMargem:'634.8k', mauSemMargem:'50.4k',
+    antecipando:'79.8k',
+    atv:67, cmg:72, mauPct:75, ant:12
+  },
+  publico: {
+    label:'Público', icon:'🏛️', cor:'var(--blue)',
+    vidas:'1.14M', conta:'320.2k', semConta:'816.8k', pctConta:'28%',
+    comMargem:'318.0k', semMargem:'2.2k',
+    mau:'168.4k', mauComMargem:'167.2k', mauSemMargem:'1.2k',
+    antecipando:'27.6k',
+    atv:28, cmg:99, mauPct:53, ant:60
+  },
+  grupo: {
+    label:'Grupo', icon:'🏗️', cor:'var(--purple)',
+    vidas:'185.3k', conta:'187.6k', semConta:'5.4k', pctConta:'101%*',
+    comMargem:'156.7k', semMargem:'31.1k',
+    mau:'180.9k', mauComMargem:'155.6k', mauSemMargem:'25.4k',
+    antecipando:'50.3k',
+    atv:97, cmg:83, mauPct:96, ant:38
+  },
+  privado: {
+    label:'Privado', icon:'🏭', cor:'var(--orange)',
+    vidas:'32.7k', conta:'54.0k', semConta:'8.6k', pctConta:'165%*',
+    comMargem:'20.3k', semMargem:'33.7k',
+    mau:'37.4k', mauComMargem:'13.7k', mauSemMargem:'23.7k',
+    antecipando:'1.9k',
+    atv:73, cmg:38, mauPct:69, ant:32
+  }
+};
+
+function setSetor(s){
+  ['total','publico','grupo','privado'].forEach(function(x){
+    document.getElementById('stab-'+x).classList.toggle('active', x===s);
+  });
+  var d = SETOR_DATA[s];
+  var cor = d.cor;
+  // cor rgba para boxes internos
+  var corRgba = cor==='var(--blue)'   ? '88,166,255'
+              : cor==='var(--purple)' ? '188,140,255'
+              : cor==='var(--orange)' ? '240,136,62'
+              : '33,163,102';
+
+  document.getElementById('setor-card-wrap').innerHTML =
+    '<div class="setor-card" style="border-top:3px solid '+cor+';max-width:520px">'
+
+    // Header
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">'
+    +  '<span style="font-size:18px">'+d.icon+'</span>'
+    +  '<span style="font-size:16px;font-weight:700">'+d.label+'</span>'
+    +'</div>'
+
+    // Linha Total Vidas
+    +'<div class="sr"><span class="sr-lbl">Total Vidas</span><span class="sr-val">'+d.vidas+'</span></div>'
+
+    // Linha Com Conta
+    +'<div class="sr">'
+    +  '<span class="sr-lbl">Com Conta</span>'
+    +  '<span class="sr-val">'+d.conta+' <span class="td-m">('+d.pctConta+')</span></span>'
+    +'</div>'
+
+    // Linha Sem Conta
+    +'<div class="sr">'
+    +  '<span class="sr-lbl">Sem Conta</span>'
+    +  '<span class="sr-val" style="color:var(--red)">'+d.semConta+'</span>'
+    +'</div>'
+
+    // Box c/sem margem (conta)
+    +'<div style="display:flex;gap:6px;margin:8px 0 4px;padding:10px 14px;background:rgba('+corRgba+',.07);border-radius:8px;border:1px solid rgba('+corRgba+',.18)">'
+    +  '<div style="flex:1;text-align:center">'
+    +    '<div style="font-size:10px;color:var(--muted);margin-bottom:3px">c/ margem</div>'
+    +    '<div style="font-size:14px;font-weight:800;color:var(--green)">'+d.comMargem+'</div>'
+    +  '</div>'
+    +  '<div style="width:1px;background:var(--border)"></div>'
+    +  '<div style="flex:1;text-align:center">'
+    +    '<div style="font-size:10px;color:var(--muted);margin-bottom:3px">sem margem</div>'
+    +    '<div style="font-size:14px;font-weight:800;color:var(--yellow)">'+d.semMargem+'</div>'
+    +  '</div>'
+    +'</div>'
+
+    // Linha MAU geral
+    +'<div class="sr" style="margin-top:8px">'
+    +  '<span class="sr-lbl">MAU geral (90d)</span>'
+    +  '<span class="sr-val">'+d.mau+'</span>'
+    +'</div>'
+
+    // Box c/sem margem (MAU)
+    +'<div style="display:flex;gap:6px;margin:4px 0 8px;padding:10px 14px;background:rgba('+corRgba+',.07);border-radius:8px;border:1px solid rgba('+corRgba+',.18)">'
+    +  '<div style="flex:1;text-align:center">'
+    +    '<div style="font-size:10px;color:var(--muted);margin-bottom:3px">c/ margem</div>'
+    +    '<div style="font-size:14px;font-weight:800;color:var(--green)">'+d.mauComMargem+'</div>'
+    +  '</div>'
+    +  '<div style="width:1px;background:var(--border)"></div>'
+    +  '<div style="flex:1;text-align:center">'
+    +    '<div style="font-size:10px;color:var(--muted);margin-bottom:3px">sem margem</div>'
+    +    '<div style="font-size:14px;font-weight:800;color:var(--yellow)">'+d.mauSemMargem+'</div>'
+    +  '</div>'
+    +'</div>'
+
+    // Linha Antecipando
+    +'<div class="sr">'
+    +  '<span class="sr-lbl">Antecipando</span>'
+    +  '<span class="sr-val" style="color:'+cor+'">'+d.antecipando+'</span>'
+    +'</div>'
+
+    // Mini funil
+    +'<div class="sfunnel" style="margin-top:12px">'
+    +  '<div class="sfr"><span class="sfr-l">Ativação</span><div class="sfr-bw"><div class="sfr-b" style="width:'+d.atv+'%;background:'+cor+'"></div></div><span class="sfr-p" style="color:'+cor+'">'+d.atv+'%</span></div>'
+    +  '<div class="sfr"><span class="sfr-l">C/ Margem</span><div class="sfr-bw"><div class="sfr-b" style="width:'+d.cmg+'%;background:'+cor+'88"></div></div><span class="sfr-p" style="color:'+cor+'">'+d.cmg+'%</span></div>'
+    +  '<div class="sfr"><span class="sfr-l">MAU geral</span><div class="sfr-bw"><div class="sfr-b" style="width:'+d.mauPct+'%;background:'+cor+'66"></div></div><span class="sfr-p" style="color:'+cor+'">'+d.mauPct+'%</span></div>'
+    +  '<div class="sfr"><span class="sfr-l">Antecipou</span><div class="sfr-bw"><div class="sfr-b" style="width:'+d.ant+'%;background:var(--greenl)"></div></div><span class="sfr-p" style="color:var(--greenl)">'+d.ant+'%</span></div>'
+    +'</div>'
+
+    +'</div>';
+}
+</script>
 <section id="temporal">
   <div class="sec-title">📈 Evolução Mensal — Antecipações por Setor</div>
   <div class="sec-sub">12 meses de histórico real. Volume, ticket médio e TPV mês a mês por setor.</div>
@@ -2587,7 +2595,7 @@ function setDEST(s){
   }).join('');
 }
 
-document.addEventListener('DOMContentLoaded',()=>{ setDIA('total'); setDEST('total'); renderTopConv(10); });
+document.addEventListener('DOMContentLoaded',()=>{ setDIA('total'); setDEST('total'); renderTopConv(10); setSetor('total'); });
 </script>
 
 
