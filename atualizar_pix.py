@@ -209,17 +209,37 @@ def git_push():
     import os
     env = {**os.environ, "PATH": "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:" + os.environ.get("PATH","") }
     now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
-    for cmd in [
-        ["git","-C",str(SCRIPT_DIR),"add","pix.html"],
-        ["git","-C",str(SCRIPT_DIR),"commit","-m",f"chore: pix — {now_str}"],
-        ["git","-C",str(SCRIPT_DIR),"push","origin","main"],
-    ]:
-        r = subprocess.run(cmd, capture_output=True, text=True, env=env)
-        if r.returncode != 0:
-            if "nothing to commit" in r.stdout+r.stderr: print("   (sem mudanças)"); break
-            print(f"   ⚠️  {r.stderr.strip()}")
-        elif "push" in cmd:
-            print(f"✅ {GITHUB_PAGES_URL}")
+    g = lambda *args: subprocess.run(["git","-C",str(SCRIPT_DIR)]+list(args), capture_output=True, text=True, env=env)
+
+    # 1. add + commit somente o HTML gerado
+    g("add","pix.html")
+    rc = g("commit","-m",f"chore: pix — {now_str}")
+    if rc.returncode != 0:
+        if "nothing to commit" in rc.stdout+rc.stderr:
+            print("   (sem mudanças)"); return
+        print(f"   ⚠️  commit: {rc.stderr.strip()}")
+
+    # 2. stash outros arquivos modificados para não bloquear o rebase
+    stashed = False
+    st = g("stash","--include-untracked","--keep-index")
+    if st.returncode == 0 and "No local changes" not in st.stdout+st.stderr:
+        stashed = True
+
+    # 3. pull --rebase para sincronizar com remoto antes do push
+    rp = g("pull","--rebase","origin","main")
+    if rp.returncode != 0:
+        print(f"   ⚠️  pull --rebase falhou: {rp.stderr.strip()}")
+
+    # 4. restaurar stash
+    if stashed:
+        g("stash","pop")
+
+    # 5. push
+    rk = g("push","origin","main")
+    if rk.returncode != 0:
+        print(f"   ⚠️  push: {rk.stderr.strip()}")
+    else:
+        print(f"✅ {GITHUB_PAGES_URL}")
 
 # ── main ──────────────────────────────────────────────────────────────────────
 def main():
