@@ -945,6 +945,8 @@ window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)
 <div class="divider"></div>
 
 <!-- SETORES -->
+<div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+<div style="flex:0 0 360px;min-width:280px;max-width:420px"><!-- col esquerda setores -->
 <section id="setores">
   <div class="sec-title">🏢 Análise por Setor — Dados Reais</div>
   <div class="sec-sub">Público domina em volume mas tem a menor taxa de ativação. Grupo tem quase 100% de conta aberta e lidera em antecipação absoluta.</div>
@@ -961,10 +963,8 @@ window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)
   <div id="setor-card-wrap"></div>
 
 </section>
-<div class="divider"></div>
-
-<!-- TEMPORAL -->
-
+</div><!-- fim col esquerda setores -->
+<div style="flex:1;min-width:0"><!-- col direita temporal -->
 <script>
 var SETOR_DATA = {
   total: {
@@ -1540,6 +1540,8 @@ function setTMP(s){
 }
 </script>
 </section>
+</div><!-- fim col direita temporal -->
+</div><!-- fim grid setores+temporal -->
 <div class="divider"></div>
 
 <!-- SAZONALIDADE -->
