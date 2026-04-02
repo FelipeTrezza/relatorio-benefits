@@ -136,7 +136,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/status":
-            self.send_json(200, {"ok": True, "status": state["last_status"], "running": state["running"]})
+            self.send_json(200, {"ok": True, "status": state["last_status"], "running": state["running"],
+                                 "last_run": state.get("last_run"), "last_output": state.get("last_output", "")})
+        elif self.path == "/log":
+            self.send_json(200, {"last_run": state.get("last_run"), "last_status": state.get("last_status"),
+                                 "last_output": state.get("last_output", "")})
         elif self.path in ("/antecipacoes", "/antecipacoes.html"):
             self._serve_html([BASE_DIR / "antecipacoes.html"])
         elif self.path in ("/", "/score", "/score.html", "/index.html"):
@@ -236,6 +240,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    HTTPServer.allow_reuse_address = True
     server = HTTPServer(("localhost", PORT), Handler)
     print("╔════════════════════════════════════════════════════╗")
     print(f"║  Benefits Analytics — Servidor Local               ║")
