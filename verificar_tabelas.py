@@ -231,45 +231,44 @@ def accounts_status(current_count: int):
 
 # ── HTML ───────────────────────────────────────────────────────────────────────
 
+def parse_dt(val):
+    """Converte qualquer formato de data/datetime retornado pelo Databricks em datetime."""
+    if not val or str(val) in ("None", "null", ""):
+        return None
+    s = str(val).strip()
+    # Remove sufixo Z ou timezone (+00:00) e milissegundos antes de parsear
+    s = s.rstrip("Z").split("+")[0].split(".")[0]  # ex: "2026-04-02T07:51:19"
+    s = s.replace("T", " ")                         # ex: "2026-04-02 07:51:19"
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(s, fmt)
+        except ValueError:
+            continue
+    return None
+
 def status_badge(max_date_str, error=None):
     """Retorna (label, css_class) baseado na defasagem."""
     if error:
         return "Erro", "status-error"
-    if not max_date_str or max_date_str in ("None", "null", ""):
+    dt = parse_dt(max_date_str)
+    if dt is None:
         return "Sem dados", "status-error"
-    try:
-        # Tenta parsear data/datetime
-        for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
-            try:
-                dt = datetime.strptime(str(max_date_str)[:19], fmt)
-                break
-            except ValueError:
-                continue
-        else:
-            return "Formato inválido", "status-warn"
-
-        delta = (datetime.now() - dt).total_seconds() / 3600  # horas
-        if delta <= 26:
-            return "Atualizado", "status-ok"
-        elif delta <= 72:
-            return f"{int(delta/24)}d atrás", "status-warn"
-        else:
-            return f"{int(delta/24)}d atrás", "status-error"
-    except Exception as e:
-        return "Inválido", "status-warn"
+    delta = (datetime.now() - dt).total_seconds() / 3600  # horas
+    if delta <= 26:
+        return "Atualizado", "status-ok"
+    elif delta <= 72:
+        return f"{int(delta/24)}d atrás", "status-warn"
+    else:
+        return f"{int(delta/24)}d atrás", "status-error"
 
 def fmt_date(val):
-    if not val or str(val) in ("None", "null", ""):
+    dt = parse_dt(val)
+    if dt is None:
         return "—"
-    try:
-        dt = datetime.strptime(str(val)[:19], "%Y-%m-%d %H:%M:%S")
-        return dt.strftime("%d/%m/%Y %H:%M")
-    except:
-        try:
-            dt = datetime.strptime(str(val)[:10], "%Y-%m-%d")
-            return dt.strftime("%d/%m/%Y")
-        except:
-            return str(val)[:19]
+    # Exibe hora só se não for meia-noite exata (datas sem hora)
+    if dt.hour == 0 and dt.minute == 0 and dt.second == 0:
+        return dt.strftime("%d/%m/%Y")
+    return dt.strftime("%d/%m/%Y %H:%M")
 
 def fmt_rows(val):
     try:
