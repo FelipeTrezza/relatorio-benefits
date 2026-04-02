@@ -937,13 +937,17 @@ function renderResult(data){
   var key = data.display_name || data.activity_name || data.journey_name || data.request_id;
   FMKT_RESULTS[key] = data;
 
-  // Se for journey → mostrar botões de activities
-  if(data.search_mode === 'journey' && data.activities && data.activities.length){
-    renderActivityButtons(data.activities, data.journey_name, data.date_from, data.date_to);
-    fmktStatus(
-      '✅ Journey carregada · ' + data.activities.length + ' activities vinculadas',
-      'var(--green)'
-    );
+  // Se for journey → mostrar botões de activities + funil consolidado automaticamente
+  if(data.search_mode === 'journey'){
+    if(data.activities && data.activities.length){
+      renderActivityButtons(data.activities, data.journey_name, data.date_from, data.date_to);
+      fmktStatus(
+        '✅ Journey carregada · ' + data.activities.length + ' activities · funil consolidado abaixo',
+        'var(--green)'
+      );
+    } else {
+      fmktStatus('✅ Journey carregada — funil consolidado abaixo', 'var(--green)');
+    }
   } else {
     var ok = Object.keys(FMKT_RESULTS).length;
     fmktStatus('✅ ' + ok + ' campanha' + (ok>1?'s carregadas':' carregada'), 'var(--green)');
@@ -958,7 +962,16 @@ function renderResult(data){
   document.querySelectorAll('.fmkt-atab').forEach(function(b){
     b.classList.toggle('active', b.dataset.act===FMKT_CAMP_AT);
   });
-  document.getElementById('fmkt-activity-label').textContent = FMKT_CAMP_AT;
+
+  // Label: se journey, mostrar "Journey consolidada" + nome curto
+  var labelEl = document.getElementById('fmkt-activity-label');
+  if(data.search_mode === 'journey'){
+    var shortName = (data.journey_name||key).split('-').slice(-3).join('-');
+    labelEl.innerHTML = '<span style="color:var(--muted);font-size:10px;margin-right:4px">JOURNEY</span>' + shortName;
+  } else {
+    labelEl.textContent = key;
+  }
+
   var fr = FMKT_RESULTS[FMKT_CAMP_AT];
   if(fr) setPeriodInputs(fr.date_from||'', fr.date_to||'');
   document.getElementById('fmkt-result').style.display  = 'block';

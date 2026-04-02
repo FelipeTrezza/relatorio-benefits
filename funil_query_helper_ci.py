@@ -132,6 +132,10 @@ if search_mode == "journey":
             # Juntar: activities da journey + relacionadas pelo ID (sem duplicatas)
             all_acts = activities_list + [a for a in related if a not in activities_list]
             activities_list = all_acts
+            # Atualizar where_filter para cobrir TODAS as activities encontradas
+            if activities_list:
+                acts_escaped = ["'" + a.replace("'", "''") + "'" for a in activities_list]
+                where_filter = "activity_name IN (%s)" % ",".join(acts_escaped)
         except Exception:
             pass  # Não crítico
 
