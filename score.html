@@ -415,9 +415,15 @@ tbody td{padding:9px 14px;font-size:12px}
 <!-- FUNIL CAMPANHA MKT -->
 <section id="funil-mkt">
   <div class="sec-title">📣 Funil de Campanha</div>
-  <div class="sec-sub">Cole um <code style="background:var(--surf2);padding:2px 6px;border-radius:4px;font-size:11px">activity_name</code> e clique em <strong>Buscar</strong>. Para múltiplos, separe por vírgula.</div>
+  <div class="sec-sub">Busque por <strong>activity_name</strong> ou por <strong>journey_name</strong>. Ao buscar por journey, as activities vinculadas aparecem como botões selecionáveis.</div>
 
-  <!-- INPUT SIMPLES -->
+  <!-- ABAS: activity vs journey -->
+  <div class="rfm-tabs" style="margin-bottom:12px">
+    <button class="rtab active" id="fmkt-mode-activity" onclick="setFmktMode('activity')">🎯 Activity</button>
+    <button class="rtab"        id="fmkt-mode-journey"  onclick="setFmktMode('journey')">🗺️ Journey</button>
+  </div>
+
+  <!-- INPUT -->
   <div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;margin-bottom:12px">
     <textarea id="fmkt-input"
       rows="2"
@@ -426,6 +432,15 @@ tbody td{padding:9px 14px;font-size:12px}
       onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"
     ></textarea>
   </div>
+
+  <!-- ACTIVITIES DA JOURNEY (aparece só no modo journey, após busca) -->
+  <div id="fmkt-journey-activities" style="display:none;margin-bottom:14px">
+    <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:8px">
+      Activities nesta Journey — clique para buscar individualmente
+    </div>
+    <div id="fmkt-act-buttons" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  </div>
+
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
     <button id="fmkt-btn" onclick="buscarFunil()"
       style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">
@@ -783,25 +798,75 @@ function copiarComando(){
 }
 
 // ── CONFIG CLOUDFLARE WORKER ────────────────────────────────────
-var WORKER_URL = 'https://score-funil.felipetrezza.workers.dev';
-var GH_PAGES   = 'https://felipetrezza.github.io/relatorio-benefits';
-var POLL_IDS   = {}; // request_id → intervalId
+var WORKER_URL  = 'https://score-funil.felipetrezza.workers.dev';
+var GH_PAGES    = 'https://felipetrezza.github.io/relatorio-benefits';
+var POLL_IDS    = {}; // request_id → intervalId
+var FMKT_MODE   = 'activity'; // 'activity' | 'journey'
+
+// ── Alternar modo activity / journey ───────────────────────────
+function setFmktMode(mode){
+  FMKT_MODE = mode;
+  document.getElementById('fmkt-mode-activity').classList.toggle('active', mode==='activity');
+  document.getElementById('fmkt-mode-journey').classList.toggle('active',  mode==='journey');
+  var ta = document.getElementById('fmkt-input');
+  ta.placeholder = mode==='journey'
+    ? 'Cole o journey_name aqui.'
+    : 'Cole o activity_name aqui. Para múltiplos, separe por vírgula ou Enter.';
+  document.getElementById('fmkt-journey-activities').style.display = 'none';
+  document.getElementById('fmkt-act-buttons').innerHTML = '';
+}
+
+// ── Renderizar botões de activities de uma journey ─────────────
+function renderActivityButtons(activities, journeyName){
+  var wrap = document.getElementById('fmkt-journey-activities');
+  var btns = document.getElementById('fmkt-act-buttons');
+  if(!activities || !activities.length){ wrap.style.display='none'; return; }
+  btns.innerHTML = activities.map(function(act){
+    var label = act;
+    var dIdx  = act.lastIndexOf('_d');
+    if(dIdx > 0) label = act.slice(dIdx+1);
+    else { var parts = act.split('-'); label = parts.slice(-2).join('-'); }
+    return '<button onclick="buscarActivityDaJourney(\''+act.replace(/'/g,"\\'")+'\')"'
+      +' title="'+act+'"'
+      +' style="background:var(--surf2);color:var(--text);border:1px solid var(--border);'
+      +'border-radius:20px;padding:5px 12px;font-size:11px;font-family:monospace;'
+      +'cursor:pointer;transition:border-color .2s,background .2s"'
+      +' onmouseover="this.style.borderColor=\'var(--green)\';this.style.background=\'rgba(33,163,102,.1)\'"'
+      +' onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--surf2)\'">'
+      +label+'</button>';
+  }).join('');
+  wrap.style.display = 'block';
+}
+
+// ── Buscar activity individual da journey ──────────────────────
+function buscarActivityDaJourney(activityName){
+  setFmktMode('activity');
+  document.getElementById('fmkt-input').value = activityName;
+  buscarFunil();
+}
 
 function genRequestId(){
   return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 }
 
 // ── DISPARAR WORKFLOW (via Worker — sem token no HTML) ──────────
-function dispatchWorkflow(activity, dateFrom, dateTo, requestId){
+function dispatchWorkflow(searchVal, dateFrom, dateTo, requestId){
+  var payload = {
+    date_from:  dateFrom || '',
+    date_to:    dateTo   || '',
+    request_id: requestId
+  };
+  if(FMKT_MODE === 'journey'){
+    payload.journey  = searchVal;
+    payload.activity = '';
+  } else {
+    payload.activity = searchVal;
+    payload.journey  = '';
+  }
   return fetch(WORKER_URL + '/funil', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      activity:   activity,
-      date_from:  dateFrom || '',
-      date_to:    dateTo   || '',
-      request_id: requestId
-    })
+    body: JSON.stringify(payload)
   });
 }
 
@@ -846,12 +911,23 @@ function renderResult(data){
     return;
   }
 
-  FMKT_RESULTS[data.activity_name] = data;
+  // Chave do resultado: display_name (journey ou activity)
+  var key = data.display_name || data.activity_name || data.journey_name || data.request_id;
+  FMKT_RESULTS[key] = data;
 
-  var ok = Object.keys(FMKT_RESULTS).length;
-  fmktStatus('✅ ' + ok + ' campanha' + (ok>1?'s carregadas':' carregada'), 'var(--green)');
+  // Se for journey → mostrar botões de activities
+  if(data.search_mode === 'journey' && data.activities && data.activities.length){
+    renderActivityButtons(data.activities, data.journey_name);
+    fmktStatus(
+      '✅ Journey carregada · ' + data.activities.length + ' activities vinculadas',
+      'var(--green)'
+    );
+  } else {
+    var ok = Object.keys(FMKT_RESULTS).length;
+    fmktStatus('✅ ' + ok + ' campanha' + (ok>1?'s carregadas':' carregada'), 'var(--green)');
+  }
 
-  if(!ok){ fmktStatus('❌ Nenhum resultado.','var(--red)'); return; }
+  if(!Object.keys(FMKT_RESULTS).length){ fmktStatus('❌ Nenhum resultado.','var(--red)'); return; }
   FMKT_CAMP_AT = Object.keys(FMKT_RESULTS)[0];
   buildCampTabs(); buildCanalTabs();
   ['total','grupo','publico','privado'].forEach(function(x){
@@ -870,6 +946,53 @@ function renderResult(data){
 
 // ── BUSCAR PRINCIPAL (via GitHub Actions) ───────────────────────
 function buscarFunil(customDateFrom, customDateTo){
+  var inputVal = document.getElementById('fmkt-input').value.trim();
+
+  // Modo journey: busca única
+  if(FMKT_MODE === 'journey'){
+    if(!inputVal){
+      fmktStatus('⚠️ Cole um journey_name no campo acima.','var(--yellow)');
+      return;
+    }
+    var btn = document.getElementById('fmkt-btn');
+    btn.disabled=true; btn.style.opacity='.5'; btn.textContent='⏳ Enviando…';
+    FMKT_RESULTS={}; FMKT_SETOR_AT='total'; FMKT_CANAL_AT='todos';
+    document.getElementById('fmkt-result').style.display  = 'none';
+    document.getElementById('fmkt-filtros').style.display = 'none';
+    document.getElementById('fmkt-offline-banner').style.display = 'none';
+
+    fmktStatus('⏳ Buscando journey no Databricks… aguarde ~90s.','var(--blue)');
+    var elapsed=0;
+    var progressId = setInterval(function(){
+      elapsed++;
+      fmktStatus('⏳ Processando journey… ('+elapsed+'s)','var(--blue)');
+    },1000);
+
+    var rid = genRequestId();
+    dispatchWorkflow(inputVal, customDateFrom||'', customDateTo||'', rid)
+      .then(function(r){
+        if(!r.ok) throw new Error('dispatch HTTP ' + r.status);
+        pollResult(rid,
+          function(data){ clearInterval(progressId); renderResult(data);
+            document.getElementById('fmkt-result').style.display  = 'block';
+            document.getElementById('fmkt-filtros').style.display = 'block';
+            redrawAll();
+          },
+          function(){ clearInterval(progressId);
+            fmktStatus('⚠️ Timeout. Tente novamente.','var(--yellow)');
+            btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+          }
+        );
+      })
+      .catch(function(err){
+        clearInterval(progressId);
+        fmktStatus('❌ Erro: '+err.message,'var(--red)');
+        btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+      });
+    return;
+  }
+
+  // Modo activity (comportamento original)
   var activities = getActivities();
   if(!activities.length){
     fmktStatus('⚠️ Cole um activity_name no campo acima.','var(--yellow)');

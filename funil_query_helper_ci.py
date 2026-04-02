@@ -2,7 +2,9 @@
 funil_query_helper_ci.py — variante para GitHub Actions (CI/CD)
 Usa DATABRICKS_HOST + DATABRICKS_TOKEN como env vars (sem OAuth CLI)
 Parâmetros via env vars:
-  ACTIVITY_NAME  — obrigatório
+  ACTIVITY_NAME  — buscar por activity_name (um valor específico)
+  JOURNEY_NAME   — buscar por journey_name (agrega todas as activities da journey)
+  (um dos dois é obrigatório)
   DATE_FROM      — opcional (detecta automaticamente)
   DATE_TO        — opcional (detecta automaticamente)
   REQUEST_ID     — obrigatório (para rastreabilidade)
@@ -17,22 +19,25 @@ except ImportError:
     print(json.dumps({"ok": False, "error": "databricks-sdk nao instalado"}))
     sys.exit(1)
 
-activity   = os.environ.get("ACTIVITY_NAME", "").strip()
-date_from  = os.environ.get("DATE_FROM", "").strip() or None
-date_to    = os.environ.get("DATE_TO", "").strip() or None
-request_id = os.environ.get("REQUEST_ID", "unknown")
-host       = os.environ.get("DATABRICKS_HOST", "https://picpay-principal.cloud.databricks.com")
-token      = os.environ.get("DATABRICKS_TOKEN", "")
+activity     = os.environ.get("ACTIVITY_NAME", "").strip()
+journey      = os.environ.get("JOURNEY_NAME",  "").strip()
+date_from    = os.environ.get("DATE_FROM",     "").strip() or None
+date_to      = os.environ.get("DATE_TO",       "").strip() or None
+request_id   = os.environ.get("REQUEST_ID",    "unknown")
+host         = os.environ.get("DATABRICKS_HOST", "https://picpay-principal.cloud.databricks.com")
+token        = os.environ.get("DATABRICKS_TOKEN", "")
 
-if not activity:
-    print(json.dumps({"ok": False, "error": "ACTIVITY_NAME obrigatorio", "request_id": request_id}))
+# Validações
+if not activity and not journey:
+    print(json.dumps({"ok": False, "error": "ACTIVITY_NAME ou JOURNEY_NAME obrigatorio", "request_id": request_id}))
     sys.exit(1)
-
 if not token:
     print(json.dumps({"ok": False, "error": "DATABRICKS_TOKEN nao configurado", "request_id": request_id}))
     sys.exit(1)
 
-# Conectar via token direto (sem CLI OAuth)
+search_mode = "journey" if journey else "activity"
+search_val  = journey if journey else activity
+
 w  = WorkspaceClient(host=host, token=token)
 WH = "6077a99f149e0d70"
 
@@ -56,17 +61,41 @@ def run_q(sql, timeout=300):
             raise Exception(s.status.error.message if s.status.error else "query falhou")
     raise Exception("timeout após %ds" % timeout)
 
-act_safe = activity.replace("'", "''")
+val_safe = search_val.replace("'", "''")
 
-# ── Detectar período se não foi passado ─────────────────────────
+# Filtro WHERE dependendo do modo
+if search_mode == "journey":
+    where_filter = "journey_name = '%s'" % val_safe
+    name_label   = journey
+else:
+    where_filter = "activity_name = '%s'" % val_safe
+    name_label   = activity
+
+# ── Se for journey: buscar activities vinculadas ────────────────────
+activities_list = []
+if search_mode == "journey":
+    try:
+        sql_acts = (
+            "SELECT DISTINCT activity_name, COUNT(DISTINCT consumer_id) AS consumers "
+            "FROM marketing.consumers_campaigns_communications "
+            "WHERE journey_name = '%s' "
+            "GROUP BY activity_name ORDER BY consumers DESC"
+        ) % val_safe
+        r = run_q(sql_acts, timeout=60)
+        activities_list = [row[0] for row in r["rows"]]
+    except Exception as e:
+        # Não crítico — seguir sem a lista
+        activities_list = []
+
+# ── Detectar período se não passado ────────────────────────────────
 if not date_from or not date_to:
     sql_period = (
         "SELECT date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, "
         "       date_format(max(sent_at),'yyyy-MM-dd') AS dt_to, "
         "       count(*) AS total "
         "FROM marketing.consumers_campaigns_communications "
-        "WHERE activity_name = '%s'" % act_safe
-    )
+        "WHERE %s"
+    ) % where_filter
     try:
         rp = run_q(sql_period, timeout=60)
         if rp["rows"] and rp["rows"][0][0]:
@@ -75,7 +104,7 @@ if not date_from or not date_to:
         else:
             print(json.dumps({
                 "ok": False,
-                "error": "Nenhum registro encontrado para: %s" % activity,
+                "error": "Nenhum registro encontrado para: %s" % search_val,
                 "request_id": request_id
             }))
             sys.exit(0)
@@ -87,7 +116,7 @@ if not date_from or not date_to:
         }))
         sys.exit(1)
 
-# ── Query principal ─────────────────────────────────────────────
+# ── Query principal ─────────────────────────────────────────────────
 date_filter = "AND date(sent_at) BETWEEN '%s' AND '%s'" % (date_from, date_to)
 
 sql = """
@@ -107,7 +136,7 @@ mapa_setor AS (
 comms AS (
   SELECT consumer_id, channel, is_sent, is_delivered, is_opened, is_clicked, sent_at
   FROM marketing.consumers_campaigns_communications
-  WHERE activity_name = '%(act)s'
+  WHERE %(where_filter)s
   %(date_filter)s
 ),
 antecip AS (
@@ -135,18 +164,22 @@ LEFT JOIN mapa_setor ms ON c.consumer_id = ms.consumer_id
 LEFT JOIN cruzado cr    ON c.consumer_id = cr.consumer_id
 GROUP BY COALESCE(ms.setor, 'Sem vinculo'), c.channel
 ORDER BY setor, enviados DESC
-""" % {"act": act_safe, "date_filter": date_filter}
+""" % {"where_filter": where_filter, "date_filter": date_filter}
 
 try:
     r = run_q(sql)
     print(json.dumps({
-        "ok":            True,
-        "activity_name": activity,
-        "date_from":     date_from,
-        "date_to":       date_to,
-        "request_id":    request_id,
-        "rows":          r["rows"],
-        "columns":       r["columns"],
+        "ok":             True,
+        "search_mode":    search_mode,
+        "activity_name":  activity if search_mode == "activity" else None,
+        "journey_name":   journey  if search_mode == "journey"  else None,
+        "activities":     activities_list,   # lista de activities da journey (se modo journey)
+        "display_name":   name_label,        # nome a exibir no funil
+        "date_from":      date_from,
+        "date_to":        date_to,
+        "request_id":     request_id,
+        "rows":           r["rows"],
+        "columns":        r["columns"],
     }))
 except Exception as e:
     print(json.dumps({

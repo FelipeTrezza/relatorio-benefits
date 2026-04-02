@@ -34,6 +34,7 @@ jobs:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ env.DATABRICKS_ACCESS_TOKEN }}
           ACTIVITY_NAME: ${{ github.event.client_payload.activity }}
+          JOURNEY_NAME: ${{ github.event.client_payload.journey }}
           DATE_FROM: ${{ github.event.client_payload.date_from }}
           DATE_TO: ${{ github.event.client_payload.date_to }}
           REQUEST_ID: ${{ github.event.client_payload.request_id }}
