@@ -556,7 +556,7 @@ function pollStatus(SERVER) {
         clearInterval(iv);
         btn.classList.remove('spinning');
         btn.disabled = false;
-        if (s.last_status === 'success') {
+        if (s.status === 'success' || s.last_status === 'success') {
           if (ts) ts.textContent = 'atualizado!';
           setTimeout(() => window.location.reload(), 1500);
         } else {
