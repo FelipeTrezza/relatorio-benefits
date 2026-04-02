@@ -80,7 +80,7 @@
     .sum-card.ok   .sc-val { color: var(--green); }
     .sum-card.warn .sc-val { color: var(--yellow); }
     .sum-card.err  .sc-val { color: var(--red); }
-    .sum-card.health .sc-val { color: #f85149; font-size: 22px; }
+    .sum-card.health .sc-val { color: #f0883e; font-size: 22px; }
 
     /* ── Health bar ── */
     .health-bar-wrap {
@@ -95,8 +95,8 @@
     .health-bar-fill {
       height: 100%;
       border-radius: 6px;
-      background: #f85149;
-      width: 27%;
+      background: #f0883e;
+      width: 55%;
       transition: width .5s ease;
     }
     .health-label {
@@ -206,26 +206,26 @@
       </div>
     </div>
     <div class="header-right">
-      <div class="updated-at">Gerado em <strong>02/04/2026 às 07:15</strong></div>
+      <div class="updated-at">Gerado em <strong>02/04/2026 às 07:19</strong></div>
       <div class="updated-at" style="margin-top:3px">Auto-refresh a cada 5 min</div>
     </div>
   </div>
 
   <div class="summary">
     <div class="sum-card health">
-      <div class="sc-val">Crítico</div>
+      <div class="sc-val">Atenção</div>
       <div class="sc-lbl">Status geral</div>
     </div>
     <div class="sum-card ok">
-      <div class="sc-val">3</div>
+      <div class="sc-val">6</div>
       <div class="sc-lbl">✅ Atualizadas</div>
     </div>
     <div class="sum-card warn">
-      <div class="sc-val">3</div>
+      <div class="sc-val">4</div>
       <div class="sc-lbl">⚠️ Com atraso</div>
     </div>
     <div class="sum-card err">
-      <div class="sc-val">5</div>
+      <div class="sc-val">1</div>
       <div class="sc-lbl">❌ Com problema</div>
     </div>
     <div class="sum-card" style="border-color:var(--border)">
@@ -238,7 +238,7 @@
     <div class="health-bar-bg">
       <div class="health-bar-fill"></div>
     </div>
-    <div class="health-label">27% das tabelas atualizadas</div>
+    <div class="health-label">55% das tabelas atualizadas</div>
   </div>
 
   <div class="table-wrap">
@@ -289,10 +289,10 @@
             <span class="table-name">consumers.consumers</span>
             <span class="table-desc">Base de consumidores PicPay</span>
           </td>
-          <td class="col-col"><code>updated_at</code></td>
-          <td class="col-date"><span class="err-msg">[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or f</span></td>
-          <td class="col-rows">—</td>
-          <td class="col-status"><span class="badge status-error">Erro</span></td>
+          <td class="col-col"><code>sent_bacen_at</code></td>
+          <td class="col-date">02/04/2026</td>
+          <td class="col-rows">119.365.366</td>
+          <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
         <tr>
           <td class="col-table">
@@ -319,10 +319,10 @@
             <span class="table-name">consumers.daily_consumers_labels_and_metrics</span>
             <span class="table-desc">Métricas diárias de consumidores (MAU, labels)</span>
           </td>
-          <td class="col-col"><code>ref_date</code></td>
-          <td class="col-date"><span class="err-msg">[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or f</span></td>
-          <td class="col-rows">—</td>
-          <td class="col-status"><span class="badge status-error">Erro</span></td>
+          <td class="col-col"><code>metric_date</code></td>
+          <td class="col-date">31/03/2026</td>
+          <td class="col-rows">158.957.541.120</td>
+          <td class="col-status"><span class="badge status-warn">2d atrás</span></td>
         </tr>
         <tr>
           <td class="col-table">
@@ -336,13 +336,13 @@
         </tr>
         <tr>
           <td class="col-table">
-            <span class="table-name">benefits.all_moviments</span>
+            <span class="table-name">benefits.all_movements</span>
             <span class="table-desc">Movimentações consolidadas Benefits</span>
           </td>
           <td class="col-col"><code>created_at</code></td>
-          <td class="col-date"><span class="err-msg">[TABLE_OR_VIEW_NOT_FOUND] The table or view `benefits`.`all_</span></td>
-          <td class="col-rows">—</td>
-          <td class="col-status"><span class="badge status-error">Erro</span></td>
+          <td class="col-date">02/04/2026</td>
+          <td class="col-rows">50.394.634</td>
+          <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
         <tr>
           <td class="col-table">
@@ -356,13 +356,13 @@
         </tr>
         <tr>
           <td class="col-table">
-            <span class="table-name">benefits.benefits_purchase</span>
+            <span class="table-name">benefits.benefits_purchases</span>
             <span class="table-desc">Compras realizadas via Benefits</span>
           </td>
           <td class="col-col"><code>created_at</code></td>
-          <td class="col-date"><span class="err-msg">[TABLE_OR_VIEW_NOT_FOUND] The table or view `benefits`.`bene</span></td>
-          <td class="col-rows">—</td>
-          <td class="col-status"><span class="badge status-error">Erro</span></td>
+          <td class="col-date">02/04/2026</td>
+          <td class="col-rows">37.058.189</td>
+          <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
       </tbody>
     </table>
