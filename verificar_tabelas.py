@@ -317,7 +317,7 @@ def generate_html(results):
             error_count += 1
 
         rows_html += f"""
-        <tr>
+        <tr data-status="{css}">
           <td class="col-table">
             <span class="table-name">{display_name}</span>
             <span class="table-desc">{description}</span>
@@ -430,7 +430,7 @@ def generate_html(results):
     #toast.toast-warn {{ background: rgba(227,179,65,.9);  border: 1px solid rgba(227,179,65,.6); color: #0d1117; }}
     #toast.toast-err  {{ background: rgba(248,81,73,.88);  border: 1px solid rgba(248,81,73,.6); }}
 
-    /* ── Summary cards ── */
+    /* ── Summary cards — filtro clicável ── */
     .summary {{
       display: flex;
       gap: 16px;
@@ -444,7 +444,21 @@ def generate_html(results):
       padding: 16px 24px;
       min-width: 160px;
       flex: 1;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color .2s, transform .15s, box-shadow .2s;
+      position: relative;
     }}
+    .sum-card:not(.health):hover {{
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,.4);
+    }}
+    .sum-card.active-filter {{
+      box-shadow: 0 0 0 2px currentColor;
+    }}
+    .sum-card.ok.active-filter   {{ box-shadow: 0 0 0 2px var(--green); border-color: var(--green); }}
+    .sum-card.warn.active-filter {{ box-shadow: 0 0 0 2px var(--yellow); border-color: var(--yellow); }}
+    .sum-card.err.active-filter  {{ box-shadow: 0 0 0 2px var(--red); border-color: var(--red); }}
     .sum-card .sc-val {{
       font-size: 32px;
       font-weight: 800;
@@ -460,7 +474,49 @@ def generate_html(results):
     .sum-card.ok   .sc-val {{ color: var(--green); }}
     .sum-card.warn .sc-val {{ color: var(--yellow); }}
     .sum-card.err  .sc-val {{ color: var(--red); }}
+    .sum-card.health {{ cursor: default; }}
     .sum-card.health .sc-val {{ color: {health_color}; font-size: 22px; }}
+    /* hint de filtro */
+    .sum-card:not(.health)::after {{
+      content: "clique para filtrar";
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 9px;
+      color: var(--muted);
+      opacity: 0;
+      transition: opacity .2s;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }}
+    .sum-card:not(.health):hover::after {{ opacity: 1; }}
+    /* linha oculta pelo filtro */
+    tbody tr.hidden-row {{ display: none; }}
+    /* banner de filtro ativo */
+    #filter-banner {{
+      display: none;
+      margin: 16px 32px 0;
+      padding: 10px 16px;
+      background: var(--surf2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text2);
+      align-items: center;
+      gap: 10px;
+    }}
+    #filter-banner.visible {{ display: flex; }}
+    #filter-banner button {{
+      margin-left: auto;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 5px;
+      padding: 3px 10px;
+      font-size: 11px;
+      cursor: pointer;
+    }}
+    #filter-banner button:hover {{ color: var(--text); border-color: var(--text2); }}
 
     /* ── Health bar ── */
     .health-bar-wrap {{
@@ -610,19 +666,19 @@ def generate_html(results):
       <div class="sc-val">{health_label}</div>
       <div class="sc-lbl">Status geral</div>
     </div>
-    <div class="sum-card ok">
+    <div class="sum-card ok" onclick="filtrar('status-ok', this)" title="Filtrar tabelas atualizadas">
       <div class="sc-val">{ok_count}</div>
       <div class="sc-lbl">✅ Atualizadas</div>
     </div>
-    <div class="sum-card warn">
+    <div class="sum-card warn" onclick="filtrar('status-warn', this)" title="Filtrar tabelas com atraso">
       <div class="sc-val">{warn_count}</div>
       <div class="sc-lbl">⚠️ Com atraso</div>
     </div>
-    <div class="sum-card err">
+    <div class="sum-card err" onclick="filtrar('status-error', this)" title="Filtrar tabelas com problema">
       <div class="sc-val">{error_count}</div>
       <div class="sc-lbl">❌ Com problema</div>
     </div>
-    <div class="sum-card" style="border-color:var(--border)">
+    <div class="sum-card" style="border-color:var(--border); cursor:default">
       <div class="sc-val" style="color:var(--text2)">{total}</div>
       <div class="sc-lbl">Total monitoradas</div>
     </div>
@@ -636,6 +692,10 @@ def generate_html(results):
   </div>
 
   <div class="table-wrap">
+    <div id="filter-banner">
+      <span id="filter-label"></span>
+      <button onclick="limparFiltro()">✕ Limpar filtro</button>
+    </div>
     <table>
       <thead>
         <tr>
@@ -663,6 +723,50 @@ def generate_html(results):
   <div id="toast"></div>
 
   <script>
+    var filtroAtivo = null;
+
+    var LABELS = {{
+      'status-ok':    '✅ Exibindo apenas: Atualizadas',
+      'status-warn':  '⚠️ Exibindo apenas: Com atraso',
+      'status-error': '❌ Exibindo apenas: Com problema'
+    }};
+
+    function filtrar(status, card) {{
+      // Toggle: clicou no mesmo filtro ativo → limpa
+      if (filtroAtivo === status) {{
+        limparFiltro();
+        return;
+      }}
+      filtroAtivo = status;
+
+      // Atualiza destaque nos cards
+      document.querySelectorAll('.sum-card').forEach(function(c) {{
+        c.classList.remove('active-filter');
+      }});
+      card.classList.add('active-filter');
+
+      // Mostra/oculta linhas
+      document.querySelectorAll('tbody tr').forEach(function(tr) {{
+        tr.classList.toggle('hidden-row', tr.dataset.status !== status);
+      }});
+
+      // Banner
+      var banner = document.getElementById('filter-banner');
+      document.getElementById('filter-label').textContent = LABELS[status] || status;
+      banner.classList.add('visible');
+    }}
+
+    function limparFiltro() {{
+      filtroAtivo = null;
+      document.querySelectorAll('.sum-card').forEach(function(c) {{
+        c.classList.remove('active-filter');
+      }});
+      document.querySelectorAll('tbody tr').forEach(function(tr) {{
+        tr.classList.remove('hidden-row');
+      }});
+      document.getElementById('filter-banner').classList.remove('visible');
+    }}
+
     function toast(msg, tipo) {{
       var t = document.getElementById('toast');
       t.textContent = msg;
