@@ -46,9 +46,53 @@
     .header-icon { font-size: 28px; }
     .header-title { font-size: 18px; font-weight: 700; color: var(--text); }
     .header-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .header-right { text-align: right; }
-    .updated-at { font-size: 12px; color: var(--muted); }
+    .header-right { text-align: right; display: flex; align-items: center; gap: 16px; }
+    .updated-at { font-size: 12px; color: var(--muted); text-align: right; }
     .updated-at strong { color: var(--text2); }
+
+    /* ── Botão Atualizar ── */
+    #btn-atualizar {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 18px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .1s, opacity .2s;
+      white-space: nowrap;
+    }
+    #btn-atualizar:hover:not(:disabled) { background: var(--greenl); transform: translateY(-1px); }
+    #btn-atualizar:active { transform: translateY(0); }
+    #btn-atualizar:disabled { opacity: .55; cursor: not-allowed; }
+    #btn-atualizar svg { flex-shrink: 0; }
+    #btn-atualizar.loading svg { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+      z-index: 9999;
+      max-width: 360px;
+    }
+    #toast.show { opacity: 1; }
+    #toast.toast-ok   { background: rgba(33,163,102,.9);  border: 1px solid rgba(33,163,102,.6); }
+    #toast.toast-warn { background: rgba(227,179,65,.9);  border: 1px solid rgba(227,179,65,.6); color: #0d1117; }
+    #toast.toast-err  { background: rgba(248,81,73,.88);  border: 1px solid rgba(248,81,73,.6); }
 
     /* ── Summary cards ── */
     .summary {
@@ -206,8 +250,17 @@
       </div>
     </div>
     <div class="header-right">
-      <div class="updated-at">Gerado em <strong>02/04/2026 às 07:19</strong></div>
-      <div class="updated-at" style="margin-top:3px">Auto-refresh a cada 5 min</div>
+      <div>
+        <div class="updated-at">Gerado em <strong>02/04/2026 às 07:25</strong></div>
+        <div class="updated-at" style="margin-top:3px">Auto-refresh a cada 5 min</div>
+      </div>
+      <button id="btn-atualizar" onclick="atualizarTabelas()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+        Atualizar
+      </button>
     </div>
   </div>
 
@@ -374,6 +427,76 @@
     <strong style="color:var(--yellow)">Atraso</strong> = 26h–72h &nbsp;|&nbsp;
     <strong style="color:var(--red)">Problema</strong> = &gt;72h ou erro
   </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script>
+    function toast(msg, tipo) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'show toast-' + tipo;
+      clearTimeout(t._timer);
+      t._timer = setTimeout(function() { t.className = ''; }, 4500);
+    }
+
+    function atualizarTabelas() {
+      var btn = document.getElementById('btn-atualizar');
+      btn.disabled = true;
+      btn.classList.add('loading');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg> Atualizando…';
+
+      // Testa se o servidor local está rodando
+      fetch('http://localhost:5001/status', { signal: AbortSignal.timeout(3000) })
+        .then(function(r) { return r.json(); })
+        .then(function() {
+          // Servidor OK — dispara a atualização
+          return fetch('http://localhost:5001/atualizar/tabelas', { method: 'POST' });
+        })
+        .then(function(r) { return r.json(); })
+        .then(function() {
+          toast('⏳ Atualização iniciada! Aguarde ~1 min e a página recarregará.', 'ok');
+          // Polling: verifica a cada 8s se o script terminou (max 3 min)
+          var tentativas = 0;
+          var poll = setInterval(function() {
+            tentativas++;
+            fetch('http://localhost:5001/status')
+              .then(function(r) { return r.json(); })
+              .then(function(s) {
+                if (!s.running) {
+                  clearInterval(poll);
+                  toast('✅ Tabelas atualizadas! Recarregando…', 'ok');
+                  setTimeout(function() { location.reload(); }, 1500);
+                } else if (tentativas >= 22) {
+                  clearInterval(poll);
+                  toast('⚠️ Demorou mais que o esperado. Recarregue a página em breve.', 'warn');
+                  resetBtn();
+                }
+              })
+              .catch(function() { clearInterval(poll); resetBtn(); });
+          }, 8000);
+        })
+        .catch(function(err) {
+          // Servidor não está rodando
+          var instrucao = err && err.name === 'AbortError'
+            ? 'Servidor local não encontrado.'
+            : 'Servidor local não encontrado.';
+          toast(
+            '🔌 ' + instrucao + ' Para usar o botão, rode no terminal:\n' +
+            'cd ~/relatorio-benefits && python3 server.py',
+            'err'
+          );
+          resetBtn();
+        });
+    }
+
+    function resetBtn() {
+      var btn = document.getElementById('btn-atualizar');
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg> Atualizar';
+    }
+  </script>
 
 </body>
 </html>
