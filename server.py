@@ -21,7 +21,8 @@ from pathlib import Path
 PORT      = 5001
 BASE_DIR  = Path(__file__).parent
 CONTAS_SCRIPT = Path.home() / "relatorio-abertura-contas" / "atualizar.py"
-FUNIL_HELPER  = BASE_DIR / "funil_query_helper.py"
+FUNIL_HELPER       = BASE_DIR / "funil_query_helper.py"
+TABELAS_SCRIPT     = BASE_DIR / "verificar_tabelas.py"
 
 state = {
     "running": False,
@@ -34,6 +35,7 @@ SCRIPTS = {
     "antecipacoes": BASE_DIR / "atualizar_antecipacoes.py",
     "pix":          BASE_DIR / "atualizar_pix.py",
     "contas":       CONTAS_SCRIPT,
+    "tabelas":      TABELAS_SCRIPT,
 }
 
 def get_python():
@@ -135,13 +137,13 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/status":
             self.send_json(200, {"ok": True, "status": state["last_status"], "running": state["running"]})
-        elif self.path in ("/", "/score", "/score.html", "/index.html", "/antecipacoes", "/antecipacoes.html"):
-            html_candidates = [
+        elif self.path in ("/antecipacoes", "/antecipacoes.html"):
+            self._serve_html([BASE_DIR / "antecipacoes.html"])
+        elif self.path in ("/", "/score", "/score.html", "/index.html"):
+            self._serve_html([
                 Path.home() / "score-antecipacoes" / "index.html",
                 BASE_DIR / "antecipacoes.html",
-                BASE_DIR / "score.html",
-            ]
-            self._serve_html(html_candidates)
+            ])
         elif self.path in ("/pix", "/pix.html"):
             self._serve_html([BASE_DIR / "pix.html"])
         else:
@@ -222,7 +224,9 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/atualizar/contas":
             names = ["contas"]
         elif self.path == "/atualizar/todos":
-            names = ["antecipacoes", "pix", "contas"]
+            names = ["antecipacoes", "pix", "contas", "tabelas"]
+        elif self.path == "/atualizar/tabelas":
+            names = ["tabelas"]
         else:
             self.send_json(404, {"error": "endpoint invalido"})
             return

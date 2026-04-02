@@ -1,0 +1,40 @@
+
+============================================================
+  Monitor de Tabelas — 02/04/2026 08:00
+============================================================
+
+[1/4] Conectando ao Databricks...
+   ✅ Conexão OK
+
+[2/4] Submetendo 11 queries em paralelo...
+   → benefits.collaborators
+   → benefits.companies
+   → benefits.accounts
+   → consumers.consumers
+   → benefits.anticipation_request
+   → benefits.sec_wage_advance_collaborator_margins
+   → consumers.daily_consumers_labels_and_metrics
+   → marketing.consumers_campaigns_communications
+   → benefits.all_movements
+   → picpay.all_transactions
+   → benefits.benefits_purchases
+
+[3/4] Aguardando resultados...
+   ✅ benefits.collaborators
+   ✅ benefits.companies
+   ✅ benefits.accounts
+   ✅ consumers.consumers
+   ✅ benefits.anticipation_request
+   ✅ benefits.sec_wage_advance_collaborator_margins
+   ✅ consumers.daily_consumers_labels_and_metrics
+   ✅ marketing.consumers_campaigns_communications
+   ✅ benefits.all_movements
+   ✅ picpay.all_transactions
+   ✅ benefits.benefits_purchases
+
+[4/4] Gerando HTML e publicando...
+   ✅ Salvo em /Users/felipe.rasquinho/relatorio-benefits/tabelas.html
+
+✅ Concluído — https://felipetrezza.github.io/relatorio-benefits/tabelas.html
+============================================================
+
