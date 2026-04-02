@@ -60,21 +60,59 @@
   .slide-title::after{background:linear-gradient(90deg,var(--green),transparent)}
 
   /* ── DASHBOARD GRID ────────────────────────────────────── */
-  .dashboard-grid{
+    .dashboard-grid{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns: minmax(0, 1.15fr) repeat(3, minmax(0, 1fr));
     gap:12px;
     flex:1;
     min-height:0;
   }
-  .setor-col{display:flex;flex-direction:column;gap:8px;min-height:0}
+    .setor-col{display:flex;flex-direction:column;gap:8px;min-height:0}
 
-  /* ── PILL HEADER ───────────────────────────────────────── */
+  /* ── COLUNA TOTAL — destaque TV ──────────────────────────── */
+  .setor-col.col-total{
+    background: #0e2318;
+    border: 2px solid #21a366;
+    border-radius: 16px;
+    padding: 10px 8px 8px;
+    box-shadow: 0 0 0 1px rgba(33,163,102,.15), 0 4px 28px rgba(33,163,102,.25);
+    position: relative;
+  }
+  .setor-col.col-total::before{
+    content: 'CONSOLIDADO';
+    display: block;
+    text-align: center;
+    font-size: clamp(9px,0.7vw,12px);
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #21a366;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    opacity: .85;
+  }
+  .setor-col.col-total .pill-header{
+    background: linear-gradient(135deg, #21a366, #2dc974) !important;
+    box-shadow: 0 2px 12px rgba(33,163,102,.5);
+    letter-spacing: 1px;
+  }
+  .setor-col.col-total .mc{
+    background: rgba(33,163,102,.10);
+    border: 1px solid rgba(33,163,102,.30);
+  }
+  .setor-col.col-total .mc-val{
+    color: #ffffff;
+    font-size: 44px;
+  }
+  .setor-col.col-total .mc-lbl{
+    color: rgba(255,255,255,.6);
+  }
+
+    /* ── PILL HEADER ───────────────────────────────────────── */
   .pill-header{
     border-radius:40px;padding:7px 0;text-align:center;
     font-size:clamp(12px,1.1vw,18px);font-weight:800;color:#fff;letter-spacing:.3px;flex-shrink:0;
   }
-  .pill-total  {background:linear-gradient(135deg,#1a6640,#21a366)}
+  .pill-total  {background:linear-gradient(135deg,#0d4d2e,#21a366)}
   .pill-publico{background:linear-gradient(135deg,#1f7a45,#27b96a)}
   .pill-privado{background:linear-gradient(135deg,#3a8a52,#4db870)}
   .pill-grupo  {background:linear-gradient(135deg,#5aa668,#7ec87e)}
@@ -384,8 +422,9 @@ function renderGrid(gridId, D) {
     if (!s) return;
     const tk_c = s.antecipacoes > 0 ? s.tpv / s.antecipacoes : 0;
     const tk_p = s.antecip_prv  > 0 ? s.tpv_prv / s.antecip_prv : 0;
+    const extraClass = col.key === 'total' ? ' col-total' : '';
     grid.insertAdjacentHTML('beforeend', `
-      <div class="setor-col">
+      <div class="setor-col${extraClass}">
         <div class="pill-header ${col.pill}">${col.label}</div>
         <div class="metrics-grid">
           ${mc('Vidas Antecipando #',       s.vidas,        s.vidas_prv,       fmtVal)}

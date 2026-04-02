@@ -58,7 +58,7 @@
   .periodo-title{font-size:13px;font-weight:700;color:var(--text)}
   .periodo-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
-  /* ── GRID PRINCIPAL: Total separado + 3 colunas ─────────── */
+    /* ── GRID PRINCIPAL: Total separado + 3 colunas ─────────── */
   .dashboard-grid{
     display:grid;
     grid-template-columns: minmax(200px, 1.15fr) repeat(3, minmax(160px, 1fr));
@@ -66,21 +66,52 @@
     align-items: start;
   }
   .setor-col{ display:flex; flex-direction:column; }
+
+  /* ── COLUNA TOTAL ─── destaque forte ─────────────────────── */
   .setor-col.col-total{
-    background: linear-gradient(160deg, rgba(33,163,102,.10) 0%, rgba(33,163,102,.04) 100%);
-    border: 1.5px solid rgba(33,163,102,.35);
+    background: #0e2318;                          /* verde muito escuro, quase preto-esmeralda */
+    border: 2px solid #21a366;                    /* borda verde sólida, sem opacidade */
     border-radius: 18px;
     padding: clamp(10px, 1vw, 16px);
-    box-shadow: 0 0 24px rgba(33,163,102,.08);
+    box-shadow:
+      0 0 0 1px rgba(33,163,102,.15),             /* halo interno */
+      0 4px 32px rgba(33,163,102,.22),            /* glow externo */
+      inset 0 1px 0 rgba(255,255,255,.04);        /* brilho sutil no topo */
+    position: relative;
+  }
+  /* faixa de label "TOTAL" acima do pill — ancora a identidade */
+  .setor-col.col-total::before{
+    content: 'CONSOLIDADO';
+    display: block;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #21a366;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    opacity: .85;
   }
   .setor-col.col-total .pill-header{
     font-size: clamp(15px, 1.4vw, 19px);
-    letter-spacing: .8px;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #21a366, #2dc974) !important;  /* verde vivo */
+    box-shadow: 0 2px 12px rgba(33,163,102,.45);
   }
+  /* valor dos cards do Total: branco puro e maior */
   .setor-col.col-total .mc{
-    background: rgba(33,163,102,.07);
-    border-color: rgba(33,163,102,.22);
+    background: rgba(33,163,102,.10);
+    border: 1px solid rgba(33,163,102,.30);
   }
+  .setor-col.col-total .mc-val{
+    color: #ffffff;                              /* branco puro — contrasta com verde dos setores */
+    font-size: clamp(20px, 2vw, 30px);          /* maior que os outros */
+  }
+  .setor-col.col-total .mc-lbl{
+    color: rgba(255,255,255,.6);
+  }
+
+  /* ── PILL HEADER ──────────────────────────────────────────── */
   .pill-header{
     border-radius: 40px;
     padding: clamp(7px,0.7vw,11px) 0;
@@ -95,6 +126,8 @@
   .pill-publico{background:linear-gradient(135deg,#1f7a45,#27b96a)}
   .pill-privado{background:linear-gradient(135deg,#3a8a52,#4db870)}
   .pill-grupo  {background:linear-gradient(135deg,#5aa668,#7ec87e)}
+
+  /* ── METRIC CARD ─────────────────────────────────────────── */
   .mc{
     background: var(--card-bg);
     border: 1px solid var(--card-border);
