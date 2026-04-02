@@ -495,8 +495,14 @@ function renderChartDia(){
 function renderMTD(){
   const mesMTD = ALL_MESES[ALL_MESES.length-1];
   const mesAnt = ALL_MESES[ALL_MESES.length-2];
+
+  // Dia máximo disponível no mês vigente → comparar mesmo período no mês anterior
+  const diasMTD = RAW.filter(r=>r.mes===mesMTD&&r.dia).map(r=>r.dia).sort();
+  const maxDiaMTD = diasMTD.length ? diasMTD.at(-1) : null;
+  const maxDiaNum = maxDiaMTD ? parseInt(maxDiaMTD.split('-')[2]) : 31;
+
   document.getElementById('mtd-sub').textContent =
-    `Mês vigente (${mesPT(mesMTD)}) vs mês anterior (${mesPT(mesAnt)})`;
+    `Mês vigente (${mesPT(mesMTD)}) vs mesmo período mês anterior (${mesPT(mesAnt)} até dia ${maxDiaNum})`;
 
   const setor = document.getElementById('f-setor').value;
   const sec   = document.getElementById('f-secretaria').value;
@@ -514,7 +520,9 @@ function renderMTD(){
 
   setDefs.forEach(s=>{
     const dMTD = base.filter(r=>r.mes===mesMTD&&r.setor===s.k);
-    const dAnt = base.filter(r=>r.mes===mesAnt&&r.setor===s.k);
+    // Mês anterior: apenas dias <= maxDiaNum (mesmo período)
+    const dAnt = base.filter(r=>r.mes===mesAnt&&r.setor===s.k&&r.dia&&
+      parseInt(r.dia.split('-')[2])<=maxDiaNum);
     const vMTD = dMTD.reduce((a,r)=>a+Number(r.count),0);
     const vAnt = dAnt.reduce((a,r)=>a+Number(r.count),0);
     const delta = pct(vMTD,vAnt);
@@ -538,7 +546,7 @@ function renderMTD(){
           <div class="mtd-main-val">${fmt(vMTD)}</div>
         </div>
         <div class="mtd-cmp">
-          <div class="mtd-cmp-lbl">vs ${mesPT(mesAnt)}</div>
+          <div class="mtd-cmp-lbl">vs ${mesPT(mesAnt)} até dia ${maxDiaNum}</div>
           <div class="mtd-delta ${dcls}">${delta||'—'}</div>
           <div class="mtd-cmp-val">${fmt(vAnt)}</div>
         </div>

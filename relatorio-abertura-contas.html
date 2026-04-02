@@ -153,6 +153,10 @@ if(typeof Chart === 'undefined'){
     <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 2a.5.5 0 0 1 .5.5V6h3.5a.5.5 0 0 1 0 1H10v3.5a.5.5 0 0 1-1 0V7H5.5a.5.5 0 0 1 0-1H9V2.5a.5.5 0 0 1 .5-.5z"/></svg>
     PIX
   </a>
+  <a class="nav-tab" href="tabelas.html">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v1h14V2zm0 2H1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4zm-5 2h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zm0 3h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zm-5-3h3a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2zm0 3h3a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2z"/></svg>
+    Tabelas
+  </a>
 </nav>
 
 <main>
@@ -491,8 +495,14 @@ function renderChartDia(){
 function renderMTD(){
   const mesMTD = ALL_MESES[ALL_MESES.length-1];
   const mesAnt = ALL_MESES[ALL_MESES.length-2];
+
+  // Dia máximo disponível no mês vigente → comparar mesmo período no mês anterior
+  const diasMTD = RAW.filter(r=>r.mes===mesMTD&&r.dia).map(r=>r.dia).sort();
+  const maxDiaMTD = diasMTD.length ? diasMTD.at(-1) : null;
+  const maxDiaNum = maxDiaMTD ? parseInt(maxDiaMTD.split('-')[2]) : 31;
+
   document.getElementById('mtd-sub').textContent =
-    `Mês vigente (${mesPT(mesMTD)}) vs mês anterior (${mesPT(mesAnt)})`;
+    `Mês vigente (${mesPT(mesMTD)}) vs mesmo período mês anterior (${mesPT(mesAnt)} até dia ${maxDiaNum})`;
 
   const setor = document.getElementById('f-setor').value;
   const sec   = document.getElementById('f-secretaria').value;
@@ -510,7 +520,9 @@ function renderMTD(){
 
   setDefs.forEach(s=>{
     const dMTD = base.filter(r=>r.mes===mesMTD&&r.setor===s.k);
-    const dAnt = base.filter(r=>r.mes===mesAnt&&r.setor===s.k);
+    // Mês anterior: apenas dias <= maxDiaNum (mesmo período)
+    const dAnt = base.filter(r=>r.mes===mesAnt&&r.setor===s.k&&r.dia&&
+      parseInt(r.dia.split('-')[2])<=maxDiaNum);
     const vMTD = dMTD.reduce((a,r)=>a+Number(r.count),0);
     const vAnt = dAnt.reduce((a,r)=>a+Number(r.count),0);
     const delta = pct(vMTD,vAnt);
@@ -534,7 +546,7 @@ function renderMTD(){
           <div class="mtd-main-val">${fmt(vMTD)}</div>
         </div>
         <div class="mtd-cmp">
-          <div class="mtd-cmp-lbl">vs ${mesPT(mesAnt)}</div>
+          <div class="mtd-cmp-lbl">vs ${mesPT(mesAnt)} até dia ${maxDiaNum}</div>
           <div class="mtd-delta ${dcls}">${delta||'—'}</div>
           <div class="mtd-cmp-val">${fmt(vAnt)}</div>
         </div>
