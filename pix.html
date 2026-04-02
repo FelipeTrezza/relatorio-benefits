@@ -389,54 +389,36 @@ document.addEventListener('DOMContentLoaded', () => {
 const REFRESH_ENDPOINT = '/atualizar/pix';
 
 function refreshData() {
-  // Se página está em HTTPS (GitHub Pages), abre servidor local numa nova aba
-  if (location.protocol === 'https:') {
-    window.open('http://localhost:5001/pix', '_blank');
-    return;
-  }
-
   const btn = document.getElementById('btn-refresh');
   const ts  = document.getElementById('upd-ts');
   const SERVER = 'http://localhost:5001';
-
   btn.classList.add('spinning');
   btn.disabled = true;
   if (ts) ts.textContent = '...';
-
-  // Tenta conectar; se servidor estiver running aguarda até 5 min antes de desistir
-  function tryConnect(attempts, waitRunning) {
-    if (waitRunning === undefined) waitRunning = 100;
+  function tryConnect(attempts) {
     fetch(SERVER + '/status', { signal: AbortSignal.timeout(3000) })
       .then(r => r.json())
       .then(status => {
         if (status.running) {
-          if (waitRunning <= 0) {
-            fetch(SERVER + '/reset', { method: 'POST' }).catch(() => {});
-            btn.classList.remove('spinning');
-            btn.disabled = false;
-            if (ts) ts.textContent = 'erro';
-            alert('Servidor travado. Clique novamente para tentar.');
-            return;
-          }
           if (ts) ts.textContent = 'aguarde...';
-          setTimeout(() => tryConnect(attempts, waitRunning - 1), 3000);
+          setTimeout(() => tryConnect(attempts), 3000);
           return;
         }
         if (ts) ts.textContent = '...';
         fetch(SERVER + REFRESH_ENDPOINT, { method: 'POST' })
           .then(r => r.json())
           .then(() => pollStatus(SERVER))
-          .catch(() => showError('Erro ao iniciar atualização'));
+          .catch(() => showError());
       })
       .catch(() => {
         if (attempts > 0) {
           if (ts) ts.textContent = 'iniciando...';
-          setTimeout(() => tryConnect(attempts - 1, waitRunning), 2000);
+          setTimeout(() => tryConnect(attempts - 1), 2000);
         } else {
           btn.classList.remove('spinning');
           btn.disabled = false;
           if (ts) ts.textContent = 'erro';
-          alert('Servidor local indisponível.\n\nRode: servidor-benefits');
+          alert('Servidor local nao encontrado.\n\nRode: servidor-benefits');
         }
       });
   }
@@ -446,10 +428,7 @@ function refreshData() {
 function pollStatus(SERVER) {
   const btn = document.getElementById('btn-refresh');
   const ts  = document.getElementById('upd-ts');
-  let attempts = 0;
-  const MAX_ATTEMPTS = 100;
   const iv = setInterval(() => {
-    attempts++;
     fetch(SERVER + '/status').then(r => r.json()).then(s => {
       if (!s.running) {
         clearInterval(iv);
@@ -460,14 +439,8 @@ function pollStatus(SERVER) {
           setTimeout(() => window.location.reload(), 1500);
         } else {
           if (ts) ts.textContent = 'erro';
-          alert('Erro na atualização. Veja o terminal.');
+          alert('Erro na atualizacao. Veja o terminal.');
         }
-      } else if (attempts >= MAX_ATTEMPTS) {
-        clearInterval(iv);
-        btn.classList.remove('spinning');
-        btn.disabled = false;
-        if (ts) ts.textContent = 'timeout';
-        alert('Atualização demorou mais que o esperado. Verifique o terminal.');
       }
     }).catch(() => { clearInterval(iv); btn.classList.remove('spinning'); btn.disabled = false; });
   }, 3000);
@@ -479,7 +452,7 @@ function showError(msg) {
   btn.classList.remove('spinning');
   btn.disabled = false;
   if (ts) ts.textContent = 'erro';
-  console.error(msg);
+  if (msg) console.error(msg);
 }
 
 (function setUpdTs(){
