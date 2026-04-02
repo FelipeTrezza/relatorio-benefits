@@ -7,23 +7,48 @@ e gera um relatório HTML gerencial.
 
 Uso:  python3 verificar_tabelas.py
 
-Link: https://felipetrezza.github.io/relatorio-benefits/tabelas.html
+Pré-requisitos:
+  pip install databricks-sdk
+
+Autenticação (escolha uma das opções):
+  Opção 1 — Profile local (recomendado):
+    databricks auth login --host https://picpay-principal.cloud.databricks.com --profile picpay
+    (o script usa DATABRICKS_PROFILE abaixo automaticamente)
+
+  Opção 2 — Variáveis de ambiente:
+    export DATABRICKS_HOST=https://picpay-principal.cloud.databricks.com
+    export DATABRICKS_TOKEN=<seu_token>
+    export DATABRICKS_WAREHOUSE_ID=<seu_warehouse_id>   # opcional, sobrescreve o padrão
+
+  Opção 3 — Default credentials (se já autenticado via CLI sem profile):
+    Basta rodar sem configuração adicional.
+
+Saída:
+  tabelas.html  →  gerado na mesma pasta do script
+  (se o diretório for um repo git com acesso de push, publica automaticamente)
 """
 
-import json, time, sys, warnings, subprocess
-from datetime import datetime, date, timedelta
+import json, os, time, warnings, subprocess
+from datetime import datetime, date
 from pathlib import Path
 
 warnings.filterwarnings("ignore")
 
-DATABRICKS_HOST    = "https://picpay-principal.cloud.databricks.com"
-DATABRICKS_PROFILE = "picpay"
-WAREHOUSE_ID       = "6077a99f149e0d70"
+# ── Configuração ───────────────────────────────────────────────────────────────
+# Pode ser sobrescrito pela variável de ambiente DATABRICKS_HOST
+DATABRICKS_HOST    = os.environ.get("DATABRICKS_HOST",
+                                    "https://picpay-principal.cloud.databricks.com")
+
+# Profile do Databricks CLI (usado se DATABRICKS_TOKEN não estiver no ambiente)
+DATABRICKS_PROFILE = os.environ.get("DATABRICKS_PROFILE", "picpay")
+
+# Warehouse padrão PicPay — pode ser sobrescrito por DATABRICKS_WAREHOUSE_ID
+WAREHOUSE_ID       = os.environ.get("DATABRICKS_WAREHOUSE_ID", "6077a99f149e0d70")
+
 SCRIPT_DIR         = Path(__file__).parent
 OUTPUT_PATH        = SCRIPT_DIR / "tabelas.html"
-GITHUB_REPO_DIR    = Path.home() / "relatorio-benefits"
 
-# Arquivo que persiste o snapshot de benefits.accounts entre execuções
+# Snapshot de benefits.accounts — salvo junto ao script
 ACCOUNTS_SNAPSHOT  = SCRIPT_DIR / "accounts_snapshot.json"
 
 # ── Tabelas monitoradas ────────────────────────────────────────────────────────
@@ -101,6 +126,10 @@ TABELAS = [
 
 def get_w():
     from databricks.sdk import WorkspaceClient
+    # Se DATABRICKS_TOKEN estiver no ambiente, usa direto (sem precisar de profile)
+    if os.environ.get("DATABRICKS_TOKEN"):
+        return WorkspaceClient(host=DATABRICKS_HOST)
+    # Caso contrário, usa o profile configurado via CLI
     return WorkspaceClient(host=DATABRICKS_HOST, profile=DATABRICKS_PROFILE)
 
 def submit(w, sql):
@@ -311,7 +340,6 @@ def generate_html(results):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content="300">
   <title>Monitor de Tabelas — Benefits Analytics</title>
   <style>
     :root {{
@@ -565,7 +593,7 @@ def generate_html(results):
     <div class="header-right">
       <div>
         <div class="updated-at">Gerado em <strong>{now_str}</strong></div>
-        <div class="updated-at" style="margin-top:3px">Auto-refresh a cada 5 min</div>
+
       </div>
       <button id="btn-atualizar" onclick="atualizarTabelas()">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -708,27 +736,71 @@ def generate_html(results):
 # ── Git push ───────────────────────────────────────────────────────────────────
 
 def git_push():
+    """Tenta publicar o HTML via git. Silencioso se não for um repo ou sem acesso de push."""
+    repo_dir = SCRIPT_DIR
+
+    # Verifica se é um repo git
+    check = subprocess.run(
+        ["git", "-C", str(repo_dir), "rev-parse", "--is-inside-work-tree"],
+        capture_output=True, text=True
+    )
+    if check.returncode != 0:
+        print("   ℹ️  Não é um repositório git — HTML salvo localmente apenas.")
+        return
+
     cmds = [
-        ["git", "-C", str(GITHUB_REPO_DIR), "add", "tabelas.html"],
-        ["git", "-C", str(GITHUB_REPO_DIR), "commit", "-m",
+        ["git", "-C", str(repo_dir), "add", "tabelas.html", "accounts_snapshot.json"],
+        ["git", "-C", str(repo_dir), "commit", "-m",
          f"chore: atualiza monitor de tabelas {datetime.now().strftime('%d/%m/%Y %H:%M')}"],
-        ["git", "-C", str(GITHUB_REPO_DIR), "push"],
+        ["git", "-C", str(repo_dir), "push"],
     ]
     for cmd in cmds:
         r = subprocess.run(cmd, capture_output=True, text=True)
-        if r.returncode != 0 and "nothing to commit" not in r.stdout + r.stderr:
-            print(f"   ⚠️  git: {r.stderr.strip()[:100]}")
+        if r.returncode != 0:
+            msg = r.stdout + r.stderr
+            if "nothing to commit" in msg:
+                pass  # normal, sem mudanças
+            elif "push" in cmd:
+                print("   ℹ️  Push não realizado (sem acesso ou remote não configurado).")
+                print(f"      HTML disponível em: {OUTPUT_PATH}")
+            else:
+                print(f"   ⚠️  git: {msg.strip()[:120]}")
 
 # ── Main ───────────────────────────────────────────────────────────────────────
+
+def check_deps():
+    """Verifica dependências e orienta instalação se faltar algo."""
+    try:
+        import databricks.sdk
+    except ImportError:
+        print("\n❌ Dependência faltando: databricks-sdk")
+        print("   Instale com:  pip install databricks-sdk")
+        print("   ou:           pip3 install databricks-sdk\n")
+        raise SystemExit(1)
 
 def main():
     print(f"\n{'='*60}")
     print(f"  Monitor de Tabelas — {datetime.now().strftime('%d/%m/%Y %H:%M')}")
     print(f"{'='*60}")
 
+    check_deps()
+
     print("\n[1/4] Conectando ao Databricks...")
-    w = get_w()
-    print("   ✅ Conexão OK")
+    try:
+        w = get_w()
+        # Teste rápido de conectividade
+        w.current_user.me()
+        print("   ✅ Conexão OK")
+    except Exception as e:
+        msg = str(e)
+        print(f"\n❌ Falha na autenticação: {msg[:200]}")
+        print("\n   Para configurar o acesso, escolha uma opção:")
+        print("   1) Profile local (recomendado):")
+        print("      databricks auth login --host https://picpay-principal.cloud.databricks.com --profile picpay")
+        print("   2) Variáveis de ambiente:")
+        print("      export DATABRICKS_HOST=https://picpay-principal.cloud.databricks.com")
+        print("      export DATABRICKS_TOKEN=<seu_token>")
+        raise SystemExit(1)
 
     print(f"\n[2/4] Submetendo {len(TABELAS)} queries em paralelo...")
     stmts = {}
