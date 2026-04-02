@@ -100,6 +100,41 @@ if search_mode == "journey":
     except Exception as e:
         activities_list = []
 
+    # ── Enriquecimento: se journey 1:1, buscar pelo ID numérico da campanha ──
+    # Padrão: `na-NNNNNN-` → extrair NNNNNN e buscar todos os activity_name com esse ID
+    import re as _re
+    id_match = _re.search(r'[-_](\d{8,}[-_])', val_safe)
+    if id_match and len(activities_list) <= 1:
+        campaign_id = id_match.group(1).strip('-_')
+        try:
+            sql_related = (
+                "SELECT "
+                "  activity_name, "
+                "  channel, "
+                "  COUNT(DISTINCT consumer_id) AS consumers, "
+                "  date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, "
+                "  date_format(max(sent_at),'yyyy-MM-dd') AS dt_to "
+                "FROM marketing.consumers_campaigns_communications "
+                "WHERE activity_name LIKE '%%%s%%' "
+                "  AND activity_name != '%s' "
+                "GROUP BY activity_name, channel "
+                "ORDER BY dt_from, consumers DESC "
+                "LIMIT 50"
+            ) % (campaign_id, activities_list[0] if activities_list else '')
+            r2 = run_q(sql_related, timeout=120)
+            related = [row[0] for row in r2["rows"]]
+            # Expandir datas com as relacionadas
+            all_from2 = [row[3] for row in r2["rows"] if row[3]]
+            all_to2   = [row[4] for row in r2["rows"] if row[4]]
+            if all_from2:
+                journey_date_from = min(filter(None, [journey_date_from] + all_from2))
+                journey_date_to   = max(filter(None, [journey_date_to]   + all_to2))
+            # Juntar: activities da journey + relacionadas pelo ID (sem duplicatas)
+            all_acts = activities_list + [a for a in related if a not in activities_list]
+            activities_list = all_acts
+        except Exception:
+            pass  # Não crítico
+
 # ── Detectar período ────────────────────────────────────────────────
 # Para journey: usar o range completo da journey (cobre todas as activities)
 # Para activity: detectar pelo próprio where_filter
