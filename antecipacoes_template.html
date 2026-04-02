@@ -200,20 +200,6 @@
     <!-- preenchido por renderDashboard() -->
   </div>
 
-  <!-- ── RÉPLICA SEM GDF E RJ ──────────────────────── -->
-  <div style="margin-top:32px">
-    <div class="sec-lbl">Excluindo GDF e RJ</div>
-    <div class="periodo-bar">
-      <div>
-        <div class="periodo-title" id="periodo-title-2">— vs —</div>
-        <div class="periodo-sub">Excluindo GDF (892) e RJ (1817) · MTD mesma janela de dias</div>
-      </div>
-    </div>
-    <div class="dashboard-grid" id="dashboard-grid-2">
-      <!-- preenchido por renderDashboard2() -->
-    </div>
-  </div>
-
 </main>
 
 <footer>
@@ -225,8 +211,6 @@
 // DADOS — injetados por atualizar_antecipacoes.py
 // ================================================================
 const DATA = %%DADOS%%;
-
-const DATA2 = %%DADOS2%%;
 
 // ================================================================
 // HELPERS
@@ -336,58 +320,6 @@ function renderDashboard() {
   });
 }
 
-// ================================================================
-// RÉPLICA — sem accounts 1817 e 892
-// ================================================================
-function renderDashboard2() {
-  const D = DATA2;
-  if (!D || !D.setores) return;
-
-  const CL = D.cur_label  || DATA.cur_label  || 'Atual';
-  const PL = D.prev_label || DATA.prev_label || 'Ant.';
-  document.getElementById('periodo-title-2').textContent = `${CL} vs ${PL}`;
-
-  const COLS = [
-    { key: 'total',   label: 'Total',   pill: 'pill-total'   },
-    { key: 'public',  label: 'Público', pill: 'pill-publico' },
-    { key: 'private', label: 'Privado', pill: 'pill-privado' },
-    { key: 'grupo',   label: 'Grupo',   pill: 'pill-grupo'   },
-  ];
-
-  const allSetores = ['public','private','grupo','INSS'];
-  function sumField(field) {
-    return allSetores.reduce((s,k) => s + ((D.setores[k] && D.setores[k][field]) || 0), 0);
-  }
-  D.setores.total = {
-    vidas: sumField('vidas'), vidas_prv: sumField('vidas_prv'),
-    antecipacoes: sumField('antecipacoes'), antecip_prv: sumField('antecip_prv'),
-    tpv: sumField('tpv'), tpv_prv: sumField('tpv_prv'),
-    abertura: sumField('abertura'), abertura_prv: sumField('abertura_prv'),
-    vidas_novas: sumField('vidas_novas'), vidas_novas_prv: sumField('vidas_novas_prv'),
-  };
-
-  const grid = document.getElementById('dashboard-grid-2');
-  grid.innerHTML = '';
-
-  COLS.forEach(col => {
-    const s = D.setores[col.key];
-    if (!s) return;
-    const tk_cur = s.antecipacoes > 0 ? s.tpv / s.antecipacoes : 0;
-    const tk_prv = s.antecip_prv  > 0 ? s.tpv_prv / s.antecip_prv : 0;
-    grid.insertAdjacentHTML('beforeend', `
-    <div class="setor-col">
-      <div class="pill-header ${col.pill}">${col.label}</div>
-      <div class="metrics-grid">
-        ${mc('Vidas Antecipando #',       s.vidas,          s.vidas_prv,       fmtVal)}
-        ${mc('Antecipações #',            s.antecipacoes,   s.antecip_prv,     fmtVal)}
-        ${mc('TPV R$',                    s.tpv,            s.tpv_prv,         fmtBRL)}
-        ${mc('Ticket Médio R$',           tk_cur,           tk_prv,            fmtBRL)}
-        ${mc('Abertura de Conta #',       s.abertura,       s.abertura_prv,    fmtVal)}
-        ${mc('Vidas Novas Antecipando #', s.vidas_novas,    s.vidas_novas_prv, fmtInt)}
-      </div>
-    </div>`);
-  });
-}
 
 // ================================================================
 // INIT
@@ -399,7 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
     now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
   renderDashboard();
-  renderDashboard2();
 });
 
 const REFRESH_ENDPOINT = '/atualizar/antecipacoes';
