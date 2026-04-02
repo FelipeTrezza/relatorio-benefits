@@ -57,75 +57,93 @@
   .periodo-title{font-size:13px;font-weight:700;color:var(--text)}
   .periodo-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
-  /* ── GRID PRINCIPAL: 4 colunas ────────────────────────────── */
+  /* ── GRID PRINCIPAL: Total separado + 3 colunas ─────────── */
   .dashboard-grid{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:16px;
+    /* Total ocupa ~22%, os 3 setores dividem o resto */
+    grid-template-columns: minmax(200px, 1.15fr) repeat(3, minmax(160px, 1fr));
+    gap: clamp(10px, 1.2vw, 18px);
+    align-items: start;
   }
 
   /* ── COLUNA DE SETOR ──────────────────────────────────────── */
-  .setor-col{}
+  .setor-col{ display:flex; flex-direction:column; }
 
-  /* ── PILL HEADER (estilo da foto) ─────────────────────────── */
-  .pill-header{
-    border-radius:40px;
-    padding:10px 0;
-    text-align:center;
-    font-size:17px;
-    font-weight:800;
-    color:#fff;
-    margin-bottom:14px;
-    letter-spacing:.3px;
+  /* ── COLUNA TOTAL — destaque visual ──────────────────────── */
+  .setor-col.col-total{
+    background: linear-gradient(160deg, rgba(33,163,102,.10) 0%, rgba(33,163,102,.04) 100%);
+    border: 1.5px solid rgba(33,163,102,.35);
+    border-radius: 18px;
+    padding: clamp(10px, 1vw, 16px);
+    box-shadow: 0 0 24px rgba(33,163,102,.08);
   }
-  .pill-total  {background:linear-gradient(135deg,#1a6640,#21a366)}
+  /* pill do Total: sólido e mais largo */
+  .setor-col.col-total .pill-header{
+    font-size: clamp(15px, 1.4vw, 19px);
+    letter-spacing: .8px;
+  }
+  /* cards do Total: fundo ligeiramente mais claro para contrastar com o wrapper */
+  .setor-col.col-total .mc{
+    background: rgba(33,163,102,.07);
+    border-color: rgba(33,163,102,.22);
+  }
+
+  /* ── PILL HEADER ──────────────────────────────────────────── */
+  .pill-header{
+    border-radius: 40px;
+    padding: clamp(7px,0.7vw,11px) 0;
+    text-align: center;
+    font-size: clamp(13px, 1.2vw, 17px);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: clamp(10px,0.9vw,14px);
+    letter-spacing: .3px;
+  }
+  .pill-total  {background:linear-gradient(135deg,#0d4d2e,#21a366)}
   .pill-publico{background:linear-gradient(135deg,#1f7a45,#27b96a)}
   .pill-privado{background:linear-gradient(135deg,#3a8a52,#4db870)}
   .pill-grupo  {background:linear-gradient(135deg,#5aa668,#7ec87e)}
 
-  /* ── GRID DE MÉTRICAS ────────────────────────────────────── */
-
   /* ── METRIC CARD ─────────────────────────────────────────── */
   .mc{
-    background:var(--card-bg);
-    border:1px solid var(--card-border);
-    border-radius:14px;
-    padding:14px 14px 12px;
-    display:flex;
-    flex-direction:column;
-    gap:5px;
-    height:100px;          /* altura fixa igual em todos */
-    box-sizing:border-box;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: clamp(10px, 0.9vw, 15px) clamp(10px, 0.9vw, 14px) clamp(8px, 0.7vw, 12px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: clamp(80px, 8vw, 106px); /* proporcional, sem altura fixa */
+    box-sizing: border-box;
   }
-  /* grid alinha as linhas pela maior célula → todos ficam igual */
+  /* grid de métricas: 2 colunas uniformes */
   .metrics-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    grid-auto-rows:1fr;    /* linhas de altura uniforme */
-    gap:10px;
-    align-items:stretch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 1fr;
+    gap: clamp(6px, 0.7vw, 10px);
+    align-items: stretch;
   }
   .mc-lbl{
-    font-size:10px;
-    font-weight:600;
-    color:var(--muted);
-    text-transform:none;
-    letter-spacing:.1px;
-    line-height:1.3;
+    font-size: clamp(9px, 0.7vw, 11px);
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: .1px;
+    line-height: 1.3;
   }
   .mc-val{
-    font-size:26px;
-    font-weight:800;
-    color:var(--greenl);
-    line-height:1;
-    letter-spacing:-0.5px;
+    font-size: clamp(18px, 1.8vw, 27px);
+    font-weight: 800;
+    color: var(--greenl);
+    line-height: 1;
+    letter-spacing: -0.5px;
   }
   .mc-delta{
-    font-size:11px;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    gap:3px;
+    font-size: clamp(9px, 0.7vw, 11px);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 3px;
   }
   .mc-delta.up{color:var(--greenl)}
   .mc-delta.dn{color:var(--red)}
@@ -357,8 +375,9 @@ function renderDashboard() {
     const tk_cur = s.vidas     > 0 ? s.tpv     / s.antecipacoes : 0;
     const tk_prv = s.vidas_prv > 0 ? s.tpv_prv / s.antecip_prv  : 0;
 
+    const extraClass = col.key === 'total' ? ' col-total' : '';
     const html = `
-    <div class="setor-col">
+    <div class="setor-col${extraClass}">
       <div class="pill-header ${col.pill}">${col.label}</div>
       <div class="metrics-grid">
         ${mc('Vidas Antecipando #',    s.vidas,          s.vidas_prv,       fmtVal)}
