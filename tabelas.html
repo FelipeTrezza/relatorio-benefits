@@ -124,7 +124,7 @@
     .sum-card.ok   .sc-val { color: var(--green); }
     .sum-card.warn .sc-val { color: var(--yellow); }
     .sum-card.err  .sc-val { color: var(--red); }
-    .sum-card.health .sc-val { color: #f0883e; font-size: 22px; }
+    .sum-card.health .sc-val { color: #21a366; font-size: 22px; }
 
     /* ── Health bar ── */
     .health-bar-wrap {
@@ -139,8 +139,8 @@
     .health-bar-fill {
       height: 100%;
       border-radius: 6px;
-      background: #f0883e;
-      width: 55%;
+      background: #21a366;
+      width: 64%;
       transition: width .5s ease;
     }
     .health-label {
@@ -203,6 +203,11 @@
       color: var(--muted);
       margin-top: 2px;
     }
+    .accounts-detail {
+      color: var(--text2);
+      font-style: italic;
+      margin-top: 3px;
+    }
     code {
       font-family: "SFMono-Regular", Consolas, monospace;
       font-size: 12px;
@@ -251,7 +256,7 @@
     </div>
     <div class="header-right">
       <div>
-        <div class="updated-at">Gerado em <strong>02/04/2026 às 07:25</strong></div>
+        <div class="updated-at">Gerado em <strong>02/04/2026 às 07:29</strong></div>
         <div class="updated-at" style="margin-top:3px">Auto-refresh a cada 5 min</div>
       </div>
       <button id="btn-atualizar" onclick="atualizarTabelas()">
@@ -266,11 +271,11 @@
 
   <div class="summary">
     <div class="sum-card health">
-      <div class="sc-val">Atenção</div>
+      <div class="sc-val">Saudável</div>
       <div class="sc-lbl">Status geral</div>
     </div>
     <div class="sum-card ok">
-      <div class="sc-val">6</div>
+      <div class="sc-val">7</div>
       <div class="sc-lbl">✅ Atualizadas</div>
     </div>
     <div class="sum-card warn">
@@ -278,7 +283,7 @@
       <div class="sc-lbl">⚠️ Com atraso</div>
     </div>
     <div class="sum-card err">
-      <div class="sc-val">1</div>
+      <div class="sc-val">0</div>
       <div class="sc-lbl">❌ Com problema</div>
     </div>
     <div class="sum-card" style="border-color:var(--border)">
@@ -291,7 +296,7 @@
     <div class="health-bar-bg">
       <div class="health-bar-fill"></div>
     </div>
-    <div class="health-label">55% das tabelas atualizadas</div>
+    <div class="health-label">64% das tabelas atualizadas</div>
   </div>
 
   <div class="table-wrap">
@@ -311,6 +316,7 @@
           <td class="col-table">
             <span class="table-name">benefits.collaborators</span>
             <span class="table-desc">Base de colaboradores elegíveis ao benefício</span>
+            
           </td>
           <td class="col-col"><code>updated_at</code></td>
           <td class="col-date">02/04/2026</td>
@@ -321,6 +327,7 @@
           <td class="col-table">
             <span class="table-name">benefits.companies</span>
             <span class="table-desc">Cadastro de empresas conveniadas</span>
+            
           </td>
           <td class="col-col"><code>updated_at</code></td>
           <td class="col-date">01/04/2026</td>
@@ -331,16 +338,18 @@
           <td class="col-table">
             <span class="table-name">benefits.accounts</span>
             <span class="table-desc">Contas de empresas no Benefits</span>
+            <span class="table-desc accounts-detail">253 empresas · sem alterações</span>
           </td>
           <td class="col-col"><code>updated_at</code></td>
           <td class="col-date">27/03/2026</td>
-          <td class="col-rows">253</td>
-          <td class="col-status"><span class="badge status-error">5d atrás</span></td>
+          <td class="col-rows"><span title="253 empresas · sem alterações">253</span></td>
+          <td class="col-status"><span class="badge status-ok">Estável</span></td>
         </tr>
         <tr>
           <td class="col-table">
             <span class="table-name">consumers.consumers</span>
             <span class="table-desc">Base de consumidores PicPay</span>
+            
           </td>
           <td class="col-col"><code>sent_bacen_at</code></td>
           <td class="col-date">02/04/2026</td>
@@ -351,6 +360,7 @@
           <td class="col-table">
             <span class="table-name">benefits.anticipation_request</span>
             <span class="table-desc">Solicitações de antecipação de salário</span>
+            
           </td>
           <td class="col-col"><code>created_at</code></td>
           <td class="col-date">31/03/2026</td>
@@ -361,6 +371,7 @@
           <td class="col-table">
             <span class="table-name">benefits.sec_wage_advance_collaborator_margins</span>
             <span class="table-desc">Margens de antecipação por colaborador</span>
+            
           </td>
           <td class="col-col"><code>updated_at</code></td>
           <td class="col-date">02/04/2026</td>
@@ -371,6 +382,7 @@
           <td class="col-table">
             <span class="table-name">consumers.daily_consumers_labels_and_metrics</span>
             <span class="table-desc">Métricas diárias de consumidores (MAU, labels)</span>
+            
           </td>
           <td class="col-col"><code>metric_date</code></td>
           <td class="col-date">31/03/2026</td>
@@ -381,6 +393,7 @@
           <td class="col-table">
             <span class="table-name">marketing.consumers_campaigns_communications</span>
             <span class="table-desc">Comunicações de campanhas de marketing</span>
+            
           </td>
           <td class="col-col"><code>sent_at</code></td>
           <td class="col-date">31/03/2026</td>
@@ -391,6 +404,7 @@
           <td class="col-table">
             <span class="table-name">benefits.all_movements</span>
             <span class="table-desc">Movimentações consolidadas Benefits</span>
+            
           </td>
           <td class="col-col"><code>created_at</code></td>
           <td class="col-date">02/04/2026</td>
@@ -401,6 +415,7 @@
           <td class="col-table">
             <span class="table-name">picpay.all_transactions</span>
             <span class="table-desc">Transações consolidadas PicPay</span>
+            
           </td>
           <td class="col-col"><code>created_at</code></td>
           <td class="col-date">31/03/2026</td>
@@ -411,6 +426,7 @@
           <td class="col-table">
             <span class="table-name">benefits.benefits_purchases</span>
             <span class="table-desc">Compras realizadas via Benefits</span>
+            
           </td>
           <td class="col-col"><code>created_at</code></td>
           <td class="col-date">02/04/2026</td>
