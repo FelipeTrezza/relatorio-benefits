@@ -816,8 +816,14 @@ function setFmktMode(mode){
   document.getElementById('fmkt-act-buttons').innerHTML = '';
 }
 
+var FMKT_JOURNEY_DATES = {from: '', to: ''}; // guarda o range da journey para activities individuais
+
 // ── Renderizar botões de activities de uma journey ─────────────
-function renderActivityButtons(activities, journeyName){
+function renderActivityButtons(activities, journeyName, dateFrom, dateTo){
+  // Guardar datas da journey para uso nas activities individuais
+  if(dateFrom) FMKT_JOURNEY_DATES.from = dateFrom;
+  if(dateTo)   FMKT_JOURNEY_DATES.to   = dateTo;
+
   var wrap = document.getElementById('fmkt-journey-activities');
   var btns = document.getElementById('fmkt-act-buttons');
   if(!activities || !activities.length){ wrap.style.display='none'; return; }
@@ -839,10 +845,12 @@ function renderActivityButtons(activities, journeyName){
 }
 
 // ── Buscar activity individual da journey ──────────────────────
+// Usa o range da journey como período para cobrir todos os steps
 function buscarActivityDaJourney(activityName){
   setFmktMode('activity');
   document.getElementById('fmkt-input').value = activityName;
-  buscarFunil();
+  // Passar o range da journey para o buscarFunil
+  buscarFunil(FMKT_JOURNEY_DATES.from || '', FMKT_JOURNEY_DATES.to || '');
 }
 
 function genRequestId(){
@@ -917,7 +925,7 @@ function renderResult(data){
 
   // Se for journey → mostrar botões de activities
   if(data.search_mode === 'journey' && data.activities && data.activities.length){
-    renderActivityButtons(data.activities, data.journey_name);
+    renderActivityButtons(data.activities, data.journey_name, data.date_from, data.date_to);
     fmktStatus(
       '✅ Journey carregada · ' + data.activities.length + ' activities vinculadas',
       'var(--green)'

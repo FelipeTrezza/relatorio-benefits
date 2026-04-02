@@ -71,24 +71,44 @@ else:
     where_filter = "activity_name = '%s'" % val_safe
     name_label   = activity
 
-# ── Se for journey: buscar activities vinculadas ────────────────────
+# ── Se for journey: buscar activities vinculadas + período da journey ───
 activities_list = []
+journey_date_from = None
+journey_date_to   = None
+
 if search_mode == "journey":
     try:
+        # Buscar activities E o período completo da journey num único select
         sql_acts = (
-            "SELECT DISTINCT activity_name, COUNT(DISTINCT consumer_id) AS consumers "
+            "SELECT "
+            "  activity_name, "
+            "  COUNT(DISTINCT consumer_id) AS consumers, "
+            "  date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, "
+            "  date_format(max(sent_at),'yyyy-MM-dd') AS dt_to "
             "FROM marketing.consumers_campaigns_communications "
             "WHERE journey_name = '%s' "
             "GROUP BY activity_name ORDER BY consumers DESC"
         ) % val_safe
-        r = run_q(sql_acts, timeout=60)
+        r = run_q(sql_acts, timeout=120)
         activities_list = [row[0] for row in r["rows"]]
+        # Período da journey = min(dt_from) de todas as activities → max(dt_to)
+        all_from = [row[2] for row in r["rows"] if row[2]]
+        all_to   = [row[3] for row in r["rows"] if row[3]]
+        if all_from and all_to:
+            journey_date_from = min(all_from)
+            journey_date_to   = max(all_to)
     except Exception as e:
-        # Não crítico — seguir sem a lista
         activities_list = []
 
-# ── Detectar período se não passado ────────────────────────────────
-if not date_from or not date_to:
+# ── Detectar período ────────────────────────────────────────────────
+# Para journey: usar o range completo da journey (cobre todas as activities)
+# Para activity: detectar pelo próprio where_filter
+if search_mode == "journey" and journey_date_from and journey_date_to:
+    # Período da journey já calculado acima — usar mesmo que date_from/to foram passados
+    # pois a intenção é cobrir TODAS as activities
+    date_from = journey_date_from
+    date_to   = journey_date_to
+elif not date_from or not date_to:
     sql_period = (
         "SELECT date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, "
         "       date_format(max(sent_at),'yyyy-MM-dd') AS dt_to, "
