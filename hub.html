@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benefits Analytics — Hub de Dashboards</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surf2: #1c2330;
+    --border: #30363d;
+    --green: #21a366;
+    --greenl: #2dc974;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --orange: #f0883e;
+    --yellow: #e3b341;
+    --red: #f85149;
+    --muted: #8b949e;
+    --text: #e6edf3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--green), var(--greenl));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 16px rgba(33,163,102,.35);
+    flex-shrink: 0;
+  }
+
+  .header-text h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .header-text p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .badge-live {
+    margin-left: auto;
+    background: rgba(33,163,102,.15);
+    border: 1px solid rgba(33,163,102,.4);
+    color: var(--greenl);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .badge-live::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--greenl);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* MAIN */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* GRID DE CARDS */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color .2s, transform .15s, box-shadow .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    border-color: var(--green);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.4), 0 0 0 1px rgba(33,163,102,.15);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .card.green::before  { background: linear-gradient(90deg, var(--green), var(--greenl)); }
+  .card.blue::before   { background: linear-gradient(90deg, #1d6fc4, var(--blue)); }
+  .card.purple::before { background: linear-gradient(90deg, #7c3aed, var(--purple)); }
+  .card.orange::before { background: linear-gradient(90deg, #b45309, var(--orange)); }
+  .card.teal::before   { background: linear-gradient(90deg, #0e7490, #22d3ee); }
+  .card.pink::before   { background: linear-gradient(90deg, #be185d, #f472b6); }
+
+  .card-icon {
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+
+  .tag-green  { background: rgba(33,163,102,.15); color: var(--greenl); border: 1px solid rgba(33,163,102,.3); }
+  .tag-blue   { background: rgba(88,166,255,.12); color: var(--blue); border: 1px solid rgba(88,166,255,.25); }
+  .tag-purple { background: rgba(188,140,255,.12); color: var(--purple); border: 1px solid rgba(188,140,255,.25); }
+  .tag-orange { background: rgba(240,136,62,.12); color: var(--orange); border: 1px solid rgba(240,136,62,.25); }
+  .tag-muted  { background: rgba(139,148,158,.1); color: var(--muted); border: 1px solid rgba(139,148,158,.2); }
+  .tag-teal   { background: rgba(34,211,238,.1); color: #22d3ee; border: 1px solid rgba(34,211,238,.2); }
+
+  .card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(33,163,102,.12);
+    border: 1px solid rgba(33,163,102,.35);
+    color: var(--greenl);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background .2s, border-color .2s;
+    width: fit-content;
+  }
+
+  .card-link:hover {
+    background: rgba(33,163,102,.22);
+    border-color: rgba(33,163,102,.6);
+  }
+
+  .card-link svg {
+    flex-shrink: 0;
+  }
+
+  /* CARD DESTAQUE (TV) */
+  .card-featured {
+    grid-column: 1 / -1;
+    background: #0e2318;
+    border: 2px solid rgba(33,163,102,.5);
+    box-shadow: 0 0 24px rgba(33,163,102,.12);
+  }
+
+  .card-featured .card-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .card-featured .card-info { flex: 1; min-width: 200px; }
+
+  .card-featured .card-title { font-size: 17px; }
+
+  .featured-badge {
+    background: linear-gradient(135deg, var(--green), var(--greenl));
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+
+  /* FUNIL CARD */
+  .card-external .card-link {
+    background: rgba(88,166,255,.1);
+    border-color: rgba(88,166,255,.3);
+    color: var(--blue);
+  }
+  .card-external .card-link:hover {
+    background: rgba(88,166,255,.2);
+    border-color: rgba(88,166,255,.5);
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer span {
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📊</div>
+  <div class="header-text">
+    <h1>Benefits Analytics</h1>
+    <p>Hub de Dashboards — Dados atualizados diariamente via Databricks</p>
+  </div>
+  <div class="badge-live">Live</div>
+</header>
+
+<main>
+
+  <!-- DASHBOARDS PRINCIPAIS -->
+  <div class="section-title">📈 Dashboards Principais</div>
+  <div class="grid">
+
+    <!-- Abertura de Contas -->
+    <div class="card green">
+      <div class="card-icon">🏦</div>
+      <div class="card-title">Abertura de Contas</div>
+      <div class="card-desc">Evolução mensal de abertura de contas por secretaria. Segmentado por Público, Privado, Grupo e INSS. Atualização diária.</div>
+      <div class="card-tags">
+        <span class="tag tag-green">Mensal</span>
+        <span class="tag tag-muted">Público · Privado · Grupo · INSS</span>
+      </div>
+      <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/" target="_blank">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Acessar Dashboard
+      </a>
+    </div>
+
+    <!-- Antecipações -->
+    <div class="card blue">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Antecipações de Salário</div>
+      <div class="card-desc">Vidas, antecipações, TPV e ticket médio. Visão completa e visão sem GDF/RJ. Todas as secretarias, segmentado por setor.</div>
+      <div class="card-tags">
+        <span class="tag tag-blue">MTD</span>
+        <span class="tag tag-muted">Público · Privado · Grupo</span>
+      </div>
+      <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/antecipacoes.html" target="_blank" style="background:rgba(88,166,255,.1);border-color:rgba(88,166,255,.3);color:var(--blue);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Acessar Dashboard
+      </a>
+    </div>
+
+    <!-- PIX -->
+    <div class="card purple">
+      <div class="card-icon">💸</div>
+      <div class="card-title">Antecipações via PIX</div>
+      <div class="card-desc">Recorte exclusivo das antecipações com destino PIX. Mesma estrutura do relatório principal, filtrado por cashin_destiny = PIX.</div>
+      <div class="card-tags">
+        <span class="tag tag-purple">PIX</span>
+        <span class="tag tag-muted">Destino · Canal</span>
+      </div>
+      <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/pix.html" target="_blank" style="background:rgba(188,140,255,.1);border-color:rgba(188,140,255,.3);color:var(--purple);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Acessar Dashboard
+      </a>
+    </div>
+
+    <!-- Score Antecipações -->
+    <div class="card orange">
+      <div class="card-icon">🎯</div>
+      <div class="card-title">Score de Antecipações</div>
+      <div class="card-desc">Análise profunda de propensão. Funil real de conversão, perfil RFM, sazonalidade, destino do pagamento e funil de campanha MKT.</div>
+      <div class="card-tags">
+        <span class="tag tag-orange">Análise Profunda</span>
+        <span class="tag tag-muted">RFM · Funil · MKT</span>
+      </div>
+      <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/score.html" target="_blank" style="background:rgba(240,136,62,.1);border-color:rgba(240,136,62,.3);color:var(--orange);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Acessar Dashboard
+      </a>
+    </div>
+
+    <!-- Monitor de Tabelas -->
+    <div class="card teal">
+      <div class="card-icon">🗄️</div>
+      <div class="card-title">Monitor de Tabelas</div>
+      <div class="card-desc">Status de atualização das 11 tabelas Databricks do Benefits. Alerta por atraso (26h+) ou problema (72h+). Atualizado diariamente às 8h.</div>
+      <div class="card-tags">
+        <span class="tag tag-teal">Infra · Dados</span>
+        <span class="tag tag-muted">11 tabelas</span>
+      </div>
+      <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/tabelas.html" target="_blank" style="background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.25);color:#22d3ee;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Acessar Monitor
+      </a>
+    </div>
+
+  </div>
+
+  <!-- TV DASHBOARD — DESTAQUE -->
+  <div class="section-title">📺 Dashboard TV</div>
+  <div class="grid">
+    <div class="card green card-featured" style="grid-column:1/-1;">
+      <div class="featured-badge">⭐ Destaque</div>
+      <div class="card-content">
+        <div class="card-info">
+          <div class="card-title" style="font-size:17px;margin-bottom:8px;">📺 &nbsp;Dashboard TV — Loop Automático</div>
+          <div class="card-desc" style="font-size:13px;max-width:520px;">3 slides em rotação automática de 1 minuto: <strong style="color:#fff">Todas as Antecipações</strong>, <strong style="color:#fff">Excluindo GDF/RJ</strong> e <strong style="color:#fff">PIX</strong>. Ideal para exibição em TV do time. Suporta fullscreen.</div>
+          <div class="card-tags" style="margin-top:12px;">
+            <span class="tag tag-green">Fullscreen</span>
+            <span class="tag tag-green">Auto-refresh 5min</span>
+            <span class="tag tag-muted">3 slides · 1min cada</span>
+          </div>
+        </div>
+        <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/tv.html" target="_blank" style="padding:12px 20px;font-size:13px;white-space:nowrap;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Abrir Dashboard TV
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FERRAMENTA EXTERNA -->
+  <div class="section-title">🔬 Análise de Campanhas</div>
+  <div class="grid">
+    <div class="card blue card-external" style="grid-column:1/-1;">
+      <div class="card-content" style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <div class="card-title" style="margin-bottom:8px;">🎪 &nbsp;Funil de Campanha MKT</div>
+          <div class="card-desc" style="font-size:13px;max-width:520px;">Análise de funil por activity ou journey de campanhas de marketing. Busca dinâmica via Cloudflare Worker → GitHub Actions → Databricks. Suporta múltiplas activities, cache local e comparativo automático.</div>
+          <div class="card-tags" style="margin-top:12px;">
+            <span class="tag tag-blue">Dinâmico</span>
+            <span class="tag tag-blue">Activity · Journey</span>
+            <span class="tag tag-muted">Cloudflare Worker</span>
+          </div>
+        </div>
+        <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/score.html#funil-mkt" target="_blank">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Acessar Funil MKT
+        </a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Mantido por <span>Benefits Analytics</span> · Dados via Databricks · Atualização automática diária 🐺
+</footer>
+
+</body>
+</html>
