@@ -531,6 +531,7 @@ tbody td{padding:9px 14px;font-size:12px}
 //  FUNIL DE CAMPANHA — v4 (simples, robusto, sem dependência de tags)
 // ═══════════════════════════════════════════════════════════════════
 var FMKT_RESULTS={}, FMKT_SETOR_AT='total', FMKT_CANAL_AT='todos', FMKT_CAMP_AT=null;
+var FMKT_CACHE={}; // cache: "activity::dateFrom::dateTo" → resultado JSON
 var CAMP_COLORS=['#21a366','#58a6ff','#bc8cff','#f0883e','#e3b341','#ff7b72'];
 var CANAL_DOT={INAPP:'#bc8cff',PUSH:'#58a6ff',DM:'#f0883e',EMAIL:'#e3b341',WHATSAPP:'#21c25e',SMS:'#8b949e'};
 function campColor(i){return CAMP_COLORS[i%CAMP_COLORS.length];}
@@ -847,9 +848,22 @@ function renderActivityButtons(activities, journeyName, dateFrom, dateTo){
 // ── Buscar activity individual da journey ──────────────────────
 // Usa o range da journey como período para cobrir todos os steps
 function buscarActivityDaJourney(activityName){
-  setFmktMode('activity');
+  // Mudar modo para activity SEM limpar os botões da journey
+  FMKT_MODE = 'activity';
+  document.getElementById('fmkt-mode-activity').classList.add('active');
+  document.getElementById('fmkt-mode-journey').classList.remove('active');
   document.getElementById('fmkt-input').value = activityName;
-  // Passar o range da journey para o buscarFunil
+  // NÃO esconde fmkt-journey-activities — mantém botões visíveis
+
+  // Destacar o botão clicado
+  document.querySelectorAll('#fmkt-act-buttons button').forEach(function(b){
+    var isActive = b.getAttribute('title') === activityName;
+    b.style.borderColor  = isActive ? 'var(--green)'  : 'var(--border)';
+    b.style.background   = isActive ? 'rgba(33,163,102,.2)' : 'var(--surf2)';
+    b.style.color        = isActive ? 'var(--green)'  : 'var(--text)';
+    b.style.fontWeight   = isActive ? '700' : '400';
+  });
+
   buscarFunil(FMKT_JOURNEY_DATES.from || '', FMKT_JOURNEY_DATES.to || '');
 }
 
@@ -969,6 +983,18 @@ function buscarFunil(customDateFrom, customDateTo){
     document.getElementById('fmkt-filtros').style.display = 'none';
     document.getElementById('fmkt-offline-banner').style.display = 'none';
 
+    // Cache para journey também
+    var journeyCacheKey = 'journey::' + inputVal + '::' + (customDateFrom||'') + '::' + (customDateTo||'');
+    if(FMKT_CACHE[journeyCacheKey]){
+      btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+      fmktStatus('⚡ Carregado do cache instantaneamente!', 'var(--green)');
+      renderResult(FMKT_CACHE[journeyCacheKey]);
+      document.getElementById('fmkt-result').style.display  = 'block';
+      document.getElementById('fmkt-filtros').style.display = 'block';
+      redrawAll();
+      return;
+    }
+
     fmktStatus('⏳ Buscando journey no Databricks… aguarde ~90s.','var(--blue)');
     var elapsed=0;
     var progressId = setInterval(function(){
@@ -981,7 +1007,10 @@ function buscarFunil(customDateFrom, customDateTo){
       .then(function(r){
         if(!r.ok) throw new Error('dispatch HTTP ' + r.status);
         pollResult(rid,
-          function(data){ clearInterval(progressId); renderResult(data);
+          function(data){
+            clearInterval(progressId);
+            if(data.ok) FMKT_CACHE[journeyCacheKey] = data;
+            renderResult(data);
             document.getElementById('fmkt-result').style.display  = 'block';
             document.getElementById('fmkt-filtros').style.display = 'block';
             redrawAll();
@@ -1037,6 +1066,19 @@ function buscarFunil(customDateFrom, customDateTo){
   }, 1000);
 
   activities.forEach(function(act){
+    // ── Cache hit: resultado já existe, reusar sem novo dispatch ──
+    var cacheKey = act + '::' + (customDateFrom||'') + '::' + (customDateTo||'');
+    if(FMKT_CACHE[cacheKey]){
+      concluido++;
+      clearInterval(progressId);
+      fmktStatus('⚡ Carregado do cache instantaneamente!', 'var(--green)');
+      renderResult(FMKT_CACHE[cacheKey]);
+      if(concluido + erros === total){
+        btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+      }
+      return;
+    }
+
     var rid = genRequestId();
 
     dispatchWorkflow(act, customDateFrom||'', customDateTo||'', rid)
@@ -1048,6 +1090,8 @@ function buscarFunil(customDateFrom, customDateTo){
           function(data){
             concluido++;
             clearInterval(progressId);
+            // Salvar no cache para reusos futuros
+            if(data.ok) FMKT_CACHE[cacheKey] = data;
             renderResult(data);
             if(concluido + erros === total){
               btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
