@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="300">
+  <title>Monitor de Tabelas — Benefits Analytics</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surf2: #1c2330;
+      --border: #30363d;
+      --green: #21a366;
+      --greenl: #2dc974;
+      --blue: #58a6ff;
+      --yellow: #e3b341;
+      --orange: #f0883e;
+      --red: #f85149;
+      --muted: #8b949e;
+      --text: #e6edf3;
+      --text2: #c9d1d9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-icon { font-size: 28px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text); }
+    .header-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .header-right { text-align: right; }
+    .updated-at { font-size: 12px; color: var(--muted); }
+    .updated-at strong { color: var(--text2); }
+
+    /* ── Summary cards ── */
+    .summary {
+      display: flex;
+      gap: 16px;
+      padding: 24px 32px 0;
+      flex-wrap: wrap;
+    }
+    .sum-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 24px;
+      min-width: 160px;
+      flex: 1;
+    }
+    .sum-card .sc-val {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .sum-card .sc-lbl {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+    .sum-card.ok   .sc-val { color: var(--green); }
+    .sum-card.warn .sc-val { color: var(--yellow); }
+    .sum-card.err  .sc-val { color: var(--red); }
+    .sum-card.health .sc-val { color: #f85149; font-size: 22px; }
+
+    /* ── Health bar ── */
+    .health-bar-wrap {
+      padding: 20px 32px 0;
+    }
+    .health-bar-bg {
+      background: var(--surf2);
+      border-radius: 6px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .health-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: #f85149;
+      width: 27%;
+      transition: width .5s ease;
+    }
+    .health-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      padding: 24px 32px 0;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    thead tr {
+      background: var(--surf2);
+    }
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+    tbody tr:hover {
+      background: var(--surface);
+    }
+    td {
+      padding: 12px 14px;
+      vertical-align: middle;
+    }
+    .col-table { min-width: 260px; }
+    .col-col   { min-width: 160px; }
+    .col-date  { min-width: 150px; white-space: nowrap; }
+    .col-rows  { min-width: 110px; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .col-status { min-width: 110px; text-align: center; }
+
+    .table-name {
+      display: block;
+      font-weight: 600;
+      color: var(--blue);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
+    }
+    .table-desc {
+      display: block;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    code {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      color: var(--orange);
+      background: rgba(240,136,62,.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .4px;
+    }
+    .status-ok    { background: rgba(33,163,102,.18); color: #2dc974; border: 1px solid rgba(33,163,102,.4); }
+    .status-warn  { background: rgba(227,179,65,.15);  color: #e3b341; border: 1px solid rgba(227,179,65,.4); }
+    .status-error { background: rgba(248,81,73,.15);   color: #f85149; border: 1px solid rgba(248,81,73,.4); }
+    .err-msg { color: var(--red); font-size: 11.5px; }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 28px 32px 0;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:.3; } }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-left">
+      <span class="header-icon">🗄️</span>
+      <div>
+        <div class="header-title">Monitor de Tabelas — Benefits Analytics</div>
+        <div class="header-sub">Acompanhamento diário de atualização das fontes de dados</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="updated-at">Gerado em <strong>02/04/2026 às 07:15</strong></div>
+      <div class="updated-at" style="margin-top:3px">Auto-refresh a cada 5 min</div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="sum-card health">
+      <div class="sc-val">Crítico</div>
+      <div class="sc-lbl">Status geral</div>
+    </div>
+    <div class="sum-card ok">
+      <div class="sc-val">3</div>
+      <div class="sc-lbl">✅ Atualizadas</div>
+    </div>
+    <div class="sum-card warn">
+      <div class="sc-val">3</div>
+      <div class="sc-lbl">⚠️ Com atraso</div>
+    </div>
+    <div class="sum-card err">
+      <div class="sc-val">5</div>
+      <div class="sc-lbl">❌ Com problema</div>
+    </div>
+    <div class="sum-card" style="border-color:var(--border)">
+      <div class="sc-val" style="color:var(--text2)">11</div>
+      <div class="sc-lbl">Total monitoradas</div>
+    </div>
+  </div>
+
+  <div class="health-bar-wrap">
+    <div class="health-bar-bg">
+      <div class="health-bar-fill"></div>
+    </div>
+    <div class="health-label">27% das tabelas atualizadas</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tabela</th>
+          <th>Coluna monitorada</th>
+          <th>Última atualização</th>
+          <th style="text-align:right">Total linhas</th>
+          <th style="text-align:center">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td class="col-table">
+            <span class="table-name">benefits.collaborators</span>
+            <span class="table-desc">Base de colaboradores elegíveis ao benefício</span>
+          </td>
+          <td class="col-col"><code>updated_at</code></td>
+          <td class="col-date">02/04/2026</td>
+          <td class="col-rows">1.900.158</td>
+          <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">benefits.companies</span>
+            <span class="table-desc">Cadastro de empresas conveniadas</span>
+          </td>
+          <td class="col-col"><code>updated_at</code></td>
+          <td class="col-date">01/04/2026</td>
+          <td class="col-rows">1.663</td>
+          <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">benefits.accounts</span>
+            <span class="table-desc">Contas de empresas no Benefits</span>
+          </td>
+          <td class="col-col"><code>updated_at</code></td>
+          <td class="col-date">27/03/2026</td>
+          <td class="col-rows">253</td>
+          <td class="col-status"><span class="badge status-error">5d atrás</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">consumers.consumers</span>
+            <span class="table-desc">Base de consumidores PicPay</span>
+          </td>
+          <td class="col-col"><code>updated_at</code></td>
+          <td class="col-date"><span class="err-msg">[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or f</span></td>
+          <td class="col-rows">—</td>
+          <td class="col-status"><span class="badge status-error">Erro</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">benefits.anticipation_request</span>
+            <span class="table-desc">Solicitações de antecipação de salário</span>
+          </td>
+          <td class="col-col"><code>created_at</code></td>
+          <td class="col-date">31/03/2026</td>
+          <td class="col-rows">7.298.281</td>
+          <td class="col-status"><span class="badge status-warn">1d atrás</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">benefits.sec_wage_advance_collaborator_margins</span>
+            <span class="table-desc">Margens de antecipação por colaborador</span>
+          </td>
+          <td class="col-col"><code>updated_at</code></td>
+          <td class="col-date">02/04/2026</td>
+          <td class="col-rows">20.579.092</td>
+          <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">consumers.daily_consumers_labels_and_metrics</span>
+            <span class="table-desc">Métricas diárias de consumidores (MAU, labels)</span>
+          </td>
+          <td class="col-col"><code>ref_date</code></td>
+          <td class="col-date"><span class="err-msg">[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or f</span></td>
+          <td class="col-rows">—</td>
+          <td class="col-status"><span class="badge status-error">Erro</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">marketing.consumers_campaigns_communications</span>
+            <span class="table-desc">Comunicações de campanhas de marketing</span>
+          </td>
+          <td class="col-col"><code>sent_at</code></td>
+          <td class="col-date">31/03/2026</td>
+          <td class="col-rows">16.118.491.272</td>
+          <td class="col-status"><span class="badge status-warn">1d atrás</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">benefits.all_moviments</span>
+            <span class="table-desc">Movimentações consolidadas Benefits</span>
+          </td>
+          <td class="col-col"><code>created_at</code></td>
+          <td class="col-date"><span class="err-msg">[TABLE_OR_VIEW_NOT_FOUND] The table or view `benefits`.`all_</span></td>
+          <td class="col-rows">—</td>
+          <td class="col-status"><span class="badge status-error">Erro</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">picpay.all_transactions</span>
+            <span class="table-desc">Transações consolidadas PicPay</span>
+          </td>
+          <td class="col-col"><code>created_at</code></td>
+          <td class="col-date">31/03/2026</td>
+          <td class="col-rows">23.578.660.372</td>
+          <td class="col-status"><span class="badge status-warn">1d atrás</span></td>
+        </tr>
+        <tr>
+          <td class="col-table">
+            <span class="table-name">benefits.benefits_purchase</span>
+            <span class="table-desc">Compras realizadas via Benefits</span>
+          </td>
+          <td class="col-col"><code>created_at</code></td>
+          <td class="col-date"><span class="err-msg">[TABLE_OR_VIEW_NOT_FOUND] The table or view `benefits`.`bene</span></td>
+          <td class="col-rows">—</td>
+          <td class="col-status"><span class="badge status-error">Erro</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <span class="dot"></span>
+    Critérios: <strong style="color:var(--green)">Atualizado</strong> = ≤26h &nbsp;|&nbsp;
+    <strong style="color:var(--yellow)">Atraso</strong> = 26h–72h &nbsp;|&nbsp;
+    <strong style="color:var(--red)">Problema</strong> = &gt;72h ou erro
+  </div>
+
+</body>
+</html>
