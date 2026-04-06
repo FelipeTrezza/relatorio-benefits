@@ -1258,11 +1258,117 @@ var SETOR_DATA = {
   }
 };
 
-function setSetor(s){
+function updateKpis(s){
+  // Atualiza abas do seletor de KPI
   ['total','publico','grupo','privado'].forEach(function(x){
-    document.getElementById('stab-'+x).classList.toggle('active', x===s);
+    var t = document.getElementById('kpitab-'+x);
+    if(t) t.classList.toggle('active', x===s);
+  });
+  // Também sincroniza os stabs da seção de análise por setor
+  ['total','publico','grupo','privado'].forEach(function(x){
+    var t = document.getElementById('stab-'+x);
+    if(t) t.classList.toggle('active', x===s);
   });
   var d = SETOR_DATA[s];
+  if(!d) return;
+  var cor = d.cor;
+
+  // helpers
+  function pctOf(a,b){ return b>0 ? Math.round(a/b*100)+'%' : '—'; }
+  function parseN(v){ // '915.2k' → 915200, '1.14M' → 1140000
+    if(!v) return 0;
+    var s2 = v.replace('%*','').replace('%','').replace(',','.');
+    if(s2.indexOf('M')>-1) return parseFloat(s2)*1e6;
+    if(s2.indexOf('k')>-1) return parseFloat(s2)*1e3;
+    return parseFloat(s2)||0;
+  }
+  var nVidas  = parseN(d.vidas);
+  var nConta  = parseN(d.conta);
+  var nMargem = parseN(d.comMargem);
+  var nSemMar = parseN(d.semMargem);
+  var nMau    = parseN(d.mau);
+  var nMauCm  = parseN(d.mauComMargem);
+  var nMauSm  = parseN(d.mauSemMargem);
+  var nAnt    = parseN(d.antecipando);
+  var nSemCo  = parseN(d.semConta);
+
+  // KPI: Vidas
+  document.getElementById('kpi-vidas').textContent = d.vidas;
+  document.getElementById('kpi-vidas-sub').textContent = 'Elegíveis ao produto';
+  document.getElementById('kpi-vidas-bar').style.width = '100%';
+  document.getElementById('kpi-vidas-bar').style.background = 'var(--blue)';
+
+  // KPI: Com Conta
+  document.getElementById('kpi-conta').textContent = d.conta;
+  document.getElementById('kpi-conta').style.color = cor;
+  document.getElementById('kpi-conta-sub').textContent = d.pctConta+' das vidas';
+  document.getElementById('kpi-conta-bar').style.width = d.atv+'%';
+  document.getElementById('kpi-conta-bar').style.background = 'var(--purple)';
+
+  // KPI: Com Margem
+  var pctMargem = nConta>0 ? Math.round(nMargem/nConta*100) : d.cmg;
+  document.getElementById('kpi-margem').textContent = d.comMargem;
+  document.getElementById('kpi-margem').style.color = '';
+  document.getElementById('kpi-margem-sub').textContent = pctMargem+'% dos com conta';
+  document.getElementById('kpi-margem-bar').style.width = Math.min(pctMargem,100)+'%';
+  document.getElementById('kpi-margem-bar').style.background = 'var(--green)';
+
+  // KPI: MAU
+  var pctMau = nConta>0 ? Math.round(nMau/nConta*100) : d.mauPct;
+  document.getElementById('kpi-mau').textContent = d.mau;
+  document.getElementById('kpi-mau').style.color = '';
+  document.getElementById('kpi-mau-sub').textContent = pctMau+'% dos com conta';
+  document.getElementById('kpi-mau-bar').style.width = Math.min(pctMau,100)+'%';
+  document.getElementById('kpi-mau-bar').style.background = 'var(--yellow)';
+
+  // KPI: Conta Sem Margem
+  var pctSemMar = nConta>0 ? Math.round(nSemMar/nConta*100) : 0;
+  document.getElementById('kpi-semmargem').textContent = d.semMargem;
+  document.getElementById('kpi-semmargem').style.color = '';
+  document.getElementById('kpi-semmargem-sub').textContent = pctSemMar+'% dos com conta';
+  document.getElementById('kpi-semmargem-bar').style.width = Math.min(pctSemMar,100)+'%';
+  document.getElementById('kpi-semmargem-bar').style.background = 'var(--orange)';
+
+  // KPI: Antecipando
+  var pctAnt = nMauCm>0 ? Math.round(nAnt/nMauCm*100) : d.ant;
+  document.getElementById('kpi-ant').textContent = d.antecipando;
+  document.getElementById('kpi-ant').style.color = cor;
+  document.getElementById('kpi-ant-sub').textContent = pctAnt+'% MAU c/ margem';
+  document.getElementById('kpi-ant-bar').style.width = Math.min(pctAnt,100)+'%';
+  document.getElementById('kpi-ant-bar').style.background = 'var(--greenl)';
+
+  // KPI: Sem Conta (Mercado)
+  var pctSemCo = nVidas>0 ? Math.round(nSemCo/nVidas*100) : 0;
+  document.getElementById('kpi-semconta').textContent = d.semConta;
+  document.getElementById('kpi-semconta').style.color = '';
+  document.getElementById('kpi-semconta-sub').textContent = pctSemCo+'% sem conta ainda';
+  document.getElementById('kpi-semconta-bar').style.width = Math.min(pctSemCo,100)+'%';
+  document.getElementById('kpi-semconta-bar').style.background = 'var(--red)';
+
+  // KPI: MAU Sem Margem
+  var pctMauSm = nConta>0 ? Math.round(nMauSm/nConta*100) : 0;
+  document.getElementById('kpi-mausemmargem').textContent = d.mauSemMargem;
+  document.getElementById('kpi-mausemmargem').style.color = '';
+  document.getElementById('kpi-mausemmargem-sub').textContent = 'MAU sem acesso';
+  document.getElementById('kpi-mausemmargem-bar').style.width = Math.max(pctMauSm,2)+'%';
+  document.getElementById('kpi-mausemmargem-bar').style.background = 'var(--pink)';
+  // Atualiza também o card detalhado da seção Análise por Setor
+  renderSetorCard(s);
+}
+
+function setSetor(s){
+  // Sincroniza abas da seção de análise por setor
+  ['total','publico','grupo','privado'].forEach(function(x){
+    var t = document.getElementById('stab-'+x);
+    if(t) t.classList.toggle('active', x===s);
+  });
+  // updateKpis cuida dos KPI cards e chama renderSetorCard
+  updateKpis(s);
+}
+
+function renderSetorCard(s){
+  var d = SETOR_DATA[s];
+  if(!d) return;
   var cor = d.cor;
   // cor rgba para boxes internos
   var corRgba = cor==='var(--blue)'   ? '88,166,255'
