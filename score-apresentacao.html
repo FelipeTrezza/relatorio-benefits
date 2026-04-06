@@ -122,6 +122,52 @@ body {
 
 .nav-btn:hover { border-color: var(--pp-green); color: var(--pp-green); }
 
+.fullscreen-btn {
+  background: var(--pp-green);
+  border-color: var(--pp-green);
+  color: #0F1923;
+  width: 42px; height: 42px;
+  font-weight: 700;
+}
+
+.fullscreen-btn:hover {
+  background: var(--pp-green-dark);
+  border-color: var(--pp-green-dark);
+  color: #fff;
+}
+
+/* Toast fullscreen */
+#fs-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15,25,35,.92);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 12px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+  white-space: nowrap;
+}
+
+#fs-toast.show { opacity: 1; }
+
+/* Esconder chrome no fullscreen */
+:fullscreen .nav-arrows,
+:fullscreen .nav-dots,
+:fullscreen .slide-counter,
+:fullscreen .progress-bar {
+  /* manter visível — apenas cursor */
+}
+
+:fullscreen body { cursor: none; }
+:fullscreen body:hover { cursor: default; }
+
 .slide-counter {
   position: fixed;
   bottom: 28px;
@@ -648,9 +694,19 @@ body {
 <div class="nav-dots" id="dots"></div>
 
 <div class="nav-arrows">
-  <button class="nav-btn" onclick="prev()">←</button>
-  <button class="nav-btn" onclick="next()">→</button>
+  <button class="nav-btn" onclick="prev()" title="Slide anterior (←)">←</button>
+  <button class="nav-btn" onclick="next()" title="Próximo slide (→)">→</button>
+  <button class="nav-btn fullscreen-btn" id="fs-btn" onclick="toggleFullscreen()" title="Modo apresentação (F)">
+    <svg id="fs-icon-enter" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/>
+    </svg>
+    <svg id="fs-icon-exit" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:none">
+      <path d="M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3"/>
+    </svg>
+  </button>
 </div>
+
+<div id="fs-toast"></div>
 
 <div class="deck" id="deck">
 
@@ -1690,7 +1746,51 @@ function prev() { if (cur > 0) goTo(cur-1); }
 document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+  if (e.key === 'f' || e.key === 'F' || e.key === 'F5') { e.preventDefault(); toggleFullscreen(); }
+  if (e.key === 'Escape') exitFullscreen();
 });
+
+// ── FULLSCREEN ──────────────────────────────────────────────────
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(function() {
+      updateFsButton(true);
+      showFsToast('Modo apresentação ativo · Esc para sair · ← → para navegar');
+    }).catch(function(){});
+  } else {
+    document.exitFullscreen().then(function() {
+      updateFsButton(false);
+    }).catch(function(){});
+  }
+}
+
+function exitFullscreen() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen().then(function() { updateFsButton(false); });
+  }
+}
+
+function updateFsButton(isFs) {
+  document.getElementById('fs-icon-enter').style.display = isFs ? 'none'  : 'block';
+  document.getElementById('fs-icon-exit').style.display  = isFs ? 'block' : 'none';
+  var btn = document.getElementById('fs-btn');
+  btn.style.background    = isFs ? 'transparent' : 'var(--pp-green)';
+  btn.style.borderColor   = isFs ? 'var(--border)' : 'var(--pp-green)';
+  btn.style.color         = isFs ? 'var(--text2)'  : '#0F1923';
+  btn.title = isFs ? 'Sair do modo apresentação (Esc)' : 'Modo apresentação (F)';
+}
+
+document.addEventListener('fullscreenchange', function() {
+  if (!document.fullscreenElement) updateFsButton(false);
+});
+
+function showFsToast(msg) {
+  var t = document.getElementById('fs-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
 
 // Day chart
 var dayData = [18777,24348,27121,32221,33274,26576,28352,29618,32181,41565,17189,13927,11921,11972,12802,11507,7899,7165,7737,9203,3846,3243,2881,2658,2516,2278,2054,1989,1949,1883,1675];
