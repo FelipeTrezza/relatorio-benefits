@@ -241,10 +241,66 @@ tbody td{padding:9px 14px;font-size:12px}
     <button class="nb" onclick="gs('rfm')">RFM</button>
     <button class="nb" onclick="gs('destino')">Destino</button>
   </nav>
-  <span class="badge-live">DADOS REAIS · MAR/2026</span>
+  <span class="badge-live">DADOS REAIS · ABR/2026</span>
+  <button id="btn-atualizar-score"
+    onclick="atualizarScore()"
+    title="Atualizar dados do dashboard com o mês atual"
+    style="margin-left:12px;background:rgba(33,163,102,.15);color:var(--green);border:1px solid rgba(33,163,102,.4);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap"
+    onmouseover="this.style.background='rgba(33,163,102,.3)'"
+    onmouseout="this.style.background='rgba(33,163,102,.15)'">
+    🔄 Atualizar dados
+  </button>
 </header>
 
 <div class="container">
+
+<script>
+function atualizarScore(){
+  var btn = document.getElementById('btn-atualizar-score');
+  btn.disabled = true;
+  btn.textContent = '⏳ Atualizando…';
+  btn.style.opacity = '.6';
+
+  fetch('http://localhost:5001/atualizar/score', {method:'POST'})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      btn.textContent = '⏳ Rodando queries…';
+      // Polling até concluir
+      var poll = setInterval(function(){
+        fetch('http://localhost:5001/status')
+          .then(function(r){ return r.json(); })
+          .then(function(s){
+            if(!s.running){
+              clearInterval(poll);
+              if(s.last_status === 'ok'){
+                btn.textContent = '✅ Atualizado!';
+                btn.style.background = 'rgba(33,163,102,.3)';
+                setTimeout(function(){
+                  btn.disabled=false;
+                  btn.textContent='🔄 Atualizar dados';
+                  btn.style.opacity='1';
+                  btn.style.background='rgba(33,163,102,.15)';
+                  // Recarregar para mostrar novos dados
+                  location.reload();
+                }, 2000);
+              } else {
+                btn.textContent = '❌ Erro — tente novamente';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+              }
+            }
+          })
+          .catch(function(){ clearInterval(poll); btn.textContent='⚠️ Servidor offline'; btn.disabled=false; btn.style.opacity='1'; });
+      }, 5000);
+    })
+    .catch(function(){
+      btn.textContent = '⚠️ Servidor local offline';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      setTimeout(function(){ btn.textContent='🔄 Atualizar dados'; }, 4000);
+    });
+}
+</script>
 
 <!-- HERO -->
 <div class="hero">
