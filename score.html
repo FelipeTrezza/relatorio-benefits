@@ -272,7 +272,7 @@ function atualizarScore(){
           .then(function(s){
             if(!s.running){
               clearInterval(poll);
-              if(s.last_status === 'ok'){
+              if(s.status === 'success'){
                 btn.textContent = '✅ Atualizado!';
                 btn.style.background = 'rgba(33,163,102,.3)';
                 setTimeout(function(){
