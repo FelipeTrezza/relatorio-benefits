@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Score de Antecipações — Benefits Analytics · PicPay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pp-green: #21E270;
+  --pp-green-dark: #00A550;
+  --pp-green-dim: rgba(33,226,112,.15);
+  --bg: #0F1923;
+  --card: #1A2535;
+  --card2: #1e2d42;
+  --border: #263347;
+  --text: #F0F4F8;
+  --text2: #8FA3BE;
+  --blue: #58a6ff;
+  --purple: #bc8cff;
+  --orange: #f0883e;
+  --yellow: #e3b341;
+  --red: #f85149;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ── SLIDES ── */
+.deck { width: 100%; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .45s ease, transform .45s ease;
+  transform: translateX(40px);
+  overflow: hidden;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0);
+}
+
+.slide.prev {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: var(--pp-green);
+  transition: width .4s ease;
+  z-index: 1000;
+}
+
+/* ── NAV ── */
+.nav-dots {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 999;
+}
+
+.nav-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  border: none;
+  cursor: pointer;
+  transition: all .25s;
+  padding: 0;
+}
+
+.nav-dot.active {
+  background: var(--pp-green);
+  width: 22px;
+  border-radius: 4px;
+}
+
+.nav-arrows {
+  position: fixed;
+  bottom: 18px;
+  right: 32px;
+  display: flex;
+  gap: 10px;
+  z-index: 999;
+}
+
+.nav-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+
+.nav-btn:hover { border-color: var(--pp-green); color: var(--pp-green); }
+
+.slide-counter {
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  font-size: 11px;
+  color: var(--text2);
+  z-index: 999;
+  font-weight: 500;
+  letter-spacing: .5px;
+}
+
+/* ── LOGO ── */
+.pp-logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  color: var(--text);
+}
+.pp-logo span { color: var(--pp-green); }
+
+/* ══════════════════════════════════════════════
+   SLIDE 1 — CAPA
+══════════════════════════════════════════════ */
+#s1 {
+  background: radial-gradient(ellipse at 30% 50%, rgba(33,226,112,.1) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(88,166,255,.07) 0%, transparent 50%),
+              var(--bg);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 48px;
+}
+
+#s1 .cover-logo {
+  margin-bottom: 48px;
+}
+
+#s1 .cover-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pp-green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+#s1 h1 {
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 900;
+  letter-spacing: -.04em;
+  line-height: 1.05;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, #ffffff 0%, #b0c4de 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+#s1 h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--pp-green) 0%, #00D4AA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+#s1 .cover-sub {
+  font-size: 18px;
+  color: var(--text2);
+  font-weight: 400;
+  margin-bottom: 48px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#s1 .cover-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+#s1 .cover-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#s1 .cover-pill {
+  background: var(--pp-dim);
+  border: 1px solid rgba(33,226,112,.3);
+  color: var(--pp-green);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: .5px;
+}
+
+.cover-bg-text {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(120px, 18vw, 220px);
+  font-weight: 900;
+  color: rgba(255,255,255,.025);
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: -.05em;
+}
+
+/* ══════════════════════════════════════════════
+   LAYOUT HELPERS
+══════════════════════════════════════════════ */
+.slide-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 60px;
+  overflow: hidden;
+}
+
+.slide-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-shrink: 0;
+}
+
+.slide-number {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pp-green);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.slide-title {
+  font-size: clamp(22px, 2.8vw, 36px);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.15;
+}
+
+.slide-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 6px;
+  font-weight: 400;
+}
+
+/* SLIDE TOP BAR */
+.slide-topbar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.card-sm { padding: 16px 18px; border-radius: 10px; }
+
+/* ── KPI ── */
+.kpi-val {
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 900;
+  letter-spacing: -.04em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.kpi-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.kpi-sub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+/* ── TAGS ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.tag-green  { background: rgba(33,226,112,.14); color: var(--pp-green); border: 1px solid rgba(33,226,112,.3); }
+.tag-blue   { background: rgba(88,166,255,.14); color: var(--blue); border: 1px solid rgba(88,166,255,.3); }
+.tag-purple { background: rgba(188,140,255,.14); color: var(--purple); border: 1px solid rgba(188,140,255,.3); }
+.tag-orange { background: rgba(240,136,62,.14); color: var(--orange); border: 1px solid rgba(240,136,62,.3); }
+
+/* ── GRID ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+/* ── BULLET LIST ── */
+.bullet-list { display: flex; flex-direction: column; gap: 14px; }
+.bullet-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 14px 18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.bullet-ic { font-size: 22px; flex-shrink: 0; }
+.bullet-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.bullet-desc { font-size: 13px; color: var(--text2); line-height: 1.55; }
+
+/* ── BAR ── */
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bar-lbl { font-size: 12px; color: var(--text2); width: 80px; text-align: right; flex-shrink: 0; }
+.bar-wrap { flex: 1; height: 22px; background: rgba(255,255,255,.06); border-radius: 5px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; border-radius: 5px; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,.9); }
+.bar-val { font-size: 12px; font-weight: 700; width: 90px; flex-shrink: 0; }
+
+/* ── HIGHLIGHT NUMBER ── */
+.hl { color: var(--pp-green); }
+
+/* ACCENT LEFT BORDER */
+.accent-card {
+  border-left: 3px solid var(--pp-green);
+}
+
+/* ══════════════════════════════════════════════
+   SLIDE 2 — O QUE É
+══════════════════════════════════════════════ */
+#s2 .concept-box {
+  background: linear-gradient(135deg, rgba(33,226,112,.08), rgba(33,226,112,.03));
+  border: 1px solid rgba(33,226,112,.25);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+#s2 .concept-box p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text2);
+}
+
+#s2 .concept-box p strong { color: var(--text); }
+
+/* ══════════════════════════════════════════════
+   SLIDE 3 — FUNIL
+══════════════════════════════════════════════ */
+.funnel-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 700px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+  justify-content: center;
+}
+
+.fn-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fn-bar-outer {
+  flex: 1;
+  position: relative;
+}
+
+.fn-bar {
+  height: 46px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  justify-content: space-between;
+  transition: width .8s ease;
+}
+
+.fn-lbl { font-size: 13px; font-weight: 600; }
+.fn-val { font-size: 14px; font-weight: 800; }
+.fn-num { width: 110px; text-align: right; font-size: 13px; font-weight: 700; color: var(--text2); flex-shrink: 0; }
+.fn-pct { width: 56px; text-align: right; font-size: 12px; font-weight: 700; color: var(--text2); flex-shrink: 0; }
+.fn-drop { font-size: 11px; color: var(--text2); padding: 2px 0 6px 14px; }
+
+/* ══════════════════════════════════════════════
+   SLIDE 6 — SAZONALIDADE
+══════════════════════════════════════════════ */
+.day-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 140px;
+  flex: 1;
+}
+
+.day-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.day-bar {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  min-height: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+
+.day-bar.peak { box-shadow: 0 0 8px rgba(33,226,112,.5); }
+.day-bar:hover { opacity: .8; }
+
+.day-num {
+  font-size: 8px;
+  color: var(--text2);
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════════
+   SLIDE 8 — DESTINO
+══════════════════════════════════════════════ */
+.dest-line-wrap {
+  position: relative;
+  height: 120px;
+  flex: 1;
+}
+
+.dest-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ══════════════════════════════════════════════
+   SLIDE 11 — CTA
+══════════════════════════════════════════════ */
+#s11 {
+  background: radial-gradient(ellipse at 50% 40%, rgba(33,226,112,.12) 0%, transparent 65%),
+              var(--bg);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 48px;
+}
+
+.cta-title {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 900;
+  letter-spacing: -.04em;
+  margin-bottom: 12px;
+}
+
+.cta-sub {
+  font-size: 16px;
+  color: var(--text2);
+  margin-bottom: 44px;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 44px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--pp-green);
+  color: #0F1923;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 16px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: opacity .2s, transform .15s;
+}
+
+.btn-primary:hover { opacity: .9; transform: translateY(-2px); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 16px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 2px solid var(--border);
+  transition: border-color .2s, transform .15s;
+}
+
+.btn-secondary:hover { border-color: var(--pp-green); transform: translateY(-2px); }
+
+.cta-note {
+  font-size: 12px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ── SETOR CARD ── */
+.setor-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.setor-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.setor-card.grupo::before  { background: var(--purple); }
+.setor-card.publico::before { background: var(--blue); }
+.setor-card.privado::before { background: var(--orange); }
+
+.setor-ic { font-size: 28px; margin-bottom: 10px; }
+.setor-name { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.setor-val { font-size: 32px; font-weight: 900; letter-spacing: -.03em; line-height: 1; margin-bottom: 12px; }
+.setor-stat { font-size: 12px; color: var(--text2); display: flex; justify-content: space-between; padding: 6px 0; border-top: 1px solid var(--border); }
+.setor-stat strong { color: var(--text); }
+
+/* MINI BAR */
+.mini-bar-wrap { height: 5px; background: rgba(255,255,255,.08); border-radius: 3px; margin: 8px 0; overflow: hidden; }
+.mini-bar { height: 100%; border-radius: 3px; }
+
+/* OPP CARD */
+.opp-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  display: flex;
+  gap: 16px;
+}
+
+.opp-ic { font-size: 32px; flex-shrink: 0; }
+.opp-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.opp-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.opp-num { font-size: 28px; font-weight: 900; letter-spacing: -.03em; margin-top: 10px; }
+
+/* USE CASE CARD */
+.uc-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.uc-ic { font-size: 26px; margin-bottom: 10px; }
+.uc-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.uc-steps { display: flex; flex-direction: column; gap: 6px; }
+.uc-step { font-size: 12px; color: var(--text2); display: flex; gap: 8px; align-items: flex-start; line-height: 1.5; }
+.uc-step::before { content: '→'; color: var(--pp-green); flex-shrink: 0; font-weight: 700; }
+
+/* DIVIDER LINE */
+.vdiv { width: 1px; background: var(--border); flex-shrink: 0; }
+
+/* EMPHASIS BOX */
+.em-box {
+  background: rgba(33,226,112,.08);
+  border: 1px solid rgba(33,226,112,.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.em-box strong { color: var(--pp-green); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+<div class="slide-counter" id="counter">1 / 11</div>
+
+<div class="nav-dots" id="dots"></div>
+
+<div class="nav-arrows">
+  <button class="nav-btn" onclick="prev()">←</button>
+  <button class="nav-btn" onclick="next()">→</button>
+</div>
+
+<div class="deck" id="deck">
+
+<!-- ═══════════════════════ SLIDE 1 — CAPA ═══════════════════════ -->
+<div class="slide active" id="s1">
+  <div class="cover-bg-text">BENEFITS</div>
+
+  <div class="cover-logo">
+    <div class="pp-logo" style="font-size:28px">pic<span>pay</span></div>
+  </div>
+
+  <div class="cover-eyebrow">Benefits Analytics · Março 2026</div>
+
+  <h1>Score de<br><em>Antecipações</em><br>de Salário</h1>
+
+  <div class="cover-sub">
+    Uma visão completa de quem antecipa, quando, quanto e como — para decisões mais inteligentes de produto e marketing.
+  </div>
+
+  <div class="cover-meta">
+    <span><div class="cover-pill">📊 Análise de Propensão</div></span>
+    <span style="color:var(--border)">|</span>
+    <span>🗓️ Referência: Mar/2026</span>
+    <span style="color:var(--border)">|</span>
+    <span>👥 1,7M vidas analisadas</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 2 — O QUE É ═══════════════════════ -->
+<div class="slide" id="s2">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-green">Benefits Analytics</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number">02 — Contexto</div>
+        <div class="slide-title">O que é este relatório?</div>
+        <div class="slide-sub">Entendendo o produto e a análise</div>
+      </div>
+    </div>
+
+    <div class="concept-box">
+      <p style="font-size:14px;margin-bottom:8px;font-weight:700;color:var(--text)">💡 O que é Antecipação de Salário?</p>
+      <p>
+        É quando um colaborador recebe <strong>parte do salário antes do dia de pagamento</strong>, diretamente pelo app PicPay. Sem burocracia, sem juros abusivos. O PicPay Benefits oferece esse benefício para empresas conveniadas — e o colaborador pode solicitar a qualquer momento, quantas vezes quiser no mês.
+      </p>
+    </div>
+
+    <div class="bullet-list" style="flex:1">
+      <div class="bullet-item">
+        <div class="bullet-ic">🎯</div>
+        <div>
+          <div class="bullet-title">Para que serve este relatório?</div>
+          <div class="bullet-desc">Entender quem são as pessoas que antecipam, com que frequência, em que dia do mês fazem isso e para onde mandam o dinheiro. Com isso, o time de produto e marketing toma decisões baseadas em dados reais.</div>
+        </div>
+      </div>
+      <div class="bullet-item">
+        <div class="bullet-ic">👥</div>
+        <div>
+          <div class="bullet-title">Quem está sendo analisado?</div>
+          <div class="bullet-desc">Colaboradores de empresas que têm convênio com o PicPay Benefits — servidores públicos, funcionários de grandes grupos como JBS e Seara, e trabalhadores do setor privado. São <strong>1,7 milhão de pessoas elegíveis</strong> no total.</div>
+        </div>
+      </div>
+      <div class="bullet-item">
+        <div class="bullet-ic">📅</div>
+        <div>
+          <div class="bullet-title">Com que frequência é atualizado?</div>
+          <div class="bullet-desc">Os dados são extraídos diretamente do banco de dados do PicPay via Databricks. A análise profunda (este relatório) é atualizada mensalmente. Os painéis operacionais são diários.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 3 — FUNIL ═══════════════════════ -->
+<div class="slide" id="s3">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-green">Benefits Analytics</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number">03 — Universo</div>
+        <div class="slide-title">Nossa base de colaboradores</div>
+        <div class="slide-sub">De quantas pessoas elegíveis chegamos a quem antecipa hoje</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Ref. Março 2026</div>
+        <div class="tag tag-green">Funil de Conversão</div>
+      </div>
+    </div>
+
+    <div class="funnel-wrap">
+
+      <div class="fn-step">
+        <div class="fn-bar-outer">
+          <div class="fn-bar" style="background:rgba(33,226,112,.22);border:1px solid rgba(33,226,112,.4);width:100%">
+            <span class="fn-lbl">👥 Total de vidas elegíveis</span>
+            <span class="fn-val" style="color:var(--pp-green)">1.748.289</span>
+          </div>
+        </div>
+        <div class="fn-pct" style="color:var(--pp-green);font-weight:800">100%</div>
+      </div>
+      <div class="fn-drop">↳ 833.029 não têm conta PicPay ainda — maior oportunidade de crescimento</div>
+
+      <div class="fn-step">
+        <div class="fn-bar-outer">
+          <div class="fn-bar" style="background:rgba(88,166,255,.2);border:1px solid rgba(88,166,255,.35);width:92%">
+            <span class="fn-lbl">📱 Com conta PicPay</span>
+            <span class="fn-val" style="color:var(--blue)">915.260</span>
+          </div>
+        </div>
+        <div class="fn-pct" style="color:var(--blue)">52%</div>
+      </div>
+      <div class="fn-drop">↳ desses, 68.986 têm conta mas ainda não têm margem de antecipação liberada</div>
+
+      <div class="fn-step">
+        <div class="fn-bar-outer">
+          <div class="fn-bar" style="background:rgba(188,140,255,.18);border:1px solid rgba(188,140,255,.35);width:84%">
+            <span class="fn-lbl">💰 Com margem ativa</span>
+            <span class="fn-val" style="color:var(--purple)">846.274</span>
+          </div>
+        </div>
+        <div class="fn-pct" style="color:var(--purple)">48%</div>
+      </div>
+      <div class="fn-drop">↳ tem margem mas não usou o app no mês — inativo</div>
+
+      <div class="fn-step">
+        <div class="fn-bar-outer">
+          <div class="fn-bar" style="background:rgba(240,136,62,.18);border:1px solid rgba(240,136,62,.35);width:64%">
+            <span class="fn-lbl">⚡ Ativo + com margem</span>
+            <span class="fn-val" style="color:var(--orange)">525.837</span>
+          </div>
+        </div>
+        <div class="fn-pct" style="color:var(--orange)">30%</div>
+      </div>
+      <div class="fn-drop">↳ 444.446 poderiam antecipar mas <strong style="color:var(--text)">não anteciparam em março</strong></div>
+
+      <div class="fn-step">
+        <div class="fn-bar-outer">
+          <div class="fn-bar" style="background:rgba(33,226,112,.35);border:1px solid rgba(33,226,112,.6);width:28%">
+            <span class="fn-lbl">✅ Antecipando Mar/26</span>
+            <span class="fn-val" style="color:#0F1923;font-weight:900">81.391</span>
+          </div>
+        </div>
+        <div class="fn-pct" style="color:var(--pp-green);font-weight:800">15%<br><span style="font-size:9px;font-weight:500">do MAU</span></div>
+      </div>
+
+    </div>
+
+    <div class="em-box" style="margin-top:16px;flex-shrink:0">
+      <strong>444 mil pessoas</strong> usam o app, têm margem disponível, mas não anteciparam em março. Esse é o nosso principal público para ativação.
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 4 — KPIs ═══════════════════════ -->
+<div class="slide" id="s4">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-green">Benefits Analytics</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number">04 — Números do Mês</div>
+        <div class="slide-title">Resultado de Março / 2026</div>
+        <div class="slide-sub">Desempenho operacional do mês</div>
+      </div>
+      <div class="tag tag-green">MTD · Mar/26</div>
+    </div>
+
+    <div class="g4" style="flex:1;align-items:stretch">
+      <div class="card" style="border-top:3px solid var(--pp-green);display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div class="kpi-lbl" style="margin-bottom:12px">Pessoas antecipando</div>
+          <div class="kpi-val" style="color:var(--pp-green)">81,4k</div>
+        </div>
+        <div>
+          <div class="mini-bar-wrap"><div class="mini-bar" style="background:var(--pp-green);width:81%"></div></div>
+          <div class="kpi-sub">vs. 93,8k em Fev/26 · ▼ 13%</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text2)">Queda típica de mês com menos dias úteis</div>
+        </div>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--blue);display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div class="kpi-lbl" style="margin-bottom:12px">Antecipações realizadas</div>
+          <div class="kpi-val" style="color:var(--blue)">311,5k</div>
+        </div>
+        <div>
+          <div class="mini-bar-wrap"><div class="mini-bar" style="background:var(--blue);width:74%"></div></div>
+          <div class="kpi-sub">cada pessoa antecipou ~3,8x no mês</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text2)">Usuário ativo usa várias vezes por mês</div>
+        </div>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--purple);display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div class="kpi-lbl" style="margin-bottom:12px">Volume financeiro (TPV)</div>
+          <div class="kpi-val" style="color:var(--purple)">R$47,6M</div>
+        </div>
+        <div>
+          <div class="mini-bar-wrap"><div class="mini-bar" style="background:var(--purple);width:61%"></div></div>
+          <div class="kpi-sub">vs. R$77,9M em Fev/26 · ▼ MTD</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text2)">Acum. 12m: ~R$760M movimentados</div>
+        </div>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--orange);display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div class="kpi-lbl" style="margin-bottom:12px">Ticket médio por antecipação</div>
+          <div class="kpi-val" style="color:var(--orange)">R$153</div>
+        </div>
+        <div>
+          <div class="mini-bar-wrap"><div class="mini-bar" style="background:var(--orange);width:45%"></div></div>
+          <div class="kpi-sub">76% das antecipações abaixo de R$200</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text2)">Antecipações pequenas e frequentes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-top:14px;flex-shrink:0">
+      <div class="card card-sm" style="display:flex;gap:16px;align-items:center">
+        <div style="font-size:28px">🚀</div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px">PIX como destino</div>
+          <div style="font-size:22px;font-weight:900;color:var(--pp-green)">R$2,54M</div>
+          <div style="font-size:11px;color:var(--text2)">Saiu de R$0 → R$2,54M em 12 meses. Canal emergente.</div>
+        </div>
+      </div>
+      <div class="card card-sm" style="display:flex;gap:16px;align-items:center">
+        <div style="font-size:28px">📈</div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Crescimento 12 meses</div>
+          <div style="font-size:22px;font-weight:900;color:var(--blue)">+176%</div>
+          <div style="font-size:11px;color:var(--text2)">De 311k antecipações (Abr/25) para o pico de 914k (antes). Base sólida.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 5 — SETORES ═══════════════════════ -->
+<div class="slide" id="s5">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-green">Benefits Analytics</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number">05 — Análise por Setor</div>
+        <div class="slide-title">Quem antecipa?</div>
+        <div class="slide-sub">Cada setor tem um perfil completamente diferente</div>
+      </div>
+    </div>
+
+    <div class="g3" style="flex:1;align-items:stretch">
+
+      <!-- GRUPO -->
+      <div class="setor-card grupo">
+        <div class="setor-ic">🏗️</div>
+        <div class="setor-name">Setor Grupo</div>
+        <div class="setor-val" style="color:var(--purple)">50.214</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">antecipando em Mar/26</div>
+
+        <div class="setor-stat"><span>Total de vidas</span><strong>185.283</strong></div>
+        <div class="setor-stat"><span>Têm conta PicPay</span><strong style="color:var(--pp-green)">97% ✓</strong></div>
+        <div style="margin:4px 0">
+          <div class="mini-bar-wrap"><div class="mini-bar" style="background:var(--purple);width:97%"></div></div>
+        </div>
+        <div class="setor-stat"><span>Taxa de antecipação</span><strong style="color:var(--purple)">27%</strong></div>
+        <div style="margin-top:14px" class="em-box" style="font-size:11px">
+          <strong>🏆 Melhor modelo</strong> — JBS e Seara lideram. Alta adesão à conta e à antecipação. Modelo a replicar.
+        </div>
+      </div>
+
+      <!-- PÚBLICO -->
+      <div class="setor-card publico">
+        <div class="setor-ic">🏛️</div>
+        <div class="setor-name">Setor Público</div>
+        <div class="setor-val" style="color:var(--blue)">27.754</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">antecipando em Mar/26</div>
+
+        <div class="setor-stat"><span>Total de vidas</span><strong>1.136.845</strong></div>
+        <div class="setor-stat"><span>Têm conta PicPay</span><strong style="color:var(--yellow)">28%</strong></div>
+        <div style="margin:4px 0">
+          <div class="mini-bar-wrap"><div class="mini-bar" style="background:var(--blue);width:28%"></div></div>
+        </div>
+        <div class="setor-stat"><span>Sem conta ainda</span><strong style="color:var(--red)">812.822</strong></div>
+        <div style="margin-top:14px" class="em-box" style="font-size:11px;background:rgba(88,166,255,.08);border-color:rgba(88,166,255,.2)">
+          <strong style="color:var(--blue)">💎 Maior oportunidade</strong> — 812k servidores sem conta = enorme mercado inexplorado.
+        </div>
+      </div>
+
+      <!-- PRIVADO -->
+      <div class="setor-card privado">
+        <div class="setor-ic">🏭</div>
+        <div class="setor-name">Setor Privado</div>
+        <div class="setor-val" style="color:var(--orange)">1.901</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">antecipando em Mar/26</div>
+
+        <div class="setor-stat"><span>Total de vidas</span><strong>32.681</strong></div>
+        <div class="setor-stat"><span>Têm conta PicPay</span><strong>~65%</strong></div>
+        <div style="margin:4px 0">
+          <div class="mini-bar-wrap"><div class="mini-bar" style="background:var(--orange);width:65%"></div></div>
+        </div>
+        <div class="setor-stat"><span>Taxa de antecipação</span><strong style="color:var(--orange)">~6%</strong></div>
+        <div style="margin-top:14px" class="em-box" style="font-size:11px;background:rgba(240,136,62,.08);border-color:rgba(240,136,62,.2)">
+          <strong style="color:var(--orange)">🌱 Em desenvolvimento</strong> — menor base, margem variável. Ticket médio menor que os outros setores.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="em-box" style="margin-top:14px;flex-shrink:0">
+      O Setor Grupo tem <strong>a melhor taxa de conversão</strong> (27%) enquanto o Setor Público tem <strong>a maior base total</strong> (65% de todos os elegíveis) com apenas 28% de penetração de conta — o maior potencial de crescimento.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 6 — SAZONALIDADE ═══════════════════════ -->
+<div class="slide" id="s6">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-green">Benefits Analytics</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number">06 — Sazonalidade</div>
+        <div class="slide-title">Quando antecipam?</div>
+        <div class="slide-sub">O padrão de comportamento ao longo do mês (média dos últimos 12 meses)</div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;gap:24px">
+
+      <!-- CHART -->
+      <div style="flex:2;display:flex;flex-direction:column;gap:12px">
+        <div id="day-chart-wrap" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
+          <div class="day-chart" id="day-chart"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;padding:0 2px">
+            <span style="font-size:10px;color:var(--text2)">Dia 1</span>
+            <span style="font-size:10px;color:var(--text2)">Dia 10 📍</span>
+            <span style="font-size:10px;color:var(--text2)">Dia 20</span>
+            <span style="font-size:10px;color:var(--text2)">Dia 31</span>
+          </div>
+        </div>
+        <div class="em-box">
+          <strong>Dia 10 = pico absoluto</strong> do mês — 365.813 antecipações nesse dia acumulado historicamente. É quando as empresas processam o pagamento da primeira quinzena.
+        </div>
+      </div>
+
+      <!-- INSIGHTS -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+        <div class="card card-sm">
+          <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📅 Padrão do Mês</div>
+          <div class="bar-row">
+            <div class="bar-lbl">Dias 1-5</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:55%;background:rgba(88,166,255,.6)">crescendo</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-lbl">Dias 6-10</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:var(--pp-green)">🔥 pico</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-lbl">Dias 11-20</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:40%;background:rgba(240,136,62,.6)">moderado</div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-lbl">Dias 21-31</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:12%;background:rgba(248,81,73,.5)">baixo</div></div>
+          </div>
+        </div>
+
+        <div class="card card-sm">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:600">💡 Insight de Ticket</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:12px;color:var(--text2)">Dia 1 — ticket médio</span>
+            <strong style="font-size:13px">R$70</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:12px;color:var(--text2)">Dia 10 — ticket médio</span>
+            <strong style="font-size:13px;color:var(--pp-green)">R$244</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:12px;color:var(--text2)">Dia 30 — ticket médio</span>
+            <strong style="font-size:13px">R$372</strong>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:10px">Quem antecipa no final do mês pega valores maiores — provavelmente emergência.</div>
+        </div>
+
+        <div class="card card-sm" style="background:rgba(33,226,112,.08);border-color:rgba(33,226,112,.25)">
+          <div style="font-size:12px;font-weight:700;color:var(--pp-green);margin-bottom:6px">🎯 Para MKT</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Dispare campanhas entre os <strong style="color:var(--text)">dias 5-9</strong> para pegar o usuário antes do pico. Ele já está pensando em antecipar.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 7 — RFM ═══════════════════════ -->
+<div class="slide" id="s7">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-green">Benefits Analytics</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number">07 — Frequência e Valor</div>
+        <div class="slide-title">Com que frequência antecipam?</div>
+        <div class="slide-sub">Perfil de uso — quem antecipa uma vez vs. quem faz disso um hábito</div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;gap:24px">
+
+      <!-- FREQ -->
+      <div style="flex:1.4;display:flex;flex-direction:column;gap:8px;justify-content:center">
+        <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Frequência de uso — histórico acumulado</div>
+
+        <div class="bar-row">
+          <div class="bar-lbl" style="width:100px">1x apenas</div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:27%;background:rgba(139,148,158,.5)">103.674</div></div>
+          <div class="bar-val" style="color:var(--text2)">27%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-lbl" style="width:100px">2 a 3x</div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:20%;background:rgba(88,166,255,.5)">76.610</div></div>
+          <div class="bar-val" style="color:var(--text2)">20%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-lbl" style="width:100px">4 a 6x</div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:18%;background:rgba(240,136,62,.5)">66.926</div></div>
+          <div class="bar-val" style="color:var(--text2)">18%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-lbl" style="width:100px">7 a 12x</div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:22%;background:rgba(188,140,255,.6)">84.569</div></div>
+          <div class="bar-val" style="color:var(--purple)">22%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-lbl" style="width:100px">13x ou mais</div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:linear-gradient(90deg,var(--pp-green),#00D4AA)">92.488</div></div>
+          <div class="bar-val" style="color:var(--pp-green);font-weight:800">24% ⭐</div>
+        </div>
+      </div>
+
+      <div class="vdiv"></div>
+
+      <!-- INSIGHTS -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;justify-content:center">
+        <div class="card card-sm" style="border-color:rgba(33,226,112,.3)">
+          <div style="font-size:28px;font-weight:900;color:var(--pp-green)">92.488</div>
+          <div style="font-size:13px;font-weight:700;margin:4px 0">Usuários Super Frequentes</div>
+          <div style="font-size:12px;color:var(--text2)">Anteciparam <strong style="color:var(--text)">13x ou mais</strong> — usam toda semana. São 24% dos usuários mas geram desproporcionalmente mais volume.</div>
+        </div>
+
+        <div class="card card-sm">
+          <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">💰 Ticket médio por frequência</div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:12px;color:var(--text2)">1x apenas</span>
+            <strong style="color:var(--text2)">R$1 (média hist.)</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:12px">7 a 12x</span>
+            <strong style="color:var(--orange)">R$9,50</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0">
+            <span style="font-size:12px">13x ou mais</span>
+            <strong style="color:var(--pp-green)">R$40,50</strong>
+          </div>
+        </div>
+
+        <div class="em-box">
+          <strong>Quem cria o hábito de antecipar</strong> pega valores maiores e com mais frequência. A jornada de ativação importa muito.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 8 — DESTINO ═══════════════════════ -->
+<div class="slide" id="s8">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-green">Benefits Analytics</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number">08 — Destino do Dinheiro</div>
+        <div class="slide-title">Para onde vai o dinheiro antecipado?</div>
+        <div class="slide-sub">Evolução dos destinos de pagamento — Jan/25 a Mar/26</div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;gap:24px">
+
+      <div style="flex:1.6;display:flex;flex-direction:column;gap:14px;justify-content:center">
+        <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Volume financeiro por canal — acumulado 12 meses</div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:600">🏦 Conta PicPay (Wallets)</span>
+            <strong style="font-size:14px;color:var(--pp-green)">R$406M</strong>
+          </div>
+          <div class="mini-bar-wrap" style="height:28px">
+            <div class="mini-bar" style="background:linear-gradient(90deg,var(--pp-green-dark),var(--pp-green));width:100%;height:100%;display:flex;align-items:center;padding-left:12px;font-size:12px;font-weight:700;color:#0F1923">Destino principal — 95% do volume</div>
+          </div>
+        </div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:600">💸 PIX</span>
+            <strong style="font-size:14px;color:var(--blue)">R$6,94M</strong>
+          </div>
+          <div class="mini-bar-wrap" style="height:28px">
+            <div class="mini-bar" style="background:var(--blue);width:1.7%;height:100%;min-width:4px"></div>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px">Mas a tendência é explosiva 🚀</div>
+        </div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:600">💼 Conta Benefits (interno)</span>
+            <strong style="font-size:14px;color:var(--purple)">R$10,82M</strong>
+          </div>
+          <div class="mini-bar-wrap" style="height:28px">
+            <div class="mini-bar" style="background:var(--purple);width:2.7%;height:100%;min-width:4px"></div>
+          </div>
+        </div>
+
+        <!-- PIX EVOLUTION -->
+        <div class="card card-sm" style="margin-top:8px">
+          <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📈 Evolução do PIX (R$ Milhões)</div>
+          <div style="display:flex;align-items:flex-end;gap:4px;height:50px">
+            <!-- meses: 03/25 a 03/26, valores: 0,0,0,0,0,0,0,0,0,0.39,1.75,2.5,2.54 -->
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:rgba(88,166,255,.2);border-radius:2px;height:2%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Mar/25</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:rgba(88,166,255,.2);border-radius:2px;height:2%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Abr</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:rgba(88,166,255,.2);border-radius:2px;height:2%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Mai</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:rgba(88,166,255,.2);border-radius:2px;height:2%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Jun</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:rgba(88,166,255,.2);border-radius:2px;height:2%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Jul</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:rgba(88,166,255,.2);border-radius:2px;height:2%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Ago</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:rgba(88,166,255,.2);border-radius:2px;height:2%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Set</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:rgba(88,166,255,.2);border-radius:2px;height:2%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Out</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:rgba(88,166,255,.2);border-radius:2px;height:2%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Nov</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:var(--blue);opacity:.5;border-radius:2px;height:15%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Dez</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:var(--blue);opacity:.65;border-radius:2px;height:68%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Jan/26</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:var(--blue);opacity:.80;border-radius:2px;height:97%"></div><div style="font-size:8px;color:var(--text2);margin-top:2px">Fev</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="width:100%;background:var(--blue);border-radius:2px;height:100%;box-shadow:0 0 8px rgba(88,166,255,.5)"></div><div style="font-size:8px;color:var(--blue);margin-top:2px;font-weight:700">Mar</div></div>
+          </div>
+          <div style="text-align:right;font-size:10px;color:var(--blue);margin-top:6px;font-weight:700">R$2,54M em Mar/26 → crescimento de 552% em 3 meses</div>
+        </div>
+      </div>
+
+      <div class="vdiv"></div>
+
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center">
+        <div class="card card-sm" style="border-color:rgba(33,226,112,.3);background:rgba(33,226,112,.06)">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px">O que significa?</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7">
+            A maioria ainda <strong style="color:var(--text)">guarda na conta PicPay</strong> — sinal de confiança no app. O crescimento do <strong style="color:var(--blue)">PIX</strong> mostra que colaboradores estão usando a antecipação para pagar contas imediatamente.
+          </div>
+        </div>
+        <div class="card card-sm">
+          <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Por setor — canal preferido</div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:12px">🏗️ Grupo</span><span style="font-size:12px;color:var(--purple)">Wallets (R$142M)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:12px">🏛️ Público</span><span style="font-size:12px;color:var(--blue)">Wallets (R$260M)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0">
+            <span style="font-size:12px">🏭 Privado</span><span style="font-size:12px;color:var(--orange)">Wallets (R$3,5M)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 9 — OPORTUNIDADES ═══════════════════════ -->
+<div class="slide" id="s9">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-green">Benefits Analytics</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number">09 — Oportunidades</div>
+        <div class="slide-title">Onde estão os maiores ganhos?</div>
+        <div class="slide-sub">3 frentes identificadas com base nos dados</div>
+      </div>
+    </div>
+
+    <div class="g3" style="flex:1;align-items:stretch">
+
+      <div class="opp-card" style="flex-direction:column;border-top:3px solid var(--blue)">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:36px">💎</div>
+          <div>
+            <div class="opp-title">Setor Público sem conta</div>
+            <div class="opp-desc">812.822 servidores públicos <strong style="color:var(--text)">elegíveis mas sem conta PicPay</strong>. Cada novo correntista que abre conta e ativa a antecipação já tem margem disponível.</div>
+          </div>
+        </div>
+        <div class="opp-num" style="color:var(--blue)">812k</div>
+        <div style="font-size:11px;color:var(--text2)">potenciais novos correntistas</div>
+        <div class="em-box" style="margin-top:12px;background:rgba(88,166,255,.08);border-color:rgba(88,166,255,.2)">
+          <strong style="color:var(--blue)">Ação:</strong> campanha de abertura de conta focada em servidores. Estado do RJ (393k), Ceará (132k) e Santa Catarina (128k) são os maiores.
+        </div>
+      </div>
+
+      <div class="opp-card" style="flex-direction:column;border-top:3px solid var(--yellow)">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:36px">⚙️</div>
+          <div>
+            <div class="opp-title">RJ e DF — margem bloqueada</div>
+            <div class="opp-desc">Estado do RJ (393k vidas) e DF (182k vidas) têm contas abertas, mas a <strong style="color:var(--text)">margem está zerada por bloqueio sistêmico</strong>. Ninguém antecipa.</div>
+          </div>
+        </div>
+        <div class="opp-num" style="color:var(--yellow)">575k</div>
+        <div style="font-size:11px;color:var(--text2)">pessoas com conta mas sem poder antecipar</div>
+        <div class="em-box" style="margin-top:12px;background:rgba(227,179,65,.08);border-color:rgba(227,179,65,.2)">
+          <strong style="color:var(--yellow)">Ação:</strong> resolve técnica de liberação de margem. Se convertidos na taxa do DF (9,6%), seriam ~55k novos antecipadores.
+        </div>
+      </div>
+
+      <div class="opp-card" style="flex-direction:column;border-top:3px solid var(--pp-green)">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:36px">🚀</div>
+          <div>
+            <div class="opp-title">444k inativos com margem</div>
+            <div class="opp-desc">Têm conta, têm margem, usam o app — mas <strong style="color:var(--text)">não anteciparam em março</strong>. São usuários ativos que ainda não criaram o hábito.</div>
+          </div>
+        </div>
+        <div class="opp-num" style="color:var(--pp-green)">444k</div>
+        <div style="font-size:11px;color:var(--text2)">potenciais ativações imediatas</div>
+        <div class="em-box" style="margin-top:12px">
+          <strong>Ação:</strong> campanhas de primeiro uso entre dias 5-9. Se 10% converterem, são +44k antecipadores no mês seguinte.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 10 — COMO USAR ═══════════════════════ -->
+<div class="slide" id="s10">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-green">Benefits Analytics</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number">10 — Como Usar</div>
+        <div class="slide-title">O relatório na prática</div>
+        <div class="slide-sub">Casos de uso para o dia a dia do time</div>
+      </div>
+    </div>
+
+    <div class="g2" style="flex:1;align-items:stretch">
+
+      <div class="uc-card" style="border-top:3px solid var(--purple)">
+        <div class="uc-ic">📣</div>
+        <div class="uc-title">Planejar Campanha de MKT</div>
+        <div class="uc-steps">
+          <div class="uc-step">Acesse a seção <strong>Funil de Campanha</strong></div>
+          <div class="uc-step">Digite o nome da campanha (activity) que quer analisar</div>
+          <div class="uc-step">Veja quantos receberam, abriram, clicaram e anteciparam</div>
+          <div class="uc-step">Compare diferentes campanhas lado a lado</div>
+          <div class="uc-step">Planeje o próximo disparo para os dias 5-9 do mês</div>
+        </div>
+      </div>
+
+      <div class="uc-card" style="border-top:3px solid var(--blue)">
+        <div class="uc-ic">🎯</div>
+        <div class="uc-title">Segmentar Público</div>
+        <div class="uc-steps">
+          <div class="uc-step">Use as abas <strong>Público / Grupo / Privado</strong> para focar no setor certo</div>
+          <div class="uc-step">Veja quem tem margem mas não antecipa (444k pessoas)</div>
+          <div class="uc-step">Identifique secretarias com alta taxa de conversão para replicar</div>
+          <div class="uc-step">Separe usuários inativos recentes (31-60 dias) — mais fácil reativar</div>
+        </div>
+      </div>
+
+      <div class="uc-card" style="border-top:3px solid var(--pp-green)">
+        <div class="uc-ic">📊</div>
+        <div class="uc-title">Acompanhar Evolução</div>
+        <div class="uc-steps">
+          <div class="uc-step">Seção <strong>Evolução Mensal</strong> mostra a tendência dos últimos 12 meses</div>
+          <div class="uc-step">Compare meses por setor separadamente</div>
+          <div class="uc-step">Identifique se um setor está crescendo ou caindo</div>
+          <div class="uc-step">O pico de Abr/25 (914k antecipações) serve como referência de potencial</div>
+        </div>
+      </div>
+
+      <div class="uc-card" style="border-top:3px solid var(--orange)">
+        <div class="uc-ic">🔍</div>
+        <div class="uc-title">Investigar Comportamento</div>
+        <div class="uc-steps">
+          <div class="uc-step">Seção <strong>Sazonalidade</strong> mostra dia a dia do mês por setor</div>
+          <div class="uc-step">Seção <strong>RFM</strong> mostra frequência e valor médio por perfil</div>
+          <div class="uc-step">Seção <strong>Destino</strong> revela se o PIX está crescendo como canal</div>
+          <div class="uc-step">Combine para entender o perfil completo de cada secretaria</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="em-box" style="flex-shrink:0;margin-top:14px">
+      💡 <strong>Dica:</strong> o relatório tem filtros por setor em todas as seções. Comece sempre pelo Total e depois afunile para Público, Grupo ou Privado conforme o foco da análise.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 11 — CTA ═══════════════════════ -->
+<div class="slide" id="s11">
+  <div style="position:absolute;top:20px;left:40px;"><div class="pp-logo">pic<span>pay</span></div></div>
+
+  <div class="cta-title">Acesse o relatório<br><span style="color:var(--pp-green)">agora mesmo</span></div>
+  <div class="cta-sub">Dados atualizados mensalmente · Análise com dados reais de Mar/2026</div>
+
+  <div class="cta-buttons">
+    <a class="btn-primary" href="https://felipetrezza.github.io/relatorio-benefits/score.html" target="_blank">
+      🎯 Acessar Score de Antecipações
+    </a>
+    <a class="btn-secondary" href="https://felipetrezza.github.io/relatorio-benefits/hub.html" target="_blank">
+      📊 Ver todos os Dashboards
+    </a>
+  </div>
+
+  <div style="display:flex;gap:32px;justify-content:center;margin-bottom:36px;flex-wrap:wrap">
+    <div style="text-align:center">
+      <div style="font-size:32px;font-weight:900;color:var(--pp-green)">1,7M</div>
+      <div style="font-size:11px;color:var(--text2)">vidas analisadas</div>
+    </div>
+    <div style="width:1px;background:var(--border)"></div>
+    <div style="text-align:center">
+      <div style="font-size:32px;font-weight:900;color:var(--blue)">81,4k</div>
+      <div style="font-size:11px;color:var(--text2)">antecipando em Mar/26</div>
+    </div>
+    <div style="width:1px;background:var(--border)"></div>
+    <div style="text-align:center">
+      <div style="font-size:32px;font-weight:900;color:var(--purple)">8 seções</div>
+      <div style="font-size:11px;color:var(--text2)">de análise interativa</div>
+    </div>
+    <div style="width:1px;background:var(--border)"></div>
+    <div style="text-align:center">
+      <div style="font-size:32px;font-weight:900;color:var(--orange)">R$760M</div>
+      <div style="font-size:11px;color:var(--text2)">movimentados em 12m</div>
+    </div>
+  </div>
+
+  <div class="cta-note">
+    <span>📋</span>
+    <a href="https://felipetrezza.github.io/relatorio-benefits/sumario.html" target="_blank" style="color:var(--text2);text-decoration:underline;">Ver documentação técnica</a>
+    <span style="color:var(--border)">·</span>
+    <span>Dúvidas? Fale com o time de Benefits Analytics</span>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+var TOTAL = 11;
+var cur = 0;
+
+// Build dots
+var dotsEl = document.getElementById('dots');
+for (var i = 0; i < TOTAL; i++) {
+  var d = document.createElement('button');
+  d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+  d.setAttribute('data-i', i);
+  d.onclick = (function(idx){ return function(){ goTo(idx); }; })(i);
+  dotsEl.appendChild(d);
+}
+
+function goTo(idx) {
+  var slides = document.querySelectorAll('.slide');
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('prev');
+  setTimeout((function(c){ return function(){ slides[c].classList.remove('prev'); }; })(cur), 500);
+  cur = idx;
+  slides[cur].classList.add('active');
+
+  // dots
+  document.querySelectorAll('.nav-dot').forEach(function(d,i){ d.classList.toggle('active', i === cur); });
+  // progress
+  document.getElementById('progress').style.width = ((cur+1)/TOTAL*100) + '%';
+  // counter
+  document.getElementById('counter').textContent = (cur+1) + ' / ' + TOTAL;
+}
+
+function next() { if (cur < TOTAL-1) goTo(cur+1); }
+function prev() { if (cur > 0) goTo(cur-1); }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+});
+
+// Day chart
+var dayData = [18777,24348,27121,32221,33274,26576,28352,29618,32181,41565,17189,13927,11921,11972,12802,11507,7899,7165,7737,9203,3846,3243,2881,2658,2516,2278,2054,1989,1949,1883,1675];
+var maxVal = Math.max.apply(null, dayData);
+
+var chartEl = document.getElementById('day-chart');
+if (chartEl) {
+  dayData.forEach(function(v, i) {
+    var pct = v / maxVal * 100;
+    var isPeak = (i === 9);
+    var green = 'var(--pp-green)';
+    var dim   = 'rgba(33,226,112,.35)';
+    var wrap = document.createElement('div');
+    wrap.className = 'day-bar-wrap';
+
+    var bar = document.createElement('div');
+    bar.className = 'day-bar' + (isPeak ? ' peak' : '');
+    bar.style.height = Math.max(pct, 2) + '%';
+    bar.style.background = isPeak ? green : (pct > 50 ? 'rgba(33,226,112,.6)' : pct > 25 ? 'rgba(33,226,112,.4)' : dim);
+    bar.title = 'Dia ' + (i+1) + ': ' + v.toLocaleString('pt-BR') + ' antecipações (média)';
+
+    var lbl = document.createElement('div');
+    lbl.className = 'day-num';
+    lbl.textContent = (i+1) % 5 === 0 || isPeak ? (i+1) : '';
+    if (isPeak) { lbl.style.color = 'var(--pp-green)'; lbl.style.fontWeight = '700'; }
+
+    wrap.appendChild(bar);
+    wrap.appendChild(lbl);
+    chartEl.appendChild(wrap);
+  });
+}
+
+// Init progress
+document.getElementById('progress').style.width = (1/TOTAL*100) + '%';
+</script>
+</body>
+</html>
