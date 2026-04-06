@@ -222,8 +222,9 @@ def upload_html():
 
     now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
 
-    # Git: stage + commit + push
+    # Git: pull --rebase primeiro para evitar push rejeitado, depois stage + commit + push
     cmds = [
+        ["git", "-C", str(SCRIPT_DIR), "pull", "--rebase", "--autostash", "origin", "main"],
         ["git", "-C", str(SCRIPT_DIR), "add", "index.html"],
         ["git", "-C", str(SCRIPT_DIR), "commit", "-m", f"chore: atualização diária {now_str}"],
         ["git", "-C", str(SCRIPT_DIR), "push", "origin", "main"],
