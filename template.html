@@ -582,8 +582,28 @@ async function refreshData(){
   const btn = document.getElementById('btn-refresh');
   btn.classList.add('spinning');
   btn.disabled = true;
-  btn.title = 'Recarregando...';
-  setTimeout(() => { window.location.reload(); }, 800);
+  btn.title = 'Buscando dados novos...';
+
+  try {
+    // Chama o servidor local que roda a query no Databricks e republica
+    const resp = await fetch('http://localhost:5001/atualizar/contas', {
+      method: 'POST',
+      signal: AbortSignal.timeout(300000) // 5 min
+    });
+    if (resp.ok) {
+      // Aguarda 3s para o GitHub Pages propagar e recarrega
+      setTimeout(() => { window.location.reload(); }, 3000);
+    } else {
+      throw new Error('servidor retornou ' + resp.status);
+    }
+  } catch(e) {
+    // Servidor local não disponível — só recarrega a página
+    console.warn('Servidor local indisponível:', e.message);
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+    btn.title = 'Servidor local offline — rode: python3 ~/relatorio-abertura-contas/atualizar.py';
+    alert('⚠️ Servidor local offline.\n\nPara atualizar os dados, rode:\n\npython3 ~/relatorio-abertura-contas/atualizar.py');
+  }
 }
 
 // Preenche o timestamp "atualizado às HH:MM" no botão
