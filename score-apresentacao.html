@@ -643,7 +643,7 @@ body {
 <body>
 
 <div class="progress-bar" id="progress"></div>
-<div class="slide-counter" id="counter">1 / 11</div>
+<div class="slide-counter" id="counter">1 / 13</div>
 
 <div class="nav-dots" id="dots"></div>
 
@@ -667,11 +667,11 @@ body {
   <h1>Score de<br><em>Antecipações</em><br>de Salário</h1>
 
   <div class="cover-sub">
-    Uma visão completa de quem antecipa, quando, quanto e como — para decisões mais inteligentes de produto e marketing.
+    Uma visão completa de quem antecipa, quando, quanto e como — com destaque para o <strong style="-webkit-text-fill-color:var(--pp-green);background:none">Funil de Campanha</strong>: meça o impacto real de cada envio de marketing.
   </div>
 
   <div class="cover-meta">
-    <span><div class="cover-pill">📊 Análise de Propensão</div></span>
+    <span><div class="cover-pill">📣 Funil de Campanha · Análise de Propensão</div></span>
     <span style="color:var(--border)">|</span>
     <span>🗓️ Referência: Abr/2026</span>
     <span style="color:var(--border)">|</span>
@@ -1325,15 +1325,15 @@ body {
 
     <div class="g2" style="flex:1;align-items:stretch">
 
-      <div class="uc-card" style="border-top:3px solid var(--purple)">
+      <div class="uc-card" style="border-top:3px solid var(--purple);background:rgba(188,140,255,.05)">
         <div class="uc-ic">📣</div>
-        <div class="uc-title">Planejar Campanha de MKT</div>
+        <div class="uc-title" style="color:var(--purple)">Analisar Campanha de MKT ← destaque</div>
         <div class="uc-steps">
-          <div class="uc-step">Acesse a seção <strong>Funil de Campanha</strong></div>
-          <div class="uc-step">Digite o nome da campanha (activity) que quer analisar</div>
-          <div class="uc-step">Veja quantos receberam, abriram, clicaram e anteciparam</div>
-          <div class="uc-step">Compare diferentes campanhas lado a lado</div>
-          <div class="uc-step">Planeje o próximo disparo para os dias 5-9 do mês</div>
+          <div class="uc-step">Acesse a seção <strong>📣 Funil Campanha</strong> no menu do relatório</div>
+          <div class="uc-step">Cole o <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px;font-size:11px;color:var(--orange)">activity_name</code> da campanha para ver o funil de 1 envio específico</div>
+          <div class="uc-step">Ou cole o <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px;font-size:11px;color:var(--blue)">journey_name</code> para ver o funil consolidado de toda a jornada + botões por step</div>
+          <div class="uc-step">Veja Enviados → Entregues → Abertos → Clicados → <strong>Anteciparam</strong></div>
+          <div class="uc-step">Compare até 4 campanhas lado a lado com tabela automática</div>
         </div>
       </div>
 
@@ -1374,6 +1374,243 @@ body {
 
     <div class="em-box" style="flex-shrink:0;margin-top:14px">
       💡 <strong>Dica:</strong> o relatório tem filtros por setor em todas as seções. Comece sempre pelo Total e depois afunile para Público, Grupo ou Privado conforme o foco da análise.
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ SLIDE 10B — FUNIL DE CAMPANHA ═══════════════════════ -->
+<div class="slide" id="s10b">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-purple">Funcionalidade Principal</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number" style="color:var(--purple)">⭐ Destaque — Funil de Campanha</div>
+        <div class="slide-title">O coração do relatório:<br>medir o impacto de cada campanha</div>
+        <div class="slide-sub">Duas formas de consultar — activity_name e journey_name</div>
+      </div>
+      <div class="tag tag-purple">📣 Seção Funil Campanha</div>
+    </div>
+
+    <div style="flex:1;display:flex;gap:20px">
+
+      <!-- ESQUERDA: Explicação dos dois modos -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+
+        <!-- Activity -->
+        <div class="card" style="border-left:4px solid var(--orange);flex:1">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="font-size:22px">🎯</div>
+            <div>
+              <div style="font-size:14px;font-weight:700">Modo Activity</div>
+              <div style="font-size:11px;color:var(--text2)">para analisar um envio específico</div>
+            </div>
+            <div style="margin-left:auto"><span class="tag tag-orange">activity_name</span></div>
+          </div>
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.7;margin-bottom:12px">
+            Cada campanha de marketing tem um <strong style="color:var(--text)">activity_name</strong> — é o identificador único daquele disparo. Cole esse nome no campo de busca e o relatório mostra exatamente o funil daquela campanha: quantas pessoas receberam, abriram, clicaram e, o mais importante, <strong style="color:var(--pp-green)">anteciparam o salário depois disso</strong>.
+          </div>
+          <div style="background:var(--surf2);border-radius:6px;padding:10px 12px;font-family:monospace;font-size:10.5px;color:var(--orange);word-break:break-all;border:1px solid var(--border)">
+            20251002-id-18091058555-pf-blast-acp-sic-gcr-gcmau-ansr-inappf-campanha-antecipacao-salarial
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:8px">↑ Exemplo real de activity_name — cole direto no campo de busca</div>
+        </div>
+
+        <!-- Journey -->
+        <div class="card" style="border-left:4px solid var(--blue);flex:1">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="font-size:22px">🗺️</div>
+            <div>
+              <div style="font-size:14px;font-weight:700">Modo Journey</div>
+              <div style="font-size:11px;color:var(--text2)">para analisar uma jornada completa</div>
+            </div>
+            <div style="margin-left:auto"><span class="tag tag-blue">journey_name</span></div>
+          </div>
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.7;margin-bottom:12px">
+            Uma jornada (<strong style="color:var(--text)">journey</strong>) agrupa vários envios sequenciais — SMS, push, e-mail — numa mesma campanha. Cole o journey_name e o relatório traz o <strong style="color:var(--pp-green)">funil consolidado de toda a jornada</strong> e ainda gera botões clicáveis para cada step individual, permitindo comparar qual canal converteu mais.
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <div style="background:var(--surf2);border:1px solid rgba(88,166,255,.4);color:var(--blue);border-radius:20px;padding:4px 10px;font-size:10px;font-family:monospace">d_step1_sms</div>
+            <div style="background:var(--surf2);border:1px solid rgba(88,166,255,.4);color:var(--blue);border-radius:20px;padding:4px 10px;font-size:10px;font-family:monospace">d_step2_push</div>
+            <div style="background:var(--surf2);border:1px solid rgba(88,166,255,.4);color:var(--blue);border-radius:20px;padding:4px 10px;font-size:10px;font-family:monospace">d_step3_email</div>
+            <div style="color:var(--text2);font-size:11px;align-self:center">← botões aparecem automaticamente</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- DIREITA: O que o funil mostra + diferenciais -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+
+        <!-- Funil visual simplificado -->
+        <div class="card" style="background:rgba(188,140,255,.06);border-color:rgba(188,140,255,.3)">
+          <div style="font-size:12px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">O que o funil mostra</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--text2);flex-shrink:0"></div>
+              <div style="flex:1;height:28px;background:rgba(139,148,158,.25);border-radius:5px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:600">📤 Enviados</div>
+              <div style="font-size:11px;color:var(--text2);width:80px;text-align:right">100% base</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>
+              <div style="flex:1;height:28px;background:rgba(88,166,255,.25);border-radius:5px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:600">📬 Entregues</div>
+              <div style="font-size:11px;color:var(--blue);width:80px;text-align:right">Taxa entrega</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--yellow);flex-shrink:0"></div>
+              <div style="flex:1;height:28px;background:rgba(227,179,65,.2);border-radius:5px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:600">📖 Abertos</div>
+              <div style="font-size:11px;color:var(--yellow);width:80px;text-align:right">Taxa abertura</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>
+              <div style="flex:1;height:28px;background:rgba(240,136,62,.2);border-radius:5px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:600">👆 Clicados</div>
+              <div style="font-size:11px;color:var(--orange);width:80px;text-align:right">Taxa clique</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--pp-green);flex-shrink:0"></div>
+              <div style="flex:1;height:28px;background:rgba(33,226,112,.3);border-radius:5px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:700;color:var(--pp-green)">⚡ Anteciparam</div>
+              <div style="font-size:11px;color:var(--pp-green);width:80px;text-align:right;font-weight:700">Conv. real ✓</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;font-size:11.5px;color:var(--text2);line-height:1.6">
+            A última linha é a que importa: <strong style="color:var(--pp-green)">de quem recebeu a campanha, quantos anteciparam nos 30 dias seguintes?</strong>
+          </div>
+        </div>
+
+        <!-- Diferenciais -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="card card-sm">
+            <div style="font-size:18px;margin-bottom:6px">⚡</div>
+            <div style="font-size:12px;font-weight:700;margin-bottom:4px">Cache instantâneo</div>
+            <div style="font-size:11px;color:var(--text2)">2ª busca da mesma campanha carrega em milissegundos — sem nova query.</div>
+          </div>
+          <div class="card card-sm">
+            <div style="font-size:18px;margin-bottom:6px">📊</div>
+            <div style="font-size:12px;font-weight:700;margin-bottom:4px">Comparativo automático</div>
+            <div style="font-size:11px;color:var(--text2)">Até 4 campanhas lado a lado. Qual converteu mais? A tabela mostra.</div>
+          </div>
+          <div class="card card-sm">
+            <div style="font-size:18px;margin-bottom:6px">🏢</div>
+            <div style="font-size:12px;font-weight:700;margin-bottom:4px">Filtro por setor</div>
+            <div style="font-size:11px;color:var(--text2)">Veja o funil só para Grupo, Público ou Privado — ou tudo junto.</div>
+          </div>
+          <div class="card card-sm">
+            <div style="font-size:18px;margin-bottom:6px">📅</div>
+            <div style="font-size:12px;font-weight:700;margin-bottom:4px">Período customizável</div>
+            <div style="font-size:11px;color:var(--text2)">Ajuste o intervalo de datas para comparar períodos diferentes.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SLIDE 10C — COMO USAR O FUNIL NA PRÁTICA ═══════════════════════ -->
+<div class="slide" id="s10c">
+  <div class="slide-topbar">
+    <div class="pp-logo">pic<span>pay</span></div>
+    <div class="tag tag-purple">Funil de Campanha — Passo a Passo</div>
+  </div>
+  <div class="slide-inner">
+    <div class="slide-header">
+      <div>
+        <div class="slide-number" style="color:var(--purple)">⭐ Destaque — Como usar na prática</div>
+        <div class="slide-title">Do disparo ao resultado em 4 passos</div>
+        <div class="slide-sub">Fluxo completo de como consultar uma campanha no relatório</div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;gap:20px;align-items:stretch">
+
+      <!-- FLUXO PASSO A PASSO -->
+      <div style="flex:1.3;display:flex;flex-direction:column;gap:0">
+
+        <!-- Step 1 -->
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0">1</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px">Pegue o nome da campanha no Braze / Planilha de campanhas</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65">Todo envio de marketing tem um identificador. Pode ser o <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px;font-size:11px;color:var(--orange)">activity_name</code> (envio único) ou o <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px;font-size:11px;color:var(--blue)">journey_name</code> (jornada completa com múltiplos steps). Peça ao time de CRM ou procure na planilha de campanhas.</div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0">2</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px">Abra o Score → clique em "📣 Funil Campanha" no menu</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65">Selecione o modo <strong style="color:var(--orange)">Activity</strong> (envio único) ou <strong style="color:var(--blue)">Journey</strong> (jornada). Cole o nome no campo e clique em <strong style="color:var(--pp-green)">Buscar</strong>. O relatório dispara uma query no Databricks automaticamente.</div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#0F1923;flex-shrink:0">3</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px">Aguarde ~60–90 segundos — o funil aparece automaticamente</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65">O sistema processa a query no Databricks em background. Quando pronto, o funil SVG aparece com todos os números. Na segunda consulta da mesma campanha, o resultado é instantâneo (cache local).</div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--pp-green);display:flex;align-items:center;justify-content:middle;font-size:15px;font-weight:900;color:#0F1923;flex-shrink:0;justify-content:center">4</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px">Leia o resultado e tome a decisão</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65">Veja a taxa de conversão final (<strong style="color:var(--pp-green)">% que antecipou</strong>). Filtre por Grupo, Público ou Privado para saber qual setor respondeu melhor. Adicione outra campanha para comparar qual teve mais impacto.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- DIREITA: Perguntas respondidas + aviso de tempo -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+
+        <div class="card" style="border-color:rgba(33,226,112,.3);background:rgba(33,226,112,.05)">
+          <div style="font-size:12px;font-weight:700;color:var(--pp-green);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">Perguntas que ele responde</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;gap:8px;font-size:12.5px;color:var(--text2);line-height:1.5">
+              <span style="color:var(--pp-green);font-weight:700;flex-shrink:0">→</span>
+              <span>Essa campanha fez alguém <strong style="color:var(--text)">antecipar de verdade</strong>?</span>
+            </div>
+            <div style="display:flex;gap:8px;font-size:12.5px;color:var(--text2);line-height:1.5">
+              <span style="color:var(--pp-green);font-weight:700;flex-shrink:0">→</span>
+              <span>O problema foi <strong style="color:var(--text)">entrega, abertura ou clique</strong>?</span>
+            </div>
+            <div style="display:flex;gap:8px;font-size:12.5px;color:var(--text2);line-height:1.5">
+              <span style="color:var(--pp-green);font-weight:700;flex-shrink:0">→</span>
+              <span>Qual <strong style="color:var(--text)">setor converteu mais</strong>: Grupo, Público ou Privado?</span>
+            </div>
+            <div style="display:flex;gap:8px;font-size:12.5px;color:var(--text2);line-height:1.5">
+              <span style="color:var(--pp-green);font-weight:700;flex-shrink:0">→</span>
+              <span>Na jornada, <strong style="color:var(--text)">qual step (SMS, push, email) performou melhor</strong>?</span>
+            </div>
+            <div style="display:flex;gap:8px;font-size:12.5px;color:var(--text2);line-height:1.5">
+              <span style="color:var(--pp-green);font-weight:700;flex-shrink:0">→</span>
+              <span>Comparando campanhas A e B: <strong style="color:var(--text)">qual gerou mais antecipações</strong>?</span>
+            </div>
+            <div style="display:flex;gap:8px;font-size:12.5px;color:var(--text2);line-height:1.5">
+              <span style="color:var(--pp-green);font-weight:700;flex-shrink:0">→</span>
+              <span>Qual <strong style="color:var(--text)">canal de comunicação</strong> tem o melhor ROI?</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-sm" style="background:rgba(227,179,65,.06);border-color:rgba(227,179,65,.25)">
+          <div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:8px">⏱ Tempo de espera</div>
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.6">A primeira busca leva <strong style="color:var(--text)">60–120 segundos</strong> — o sistema consulta o Databricks ao vivo com todos os dados históricos. Vale a espera: o resultado é preciso e cruza a campanha com antecipações reais.</div>
+        </div>
+
+        <div class="card card-sm" style="background:rgba(88,166,255,.06);border-color:rgba(88,166,255,.25)">
+          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px">🔁 Use em conjunto</div>
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.6">Combine com a seção de <strong style="color:var(--text)">Sazonalidade</strong>: dispare a campanha nos dias 5–9 do mês (pré-pico) e depois use o Funil para medir quantos converteram no dia 10.</div>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>
@@ -1427,7 +1664,7 @@ body {
 </div><!-- /deck -->
 
 <script>
-var TOTAL = 11;
+var TOTAL = 13;
 var cur = 0;
 
 // Build dots
