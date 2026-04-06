@@ -204,6 +204,39 @@ def generate_html(data):
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     print(f"📄 {OUTPUT_PATH.name} ({OUTPUT_PATH.stat().st_size//1024} KB)")
 
+
+# ── gerar tv.html (chamado após generate_html) ────────────────────────────────
+def generate_tv(data_pix):
+    """Regera tv.html com DATA das antecipacoes + DATA_PIX recém-gerado."""
+    import re as _re
+    TV_TEMPLATE   = SCRIPT_DIR / "tv_template.html"
+    TV_OUTPUT     = SCRIPT_DIR / "tv.html"
+    ANTECIP_HTML  = SCRIPT_DIR / "antecipacoes.html"
+
+    if not TV_TEMPLATE.exists():
+        print("   ⚠️  tv_template.html não encontrado, pulando tv.html")
+        return
+
+    def extract(html, varname):
+        m = _re.search(rf'const {varname}\s*=\s*(\{{[\s\S]*?\n\}});', html)
+        return m.group(1) if m else 'null'
+
+    # DATA vem do antecipacoes.html já gerado
+    antecip_html = ANTECIP_HTML.read_text(encoding="utf-8") if ANTECIP_HTML.exists() else ""
+    data_antecip = extract(antecip_html, 'DATA') if antecip_html else 'null'
+
+    data_pix_block = json.dumps(data_pix, ensure_ascii=False, indent=2)
+    now_str = datetime.now().strftime('%d/%m/%Y %H:%M')
+    template = TV_TEMPLATE.read_text(encoding="utf-8")
+
+    tv_html = (template
+        .replace('%%DATA%%',     data_antecip)
+        .replace('%%DATA_PIX%%', data_pix_block)
+        .replace('%%UPDATED%%',  now_str))
+
+    TV_OUTPUT.write_text(tv_html, encoding="utf-8")
+    print(f"📺 tv.html regerado ({TV_OUTPUT.stat().st_size//1024} KB)")
+
 # ── git push ──────────────────────────────────────────────────────────────────
 def git_push():
     import os
@@ -212,7 +245,7 @@ def git_push():
     g = lambda *args: subprocess.run(["git","-C",str(SCRIPT_DIR)]+list(args), capture_output=True, text=True, env=env)
 
     # 1. add + commit somente o HTML gerado
-    g("add","pix.html")
+    g("add","pix.html","tv.html")
     rc = g("commit","-m",f"chore: pix — {now_str}")
     if rc.returncode != 0:
         if "nothing to commit" in rc.stdout+rc.stderr:
@@ -279,6 +312,7 @@ def main():
     for sk, d in data['setores'].items():
         print(f"   {sk}: vidas={d['vidas']:,} antecip={d['antecipacoes']:,} tpv=R${d['tpv']:,.0f} abertura={d['abertura']:,} novas={d['vidas_novas']:,}")
     generate_html(data)
+    generate_tv(data)
 
     print("\n[4/4] Publicando...")
     git_push()
