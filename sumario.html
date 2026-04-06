@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sumário — Benefits Analytics</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surf2: #1c2330;
+    --surf3: #21262d;
+    --border: #30363d;
+    --green: #21a366;
+    --greenl: #2dc974;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --orange: #f0883e;
+    --yellow: #e3b341;
+    --teal: #22d3ee;
+    --muted: #8b949e;
+    --text: #e6edf3;
+    --text2: #c9d1d9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+
+  .logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--green), var(--greenl));
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 0 14px rgba(33,163,102,.25);
+    flex-shrink: 0;
+  }
+
+  .header-text h1 { font-size: 15px; font-weight: 700; line-height: 1.2; }
+  .header-text p  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  .hub-btn {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 7px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: border-color .2s, color .2s;
+    white-space: nowrap;
+  }
+  .hub-btn:hover { border-color: var(--text2); color: var(--text); }
+
+  /* ── TOC LATERAL ── */
+  .layout {
+    display: flex;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px 100px;
+    gap: 48px;
+    align-items: flex-start;
+  }
+
+  .toc {
+    width: 200px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 80px;
+  }
+
+  .toc-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .toc-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+
+  .toc-list a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px 8px;
+    border-radius: 6px;
+    transition: color .2s, background .2s;
+    border-left: 2px solid transparent;
+  }
+
+  .toc-list a:hover,
+  .toc-list a.active {
+    color: var(--text);
+    background: var(--surf2);
+    border-left-color: var(--green);
+  }
+
+  /* ── CONTEÚDO ── */
+  .content { flex: 1; min-width: 0; }
+
+  .page-intro {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-intro h2 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin-bottom: 8px;
+  }
+
+  .page-intro p {
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* ── REPORT SECTION ── */
+  .report-section {
+    margin-bottom: 56px;
+    scroll-margin-top: 80px;
+  }
+
+  /* REPORT HEADER STRIP */
+  .report-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .report-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0;
+    height: 2px;
+    width: 48px;
+    border-radius: 2px;
+  }
+
+  .report-section.green  .report-header::after { background: var(--green); }
+  .report-section.blue   .report-header::after { background: var(--blue); }
+  .report-section.purple .report-header::after { background: var(--purple); }
+  .report-section.orange .report-header::after { background: var(--orange); }
+  .report-section.teal   .report-header::after { background: var(--teal); }
+  .report-section.yellow .report-header::after { background: var(--yellow); }
+
+  .report-icon { font-size: 26px; flex-shrink: 0; }
+
+  .report-meta { flex: 1; }
+  .report-title { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
+  .report-url {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'SFMono-Regular', Consolas, monospace;
+  }
+
+  .report-access {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 7px;
+    text-decoration: none;
+    transition: opacity .2s;
+    flex-shrink: 0;
+    color: #fff;
+    opacity: .92;
+  }
+
+  .report-access:hover { opacity: 1; }
+
+  .green  .report-access { background: var(--green); }
+  .blue   .report-access { background: #1d6fc4; }
+  .purple .report-access { background: #7c3aed; }
+  .orange .report-access { background: #b45309; }
+  .teal   .report-access { background: #0e7490; }
+  .yellow .report-access { background: #92400e; }
+
+  /* TAGS */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+
+  .tag {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 9px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+  .tg { background: rgba(33,163,102,.15); color: var(--greenl); border: 1px solid rgba(33,163,102,.3); }
+  .tb { background: rgba(88,166,255,.12); color: var(--blue);   border: 1px solid rgba(88,166,255,.25); }
+  .tp { background: rgba(188,140,255,.12); color: var(--purple); border: 1px solid rgba(188,140,255,.25); }
+  .to { background: rgba(240,136,62,.12); color: var(--orange); border: 1px solid rgba(240,136,62,.25); }
+  .ty { background: rgba(227,179,65,.12); color: var(--yellow); border: 1px solid rgba(227,179,65,.25); }
+  .tt { background: rgba(34,211,238,.1);  color: var(--teal);   border: 1px solid rgba(34,211,238,.2); }
+  .tm { background: rgba(139,148,158,.1); color: var(--muted);  border: 1px solid rgba(139,148,158,.2); }
+
+  /* DESCRIÇÃO */
+  .report-desc {
+    font-size: 13.5px;
+    color: var(--text2);
+    line-height: 1.75;
+    margin-bottom: 28px;
+  }
+
+  /* BLOCO LABEL */
+  .block-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .block-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* GRID DE SEÇÕES */
+  .sections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .sec-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .sec-ic { font-size: 15px; flex-shrink: 0; margin-top: 2px; }
+  .sec-name { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .sec-desc { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+
+  /* REGRAS */
+  .rules-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 24px; }
+
+  .rule {
+    display: flex;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--rc, var(--border));
+    border-radius: 0 7px 7px 0;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text2);
+  }
+
+  .rule strong { color: var(--text); }
+  .rule code {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 11px;
+    background: rgba(255,255,255,.06);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--orange);
+  }
+
+  .rc-green  { --rc: var(--green); }
+  .rc-blue   { --rc: var(--blue); }
+  .rc-purple { --rc: var(--purple); }
+  .rc-orange { --rc: var(--orange); }
+  .rc-yellow { --rc: var(--yellow); }
+  .rc-teal   { --rc: var(--teal); }
+
+  /* FONTES */
+  .source-note {
+    font-size: 11.5px;
+    color: var(--muted);
+    padding: 10px 14px;
+    background: var(--surf2);
+    border-radius: 7px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .source-note strong { color: var(--text2); }
+
+  /* ── BOTÃO VER QUERY ── */
+  .query-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s;
+    font-family: inherit;
+    margin-bottom: 0;
+  }
+
+  .query-toggle-btn:hover {
+    border-color: var(--text2);
+    color: var(--text);
+    background: var(--surf2);
+  }
+
+  .query-toggle-btn svg {
+    transition: transform .25s;
+    flex-shrink: 0;
+  }
+
+  .query-toggle-btn.open svg { transform: rotate(90deg); }
+
+  /* QUERY PANEL */
+  .query-panel {
+    display: none;
+    margin-top: 12px;
+    background: var(--surf2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    overflow: hidden;
+  }
+
+  .query-panel.visible { display: block; }
+
+  .query-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .query-panel-header span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 11px;
+  }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .copy-btn:hover { border-color: var(--text2); color: var(--text); background: var(--surf3); }
+  .copy-btn.copied { border-color: var(--green); color: var(--greenl); }
+
+  pre.query-code {
+    padding: 18px;
+    overflow-x: auto;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--text2);
+    margin: 0;
+    white-space: pre;
+    tab-size: 2;
+  }
+
+  /* Highlight simples */
+  .kw  { color: #ff7b72; }   /* keywords SQL */
+  .fn  { color: var(--yellow); }  /* funções */
+  .cm  { color: var(--muted); font-style: italic; } /* comentários */
+  .st  { color: #a5d6ff; }   /* strings */
+  .nm  { color: var(--orange); }  /* números */
+
+  /* DIVIDER */
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 48px 0;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📋</div>
+  <div class="header-text">
+    <h1>Sumário — Benefits Analytics</h1>
+    <p>Composição, métricas e regras de negócio</p>
+  </div>
+  <a class="hub-btn" href="https://felipetrezza.github.io/relatorio-benefits/hub.html" target="_blank">
+    ← Hub de Dashboards
+  </a>
+</header>
+
+<div class="layout">
+
+  <!-- ── TOC ── -->
+  <nav class="toc">
+    <div class="toc-title">Nesta página</div>
+    <ul class="toc-list">
+      <li><a href="#abertura">🏦 Abertura de Contas</a></li>
+      <li><a href="#antecipacoes">⚡ Antecipações</a></li>
+      <li><a href="#pix">💸 PIX</a></li>
+      <li><a href="#score">🎯 Score</a></li>
+      <li><a href="#tabelas">🗄️ Monitor de Tabelas</a></li>
+      <li><a href="#tv">📺 Dashboard TV</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── CONTEÚDO ── -->
+  <div class="content">
+
+    <div class="page-intro">
+      <h2>Documentação dos Dashboards</h2>
+      <p>O que cada relatório contém, como os dados são calculados e quais regras de negócio se aplicam. Use os botões <strong>"Ver Query"</strong> para visualizar o SQL utilizado em cada relatório.</p>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- 1. ABERTURA DE CONTAS                                           -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="abertura" class="report-section green">
+      <div class="report-header">
+        <div class="report-icon">🏦</div>
+        <div class="report-meta">
+          <div class="report-title">Abertura de Contas</div>
+          <div class="report-url">felipetrezza.github.io/relatorio-benefits/</div>
+        </div>
+        <a class="report-access" href="https://felipetrezza.github.io/relatorio-benefits/" target="_blank">
+          Acessar →
+        </a>
+      </div>
+
+      <div class="tags">
+        <span class="tag tg">Atualização diária</span>
+        <span class="tag tm">Últimos 5 meses</span>
+        <span class="tag tm">Público · Privado · Grupo · INSS</span>
+      </div>
+
+      <p class="report-desc">
+        Acompanha a evolução mensal e diária de abertura de contas PicPay por colaboradores elegíveis ao Benefits. Permite identificar crescimento por secretaria, setor e região do Brasil, com filtros interativos de mês, setor e estado.
+      </p>
+
+      <div class="block-label">Seções</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">📊</div><div><div class="sec-name">KPIs Mensais</div><div class="sec-desc">Total de aberturas por mês nos últimos 5 meses, com variação m/m.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏢</div><div><div class="sec-name">Top Secretarias</div><div class="sec-desc">Ranking por volume de abertura, com filtro por setor e mês.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🗺️</div><div><div class="sec-name">Distribuição por Região</div><div class="sec-desc">Aberturas agrupadas por região do Brasil.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📅</div><div><div class="sec-name">Evolução Diária</div><div class="sec-desc">Curva dia-a-dia do mês selecionado.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">⚡</div><div><div class="sec-name">Status de Antecipação</div><div class="sec-desc">Quem antecipou, quem antecipou no dia de abertura e quem nunca antecipou.</div></div></div>
+      </div>
+
+      <div class="block-label">Regras de negócio</div>
+      <div class="rules-list">
+        <div class="rule rc-green"><strong>Abertura de conta:</strong>&nbsp;Identificada por <code>consumers.consumers.sent_bacen_at</code> — data de envio ao BACEN. Registros com <code>sent_bacen_at IS NULL</code> são excluídos.</div>
+        <div class="rule rc-green"><strong>Deduplicação:</strong>&nbsp;Cada colaborador é contado uma vez via <code>QUALIFY row_number() OVER (PARTITION BY collaborator_document ORDER BY collaborator_id DESC) = 1</code> — preserva o vínculo mais recente.</div>
+        <div class="rule rc-blue"><strong>Segmentação de setor:</strong>&nbsp;<code>account_id = 1420</code> → INSS | <code>account_id IN (6,52,57,58,60,62,65,73,100,3170,3675)</code> → Grupo | <code>IS NULL</code> → INSS | demais → <code>flag_company_sector</code>.</div>
+        <div class="rule rc-blue"><strong>Janela temporal:</strong>&nbsp;Últimos 5 meses a partir do mês corrente (<code>sent_bacen_at &gt; current_date - 150 dias</code>).</div>
+        <div class="rule rc-orange"><strong>Comparativo MTD:</strong>&nbsp;Mês atual (dias 1–N) vs. mês anterior (dias 1–N), onde N é o dia de hoje. Garante comparação justa entre períodos iguais.</div>
+        <div class="rule rc-orange"><strong>Status de antecipação:</strong>&nbsp;"Antecipou no dia" = <code>sent_bacen_at = pri_antecipa</code> | "Antecipou" = <code>sent_bacen_at &lt; pri_antecipa</code> | "Nunca antecipou" = sem registro em <code>anticipation_request</code>.</div>
+      </div>
+
+      <div class="source-note"><strong>Tabelas:</strong> benefits.sec_collaborators · consumers.sec_consumers · consumers.consumers · benefits.companies · benefits.accounts · benefits.anticipation_request</div>
+
+      <button class="query-toggle-btn" onclick="toggleQuery('q-abertura', this)">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 12.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z"/></svg>
+        Ver Query SQL
+      </button>
+
+      <div id="q-abertura" class="query-panel">
+        <div class="query-panel-header">
+          <span>📄 abertura_de_contas.sql</span>
+          <button class="copy-btn" onclick="copyQuery('q-abertura', this)">Copiar</button>
+        </div>
+<pre class="query-code"><span class="kw">WITH</span> base_docs <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> collaborator_document, company_id, collaborator_id
+  <span class="kw">FROM</span>   benefits.sec_collaborators
+  <span class="kw">QUALIFY</span> <span class="fn">row_number</span>() <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> collaborator_document
+    <span class="kw">ORDER BY</span> collaborator_id <span class="kw">DESC</span>
+  ) = <span class="nm">1</span>
+),
+contas <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> consumer_id, cpf
+  <span class="kw">FROM</span>   consumers.sec_consumers
+  <span class="kw">WHERE</span>  cpf <span class="kw">IN</span> (<span class="kw">SELECT</span> collaborator_document <span class="kw">FROM</span> base_docs)
+),
+abertura <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> consumer_id,
+         <span class="fn">date_format</span>(sent_bacen_at, <span class="st">'yyyy-MM-dd'</span>) <span class="kw">AS</span> sent_bacen_at
+  <span class="kw">FROM</span>   consumers.consumers
+  <span class="kw">WHERE</span>  consumer_id <span class="kw">IN</span> (<span class="kw">SELECT</span> consumer_id <span class="kw">FROM</span> contas)
+    <span class="kw">AND</span>  sent_bacen_at <span class="kw">IS NOT NULL</span>
+  <span class="kw">QUALIFY</span> <span class="fn">row_number</span>() <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> consumer_id
+    <span class="kw">ORDER BY</span> sent_bacen_at <span class="kw">DESC</span>
+  ) = <span class="nm">1</span>
+),
+pri_antecipa <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> consumer_id, <span class="fn">min</span>(<span class="fn">date_format</span>(created_at, <span class="st">'yyyy-MM-dd'</span>)) <span class="kw">AS</span> pri_antecipa
+  <span class="kw">FROM</span>   benefits.anticipation_request
+  <span class="kw">WHERE</span>  request_status = <span class="st">'FINISH'</span>
+    <span class="kw">AND</span>  consumer_id <span class="kw">IN</span> (<span class="kw">SELECT DISTINCT</span> consumer_id <span class="kw">FROM</span> abertura)
+  <span class="kw">GROUP BY</span> <span class="nm">1</span>
+),
+fim <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    a.collaborator_document,
+    <span class="fn">upper</span>(f.account_name) <span class="kw">AS</span> account_name,
+    f.account_id,
+    <span class="cm">-- Segmentação de setor</span>
+    <span class="kw">CASE</span>
+      <span class="kw">WHEN</span> f.account_id = <span class="nm">1420</span>                                           <span class="kw">THEN</span> <span class="st">'INSS'</span>
+      <span class="kw">WHEN</span> f.account_id <span class="kw">IN</span> (<span class="nm">6</span>,<span class="nm">52</span>,<span class="nm">57</span>,<span class="nm">58</span>,<span class="nm">60</span>,<span class="nm">62</span>,<span class="nm">65</span>,<span class="nm">73</span>,<span class="nm">100</span>,<span class="nm">3170</span>,<span class="nm">3675</span>) <span class="kw">THEN</span> <span class="st">'grupo'</span>
+      <span class="kw">WHEN</span> f.account_id <span class="kw">IS NULL</span>                                          <span class="kw">THEN</span> <span class="st">'INSS'</span>
+      <span class="kw">ELSE</span>  <span class="fn">coalesce</span>(e.flag_company_sector, <span class="st">'private'</span>)
+    <span class="kw">END AS</span> setor,
+    <span class="cm">-- Região geográfica</span>
+    <span class="kw">CASE</span>
+      <span class="kw">WHEN</span> e.address_state <span class="kw">IN</span> (<span class="st">'AC'</span>,<span class="st">'AP'</span>,<span class="st">'AM'</span>,<span class="st">'PA'</span>,<span class="st">'RO'</span>,<span class="st">'RR'</span>,<span class="st">'TO'</span>)              <span class="kw">THEN</span> <span class="st">'Norte'</span>
+      <span class="kw">WHEN</span> e.address_state <span class="kw">IN</span> (<span class="st">'AL'</span>,<span class="st">'BA'</span>,<span class="st">'CE'</span>,<span class="st">'MA'</span>,<span class="st">'PB'</span>,<span class="st">'PE'</span>,<span class="st">'PI'</span>,<span class="st">'RN'</span>,<span class="st">'SE'</span>) <span class="kw">THEN</span> <span class="st">'Nordeste'</span>
+      <span class="kw">WHEN</span> e.address_state <span class="kw">IN</span> (<span class="st">'DF'</span>,<span class="st">'GO'</span>,<span class="st">'MT'</span>,<span class="st">'MS'</span>)                        <span class="kw">THEN</span> <span class="st">'Centro-Oeste'</span>
+      <span class="kw">WHEN</span> e.address_state <span class="kw">IN</span> (<span class="st">'ES'</span>,<span class="st">'MG'</span>,<span class="st">'RJ'</span>,<span class="st">'SP'</span>)                        <span class="kw">THEN</span> <span class="st">'Sudeste'</span>
+      <span class="kw">WHEN</span> e.address_state <span class="kw">IN</span> (<span class="st">'PR'</span>,<span class="st">'RS'</span>,<span class="st">'SC'</span>)                            <span class="kw">THEN</span> <span class="st">'Sul'</span>
+      <span class="kw">ELSE</span> <span class="st">'Outra/Não Identificada'</span>
+    <span class="kw">END AS</span> regiao_brasil,
+    c.sent_bacen_at,
+    <span class="cm">-- Status de antecipação</span>
+    <span class="kw">CASE</span>
+      <span class="kw">WHEN</span> d.consumer_id <span class="kw">IS NOT NULL AND</span> c.sent_bacen_at = d.pri_antecipa <span class="kw">THEN</span> <span class="st">'Antecipou dia abertura'</span>
+      <span class="kw">WHEN</span> d.consumer_id <span class="kw">IS NOT NULL AND</span> c.sent_bacen_at &lt; d.pri_antecipa  <span class="kw">THEN</span> <span class="st">'Antecipou'</span>
+      <span class="kw">ELSE</span> <span class="st">'Nunca antecipou'</span>
+    <span class="kw">END AS</span> fl_antecipacao
+  <span class="kw">FROM</span>       base_docs       a
+  <span class="kw">LEFT JOIN</span>  contas          b  <span class="kw">ON</span> a.collaborator_document = b.cpf
+  <span class="kw">LEFT JOIN</span>  abertura        c  <span class="kw">ON</span> b.consumer_id           = c.consumer_id
+  <span class="kw">LEFT JOIN</span>  pri_antecipa    d  <span class="kw">ON</span> b.consumer_id           = d.consumer_id
+  <span class="kw">LEFT JOIN</span>  benefits.companies e <span class="kw">ON</span> a.company_id          = e.company_id
+  <span class="kw">LEFT JOIN</span>  benefits.accounts  f <span class="kw">ON</span> e.account_id          = f.account_id
+)
+<span class="kw">SELECT</span>
+  <span class="fn">date_format</span>(sent_bacen_at, <span class="st">'yyyy-MM'</span>)    <span class="kw">AS</span> mes,
+  <span class="fn">date_format</span>(sent_bacen_at, <span class="st">'yyyy-MM-dd'</span>) <span class="kw">AS</span> dia,
+  setor,
+  Secretaria                               <span class="kw">AS</span> secretaria,
+  regiao_brasil                            <span class="kw">AS</span> regiao,
+  <span class="fn">count</span>(*)                                 <span class="kw">AS</span> count
+<span class="kw">FROM</span> fim
+<span class="kw">WHERE</span> <span class="fn">date_format</span>(sent_bacen_at, <span class="st">'yyyyMM'</span>) &gt; <span class="fn">date_format</span>(current_date() - <span class="nm">150</span>, <span class="st">'yyyyMM'</span>)
+  <span class="kw">AND</span> sent_bacen_at <span class="kw">IS NOT NULL</span>
+<span class="kw">GROUP BY</span> <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>
+<span class="kw">ORDER BY</span> <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span></pre>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- 2. ANTECIPAÇÕES                                                 -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="antecipacoes" class="report-section blue">
+      <div class="report-header">
+        <div class="report-icon">⚡</div>
+        <div class="report-meta">
+          <div class="report-title">Antecipações de Salário</div>
+          <div class="report-url">felipetrezza.github.io/relatorio-benefits/antecipacoes.html</div>
+        </div>
+        <a class="report-access" href="https://felipetrezza.github.io/relatorio-benefits/antecipacoes.html" target="_blank">Acessar →</a>
+      </div>
+
+      <div class="tags">
+        <span class="tag tb">MTD</span>
+        <span class="tag tg">Atualização diária</span>
+        <span class="tag tm">6 queries paralelas</span>
+        <span class="tag tm">2 visões</span>
+      </div>
+
+      <p class="report-desc">Painel operacional com métricas MTD de antecipações de salário. Duas visões: <strong>todas as antecipações</strong> e <strong>excluindo GDF e RJ</strong>. Cada visão apresenta 6 indicadores por setor com comparativo ao mesmo período do mês anterior.</p>
+
+      <div class="block-label">Indicadores (por setor: Total · Público · Privado · Grupo · INSS)</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">👥</div><div><div class="sec-name">Vidas</div><div class="sec-desc">Colaboradores únicos que anteciparam no mês (<code>DISTINCT consumer_id</code>).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📦</div><div><div class="sec-name">Antecipações</div><div class="sec-desc">Total de transações concluídas com <code>request_status = 'FINISH'</code>.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">💰</div><div><div class="sec-name">TPV (R$)</div><div class="sec-desc">Volume financeiro total (<code>SUM(request_value)</code>).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🎫</div><div><div class="sec-name">Ticket Médio (R$)</div><div class="sec-desc">TPV ÷ antecipações — calculado no frontend.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏦</div><div><div class="sec-name">Abertura de Contas</div><div class="sec-desc">Contas abertas no mesmo período MTD.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🌱</div><div><div class="sec-name">Vidas Novas</div><div class="sec-desc">1ª antecipação ever do colaborador dentro do mês atual.</div></div></div>
+      </div>
+
+      <div class="block-label">Regras de negócio</div>
+      <div class="rules-list">
+        <div class="rule rc-blue"><strong>MTD comparativo:</strong>&nbsp;Dias 1–N do mês atual vs. dias 1–N do mês anterior, onde N = dia de hoje. Filtro: <code>day(created_at) &lt;= N</code>.</div>
+        <div class="rule rc-blue"><strong>Status de conclusão:</strong>&nbsp;Somente <code>request_status = 'FINISH'</code> é contabilizado.</div>
+        <div class="rule rc-green"><strong>Vidas novas:</strong>&nbsp;Colaborador com primeira antecipação ever no mês vigente — exclui quem já tinha <code>created_at &lt; inicio_do_mes</code> via subquery.</div>
+        <div class="rule rc-orange"><strong>Visão sem GDF/RJ:</strong>&nbsp;Filtra <code>account_id NOT IN (892, 1817)</code>. GDF (892) e Estado do RJ (1817) têm margem zerada por bloqueio sistêmico e distorcem médias nacionais.</div>
+        <div class="rule rc-blue"><strong>Execução:</strong>&nbsp;6 queries em paralelo (antecip · novas · abertura × mês atual e anterior). Autenticação via OAuth CLI, perfil "picpay".</div>
+      </div>
+
+      <div class="source-note"><strong>Tabelas:</strong> benefits.anticipation_request · benefits.companies · benefits.accounts · benefits.sec_collaborators · consumers.sec_consumers · consumers.consumers</div>
+
+      <button class="query-toggle-btn" onclick="toggleQuery('q-antecip', this)">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 12.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z"/></svg>
+        Ver Query SQL
+      </button>
+      <div id="q-antecip" class="query-panel">
+        <div class="query-panel-header">
+          <span>📄 antecipacoes.sql — <em>3 queries rodadas em paralelo (mês atual e anterior)</em></span>
+          <button class="copy-btn" onclick="copyQuery('q-antecip', this)">Copiar</button>
+        </div>
+<pre class="query-code"><span class="cm">-- Query 1: Volume de antecipações por setor</span>
+<span class="kw">SELECT</span>
+  <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> f.account_id = <span class="nm">1420</span>                                           <span class="kw">THEN</span> <span class="st">'INSS'</span>
+    <span class="kw">WHEN</span> f.account_id <span class="kw">IN</span> (<span class="nm">6</span>,<span class="nm">52</span>,<span class="nm">57</span>,<span class="nm">58</span>,<span class="nm">60</span>,<span class="nm">62</span>,<span class="nm">65</span>,<span class="nm">73</span>,<span class="nm">100</span>,<span class="nm">3170</span>,<span class="nm">3675</span>) <span class="kw">THEN</span> <span class="st">'grupo'</span>
+    <span class="kw">WHEN</span> f.account_id <span class="kw">IS NULL</span>                                          <span class="kw">THEN</span> <span class="st">'INSS'</span>
+    <span class="kw">ELSE</span>  <span class="fn">coalesce</span>(e.flag_company_sector, <span class="st">'private'</span>)
+  <span class="kw">END AS</span> setor,
+  <span class="fn">count</span>(<span class="kw">distinct</span> ar.consumer_id)                  <span class="kw">AS</span> vidas,
+  <span class="fn">count</span>(*)                                         <span class="kw">AS</span> antecipacoes,
+  <span class="fn">round</span>(<span class="fn">sum</span>(<span class="fn">cast</span>(ar.request_value <span class="kw">AS</span> <span class="kw">double</span>)), <span class="nm">2</span>) <span class="kw">AS</span> tpv
+<span class="kw">FROM</span>       benefits.anticipation_request ar
+<span class="kw">LEFT JOIN</span>  benefits.companies  e <span class="kw">ON</span> ar.company_id  = e.company_id
+<span class="kw">LEFT JOIN</span>  benefits.accounts   f <span class="kw">ON</span> e.account_id   = f.account_id
+<span class="kw">WHERE</span>  ar.request_status = <span class="st">'FINISH'</span>
+  <span class="kw">AND</span>  ar.created_at &gt;= <span class="st">'&lt;ini&gt;'</span>   <span class="cm">-- 1º dia do mês</span>
+  <span class="kw">AND</span>  ar.created_at &lt;  <span class="st">'&lt;fim&gt;'</span>   <span class="cm">-- 1º dia do mês seguinte</span>
+  <span class="kw">AND</span>  <span class="fn">day</span>(ar.created_at) &lt;= <span class="nm">&lt;N&gt;</span>  <span class="cm">-- dia de hoje (MTD)</span>
+<span class="kw">GROUP BY</span> <span class="nm">1</span>
+
+<span class="cm">-- Query 2: Vidas novas (1ª antecipação ever no mês)</span>
+<span class="kw">SELECT</span>
+  <span class="cm">/* mesmo CASE setor acima */</span> setor,
+  <span class="fn">count</span>(<span class="kw">distinct</span> ar.consumer_id) <span class="kw">AS</span> vidas_novas
+<span class="kw">FROM</span>       benefits.anticipation_request ar
+<span class="kw">LEFT JOIN</span>  benefits.companies e <span class="kw">ON</span> ar.company_id = e.company_id
+<span class="kw">LEFT JOIN</span>  benefits.accounts  f <span class="kw">ON</span> e.account_id  = f.account_id
+<span class="kw">WHERE</span>  ar.request_status = <span class="st">'FINISH'</span>
+  <span class="kw">AND</span>  ar.created_at &gt;= <span class="st">'&lt;ini&gt;'</span>
+  <span class="kw">AND</span>  ar.created_at &lt;  <span class="st">'&lt;fim&gt;'</span>
+  <span class="kw">AND</span>  <span class="fn">day</span>(ar.created_at) &lt;= <span class="nm">&lt;N&gt;</span>
+  <span class="kw">AND</span>  ar.consumer_id <span class="kw">NOT IN</span> (
+    <span class="kw">SELECT DISTINCT</span> consumer_id
+    <span class="kw">FROM</span>   benefits.anticipation_request
+    <span class="kw">WHERE</span>  request_status = <span class="st">'FINISH'</span>
+      <span class="kw">AND</span>  created_at &lt; <span class="st">'&lt;ini&gt;'</span>  <span class="cm">-- nunca antecipou antes do mês</span>
+  )
+<span class="kw">GROUP BY</span> <span class="nm">1</span>
+
+<span class="cm">-- Query 3: Abertura de contas no período</span>
+<span class="kw">WITH</span> base <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> sc.collaborator_document, sc.company_id
+  <span class="kw">FROM</span>       benefits.sec_collaborators sc
+  <span class="kw">INNER JOIN</span> consumers.sec_consumers cc <span class="kw">ON</span> cc.cpf         = sc.collaborator_document
+  <span class="kw">INNER JOIN</span> consumers.consumers     c  <span class="kw">ON</span> c.consumer_id  = cc.consumer_id
+  <span class="kw">WHERE</span>  c.sent_bacen_at &gt;= <span class="st">'&lt;ini&gt;'</span>
+    <span class="kw">AND</span>  c.sent_bacen_at &lt;  <span class="st">'&lt;fim&gt;'</span>
+    <span class="kw">AND</span>  <span class="fn">day</span>(c.sent_bacen_at) &lt;= <span class="nm">&lt;N&gt;</span>
+    <span class="kw">AND</span>  c.sent_bacen_at <span class="kw">IS NOT NULL</span>
+  <span class="kw">QUALIFY</span> <span class="fn">row_number</span>() <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> sc.collaborator_document
+    <span class="kw">ORDER BY</span> sc.collaborator_id <span class="kw">DESC</span>
+  ) = <span class="nm">1</span>
+)
+<span class="kw">SELECT</span>
+  <span class="cm">/* mesmo CASE setor */</span> setor,
+  <span class="fn">count</span>(*) <span class="kw">AS</span> abertura_contas
+<span class="kw">FROM</span>       base b
+<span class="kw">LEFT JOIN</span>  benefits.companies e <span class="kw">ON</span> b.company_id = e.company_id
+<span class="kw">LEFT JOIN</span>  benefits.accounts  f <span class="kw">ON</span> e.account_id = f.account_id
+<span class="kw">GROUP BY</span> <span class="nm">1</span></pre>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- 3. PIX                                                          -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="pix" class="report-section purple">
+      <div class="report-header">
+        <div class="report-icon">💸</div>
+        <div class="report-meta">
+          <div class="report-title">Antecipações via PIX</div>
+          <div class="report-url">felipetrezza.github.io/relatorio-benefits/pix.html</div>
+        </div>
+        <a class="report-access" href="https://felipetrezza.github.io/relatorio-benefits/pix.html" target="_blank">Acessar →</a>
+      </div>
+
+      <div class="tags">
+        <span class="tag tp">Canal PIX</span>
+        <span class="tag tg">Atualização diária</span>
+        <span class="tag tm">2 queries paralelas</span>
+      </div>
+
+      <p class="report-desc">Recorte exclusivo das antecipações cujo destino é PIX. Mesma estrutura do relatório de antecipações (6 indicadores × 4 setores + MTD), porém filtrado por <code>cashin_destiny = 'PIX'</code>. Após gerado, regera automaticamente o Dashboard TV.</p>
+
+      <div class="block-label">Regras de negócio</div>
+      <div class="rules-list">
+        <div class="rule rc-purple"><strong>Filtro principal:</strong>&nbsp;<code>cashin_destiny = 'PIX'</code> aplicado em <code>benefits.anticipation_request</code>. Demais destinos (TED, conta PicPay etc.) são excluídos.</div>
+        <div class="rule rc-purple"><strong>Vidas novas PIX:</strong>&nbsp;CTE <code>pri_antecipacao</code> identifica o <code>MIN(created_at)</code> por <code>consumer_id</code> em todo o histórico PIX. Flag <code>fl_pri = 1</code> = nunca antecipou via PIX antes.</div>
+        <div class="rule rc-blue"><strong>Query unificada:</strong>&nbsp;1 única query retorna os dois períodos (mês atual e anterior) via flags <code>fl_cur</code> e <code>fl_prv</code> no SELECT — reduz de 6 para 2 queries no total.</div>
+        <div class="rule rc-green"><strong>Sincronização TV:</strong>&nbsp;Após gerar pix.html, o script lê antecipacoes.html do disco e regera tv.html combinando os dois datasets. Os três arquivos sobem no mesmo commit.</div>
+      </div>
+
+      <div class="source-note"><strong>Tabelas:</strong> benefits.anticipation_request (filtro: cashin_destiny = 'PIX') · benefits.companies · benefits.accounts · consumers.sec_consumers · consumers.consumers</div>
+
+      <button class="query-toggle-btn" onclick="toggleQuery('q-pix', this)">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 12.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z"/></svg>
+        Ver Query SQL
+      </button>
+      <div id="q-pix" class="query-panel">
+        <div class="query-panel-header">
+          <span>📄 pix.sql — <em>query unificada (cur + prv em uma passagem)</em></span>
+          <button class="copy-btn" onclick="copyQuery('q-pix', this)">Copiar</button>
+        </div>
+<pre class="query-code"><span class="kw">WITH</span> pri_antecipacao <span class="kw">AS</span> (
+  <span class="cm">-- Identifica a 1ª antecipação PIX ever por consumer</span>
+  <span class="kw">SELECT</span> consumer_id, <span class="fn">min</span>(created_at) <span class="kw">AS</span> dt_pri
+  <span class="kw">FROM</span>   benefits.anticipation_request
+  <span class="kw">WHERE</span>  request_status = <span class="st">'FINISH'</span>
+  <span class="kw">GROUP BY</span> <span class="nm">1</span>
+),
+fim <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    <span class="cm">/* CASE setor (mesma lógica dos demais relatórios) */</span>
+    <span class="kw">CASE</span>
+      <span class="kw">WHEN</span> f.account_id = <span class="nm">1420</span>                                           <span class="kw">THEN</span> <span class="st">'INSS'</span>
+      <span class="kw">WHEN</span> f.account_id <span class="kw">IN</span> (<span class="nm">6</span>,<span class="nm">52</span>,<span class="nm">57</span>,<span class="nm">58</span>,<span class="nm">60</span>,<span class="nm">62</span>,<span class="nm">65</span>,<span class="nm">73</span>,<span class="nm">100</span>,<span class="nm">3170</span>,<span class="nm">3675</span>) <span class="kw">THEN</span> <span class="st">'grupo'</span>
+      <span class="kw">WHEN</span> f.account_id <span class="kw">IS NULL</span>                                          <span class="kw">THEN</span> <span class="st">'INSS'</span>
+      <span class="kw">ELSE</span>  <span class="fn">coalesce</span>(e.flag_company_sector, <span class="st">'private'</span>)
+    <span class="kw">END AS</span> setor,
+    ar.consumer_id,
+    ar.request_value,
+    <span class="cm">-- Flag: primeira antecipação ever desse consumer?</span>
+    <span class="kw">CASE WHEN</span> pa.consumer_id <span class="kw">IS NULL THEN</span> <span class="nm">0</span> <span class="kw">ELSE</span> <span class="nm">1</span> <span class="kw">END AS</span> fl_pri,
+    <span class="cm">-- Flag: pertence ao mês atual (MTD)?</span>
+    <span class="kw">CASE WHEN</span> <span class="fn">date_format</span>(ar.created_at, <span class="st">'yyyy-MM'</span>) = <span class="st">'&lt;cur_mes&gt;'</span>
+              <span class="kw">AND</span> <span class="fn">day</span>(ar.created_at) &lt;= <span class="nm">&lt;N&gt;</span> <span class="kw">THEN</span> <span class="nm">1</span> <span class="kw">ELSE</span> <span class="nm">0</span> <span class="kw">END AS</span> fl_cur,
+    <span class="cm">-- Flag: pertence ao mês anterior (mesmo período)?</span>
+    <span class="kw">CASE WHEN</span> <span class="fn">date_format</span>(ar.created_at, <span class="st">'yyyy-MM'</span>) = <span class="st">'&lt;prev_mes&gt;'</span>
+              <span class="kw">AND</span> <span class="fn">day</span>(ar.created_at) &lt;= <span class="nm">&lt;N&gt;</span> <span class="kw">THEN</span> <span class="nm">1</span> <span class="kw">ELSE</span> <span class="nm">0</span> <span class="kw">END AS</span> fl_prv
+  <span class="kw">FROM</span>       benefits.anticipation_request ar
+  <span class="kw">LEFT JOIN</span>  benefits.companies  e  <span class="kw">ON</span> ar.company_id  = e.company_id
+  <span class="kw">LEFT JOIN</span>  benefits.accounts   f  <span class="kw">ON</span> e.account_id   = f.account_id
+  <span class="kw">LEFT JOIN</span>  pri_antecipacao     pa <span class="kw">ON</span> ar.consumer_id = pa.consumer_id
+                                    <span class="kw">AND</span> ar.created_at  = pa.dt_pri
+  <span class="kw">WHERE</span>  ar.request_status = <span class="st">'FINISH'</span>
+    <span class="kw">AND</span>  ar.cashin_destiny = <span class="st">'PIX'</span>       <span class="cm">-- &lt;-- filtro principal</span>
+    <span class="kw">AND</span>  ar.created_at &gt;= <span class="st">'&lt;prev_ini&gt;'</span>  <span class="cm">-- inicia no mês anterior (cobre os dois)</span>
+)
+<span class="kw">SELECT</span>
+  setor,
+  <span class="fn">count</span>(<span class="kw">distinct CASE WHEN</span> fl_cur=<span class="nm">1</span> <span class="kw">THEN</span> consumer_id <span class="kw">END</span>)               <span class="kw">AS</span> vidas_cur,
+  <span class="fn">count</span>(<span class="kw">CASE WHEN</span> fl_cur=<span class="nm">1</span> <span class="kw">THEN</span> <span class="nm">1</span> <span class="kw">END</span>)                                  <span class="kw">AS</span> antecip_cur,
+  <span class="fn">round</span>(<span class="fn">sum</span>(<span class="kw">CASE WHEN</span> fl_cur=<span class="nm">1</span> <span class="kw">THEN</span> request_value <span class="kw">ELSE</span> <span class="nm">0</span> <span class="kw">END</span>), <span class="nm">2</span>)       <span class="kw">AS</span> tpv_cur,
+  <span class="fn">count</span>(<span class="kw">distinct CASE WHEN</span> fl_cur=<span class="nm">1</span> <span class="kw">AND</span> fl_pri=<span class="nm">1</span> <span class="kw">THEN</span> consumer_id <span class="kw">END</span>)  <span class="kw">AS</span> novas_cur,
+  <span class="fn">count</span>(<span class="kw">distinct CASE WHEN</span> fl_prv=<span class="nm">1</span> <span class="kw">THEN</span> consumer_id <span class="kw">END</span>)               <span class="kw">AS</span> vidas_prv,
+  <span class="fn">count</span>(<span class="kw">CASE WHEN</span> fl_prv=<span class="nm">1</span> <span class="kw">THEN</span> <span class="nm">1</span> <span class="kw">END</span>)                                  <span class="kw">AS</span> antecip_prv,
+  <span class="fn">round</span>(<span class="fn">sum</span>(<span class="kw">CASE WHEN</span> fl_prv=<span class="nm">1</span> <span class="kw">THEN</span> request_value <span class="kw">ELSE</span> <span class="nm">0</span> <span class="kw">END</span>), <span class="nm">2</span>)       <span class="kw">AS</span> tpv_prv,
+  <span class="fn">count</span>(<span class="kw">distinct CASE WHEN</span> fl_prv=<span class="nm">1</span> <span class="kw">AND</span> fl_pri=<span class="nm">1</span> <span class="kw">THEN</span> consumer_id <span class="kw">END</span>)  <span class="kw">AS</span> novas_prv
+<span class="kw">FROM</span> fim
+<span class="kw">GROUP BY</span> <span class="nm">1</span>
+<span class="kw">ORDER BY</span> <span class="nm">1</span></pre>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- 4. SCORE                                                        -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="score" class="report-section orange">
+      <div class="report-header">
+        <div class="report-icon">🎯</div>
+        <div class="report-meta">
+          <div class="report-title">Score de Antecipações</div>
+          <div class="report-url">felipetrezza.github.io/relatorio-benefits/score.html</div>
+        </div>
+        <a class="report-access" href="https://felipetrezza.github.io/relatorio-benefits/score.html" target="_blank">Acessar →</a>
+      </div>
+
+      <div class="tags">
+        <span class="tag to">Análise Profunda</span>
+        <span class="tag tp">RFM</span>
+        <span class="tag tb">Funil de Conversão</span>
+        <span class="tag tm">Atualização manual</span>
+      </div>
+
+      <p class="report-desc">Dashboard analítico de propensão à antecipação. Vai além dos volumes operacionais: mapeia <strong>quem antecipa</strong>, <strong>quando antecipa</strong>, <strong>para onde vai o dinheiro</strong> e <strong>qual o perfil de quem ainda não antecipou</strong>. Base para decisões de produto e segmentação de campanhas.</p>
+
+      <div class="block-label">Seções</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">🔢</div><div><div class="sec-name">KPIs Hero</div><div class="sec-desc">8 cards: elegíveis, com conta, com margem, MAU, antecipando, ticket médio, TPV, % conversão.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🔽</div><div><div class="sec-name">Funil Real de Conversão</div><div class="sec-desc">1,35M elegíveis → conta → margem → MAU → antecipando. % de conversão em cada etapa.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🎪</div><div><div class="sec-name">Funil de Campanha MKT</div><div class="sec-desc">Análise dinâmica de funil por activity ou journey (Databricks live via Cloudflare Worker).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏢</div><div><div class="sec-name">Análise por Setor</div><div class="sec-desc">Mini-funil Público · Grupo · Privado com conversão conta → margem → antecipação.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📅</div><div><div class="sec-name">Evolução Mensal</div><div class="sec-desc">Tendência histórica por mês, com abas por setor.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🌡️</div><div><div class="sec-name">Sazonalidade</div><div class="sec-desc">Heatmap por dia do mês — pico no dia 10. Filtro dinâmico por setor.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🧮</div><div><div class="sec-name">Perfil RFM</div><div class="sec-desc">Recência, Frequência e Valor por setor. Segmenta antecipadores frequentes vs. pontuais.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📍</div><div><div class="sec-name">Destino do Pagamento</div><div class="sec-desc">Para onde vai o dinheiro: PIX, TED, conta PicPay etc. Evolução temporal por setor.</div></div></div>
+      </div>
+
+      <div class="block-label">Regras de negócio</div>
+      <div class="rules-list">
+        <div class="rule rc-orange"><strong>Funil correto:</strong>&nbsp;Sem filtro <code>has_anticipation_enabled</code> e sem <code>resignation_date IS NULL</code>. Inclui colaboradores desligados — alinhado com o número real do Dashboard TV.</div>
+        <div class="rule rc-orange"><strong>MAU:</strong>&nbsp;Calculado com <code>D-7</code> (7 dias de estabilidade) usando <code>is_mau_app_30</code> de <code>consumers.daily_consumers_labels_and_metrics</code>.</div>
+        <div class="rule rc-blue"><strong>Funil MKT (dinâmico):</strong>&nbsp;Cloudflare Worker → GitHub Actions → Databricks. Cruza <code>marketing.consumers_campaigns_communications</code> com <code>benefits.anticipation_request</code> em janela de 30 dias após o envio.</div>
+        <div class="rule rc-orange"><strong>Campo correto de valor:</strong>&nbsp;<code>anticipation_request.request_value</code> (não <code>anticipation_value</code> — inexistente nessa tabela). Campo de margem: <code>sec_wage_advance_collaborator_margins.anticipation_value</code>.</div>
+      </div>
+
+      <div class="source-note"><strong>Tabelas:</strong> benefits.anticipation_request · benefits.collaborators · benefits.companies · benefits.accounts · benefits.sec_wage_advance_collaborator_margins · consumers.consumers · consumers.daily_consumers_labels_and_metrics · marketing.consumers_campaigns_communications</div>
+
+      <button class="query-toggle-btn" onclick="toggleQuery('q-score', this)">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 12.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z"/></svg>
+        Ver Query SQL
+      </button>
+      <div id="q-score" class="query-panel">
+        <div class="query-panel-header">
+          <span>📄 score_funil.sql — <em>funil principal de conversão</em></span>
+          <button class="copy-btn" onclick="copyQuery('q-score', this)">Copiar</button>
+        </div>
+<pre class="query-code"><span class="cm">-- Funil real de conversão (base do Score)</span>
+<span class="kw">WITH</span>
+<span class="cm">-- Total de vidas elegíveis no Benefits</span>
+elegíveis <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="fn">count</span>(<span class="kw">distinct</span> sc.collaborator_document) <span class="kw">AS</span> total
+  <span class="kw">FROM</span>   benefits.sec_collaborators sc
+),
+<span class="cm">-- Colaboradores com conta PicPay aberta</span>
+com_conta <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="fn">count</span>(<span class="kw">distinct</span> cc.consumer_id) <span class="kw">AS</span> total
+  <span class="kw">FROM</span>       benefits.sec_collaborators sc
+  <span class="kw">INNER JOIN</span> consumers.sec_consumers   cc <span class="kw">ON</span> cc.cpf        = sc.collaborator_document
+  <span class="kw">INNER JOIN</span> consumers.consumers       c  <span class="kw">ON</span> c.consumer_id = cc.consumer_id
+  <span class="kw">WHERE</span>  c.sent_bacen_at <span class="kw">IS NOT NULL</span>
+),
+<span class="cm">-- Com margem ativa de antecipação</span>
+com_margem <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="fn">count</span>(<span class="kw">distinct</span> m.consumer_id) <span class="kw">AS</span> total
+  <span class="kw">FROM</span>   benefits.sec_wage_advance_collaborator_margins m
+  <span class="kw">WHERE</span>  m.is_enabled = <span class="kw">true</span>
+    <span class="kw">AND</span>  m.anticipation_value &gt; <span class="nm">0</span>
+),
+<span class="cm">-- MAU com margem (D-7 para estabilidade)</span>
+mau_margem <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="fn">count</span>(<span class="kw">distinct</span> lm.consumer_id) <span class="kw">AS</span> total
+  <span class="kw">FROM</span>       consumers.daily_consumers_labels_and_metrics lm
+  <span class="kw">INNER JOIN</span> benefits.sec_wage_advance_collaborator_margins m
+          <span class="kw">ON</span> m.consumer_id = lm.consumer_id
+         <span class="kw">AND</span> m.is_enabled = <span class="kw">true</span>
+  <span class="kw">WHERE</span>  lm.metric_date = <span class="fn">date_sub</span>(<span class="fn">current_date</span>(), <span class="nm">7</span>)
+    <span class="kw">AND</span>  lm.is_mau_app_30 = <span class="kw">true</span>
+),
+<span class="cm">-- Antecipando no mês corrente</span>
+antecipando <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="fn">count</span>(<span class="kw">distinct</span> ar.consumer_id) <span class="kw">AS</span> total
+  <span class="kw">FROM</span>   benefits.anticipation_request ar
+  <span class="kw">WHERE</span>  ar.request_status = <span class="st">'FINISH'</span>
+    <span class="kw">AND</span>  <span class="fn">date_format</span>(ar.created_at, <span class="st">'yyyy-MM'</span>) = <span class="fn">date_format</span>(<span class="fn">current_date</span>(), <span class="st">'yyyy-MM'</span>)
+  <span class="cm">-- Sem filtro has_anticipation_enabled — conta todos os finalizados</span>
+)
+<span class="kw">SELECT</span>
+  e.total  <span class="kw">AS</span> elegiveis,
+  c.total  <span class="kw">AS</span> com_conta,
+  m.total  <span class="kw">AS</span> com_margem,
+  mm.total <span class="kw">AS</span> mau_com_margem,
+  a.total  <span class="kw">AS</span> antecipando
+<span class="kw">FROM</span> elegíveis e, com_conta c, com_margem m, mau_margem mm, antecipando a</pre>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- 5. MONITOR DE TABELAS                                           -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="tabelas" class="report-section teal">
+      <div class="report-header">
+        <div class="report-icon">🗄️</div>
+        <div class="report-meta">
+          <div class="report-title">Monitor de Tabelas</div>
+          <div class="report-url">felipetrezza.github.io/relatorio-benefits/tabelas.html</div>
+        </div>
+        <a class="report-access" href="https://felipetrezza.github.io/relatorio-benefits/tabelas.html" target="_blank">Acessar →</a>
+      </div>
+
+      <div class="tags">
+        <span class="tag tt">Infra · Dados</span>
+        <span class="tag tg">Atualização diária às 8h</span>
+        <span class="tag tm">11 tabelas · 11 queries paralelas</span>
+      </div>
+
+      <p class="report-desc">Painel de saúde das fontes de dados. Monitora a data da última atualização das 11 tabelas Databricks usadas pelos relatórios Benefits e emite alertas de atraso ou problema.</p>
+
+      <div class="block-label">Tabelas monitoradas</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">👥</div><div><div class="sec-name">benefits.collaborators</div><div class="sec-desc">Colaboradores elegíveis — <code>updated_at</code></div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏢</div><div><div class="sec-name">benefits.companies</div><div class="sec-desc">Empresas conveniadas — <code>updated_at</code></div></div></div>
+        <div class="sec-item"><div class="sec-ic">🔒</div><div><div class="sec-name">benefits.accounts</div><div class="sec-desc">Lógica especial — alerta por variação de COUNT de linhas.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🧑</div><div><div class="sec-name">consumers.consumers</div><div class="sec-desc">Base de consumidores — <code>sent_bacen_at</code> (não <code>updated_at</code>).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">⚡</div><div><div class="sec-name">benefits.anticipation_request</div><div class="sec-desc">Solicitações de antecipação — <code>created_at</code></div></div></div>
+        <div class="sec-item"><div class="sec-ic">📐</div><div><div class="sec-name">benefits.sec_wage_advance_collaborator_margins</div><div class="sec-desc">Margens por colaborador — <code>updated_at</code></div></div></div>
+        <div class="sec-item"><div class="sec-ic">📊</div><div><div class="sec-name">consumers.daily_consumers_labels_and_metrics</div><div class="sec-desc">Métricas diárias (MAU) — <code>metric_date</code></div></div></div>
+        <div class="sec-item"><div class="sec-ic">📣</div><div><div class="sec-name">marketing.consumers_campaigns_communications</div><div class="sec-desc">Comunicações de campanhas — <code>sent_at</code></div></div></div>
+        <div class="sec-item"><div class="sec-ic">🔄</div><div><div class="sec-name">benefits.all_movements</div><div class="sec-desc">Movimentações consolidadas — <code>created_at</code></div></div></div>
+        <div class="sec-item"><div class="sec-ic">💳</div><div><div class="sec-name">picpay.picpay.all_transactions</div><div class="sec-desc">Transações PicPay — <code>created_at</code></div></div></div>
+        <div class="sec-item"><div class="sec-ic">🛍️</div><div><div class="sec-name">benefits.benefits_purchases</div><div class="sec-desc">Compras via Benefits — <code>created_at</code></div></div></div>
+      </div>
+
+      <div class="block-label">Regras de negócio</div>
+      <div class="rules-list">
+        <div class="rule rc-teal"><strong>Critérios de status:</strong>&nbsp;✅ Atualizado = ≤ 26h | ⚠️ Atraso = 26h–72h | ❌ Problema = &gt; 72h ou erro.</div>
+        <div class="rule rc-teal"><strong>benefits.accounts:</strong>&nbsp;Tabela sem movimentação diária. Alerta baseado em variação de <code>COUNT(*)</code> vs. snapshot salvo na execução anterior.</div>
+        <div class="rule rc-blue"><strong>Parser de datas:</strong>&nbsp;Databricks retorna ISO com sufixo <code>T</code>, <code>Z</code> e milissegundos (ex: <code>2026-04-02T07:51:19.114Z</code>). O script remove esses sufixos antes de calcular o delta em horas.</div>
+      </div>
+
+      <button class="query-toggle-btn" onclick="toggleQuery('q-tabelas', this)">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 12.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z"/></svg>
+        Ver Query SQL
+      </button>
+      <div id="q-tabelas" class="query-panel">
+        <div class="query-panel-header">
+          <span>📄 monitor_tabelas.sql — <em>executada para cada tabela (11 queries em paralelo)</em></span>
+          <button class="copy-btn" onclick="copyQuery('q-tabelas', this)">Copiar</button>
+        </div>
+<pre class="query-code"><span class="cm">-- Padrão executado para cada tabela monitorada</span>
+<span class="cm">-- Substitua &lt;tabela&gt; e &lt;coluna_data&gt; conforme a tabela</span>
+
+<span class="kw">SELECT</span>
+  <span class="fn">max</span>(&lt;coluna_data&gt;) <span class="kw">AS</span> max_date,
+  <span class="fn">count</span>(*)           <span class="kw">AS</span> total_rows
+<span class="kw">FROM</span> &lt;tabela&gt;
+
+<span class="cm">-- Exemplos reais:
+-- benefits.collaborators       → max(updated_at)
+-- consumers.consumers          → max(sent_bacen_at)   ← NÃO updated_at
+-- benefits.anticipation_request→ max(created_at)
+-- daily_consumers_labels_...   → max(metric_date)     ← NÃO ref_date
+-- marketing.consumers_campaigns→ max(sent_at)
+-- picpay.picpay.all_transactions→ max(created_at)     ← schema duplo</span>
+
+<span class="cm">-- Lógica de status (Python, pós-query):
+-- delta = (now - max_date).total_seconds() / 3600
+-- ≤ 26h  → "Atualizado"
+-- 26-72h → "Atraso"
+-- &gt; 72h  → "Problema"</span>
+
+<span class="cm">-- Lógica especial para benefits.accounts:
+-- Não usa max(updated_at) — a tabela não muda diariamente
+-- Compara COUNT(*) atual vs. snapshot JSON salvo na execução anterior
+-- diff > 0  → "+N linhas adicionadas" (status OK)
+-- diff == 0 → "Estável"             (status OK)
+-- diff < 0  → "N linhas removidas"  (status ERRO)</span></pre>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- 6. TV                                                           -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="tv" class="report-section yellow">
+      <div class="report-header">
+        <div class="report-icon">📺</div>
+        <div class="report-meta">
+          <div class="report-title">Dashboard TV</div>
+          <div class="report-url">felipetrezza.github.io/relatorio-benefits/tv.html</div>
+        </div>
+        <a class="report-access" href="https://felipetrezza.github.io/relatorio-benefits/tv.html" target="_blank">Acessar →</a>
+      </div>
+
+      <div class="tags">
+        <span class="tag ty">Display TV</span>
+        <span class="tag tg">3 slides · 1 min cada</span>
+        <span class="tag tm">Gerado automaticamente</span>
+      </div>
+
+      <p class="report-desc">Dashboard projetado para exibição em TV do time. Alterna automaticamente entre 3 visões a cada 1 minuto. Suporta fullscreen (tecla <kbd style="background:var(--surf3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;">F</kbd>). Gerado automaticamente sempre que os relatórios de antecipações ou PIX são atualizados.</p>
+
+      <div class="block-label">Slides em rotação (1 minuto cada)</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">1️⃣</div><div><div class="sec-name">Todas as Antecipações</div><div class="sec-desc">Dados completos incluindo GDF e RJ.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">2️⃣</div><div><div class="sec-name">Excluindo GDF e RJ</div><div class="sec-desc">Sem <code>account_id IN (892, 1817)</code> — visão sem outliers de margem zerada.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">3️⃣</div><div><div class="sec-name">PIX</div><div class="sec-desc">Recorte exclusivo de antecipações com destino PIX.</div></div></div>
+      </div>
+
+      <div class="block-label">Regras de negócio</div>
+      <div class="rules-list">
+        <div class="rule rc-yellow"><strong>Geração automática:</strong>&nbsp;Regerado por <code>atualizar_antecipacoes.py</code> (após gerar antecipacoes.html) e por <code>atualizar_pix.py</code> (após gerar pix.html). Nunca fica desatualizado.</div>
+        <div class="rule rc-yellow"><strong>Sincronização PIX:</strong>&nbsp;Ao atualizar o PIX, o script lê antecipacoes.html do disco (DATA) e combina com os dados PIX recém-calculados (DATA_PIX). Os três arquivos sobem no mesmo commit.</div>
+        <div class="rule rc-green"><strong>Auto-refresh:</strong>&nbsp;Recarrega a cada 5 minutos via <code>setInterval</code>, mas <strong>somente quando não está em fullscreen</strong> — evita saída involuntária do modo TV.</div>
+        <div class="rule rc-blue"><strong>Timer de slides:</strong>&nbsp;<code>setTimeout</code> simples de 60s (não <code>setInterval</code>) — sem deriva acumulada de tempo entre slides.</div>
+      </div>
+
+      <div class="source-note"><strong>Gerado a partir de:</strong> antecipacoes.html (DATA + DATA2) e pix.html (DATA_PIX) — nenhuma query adicional é executada.</div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<footer>
+  <a href="https://felipetrezza.github.io/relatorio-benefits/hub.html">← Hub de Dashboards</a>
+  &nbsp;·&nbsp;
+  Benefits Analytics · Dados via Databricks 📊
+</footer>
+
+<script>
+  function toggleQuery(id, btn) {
+    var panel = document.getElementById(id);
+    var isOpen = panel.classList.contains('visible');
+    panel.classList.toggle('visible', !isOpen);
+    btn.classList.toggle('open', !isOpen);
+    btn.querySelector('svg + span') && null;
+    // atualiza texto do botão
+    var spans = btn.childNodes;
+    btn.lastChild.textContent = isOpen ? ' Ver Query SQL' : ' Ocultar Query';
+  }
+
+  function copyQuery(id, btn) {
+    var pre = document.querySelector('#' + id + ' pre.query-code');
+    var text = pre ? pre.innerText : '';
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = '✓ Copiado';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copiar';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // TOC scroll spy
+  var sections = document.querySelectorAll('.report-section');
+  var tocLinks = document.querySelectorAll('.toc-list a');
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(function(a) { a.classList.remove('active'); });
+        var active = document.querySelector('.toc-list a[href="#' + entry.target.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(function(s) { observer.observe(s); });
+</script>
+
+</body>
+</html>
