@@ -983,7 +983,7 @@ function dispatchWorkflow(searchVal, dateFrom, dateTo, requestId){
 function pollResult(requestId, onSuccess, onTimeout){
   var url      = GH_PAGES + '/results/' + requestId + '.json';
   var attempts = 0;
-  var maxAttempts = 48; // 48 × 5s = 4 minutos
+  var maxAttempts = 96; // 96 × 5s = 8 minutos (cobre cache miss no pip)
 
   var id = setInterval(function(){
     attempts++;
