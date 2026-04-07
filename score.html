@@ -927,24 +927,55 @@ function genRequestId(){
   return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 }
 
-// ── DISPARAR WORKFLOW (via Worker — sem token no HTML) ──────────
-function dispatchWorkflow(searchVal, dateFrom, dateTo, requestId){
-  var payload = {
-    date_from:  dateFrom || '',
-    date_to:    dateTo   || '',
-    request_id: requestId
-  };
-  if(FMKT_MODE === 'journey'){
-    payload.journey  = searchVal;
-    payload.activity = '';
-  } else {
-    payload.activity = searchVal;
-    payload.journey  = '';
-  }
-  return fetch(WORKER_URL + '/funil', {
+// ── DISPARAR QUERY ─────────────────────────────────────────────
+// Tenta localhost:5001 primeiro (~10s). Fallback para CF Worker (~90s) se offline.
+function dispatchQuery(searchVal, dateFrom, dateTo, onSuccess, onError, onFallback){
+  var payload = { date_from: dateFrom||'', date_to: dateTo||'' };
+  if(FMKT_MODE === 'journey') payload.journey  = searchVal;
+  else                         payload.activity = searchVal;
+
+  // Tentar servidor local primeiro
+  fetch('http://localhost:5001/funil', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout ? AbortSignal.timeout(300000) : undefined
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data && (data.ok || data.error)) onSuccess(data);
+    else throw new Error('resposta invalida');
+  })
+  .catch(function(){
+    // Local offline → fallback para CF Worker + polling GH Pages
+    if(onFallback) onFallback();
+    var rid = genRequestId();
+    var cfPayload = { date_from: dateFrom||'', date_to: dateTo||'', request_id: rid };
+    if(FMKT_MODE === 'journey') cfPayload.journey  = searchVal;
+    else                         cfPayload.activity = searchVal;
+    fetch(WORKER_URL + '/funil', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(cfPayload)
+    })
+    .then(function(r){ if(!r.ok) throw new Error('CF Worker HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      if(!d.ok) throw new Error(d.error||'dispatch falhou');
+      pollResult(rid, onSuccess, function(){
+        onError('Timeout após 4 min. Servidor local offline e GH Actions demorou.');
+      });
+    })
+    .catch(onError);
+  });
+}
+
+// Mantido por compatibilidade
+function dispatchWorkflow(searchVal, dateFrom, dateTo, requestId){
+  var payload = { date_from: dateFrom||'', date_to: dateTo||'', request_id: requestId };
+  if(FMKT_MODE === 'journey') payload.journey = searchVal;
+  else                         payload.activity = searchVal;
+  return fetch(WORKER_URL + '/funil', {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
   });
 }
 
@@ -1064,37 +1095,33 @@ function buscarFunil(customDateFrom, customDateTo){
       return;
     }
 
-    fmktStatus('⏳ Buscando journey no Databricks… aguarde ~90s.','var(--blue)');
+    fmktStatus('⏳ Conectando ao servidor local…','var(--blue)');
     var elapsed=0;
     var progressId = setInterval(function(){
       elapsed++;
       fmktStatus('⏳ Processando journey… ('+elapsed+'s)','var(--blue)');
     },1000);
 
-    var rid = genRequestId();
-    dispatchWorkflow(inputVal, customDateFrom||'', customDateTo||'', rid)
-      .then(function(r){
-        if(!r.ok) throw new Error('dispatch HTTP ' + r.status);
-        pollResult(rid,
-          function(data){
-            clearInterval(progressId);
-            if(data.ok) FMKT_CACHE[journeyCacheKey] = data;
-            renderResult(data);
-            document.getElementById('fmkt-result').style.display  = 'block';
-            document.getElementById('fmkt-filtros').style.display = 'block';
-            redrawAll();
-          },
-          function(){ clearInterval(progressId);
-            fmktStatus('⚠️ Timeout. Tente novamente.','var(--yellow)');
-            btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
-          }
-        );
-      })
-      .catch(function(err){
+    dispatchQuery(
+      inputVal, customDateFrom||'', customDateTo||'',
+      function(data){  // onSuccess
         clearInterval(progressId);
-        fmktStatus('❌ Erro: '+err.message,'var(--red)');
+        if(data.ok) FMKT_CACHE[journeyCacheKey] = data;
+        renderResult(data);
+        document.getElementById('fmkt-result').style.display  = 'block';
+        document.getElementById('fmkt-filtros').style.display = 'block';
+        redrawAll();
         btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
-      });
+      },
+      function(err){   // onError
+        clearInterval(progressId);
+        fmktStatus('❌ Erro: '+(err.message||err),'var(--red)');
+        btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+      },
+      function(){      // onFallback (local offline → usando CF Worker)
+        fmktStatus('⚠️ Servidor local offline — usando CF Worker (~90s)…','var(--yellow)');
+      }
+    );
     return;
   }
 
@@ -1117,8 +1144,8 @@ function buscarFunil(customDateFrom, customDateTo){
   var erros     = 0;
 
   fmktStatus(
-    '⏳ Disparando ' + total + ' workflow' + (total>1?'s':'') +
-    ' no GitHub Actions… aguarde ~90s por campanha.',
+    '⏳ Consultando ' + total + ' campanha' + (total>1?'s':'') +
+    ' no servidor local… aguarde ~15s.',
     'var(--blue)'
   );
 
@@ -1150,36 +1177,27 @@ function buscarFunil(customDateFrom, customDateTo){
 
     var rid = genRequestId();
 
-    dispatchWorkflow(act, customDateFrom||'', customDateTo||'', rid)
-      .then(function(r){
-        if(!r.ok) throw new Error('dispatch HTTP ' + r.status);
-
-        // Polling até o resultado aparecer no GitHub Pages
-        pollResult(rid,
-          function(data){
-            concluido++;
-            clearInterval(progressId);
-            // Salvar no cache para reusos futuros
-            if(data.ok) FMKT_CACHE[cacheKey] = data;
-            renderResult(data);
-            if(concluido + erros === total){
-              btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
-            }
-          },
-          function(){
-            erros++;
-            clearInterval(progressId);
-            fmktStatus('⚠️ Timeout para "' + act + '". Tente novamente.', 'var(--yellow)');
-            btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
-          }
-        );
-      })
-      .catch(function(err){
+    dispatchQuery(
+      act, customDateFrom||'', customDateTo||'',
+      function(data){   // onSuccess
+        concluido++;
+        clearInterval(progressId);
+        if(data.ok) FMKT_CACHE[cacheKey] = data;
+        renderResult(data);
+        if(concluido + erros === total){
+          btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
+        }
+      },
+      function(err){    // onError
         erros++;
         clearInterval(progressId);
-        fmktStatus('❌ Erro ao disparar workflow: ' + err.message, 'var(--red)');
+        fmktStatus('❌ Erro: '+(err.message||err), 'var(--red)');
         btn.disabled=false; btn.style.opacity='1'; btn.textContent='🔍 Buscar';
-      });
+      },
+      function(){       // onFallback (local offline → usando CF Worker)
+        fmktStatus('⚠️ Servidor local offline — usando CF Worker (~90s)…', 'var(--yellow)');
+      }
+    );
   });
 }
 
