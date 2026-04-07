@@ -180,11 +180,131 @@ SELECT
 FROM {full_table}
 """
 
+def build_historico_query(full_table, date_expr, extra_filter=""):
+    """Monta query de contagem por dia nos últimos 7 dias."""
+    return f"""
+SELECT
+  {date_expr} AS dia,
+  count(*)    AS n
+FROM {full_table}
+WHERE {date_expr} >= current_date() - 7
+  AND {date_expr} < current_date()
+  {extra_filter}
+GROUP BY 1
+ORDER BY 1
+"""
+
+def fetch_historico(w, dias=7):
+    """
+    Submete queries de histórico diário para todas as tabelas configuradas.
+    Retorna dict: key → lista de {'dia': 'YYYY-MM-DD', 'n': int} ou {'error': msg}
+    Queries com timeout individual não bloqueiam as demais.
+    """
+    from databricks.sdk.service.sql import StatementState
+    from datetime import timedelta
+
+    # Dias esperados: D-7 até D-1 (hoje ainda pode estar incompleto)
+    today = date.today()
+    dias_esperados = [(today - timedelta(days=i)).isoformat() for i in range(dias, 0, -1)]
+
+    stmts = {}
+    for key, (full_table, date_expr) in HISTORICO_TABELAS.items():
+        extra = "AND is_current = true" if key == "picpay.all_transactions" else ""
+        sql = build_historico_query(full_table, date_expr, extra)
+        try:
+            sid = submit(w, sql)
+            stmts[key] = sid
+        except Exception as e:
+            stmts[key] = None
+            print(f"   ⚠️  histórico {key}: erro ao submeter — {e}")
+
+    # Poll com timeout individual por tabela
+    timeout_default = 90
+    resultados = {}
+    pending = {k: v for k, v in stmts.items() if v}
+    elapsed = 0
+    timeouts = {}  # key → tempo máximo em segundos
+
+    while pending and elapsed < 240:
+        time.sleep(10)
+        elapsed += 10
+        done = []
+        for key, sid in pending.items():
+            limite = HISTORICO_TIMEOUT.get(key, timeout_default)
+            s = w.statement_execution.get_statement(sid)
+            st = s.status.state
+            if st == StatementState.SUCCEEDED:
+                cols = [c.name for c in s.manifest.schema.columns]
+                rows = [{"dia": r[0], "n": int(r[1])} for r in (s.result.data_array or [])]
+                # Preenche dias faltantes com n=0 (gap real)
+                por_dia = {r["dia"]: r["n"] for r in rows}
+                resultados[key] = [
+                    {"dia": d, "n": por_dia.get(d, 0), "gap": d not in por_dia}
+                    for d in dias_esperados
+                ]
+                print(f"   ✅ histórico {key}")
+                done.append(key)
+            elif st.name in ("FAILED", "CANCELED"):
+                err = s.status.error.message[:80] if s.status.error else "erro"
+                resultados[key] = {"error": err}
+                print(f"   ❌ histórico {key}: {err}")
+                done.append(key)
+            elif elapsed >= limite:
+                # Timeout individual — cancela a query
+                try:
+                    w.statement_execution.cancel_execution(sid)
+                except Exception:
+                    pass
+                resultados[key] = {"error": f"timeout ({limite}s)"}
+                print(f"   ⏱️  histórico {key}: timeout após {limite}s")
+                done.append(key)
+        for k in done:
+            del pending[k]
+        if pending:
+            print(f"   [{elapsed}s] histórico aguardando: {len(pending)}...", end="\r")
+
+    # Qualquer pendente restante
+    for key in list(pending.keys()):
+        resultados[key] = {"error": "timeout global"}
+
+    # Tabelas sem histórico (accounts)
+    for (display_name, _, _, _) in TABELAS:
+        if display_name not in resultados and display_name not in HISTORICO_TABELAS:
+            resultados[display_name] = None  # sem histórico
+
+    return resultados, dias_esperados
+
 # ── Lógica especial: benefits.accounts ────────────────────────────────────────
 # Essa tabela não tem movimentação diária. O alerta só dispara quando o número
 # de linhas muda (inserção → ok, remoção → erro). Caso contrário, sempre "Estável".
 
 ACCOUNTS_KEY = "benefits.accounts"
+
+# Tabelas com histórico diário + coluna de data para agrupar
+# (nome_key, full_table, date_col)
+# Tabelas sem histórico (accounts) ficam de fora
+HISTORICO_TABELAS = {
+    "benefits.collaborators":                        ("benefits.collaborators",                        "date(updated_at)"),
+    "benefits.companies":                            ("benefits.companies",                            "date(updated_at)"),
+    "consumers.consumers":                           ("consumers.consumers",                           "date(sent_bacen_at)"),
+    "benefits.anticipation_request":                 ("benefits.anticipation_request",                 "date(created_at)"),
+    "benefits.sec_wage_advance_collaborator_margins":("benefits.sec_wage_advance_collaborator_margins","date(updated_at)"),
+    "consumers.daily_consumers_labels_and_metrics":  ("consumers.daily_consumers_labels_and_metrics",  "metric_date"),
+    "marketing.consumers_campaigns_communications":  ("marketing.consumers_campaigns_communications",  "date(sent_at)"),
+    "benefits.all_movements":                        ("benefits.all_movements",                        "date(created_at)"),
+    "picpay.all_transactions":                       ("picpay.picpay.all_transactions",                "date(created_at)"),
+    "benefits.benefits_purchases":                   ("benefits.benefits_purchases",                   "date(created_at)"),
+}
+
+# Timeout individual por tabela (segundos) — tabelas pesadas têm mais tempo
+HISTORICO_TIMEOUT = {
+    "benefits.collaborators":                         120,
+    "benefits.sec_wage_advance_collaborator_margins": 120,
+    "consumers.consumers":                            120,
+    "picpay.all_transactions":                        180,
+    "consumers.daily_consumers_labels_and_metrics":   120,
+    "marketing.consumers_campaigns_communications":   120,
+}
 
 def load_accounts_snapshot():
     """Lê o snapshot salvo da última execução. Retorna dict com 'count'."""
@@ -276,7 +396,48 @@ def fmt_rows(val):
     except:
         return "—"
 
-def generate_html(results):
+def render_sparkbar(hist_data, dias_esperados):
+    """Gera o HTML do mini gráfico de barras para uma tabela."""
+    if hist_data is None:
+        return '<span class="spark-na">—</span>'
+    if isinstance(hist_data, dict) and "error" in hist_data:
+        return f'<span class="spark-na" title="{hist_data["error"]}">indisponível</span>'
+
+    valores = [d["n"] for d in hist_data]
+    max_val = max(valores) if any(v > 0 for v in valores) else 1
+    today = date.today().isoformat()
+    ontem = (date.today() - __import__("datetime").timedelta(days=1)).isoformat()
+
+    bars = ""
+    tem_gap = False
+    for d in hist_data:
+        dia_str = d["dia"]
+        n = d["n"]
+        is_gap = d.get("gap", False) and n == 0
+        is_today = dia_str == today
+
+        if is_gap:
+            tem_gap = True
+
+        altura = max(3, round((n / max_val) * 26)) if n > 0 else 3
+        css_bar = "spark-bar gap" if is_gap else ("spark-bar today" if is_today else "spark-bar")
+
+        # Formata label do dia ex: "02/04"
+        try:
+            dt = __import__("datetime").date.fromisoformat(dia_str)
+            label_dia = dt.strftime("%d/%m")
+        except Exception:
+            label_dia = dia_str[-5:]
+
+        n_fmt = f"{n:,}".replace(",", ".")
+        tip = f"{label_dia}: {'faltando dados' if is_gap else n_fmt}"
+
+        bars += f'<div class="spark-day" data-tip="{tip}"><div class="{css_bar}" style="height:{altura}px"></div></div>'
+
+    return f'<div class="sparkbar" title="{"⚠️ dia(s) sem dados" if tem_gap else "últimos 7 dias"}">{bars}</div>'
+
+
+def generate_html(results, historico, dias_esperados):
     now_str = datetime.now().strftime("%d/%m/%Y às %H:%M")
     today = date.today()
 
@@ -325,6 +486,7 @@ def generate_html(results):
           <td class="col-col"><code>{date_col}</code></td>
           <td class="col-date">{date_display}</td>
           <td class="col-rows">{rows_display}</td>
+          <td class="col-spark">{render_sparkbar(historico.get(display_name), dias_esperados)}</td>
           <td class="col-status"><span class="badge {css}">{label}</span></td>
         </tr>"""
 
@@ -599,6 +761,67 @@ def generate_html(results):
       font-style: italic;
       margin-top: 3px;
     }}
+
+    /* ── Sparkbar histórico ── */
+    .sparkbar {{
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 28px;
+    }}
+    .spark-day {{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      flex: 1;
+      position: relative;
+    }}
+    .spark-bar {{
+      width: 100%;
+      min-height: 3px;
+      border-radius: 2px 2px 0 0;
+      background: var(--green);
+      opacity: .75;
+      transition: opacity .15s;
+    }}
+    .spark-bar.gap {{
+      background: var(--red);
+      opacity: .9;
+      animation: blink-bar 1.5s ease-in-out infinite;
+    }}
+    @keyframes blink-bar {{ 0%,100%{{ opacity:.9; }} 50%{{ opacity:.4; }} }}
+    .spark-bar.today {{
+      background: var(--blue);
+      opacity: .6;
+    }}
+    .spark-day:hover .spark-bar {{ opacity: 1; }}
+    /* tooltip */
+    .spark-day::after {{
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 4px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1c2330;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 10px;
+      white-space: nowrap;
+      padding: 3px 7px;
+      border-radius: 5px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 50;
+      transition: opacity .15s;
+    }}
+    .spark-day:hover::after {{ opacity: 1; }}
+    .spark-na {{
+      font-size: 10px;
+      color: var(--muted);
+      white-space: nowrap;
+    }}
+    .col-spark {{ min-width: 120px; }}
     code {{
       font-family: "SFMono-Regular", Consolas, monospace;
       font-size: 12px;
@@ -702,6 +925,7 @@ def generate_html(results):
           <th>Coluna monitorada</th>
           <th>Última atualização</th>
           <th style="text-align:right">Total linhas</th>
+          <th>Últimos 7 dias</th>
           <th style="text-align:center">Status</th>
         </tr>
       </thead>
@@ -905,18 +1129,21 @@ def main():
         print("      export DATABRICKS_TOKEN=<seu_token>")
         raise SystemExit(1)
 
-    print(f"\n[2/4] Submetendo {len(TABELAS)} queries em paralelo...")
+    print(f"\n[2/5] Submetendo {len(TABELAS)} queries de status em paralelo...")
     stmts = {}
     for (display_name, full_table, date_col, _) in TABELAS:
         sql = build_query(full_table, date_col)
         stmts[display_name] = submit(w, sql)
         print(f"   → {display_name}")
 
-    print("\n[3/4] Aguardando resultados...")
+    print(f"\n[3/5] Aguardando resultados de status...")
     results = poll_all(w, stmts)
 
-    print("\n[4/4] Gerando HTML e publicando...")
-    html = generate_html(results)
+    print(f"\n[4/5] Buscando histórico diário (últimos 7 dias)...")
+    historico, dias_esperados = fetch_historico(w)
+
+    print("\n[5/5] Gerando HTML e publicando...")
+    html = generate_html(results, historico, dias_esperados)
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     print(f"   ✅ Salvo em {OUTPUT_PATH}")
 
