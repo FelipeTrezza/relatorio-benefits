@@ -846,17 +846,17 @@ fim <span class="kw">AS</span> (
         <span class="tag to">Análise Profunda</span>
         <span class="tag tp">RFM</span>
         <span class="tag tb">Funil de Conversão</span>
-        <span class="tag tm">Atualização manual</span>
+        <span class="tag tg">Atualização automática disponível</span>
       </div>
 
-      <p class="report-desc">Dashboard analítico de propensão à antecipação. Vai além dos volumes operacionais: mapeia <strong>quem antecipa</strong>, <strong>quando antecipa</strong>, <strong>para onde vai o dinheiro</strong> e <strong>qual o perfil de quem ainda não antecipou</strong>. Base para decisões de produto e segmentação de campanhas.</p>
+      <p class="report-desc">Dashboard analítico de propensão à antecipação. Vai além dos volumes operacionais: mapeia <strong>quem antecipa</strong>, <strong>quando antecipa</strong>, <strong>para onde vai o dinheiro</strong> e <strong>qual o perfil de quem ainda não antecipou</strong>. Todos os indicadores têm filtro por setor (Total · Público · Grupo · Privado). Possui botão de atualização de dados integrado ao servidor local.</p>
 
       <div class="block-label">Seções</div>
       <div class="sections-grid">
-        <div class="sec-item"><div class="sec-ic">🔢</div><div><div class="sec-name">KPIs Hero</div><div class="sec-desc">8 cards: elegíveis, com conta, com margem, MAU, antecipando, ticket médio, TPV, % conversão.</div></div></div>
-        <div class="sec-item"><div class="sec-ic">🔽</div><div><div class="sec-name">Funil Real de Conversão</div><div class="sec-desc">1,35M elegíveis → conta → margem → MAU → antecipando. % de conversão em cada etapa.</div></div></div>
-        <div class="sec-item"><div class="sec-ic">🎪</div><div><div class="sec-name">Funil de Campanha MKT</div><div class="sec-desc">Análise dinâmica de funil por activity ou journey (Databricks live via Cloudflare Worker).</div></div></div>
-        <div class="sec-item"><div class="sec-ic">🏢</div><div><div class="sec-name">Análise por Setor</div><div class="sec-desc">Mini-funil Público · Grupo · Privado com conversão conta → margem → antecipação.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🔢</div><div><div class="sec-name">KPIs Hero</div><div class="sec-desc">8 cards (Total Vidas, Com Conta, Com Margem, MAU 30d, Conta Sem Margem, Antecipando, Sem Conta, MAU Sem Margem) com filtro interativo por setor (Total · Público · Grupo · Privado).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🔽</div><div><div class="sec-name">Funil Real de Conversão</div><div class="sec-desc">1,75M elegíveis → conta → margem → MAU → antecipando. % de conversão em cada etapa.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🎪</div><div><div class="sec-name">Funil de Campanha MKT</div><div class="sec-desc">Análise dinâmica de funil por <code>activity_name</code> (envio único) ou <code>journey_name</code> (jornada completa). Retorna Enviados → Entregues → Abertos → Clicados → Anteciparam. Suporta múltiplas campanhas com comparativo automático e filtro por setor.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏢</div><div><div class="sec-name">Análise por Setor</div><div class="sec-desc">Mini-funil Público · Grupo · Privado com conversão conta → margem → antecipação. Os KPIs do topo também têm filtro por setor — clique nas abas Total · Público · Grupo · Privado para ver os indicadores do setor selecionado.</div></div></div>
         <div class="sec-item"><div class="sec-ic">📅</div><div><div class="sec-name">Evolução Mensal</div><div class="sec-desc">Tendência histórica por mês, com abas por setor.</div></div></div>
         <div class="sec-item"><div class="sec-ic">🌡️</div><div><div class="sec-name">Sazonalidade</div><div class="sec-desc">Heatmap por dia do mês — pico no dia 10. Filtro dinâmico por setor.</div></div></div>
         <div class="sec-item"><div class="sec-ic">🧮</div><div><div class="sec-name">Perfil RFM</div><div class="sec-desc">Recência, Frequência e Valor por setor. Segmenta antecipadores frequentes vs. pontuais.</div></div></div>
@@ -867,8 +867,9 @@ fim <span class="kw">AS</span> (
       <div class="rules-list">
         <div class="rule rc-orange"><strong>Funil correto:</strong>&nbsp;Sem filtro <code>has_anticipation_enabled</code> e sem <code>resignation_date IS NULL</code>. Inclui colaboradores desligados — alinhado com o número real do Dashboard TV.</div>
         <div class="rule rc-orange"><strong>MAU:</strong>&nbsp;Calculado com <code>D-7</code> (7 dias de estabilidade) usando <code>is_mau_app_30</code> de <code>consumers.daily_consumers_labels_and_metrics</code>.</div>
-        <div class="rule rc-blue"><strong>Funil MKT (dinâmico):</strong>&nbsp;Cloudflare Worker → GitHub Actions → Databricks. Cruza <code>marketing.consumers_campaigns_communications</code> com <code>benefits.anticipation_request</code> em janela de 30 dias após o envio.</div>
+        <div class="rule rc-blue"><strong>Funil MKT (dinâmico):</strong>&nbsp;Cloudflare Worker → GitHub Actions → Databricks. Dois modos: <strong>Activity</strong> (cole o <code>activity_name</code> para um envio específico) e <strong>Journey</strong> (cole o <code>journey_name</code> para ver funil consolidado de toda a jornada + botões por step). Cruza <code>marketing.consumers_campaigns_communications</code> com <code>benefits.anticipation_request</code> em janela de 30 dias após o envio. Cache local: 2ª busca é instantânea.</div>
         <div class="rule rc-orange"><strong>Campo correto de valor:</strong>&nbsp;<code>anticipation_request.request_value</code> (não <code>anticipation_value</code> — inexistente nessa tabela). Campo de margem: <code>sec_wage_advance_collaborator_margins.anticipation_value</code>.</div>
+        <div class="rule rc-green"><strong>Botão "🔄 Atualizar dados":</strong>&nbsp;Presente no header do relatório. Dispara <code>POST localhost:5001/atualizar/score</code>, executa queries Databricks ao vivo e recarrega a página automaticamente ao concluir. Requer servidor local na porta 5001.</div>
       </div>
 
       <div class="source-note"><strong>Tabelas:</strong> benefits.anticipation_request · benefits.collaborators · benefits.companies · benefits.accounts · benefits.sec_wage_advance_collaborator_margins · consumers.consumers · consumers.daily_consumers_labels_and_metrics · marketing.consumers_campaigns_communications</div>
