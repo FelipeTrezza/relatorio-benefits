@@ -349,15 +349,56 @@
 
     /* ── Footer ── */
     .footer {
-      padding: 28px 32px 0;
-      font-size: 11px;
-      color: var(--muted);
       display: flex;
-      align-items: center;
+      align-items: flex-start;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 24px 32px 0;
+    }
+    .footer-block {
+      display: flex;
+      flex-direction: column;
       gap: 8px;
     }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:.3; } }
+    .footer-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      color: var(--muted);
+    }
+    .footer-items {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      font-size: 11.5px;
+      color: var(--text2);
+    }
+    .footer-items span { display: flex; align-items: center; gap: 5px; }
+    .footer-sep {
+      width: 1px;
+      align-self: stretch;
+      background: var(--border);
+      margin: 0 4px;
+    }
+    /* dots de status */
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-ok   { background: var(--green); }
+    .dot-warn { background: var(--yellow); }
+    .dot-err  { background: var(--red); }
+    /* amostras do sparkbar */
+    .spark-legend {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .spark-legend-ok    { background: var(--green); opacity: .8; }
+    .spark-legend-gap   { background: var(--red); opacity: .9; }
+    .spark-legend-today { background: var(--blue); opacity: .7; }
+    .spark-legend-na    { background: var(--muted); opacity: .5; }
   </style>
 </head>
 <body>
@@ -372,7 +413,7 @@
     </div>
     <div class="header-right">
       <div>
-        <div class="updated-at">Gerado em <strong>07/04/2026 às 14:29</strong></div>
+        <div class="updated-at">Gerado em <strong>07/04/2026 às 14:44</strong></div>
 
       </div>
       <button id="btn-atualizar" onclick="atualizarTabelas()">
@@ -570,10 +611,24 @@
   </div>
 
   <div class="footer">
-    <span class="dot"></span>
-    Critérios: <strong style="color:var(--green)">Atualizado</strong> = ≤26h &nbsp;|&nbsp;
-    <strong style="color:var(--yellow)">Atraso</strong> = 26h–72h &nbsp;|&nbsp;
-    <strong style="color:var(--red)">Problema</strong> = &gt;72h ou erro
+    <div class="footer-block">
+      <span class="footer-title">Status da tabela</span>
+      <div class="footer-items">
+        <span class="dot dot-ok"></span><span>Atualizado = ≤26h</span>
+        <span class="dot dot-warn"></span><span>Atraso = 26h–72h</span>
+        <span class="dot dot-err"></span><span>Problema = &gt;72h ou erro</span>
+      </div>
+    </div>
+    <div class="footer-sep"></div>
+    <div class="footer-block">
+      <span class="footer-title">Gráfico — últimos 7 dias</span>
+      <div class="footer-items">
+        <span class="spark-legend spark-legend-ok"></span><span>Dia com dados</span>
+        <span class="spark-legend spark-legend-gap"></span><span>Dia sem dados ⚠️</span>
+        <span class="spark-legend spark-legend-today"></span><span>Hoje (pode estar incompleto)</span>
+        <span class="spark-legend spark-legend-na"></span><span>Sem histórico diário</span>
+      </div>
+    </div>
   </div>
 
   <!-- Toast -->
