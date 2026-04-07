@@ -1,7 +1,9 @@
 """
 Helper: executa query de funil marketing x antecipações no Databricks.
-Uso: python3 funil_query_helper.py "activity_name" ["date_from"] ["date_to"]
-  date_from / date_to: formato YYYY-MM-DD (opcional — detecta automaticamente se omitido)
+Uso:
+  python3 funil_query_helper.py "activity_name" [date_from] [date_to]
+  python3 funil_query_helper.py "journey_name"  [date_from] [date_to] --journey
+  date_from / date_to: formato YYYY-MM-DD (opcional)
 """
 import json, time, sys, warnings
 warnings.filterwarnings('ignore')
@@ -10,16 +12,20 @@ try:
     from databricks.sdk import WorkspaceClient
     from databricks.sdk.service.sql import StatementState
 except ImportError:
-    print(json.dumps({"ok": False, "error": "databricks-sdk nao instalado. Rode: pip install databricks-sdk"}))
+    print(json.dumps({"ok": False, "error": "databricks-sdk nao instalado"}))
     sys.exit(1)
 
 if len(sys.argv) < 2:
-    print(json.dumps({"ok": False, "error": "activity_name obrigatorio como argumento"}))
+    print(json.dumps({"ok": False, "error": "activity/journey obrigatorio como argumento"}))
     sys.exit(1)
 
-activity   = sys.argv[1]
-date_from  = sys.argv[2] if len(sys.argv) > 2 else None
-date_to    = sys.argv[3] if len(sys.argv) > 3 else None
+args       = sys.argv[1:]
+is_journey = '--journey' in args
+args       = [a for a in args if a != '--journey']
+
+search_val = args[0]
+date_from  = args[1] if len(args) > 1 else None
+date_to    = args[2] if len(args) > 2 else None
 
 w  = WorkspaceClient(host="https://picpay-principal.cloud.databricks.com", profile="picpay")
 WH = "6077a99f149e0d70"
@@ -42,89 +48,163 @@ def run_q(sql, timeout=240):
             raise Exception(s.status.error.message)
     raise Exception("timeout")
 
-act_safe = activity.replace("'", "''")
+val_safe = search_val.replace("'", "''")
 
-# ── Passo 1: detectar período real se não foi passado ──────────
+# ── Modo journey: detectar activities + período ─────────────────
+activities_list   = []
+journey_date_from = None
+journey_date_to   = None
+
+if is_journey:
+    sql_acts = (
+        "SELECT activity_name, COUNT(DISTINCT consumer_id) AS consumers, "
+        "date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, "
+        "date_format(max(sent_at),'yyyy-MM-dd') AS dt_to "
+        "FROM marketing.consumers_campaigns_communications "
+        "WHERE journey_name = '%s' "
+        "GROUP BY activity_name ORDER BY consumers DESC"
+    ) % val_safe
+    try:
+        r = run_q(sql_acts, timeout=120)
+        activities_list = [row[0] for row in r["rows"]]
+        all_from = [row[2] for row in r["rows"] if row[2]]
+        all_to   = [row[3] for row in r["rows"] if row[3]]
+        if all_from and all_to:
+            journey_date_from = min(all_from)
+            journey_date_to   = max(all_to)
+    except Exception as e:
+        activities_list = []
+
+    # ── Fallback: se journey_name exato não encontrou nada, buscar pelo ID numérico ──
+    # Usuários frequentemente digitam nomes com "na" em vez de "id" ou sufixos diferentes
+    # Ex: "20260325-na-11560355402-...-mcn-Titulo" → tabela tem "20260325-id-11560355402-...-inappm-4-Titulo"
+    import re as _re
+    id_match = _re.search(r'[-_](\d{8,})[-_]', val_safe)
+    if not activities_list and id_match:
+        campaign_id = id_match.group(1)
+        try:
+            sql_fallback = (
+                "SELECT activity_name, COUNT(DISTINCT consumer_id) AS consumers, "
+                "date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, "
+                "date_format(max(sent_at),'yyyy-MM-dd') AS dt_to "
+                "FROM marketing.consumers_campaigns_communications "
+                "WHERE activity_name LIKE '%%%s%%' OR journey_name LIKE '%%%s%%' "
+                "GROUP BY activity_name ORDER BY consumers DESC LIMIT 50"
+            ) % (campaign_id, campaign_id)
+            r_fb = run_q(sql_fallback, timeout=120)
+            if r_fb["rows"]:
+                activities_list = [row[0] for row in r_fb["rows"]]
+                all_from_fb = [row[2] for row in r_fb["rows"] if row[2]]
+                all_to_fb   = [row[3] for row in r_fb["rows"] if row[3]]
+                journey_date_from = min(all_from_fb) if all_from_fb else journey_date_from
+                journey_date_to   = max(all_to_fb)   if all_to_fb   else journey_date_to
+        except Exception:
+            pass
+
+    if not activities_list:
+        print(json.dumps({"ok": False, "error": "Nenhuma activity encontrada. ID buscado: %s" % (id_match.group(1) if id_match else val_safe)}))
+        sys.exit(0)
+
+    # Usar período da journey se não foi passado
+    date_from = date_from or journey_date_from
+    date_to   = date_to   or journey_date_to
+    # where_comms: se fallback por ID, cobrir todas as activities encontradas; senão, filtrar por journey_name
+    if id_match and not any(True for _ in [1]):  # placeholder — ver abaixo
+        where_comms = "journey_name = '%s'" % val_safe
+    acts_escaped = ["'" + a.replace("'","''") + "'" for a in activities_list]
+    where_comms = "activity_name IN (%s)" % ",".join(acts_escaped)
+else:
+    where_comms = "activity_name = '%s'" % val_safe
+
+# ── Detectar período se ainda não tem ──────────────────────────
 if not date_from or not date_to:
     sql_period = (
-        "SELECT date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, "
-        "       date_format(max(sent_at),'yyyy-MM-dd') AS dt_to, "
-        "       count(*) AS total "
+        "SELECT date_format(min(sent_at),'yyyy-MM-dd'), "
+        "       date_format(max(sent_at),'yyyy-MM-dd') "
         "FROM marketing.consumers_campaigns_communications "
-        "WHERE activity_name = '__ACT__'"
-    ).replace("__ACT__", act_safe)
+        "WHERE %s"
+    ) % where_comms
     try:
         rp = run_q(sql_period, timeout=60)
         if rp["rows"] and rp["rows"][0][0]:
             date_from = date_from or rp["rows"][0][0]
             date_to   = date_to   or rp["rows"][0][1]
         else:
-            print(json.dumps({"ok": False, "error": "Nenhum registro encontrado para este activity_name"}))
+            print(json.dumps({"ok": False, "error": "Nenhum registro encontrado"}))
             sys.exit(0)
     except Exception as e:
         print(json.dumps({"ok": False, "error": "Erro ao detectar periodo: " + str(e)}))
         sys.exit(1)
 
-# ── Passo 2: query principal com filtro de data ────────────────
-date_filter = "AND date(sent_at) BETWEEN '__FROM__' AND '__TO__'"\
-    .replace("__FROM__", date_from).replace("__TO__", date_to)
-
-sql = (
-    "WITH\n"
-    "mapa_setor AS (\n"
-    "  SELECT co.consumer_id,\n"
-    "    CASE\n"
-    "      WHEN f.account_id = 1420 OR f.account_id IS NULL THEN 'INSS'\n"
-    "      WHEN f.account_id IN (6,52,57,58,60,62,65,73,100,3170,3675) THEN 'Grupo'\n"
-    "      WHEN co2.flag_company_sector = 'public' THEN 'Publico'\n"
-    "      ELSE 'Privado'\n"
-    "    END AS setor\n"
-    "  FROM benefits.collaborators co\n"
-    "  JOIN benefits.companies co2 ON co.company_id = co2.company_id\n"
-    "  LEFT JOIN benefits.accounts f ON co2.account_id = f.account_id\n"
-    "),\n"
-    "comms AS (\n"
-    "  SELECT consumer_id, channel, is_sent, is_delivered, is_opened, is_clicked, sent_at\n"
-    "  FROM marketing.consumers_campaigns_communications\n"
-    "  WHERE activity_name = '__ACT__'\n"
-    "  __DATE_FILTER__\n"
-    "),\n"
-    "antecip AS (\n"
-    "  SELECT DISTINCT consumer_id, date(created_at) AS dt_antecip\n"
-    "  FROM benefits.anticipation_request\n"
-    "  WHERE request_status = 'FINISH'\n"
-    "),\n"
-    "cruzado AS (\n"
-    "  SELECT DISTINCT c.consumer_id\n"
-    "  FROM comms c\n"
-    "  JOIN antecip a ON c.consumer_id = a.consumer_id\n"
-    "  WHERE date(c.sent_at) <= a.dt_antecip\n"
-    "    AND date(c.sent_at) >= a.dt_antecip - INTERVAL 30 DAYS\n"
-    ")\n"
-    "SELECT\n"
-    "  COALESCE(ms.setor, 'Sem vinculo') AS setor,\n"
-    "  c.channel,\n"
-    "  COUNT(DISTINCT c.consumer_id) AS enviados,\n"
-    "  COUNT(DISTINCT CASE WHEN c.is_delivered = true THEN c.consumer_id END) AS entregues,\n"
-    "  COUNT(DISTINCT CASE WHEN c.is_opened = true THEN c.consumer_id END) AS abriram,\n"
-    "  COUNT(DISTINCT CASE WHEN c.is_clicked = true THEN c.consumer_id END) AS clicaram,\n"
-    "  COUNT(DISTINCT cr.consumer_id) AS anteciparam\n"
-    "FROM comms c\n"
-    "LEFT JOIN mapa_setor ms ON c.consumer_id = ms.consumer_id\n"
-    "LEFT JOIN cruzado cr ON c.consumer_id = cr.consumer_id\n"
-    "GROUP BY COALESCE(ms.setor, 'Sem vinculo'), c.channel\n"
-    "ORDER BY setor, enviados DESC\n"
-).replace("__ACT__", act_safe).replace("__DATE_FILTER__", date_filter)
+# ── Query principal otimizada ───────────────────────────────────
+sql = """
+WITH
+comms AS (
+  SELECT consumer_id, channel, is_sent, is_delivered, is_opened, is_clicked, sent_at
+  FROM marketing.consumers_campaigns_communications
+  WHERE {where_comms}
+  AND date(sent_at) BETWEEN '{date_from}' AND '{date_to}'
+),
+mapa_setor AS (
+  -- Filtrado nos consumer_ids de comms — evita full scan de 1.9M rows
+  SELECT co.consumer_id,
+    CASE
+      WHEN f.account_id = 1420 OR f.account_id IS NULL THEN 'INSS'
+      WHEN f.account_id IN (6,52,57,58,60,62,65,73,100,3170,3675) THEN 'Grupo'
+      WHEN co2.flag_company_sector = 'public' THEN 'Publico'
+      ELSE 'Privado'
+    END AS setor
+  FROM benefits.collaborators co
+  JOIN benefits.companies co2 ON co.company_id = co2.company_id
+  LEFT JOIN benefits.accounts f ON co2.account_id = f.account_id
+  WHERE co.consumer_id IN (SELECT DISTINCT consumer_id FROM comms)
+),
+antecip AS (
+  -- Filtrado nos consumer_ids de comms + janela de data relevante
+  SELECT DISTINCT consumer_id, date(created_at) AS dt_antecip
+  FROM benefits.anticipation_request
+  WHERE request_status = 'FINISH'
+    AND consumer_id IN (SELECT DISTINCT consumer_id FROM comms)
+    AND created_at >= '{date_from}'
+    AND created_at <= date_add(cast('{date_to}' AS date), 30)
+),
+cruzado AS (
+  SELECT DISTINCT c.consumer_id
+  FROM comms c
+  JOIN antecip a ON c.consumer_id = a.consumer_id
+  WHERE date(c.sent_at) <= a.dt_antecip
+    AND date(c.sent_at) >= a.dt_antecip - INTERVAL 30 DAYS
+)
+SELECT
+  COALESCE(ms.setor, 'Sem vinculo') AS setor,
+  c.channel,
+  COUNT(DISTINCT c.consumer_id)                                              AS enviados,
+  COUNT(DISTINCT CASE WHEN c.is_delivered = true THEN c.consumer_id END)    AS entregues,
+  COUNT(DISTINCT CASE WHEN c.is_opened    = true THEN c.consumer_id END)    AS abriram,
+  COUNT(DISTINCT CASE WHEN c.is_clicked   = true THEN c.consumer_id END)    AS clicaram,
+  COUNT(DISTINCT cr.consumer_id)                                             AS anteciparam
+FROM comms c
+LEFT JOIN mapa_setor ms ON c.consumer_id = ms.consumer_id
+LEFT JOIN cruzado cr    ON c.consumer_id = cr.consumer_id
+GROUP BY COALESCE(ms.setor, 'Sem vinculo'), c.channel
+ORDER BY setor, enviados DESC
+""".format(where_comms=where_comms, date_from=date_from, date_to=date_to)
 
 try:
     r = run_q(sql)
-    print(json.dumps({
+    result = {
         "ok":            True,
-        "activity_name": activity,
+        "search_mode":   "journey" if is_journey else "activity",
+        "activity_name": search_val if not is_journey else "",
+        "journey_name":  search_val if is_journey else "",
+        "display_name":  search_val,
         "date_from":     date_from,
         "date_to":       date_to,
         "rows":          r["rows"],
         "columns":       r["columns"],
-    }))
+    }
+    if is_journey and activities_list:
+        result["activities"] = activities_list
+    print(json.dumps(result))
 except Exception as e:
     print(json.dumps({"ok": False, "error": str(e)}))

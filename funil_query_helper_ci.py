@@ -100,10 +100,38 @@ if search_mode == "journey":
     except Exception as e:
         activities_list = []
 
-    # ── Enriquecimento: se journey 1:1, buscar pelo ID numérico da campanha ──
-    # Padrão: `na-NNNNNN-` → extrair NNNNNN e buscar todos os activity_name com esse ID
+    # ── Fallback: se journey_name não encontrou nada, tentar pelo ID numérico ──
+    # Usuários frequentemente digitam nomes com "na" em vez de "id", ou sufixos diferentes
+    # Ex: "20260325-na-11560355402-...-mcn-Titulo" → tabela tem "20260325-id-11560355402-...-inappm-4-Titulo"
     import re as _re
-    id_match = _re.search(r'[-_](\d{8,}[-_])', val_safe)
+    id_match = _re.search(r'[-_](\d{8,})[-_]', val_safe)
+    if not activities_list and id_match:
+        campaign_id = id_match.group(1)
+        try:
+            sql_fallback = (
+                "SELECT "
+                "  activity_name, "
+                "  COUNT(DISTINCT consumer_id) AS consumers, "
+                "  date_format(min(sent_at),'yyyy-MM-dd') AS dt_from, "
+                "  date_format(max(sent_at),'yyyy-MM-dd') AS dt_to "
+                "FROM marketing.consumers_campaigns_communications "
+                "WHERE activity_name LIKE '%%%s%%' "
+                "   OR journey_name  LIKE '%%%s%%' "
+                "GROUP BY activity_name ORDER BY consumers DESC LIMIT 50"
+            ) % (campaign_id, campaign_id)
+            r_fb = run_q(sql_fallback, timeout=120)
+            if r_fb["rows"]:
+                activities_list = [row[0] for row in r_fb["rows"]]
+                all_from_fb = [row[2] for row in r_fb["rows"] if row[2]]
+                all_to_fb   = [row[3] for row in r_fb["rows"] if row[3]]
+                if all_from_fb: journey_date_from = min(all_from_fb)
+                if all_to_fb:   journey_date_to   = max(all_to_fb)
+                acts_escaped = ["'" + a.replace("'","''") + "'" for a in activities_list]
+                where_filter = "activity_name IN (%s)" % ",".join(acts_escaped)
+        except Exception:
+            pass
+
+    # ── Enriquecimento: se journey 1:1, buscar pelo ID numérico da campanha ──
     if id_match and len(activities_list) <= 1:
         campaign_id = id_match.group(1).strip('-_')
         try:
