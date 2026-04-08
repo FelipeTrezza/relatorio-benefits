@@ -184,12 +184,29 @@ primeira_vida AS (
   WHERE request_status = 'FINISH'
   GROUP BY consumer_id
 ),
+sent_at_ref AS (
+  -- Menor sent_at por consumer (referência única quando aparece em múltiplas activities)
+  SELECT consumer_id, MIN(sent_at) AS primeiro_envio
+  FROM comms
+  GROUP BY consumer_id
+),
 novatos AS (
-  -- Consumers que anteciparam nas 24h E essa foi a primeira vez na vida
+  -- Consumers que anteciparam nas 24h E a primeira antecipação da vida foi APÓS o envio
+  -- (nunca tinham antecipado antes da campanha ser enviada)
   SELECT DISTINCT cr.consumer_id
   FROM cruzado cr
+  JOIN sent_at_ref s    ON cr.consumer_id = s.consumer_id
   JOIN primeira_vida pv ON cr.consumer_id = pv.consumer_id
-  WHERE cr.ts_antecip = pv.primeira_antecip
+  WHERE pv.primeira_antecip >= s.primeiro_envio
+),
+recompra AS (
+  -- Consumers que anteciparam nas 24h E já tinham antecipado ANTES do envio da campanha
+  -- Mutuamente exclusivo com novatos: novatos + recompra = consumers_anteciparam
+  SELECT DISTINCT cr.consumer_id
+  FROM cruzado cr
+  JOIN sent_at_ref s    ON cr.consumer_id = s.consumer_id
+  JOIN primeira_vida pv ON cr.consumer_id = pv.consumer_id
+  WHERE pv.primeira_antecip < s.primeiro_envio
 )
 SELECT
   COALESCE(ms.setor, 'Sem vinculo') AS setor,
@@ -200,11 +217,13 @@ SELECT
   COUNT(DISTINCT CASE WHEN c.is_clicked   = true THEN c.consumer_id END)    AS clicaram,
   COUNT(cr.anticipation_id)                                                 AS anteciparam,
   COUNT(DISTINCT cr.consumer_id)                                             AS consumers_anteciparam,
-  COUNT(DISTINCT nv.consumer_id)                                             AS novatos_anteciparam
+  COUNT(DISTINCT nv.consumer_id)                                             AS novatos_anteciparam,
+  COUNT(DISTINCT rc.consumer_id)                                             AS recompra_anteciparam
 FROM comms c
 LEFT JOIN mapa_setor ms ON c.consumer_id = ms.consumer_id
 LEFT JOIN cruzado cr    ON c.consumer_id = cr.consumer_id
 LEFT JOIN novatos nv    ON c.consumer_id = nv.consumer_id
+LEFT JOIN recompra rc   ON c.consumer_id = rc.consumer_id
 GROUP BY COALESCE(ms.setor, 'Sem vinculo'), c.channel
 ORDER BY setor, enviados DESC
 """.format(where_comms=where_comms, date_from=date_from, date_to=date_to)
