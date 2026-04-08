@@ -81,6 +81,7 @@ mau_geral AS (
   WHERE metric_date=date_sub(current_date(),7) AND is_mau_geral=true
 ),
 antecip AS (
+  -- Igual ao TV: todos que anteciparam no mês, sem filtro de colaborador ativo
   SELECT DISTINCT consumer_id FROM benefits.anticipation_request
   WHERE request_status='FINISH' AND date_format(created_at,'yyyy-MM')='{MES_ATUAL}'
 )
@@ -92,12 +93,12 @@ SELECT
   COUNT(DISTINCT CASE WHEN mau30.consumer_id IS NOT NULL AND m.collaborator_id IS NOT NULL THEN v.consumer_id END) AS mau_30_margem,
   COUNT(DISTINCT mau_geral.consumer_id)                                                       AS mau_geral,
   COUNT(DISTINCT CASE WHEN mau_geral.consumer_id IS NOT NULL AND m.collaborator_id IS NOT NULL THEN v.consumer_id END) AS mau_geral_margem,
-  COUNT(DISTINCT a.consumer_id)                                                               AS antecipando
+  -- antecipando: total direto da anticipation_request (igual ao TV, sem interseção com vidas ativas)
+  (SELECT COUNT(DISTINCT consumer_id) FROM antecip)                                           AS antecipando
 FROM vidas v
 LEFT JOIN margem m      ON v.collaborator_id=m.collaborator_id
 LEFT JOIN mau30         ON v.consumer_id=mau30.consumer_id
 LEFT JOIN mau_geral     ON v.consumer_id=mau_geral.consumer_id
-LEFT JOIN antecip a     ON v.consumer_id=a.consumer_id
 """,
 
     "total_vidas": """
@@ -109,12 +110,30 @@ FROM benefits.collaborators WHERE resignation_date IS NULL
 """,
 
     "setores": f"""
-WITH base AS (
-  SELECT co.consumer_id, co.collaborator_id, {SETOR_CASE} AS setor
+WITH bacen AS (
+  -- Consumer mais recente validado pelo BACEN por CPF
+  -- Garante com_conta <= total_vidas (sem dupla contagem de reaberturas de conta)
+  SELECT cpf, consumer_id
+  FROM (
+    SELECT cpf, consumer_id,
+           ROW_NUMBER() OVER (PARTITION BY cpf ORDER BY sent_bacen_at DESC) AS rn
+    FROM consumers.consumers
+    WHERE sent_bacen_at IS NOT NULL AND cpf IS NOT NULL
+  ) WHERE rn = 1
+),
+base AS (
+  -- Todos os colaboradores ativos, com ou sem conta
+  SELECT co.collaborator_id, co.document_number, {SETOR_CASE} AS setor
   FROM benefits.collaborators co
   JOIN benefits.companies co2 ON co.company_id=co2.company_id
   LEFT JOIN benefits.accounts f ON co2.account_id=f.account_id
-  WHERE co.resignation_date IS NULL AND co.consumer_id IS NOT NULL
+  WHERE co.resignation_date IS NULL
+),
+conta AS (
+  -- Join pelo CPF: pega o consumer_id mais recente pelo BACEN
+  SELECT b.collaborator_id, b.setor, bk.consumer_id AS consumer_bacen
+  FROM base b
+  LEFT JOIN bacen bk ON b.document_number = bk.cpf
 ),
 margem AS (
   SELECT DISTINCT collaborator_id FROM benefits.sec_wage_advance_collaborator_margins
@@ -124,23 +143,37 @@ mau_geral AS (
   SELECT consumer_id FROM consumers.daily_consumers_labels_and_metrics
   WHERE metric_date=date_sub(current_date(),7) AND is_mau_geral=true
 ),
-antecip AS (
-  SELECT DISTINCT consumer_id FROM benefits.anticipation_request
-  WHERE request_status='FINISH' AND date_format(created_at,'yyyy-MM')='{MES_ATUAL}'
+antecip_setor AS (
+  SELECT
+    CASE
+      WHEN f.account_id = 1420 OR f.account_id IS NULL THEN 'INSS'
+      WHEN f.account_id IN (6,52,57,58,60,62,65,73,100,3170,3675) THEN 'Grupo'
+      WHEN co2.flag_company_sector = 'public' THEN 'Publico'
+      ELSE 'Privado'
+    END AS setor,
+    COUNT(DISTINCT ar.consumer_id) AS antecipando
+  FROM benefits.anticipation_request ar
+  LEFT JOIN benefits.companies co2 ON ar.company_id=co2.company_id
+  LEFT JOIN benefits.accounts f ON co2.account_id=f.account_id
+  WHERE ar.request_status='FINISH' AND date_format(ar.created_at,'yyyy-MM')='{MES_ATUAL}'
+  GROUP BY 1
 )
-SELECT b.setor,
-  COUNT(DISTINCT b.consumer_id) AS com_conta,
-  COUNT(DISTINCT CASE WHEN m.collaborator_id IS NOT NULL THEN b.consumer_id END) AS com_margem,
-  COUNT(DISTINCT CASE WHEN m.collaborator_id IS NULL THEN b.consumer_id END) AS sem_margem,
-  COUNT(DISTINCT mau.consumer_id) AS mau_geral,
-  COUNT(DISTINCT CASE WHEN mau.consumer_id IS NOT NULL AND m.collaborator_id IS NOT NULL THEN b.consumer_id END) AS mau_com_margem,
-  COUNT(DISTINCT CASE WHEN mau.consumer_id IS NOT NULL AND m.collaborator_id IS NULL THEN b.consumer_id END) AS mau_sem_margem,
-  COUNT(DISTINCT a.consumer_id) AS antecipando
-FROM base b
-LEFT JOIN margem m ON b.collaborator_id=m.collaborator_id
-LEFT JOIN mau_geral mau ON b.consumer_id=mau.consumer_id
-LEFT JOIN antecip a ON b.consumer_id=a.consumer_id
-GROUP BY b.setor ORDER BY com_conta DESC
+SELECT c.setor,
+  COUNT(DISTINCT c.collaborator_id)                                                                                 AS total_vidas,
+  COUNT(DISTINCT c.consumer_bacen)                                                                                  AS com_conta,
+  COUNT(DISTINCT c.collaborator_id) - COUNT(DISTINCT c.consumer_bacen)                                             AS sem_conta,
+  COUNT(DISTINCT CASE WHEN m.collaborator_id IS NOT NULL THEN c.consumer_bacen END)                                 AS com_margem,
+  COUNT(DISTINCT CASE WHEN m.collaborator_id IS NULL     THEN c.consumer_bacen END)                                 AS sem_margem,
+  COUNT(DISTINCT mau.consumer_id)                                                                                   AS mau_geral,
+  COUNT(DISTINCT CASE WHEN mau.consumer_id IS NOT NULL AND m.collaborator_id IS NOT NULL THEN c.consumer_bacen END) AS mau_com_margem,
+  COUNT(DISTINCT CASE WHEN mau.consumer_id IS NOT NULL AND m.collaborator_id IS NULL     THEN c.consumer_bacen END) AS mau_sem_margem,
+  COALESCE(ast.antecipando, 0)                                                                                      AS antecipando
+FROM conta c
+LEFT JOIN margem m      ON c.collaborator_id = m.collaborator_id
+LEFT JOIN mau_geral mau ON c.consumer_bacen  = mau.consumer_id
+LEFT JOIN antecip_setor ast ON c.setor       = ast.setor
+GROUP BY c.setor, ast.antecipando
+ORDER BY total_vidas DESC
 """,
 
     "historico": """
@@ -323,36 +356,36 @@ new_data = {
     "setores": {
         "public": {
             "nome": "Público", "cor": "#58a6ff",
-            "vidas":        1136845,  # estático (sem conta não temos total por setor)
-            "contas":       int(pub.get("com_conta",  0)),
-            "com_margem":   int(pub.get("com_margem", 0)),
-            "sem_margem":   int(pub.get("sem_margem", 0)),
-            "sem_conta":    0,
-            "mau":          int(pub.get("mau_geral",  0)),
-            "mau_margem":   int(pub.get("mau_com_margem", 0)),
-            "antecipando":  int(pub.get("antecipando",0))
+            "vidas":      int(pub.get("total_vidas", 0)),
+            "contas":     int(pub.get("com_conta",   0)),
+            "com_margem": int(pub.get("com_margem",  0)),
+            "sem_margem": int(pub.get("sem_margem",  0)),
+            "sem_conta":  int(pub.get("sem_conta",   0)),
+            "mau":        int(pub.get("mau_geral",   0)),
+            "mau_margem": int(pub.get("mau_com_margem", 0)),
+            "antecipando":int(pub.get("antecipando", 0))
         },
         "grupo": {
             "nome": "Grupo", "cor": "#bc8cff",
-            "vidas":        185283,
-            "contas":       int(grp.get("com_conta",  0)),
-            "com_margem":   int(grp.get("com_margem", 0)),
-            "sem_margem":   int(grp.get("sem_margem", 0)),
-            "sem_conta":    0,
-            "mau":          int(grp.get("mau_geral",  0)),
-            "mau_margem":   int(grp.get("mau_com_margem", 0)),
-            "antecipando":  int(grp.get("antecipando",0))
+            "vidas":      int(grp.get("total_vidas", 0)),
+            "contas":     int(grp.get("com_conta",   0)),
+            "com_margem": int(grp.get("com_margem",  0)),
+            "sem_margem": int(grp.get("sem_margem",  0)),
+            "sem_conta":  int(grp.get("sem_conta",   0)),
+            "mau":        int(grp.get("mau_geral",   0)),
+            "mau_margem": int(grp.get("mau_com_margem", 0)),
+            "antecipando":int(grp.get("antecipando", 0))
         },
         "private": {
             "nome": "Privado", "cor": "#f0883e",
-            "vidas":        32681,
-            "contas":       int(prv.get("com_conta",  0)),
-            "com_margem":   int(prv.get("com_margem", 0)),
-            "sem_margem":   int(prv.get("sem_margem", 0)),
-            "sem_conta":    0,
-            "mau":          int(prv.get("mau_geral",  0)),
-            "mau_margem":   int(prv.get("mau_com_margem", 0)),
-            "antecipando":  int(prv.get("antecipando",0))
+            "vidas":      int(prv.get("total_vidas", 0)),
+            "contas":     int(prv.get("com_conta",   0)),
+            "com_margem": int(prv.get("com_margem",  0)),
+            "sem_margem": int(prv.get("sem_margem",  0)),
+            "sem_conta":  int(prv.get("sem_conta",   0)),
+            "mau":        int(prv.get("mau_geral",   0)),
+            "mau_margem": int(prv.get("mau_com_margem", 0)),
+            "antecipando":int(prv.get("antecipando", 0))
         }
     },
     "historico": {
@@ -403,6 +436,14 @@ antecipando_total = antecipando
 ant_pct_total = round(antecipando/mau_geral_m*100) if mau_geral_m else 0
 mau_sem_m = mau_geral - mau_geral_m
 
+# Helper pct seguro
+def _pct(a, b): return round(a/b*100) if b else 0
+
+# Valores de setor vindos da query ao vivo (sem hardcoded)
+pub_tv = int(pub.get("total_vidas", 0)); pub_cc = int(pub.get("com_conta", 0)); pub_sc = int(pub.get("sem_conta", 0))
+grp_tv = int(grp.get("total_vidas", 0)); grp_cc = int(grp.get("com_conta", 0)); grp_sc = int(grp.get("sem_conta", 0))
+prv_tv = int(prv.get("total_vidas", 0)); prv_cc = int(prv.get("com_conta", 0)); prv_sc = int(prv.get("sem_conta", 0))
+
 setor_data_new = f"""var SETOR_DATA = {{
   total: {{
     label:'Total', icon:'📊', cor:'var(--green)',
@@ -410,39 +451,66 @@ setor_data_new = f"""var SETOR_DATA = {{
     comMargem:'{fmt_k(com_margem)}', semMargem:'{fmt_k(sem_margem)}',
     mau:'{fmt_k(mau_geral)}', mauComMargem:'{fmt_k(mau_geral_m)}', mauSemMargem:'{fmt_k(mau_sem_m)}',
     antecipando:'{fmt_k(antecipando)}',
-    atv:{pct_conta}, cmg:{round(com_margem/com_conta*100) if com_conta else 0},
-    mauPct:{round(mau_geral/com_conta*100) if com_conta else 0}, ant:{ant_pct_total}
+    atv:{pct_conta}, cmg:{_pct(com_margem,com_conta)},
+    mauPct:{_pct(mau_geral,com_conta)}, ant:{ant_pct_total}
   }},
   publico: {{
     label:'Público', icon:'🏛️', cor:'var(--blue)',
-    vidas:'1.14M', conta:'{fmt_k(int(pub.get("com_conta",0)))}', semConta:'{fmt_k(int(pub.get("sem_margem",0)))}', pctConta:'{round(int(pub.get("com_conta",0))/1136845*100)}%',
+    vidas:'{fmt_k(pub_tv)}', conta:'{fmt_k(pub_cc)}', semConta:'{fmt_k(pub_sc)}', pctConta:'{_pct(pub_cc,pub_tv)}%',
     comMargem:'{fmt_k(int(pub.get("com_margem",0)))}', semMargem:'{fmt_k(int(pub.get("sem_margem",0)))}',
     mau:'{fmt_k(int(pub.get("mau_geral",0)))}', mauComMargem:'{fmt_k(int(pub.get("mau_com_margem",0)))}', mauSemMargem:'{fmt_k(int(pub.get("mau_sem_margem",0)))}',
     antecipando:'{fmt_k(int(pub.get("antecipando",0)))}',
-    atv:{round(int(pub.get("com_conta",0))/1136845*100)}, cmg:{round(int(pub.get("com_margem",0))/int(pub.get("com_conta",1))*100)},
-    mauPct:{round(int(pub.get("mau_geral",0))/int(pub.get("com_conta",1))*100)}, ant:{round(int(pub.get("antecipando",0))/int(pub.get("mau_com_margem",1))*100)}
+    atv:{_pct(pub_cc,pub_tv)}, cmg:{_pct(int(pub.get("com_margem",0)),pub_cc)},
+    mauPct:{_pct(int(pub.get("mau_geral",0)),pub_cc)}, ant:{_pct(int(pub.get("antecipando",0)),int(pub.get("mau_com_margem",1)))}
   }},
   grupo: {{
     label:'Grupo', icon:'🏗️', cor:'var(--purple)',
-    vidas:'185.3k', conta:'{fmt_k(int(grp.get("com_conta",0)))}', semConta:'{fmt_k(int(grp.get("sem_margem",0)))}', pctConta:'{round(int(grp.get("com_conta",0))/185283*100)}%',
+    vidas:'{fmt_k(grp_tv)}', conta:'{fmt_k(grp_cc)}', semConta:'{fmt_k(grp_sc)}', pctConta:'{_pct(grp_cc,grp_tv)}%',
     comMargem:'{fmt_k(int(grp.get("com_margem",0)))}', semMargem:'{fmt_k(int(grp.get("sem_margem",0)))}',
     mau:'{fmt_k(int(grp.get("mau_geral",0)))}', mauComMargem:'{fmt_k(int(grp.get("mau_com_margem",0)))}', mauSemMargem:'{fmt_k(int(grp.get("mau_sem_margem",0)))}',
     antecipando:'{fmt_k(int(grp.get("antecipando",0)))}',
-    atv:{round(int(grp.get("com_conta",0))/185283*100)}, cmg:{round(int(grp.get("com_margem",0))/int(grp.get("com_conta",1))*100)},
-    mauPct:{round(int(grp.get("mau_geral",0))/int(grp.get("com_conta",1))*100)}, ant:{round(int(grp.get("antecipando",0))/int(grp.get("mau_com_margem",1))*100)}
+    atv:{_pct(grp_cc,grp_tv)}, cmg:{_pct(int(grp.get("com_margem",0)),grp_cc)},
+    mauPct:{_pct(int(grp.get("mau_geral",0)),grp_cc)}, ant:{_pct(int(grp.get("antecipando",0)),int(grp.get("mau_com_margem",1)))}
   }},
   privado: {{
     label:'Privado', icon:'🏭', cor:'var(--orange)',
-    vidas:'32.7k', conta:'{fmt_k(int(prv.get("com_conta",0)))}', semConta:'{fmt_k(int(prv.get("sem_margem",0)))}', pctConta:'{round(int(prv.get("com_conta",0))/32681*100)}%',
+    vidas:'{fmt_k(prv_tv)}', conta:'{fmt_k(prv_cc)}', semConta:'{fmt_k(prv_sc)}', pctConta:'{_pct(prv_cc,prv_tv)}%',
     comMargem:'{fmt_k(int(prv.get("com_margem",0)))}', semMargem:'{fmt_k(int(prv.get("sem_margem",0)))}',
     mau:'{fmt_k(int(prv.get("mau_geral",0)))}', mauComMargem:'{fmt_k(int(prv.get("mau_com_margem",0)))}', mauSemMargem:'{fmt_k(int(prv.get("mau_sem_margem",0)))}',
     antecipando:'{fmt_k(int(prv.get("antecipando",0)))}',
-    atv:{round(int(prv.get("com_conta",0))/32681*100)}, cmg:{round(int(prv.get("com_margem",0))/int(prv.get("com_conta",1))*100)},
-    mauPct:{round(int(prv.get("mau_geral",0))/int(prv.get("com_conta",1))*100)}, ant:{round(int(prv.get("antecipando",0))/int(prv.get("mau_com_margem",1))*100) if int(prv.get("mau_com_margem",0)) else 0}
+    atv:{_pct(prv_cc,prv_tv)}, cmg:{_pct(int(prv.get("com_margem",0)),prv_cc)},
+    mauPct:{_pct(int(prv.get("mau_geral",0)),prv_cc)}, ant:{_pct(int(prv.get("antecipando",0)),int(prv.get("mau_com_margem",1))) if int(prv.get("mau_com_margem",0)) else 0}
   }}
 }};"""
 
 html = re_mod.sub(r'var SETOR_DATA = \{.*?\};', setor_data_new, html, flags=re_mod.DOTALL)
+
+# ── Atualizar valores hardcoded dos KPI cards (Total) ─────────────
+# Garante que o HTML inicial já mostra os valores corretos antes do JS rodar
+pct_sem_conta  = round(sem_conta/total_v*100)  if total_v  else 0
+pct_sem_margem = round(sem_margem/com_conta*100) if com_conta else 0
+pct_mau        = round(mau_geral/com_conta*100)  if com_conta else 0
+pct_mau_sm     = round(mau_sem_m/com_conta*100)  if com_conta else 0
+
+kpi_updates = {
+    r'(id="kpi-vidas">)[^<]+'        : f'\\g<1>{fmt_k(total_v)}',
+    r'(id="kpi-vidas-sub">)[^<]+'    : r'\g<1>Elegíveis ao produto',
+    r'(id="kpi-conta">)[^<]+'        : f'\\g<1>{fmt_k(com_conta)}',
+    r'(id="kpi-conta-sub">)[^<]+'    : f'\\g<1>{pct_conta}% das vidas',
+    r'(id="kpi-margem">)[^<]+'       : f'\\g<1>{fmt_k(com_margem)}',
+    r'(id="kpi-margem-sub">)[^<]+'   : f'\\g<1>{round(com_margem/com_conta*100) if com_conta else 0}% dos com conta',
+    r'(id="kpi-mau">)[^<]+'          : f'\\g<1>{fmt_k(mau_geral)}',
+    r'(id="kpi-mau-sub">)[^<]+'      : f'\\g<1>{pct_mau}% dos com conta',
+    r'(id="kpi-semmargem">)[^<]+'    : f'\\g<1>{fmt_k(sem_margem)}',
+    r'(id="kpi-semmargem-sub">)[^<]+': f'\\g<1>{pct_sem_margem}% dos com conta',
+    r'(id="kpi-ant">)[^<]+'          : f'\\g<1>{fmt_k(antecipando)}',
+    r'(id="kpi-ant-sub">)[^<]+'      : f'\\g<1>{ant_pct_total}% MAU c/ margem',
+    r'(id="kpi-semconta">)[^<]+'     : f'\\g<1>{fmt_k(sem_conta)}',
+    r'(id="kpi-semconta-sub">)[^<]+' : f'\\g<1>{pct_sem_conta}% sem conta ainda',
+    r'(id="kpi-mausemmargem">)[^<]+' : f'\\g<1>{fmt_k(mau_sem_m)}',
+}
+for pattern, repl in kpi_updates.items():
+    html = re_mod.sub(pattern, repl, html)
 
 # Atualizar hero tags
 mes_str = MES_LABEL

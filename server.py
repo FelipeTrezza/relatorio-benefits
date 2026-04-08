@@ -78,14 +78,16 @@ def run_async(names):
     finally:
         state["running"] = False  # SEMPRE libera, mesmo se der exceção
 
-def run_funil_query(activity, date_from=None, date_to=None):
-    """Chama funil_query_helper.py como subprocess com o activity_name e período opcional."""
+def run_funil_query(activity, date_from=None, date_to=None, is_journey=False):
+    """Chama funil_query_helper.py como subprocess com o activity/journey e período opcional."""
     if not FUNIL_HELPER.exists():
         raise Exception(f"Helper nao encontrado: {FUNIL_HELPER}")
+    cmd = [get_python(), "-W", "ignore", str(FUNIL_HELPER), activity]
+    if date_from: cmd.append(date_from)
+    if date_to:   cmd.append(date_to)
+    if is_journey: cmd.append("--journey")
     result = subprocess.run(
-        [get_python(), "-W", "ignore", str(FUNIL_HELPER), activity]
-        + ([date_from] if date_from else [])
-        + ([date_to]   if date_to   else []),
+        cmd,
         capture_output=True, text=True, timeout=300, env=get_env()
     )
     # Procura linha JSON no stdout (ignora warnings)
@@ -137,6 +139,18 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/status":
+            # Auto-reset se running=True por mais de 10 minutos (estado travado)
+            if state["running"] and state.get("last_run"):
+                try:
+                    from datetime import datetime
+                    t0 = datetime.strptime(state["last_run"], "%d/%m/%Y %H:%M:%S")
+                    elapsed = (datetime.now() - t0).total_seconds()
+                    if elapsed > 600:  # 10 min
+                        state["running"] = False
+                        state["last_status"] = "error"
+                        state["last_output"] += "\n[auto-reset após 10min sem conclusão]"
+                except Exception:
+                    pass
             self.send_json(200, {"ok": True, "status": state["last_status"], "running": state["running"],
                                  "last_run": state.get("last_run"), "last_output": state.get("last_output", "")})
         elif self.path == "/log":
@@ -169,13 +183,20 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 payload = json.loads(body)
                 # Aceita activity_name (string) ou activities (lista)
-                raw = payload.get("activities") or payload.get("activity_name")
-                if not raw:
-                    self.send_json(400, {"error": "activities obrigatorio"})
+                journey_val = payload.get("journey", "").strip()
+                raw = payload.get("activities") or payload.get("activity_name") or payload.get("activity")
+                if journey_val:
+                    # Busca por journey — delega direto ao helper com --journey
+                    activities = [journey_val]
+                    payload["_is_journey"] = True
+                elif not raw:
+                    self.send_json(400, {"error": "activities ou journey obrigatorio"})
                     return
-                activities = [raw] if isinstance(raw, str) else [a.strip() for a in raw if a.strip()]
+                else:
+                    activities = [raw] if isinstance(raw, str) else [a.strip() for a in raw if a.strip()]
+                    payload["_is_journey"] = False
                 if not activities:
-                    self.send_json(400, {"error": "Nenhum activity_name valido"})
+                    self.send_json(400, {"error": "Nenhum activity/journey valido"})
                     return
             except Exception:
                 self.send_json(400, {"error": "JSON invalido"})
@@ -190,7 +211,7 @@ class Handler(BaseHTTPRequestHandler):
                 period_str = f"{date_from or 'auto'} → {date_to or 'auto'}"
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] Funil: {act[:60]}... ({period_str})")
                 try:
-                    result = run_funil_query(act, date_from, date_to)
+                    result = run_funil_query(act, date_from, date_to, is_journey=payload.get("_is_journey", False))
                     result["multi"] = False
                     print(f"  -> {len(result.get('rows', []))} linhas | {result.get('date_from')} → {result.get('date_to')}")
                     self.send_json(200, result)
@@ -206,7 +227,7 @@ class Handler(BaseHTTPRequestHandler):
                 date_from = payload.get("date_from", "").strip() or None
                 date_to   = payload.get("date_to",   "").strip() or None
                 with ThreadPoolExecutor(max_workers=min(len(activities), 4)) as ex:
-                    future_map = {ex.submit(run_funil_query, a, date_from, date_to): a for a in activities}
+                    future_map = {ex.submit(run_funil_query, a, date_from, date_to, payload.get("_is_journey", False)): a for a in activities}
                     for future in as_completed(future_map):
                         act = future_map[future]
                         try:
