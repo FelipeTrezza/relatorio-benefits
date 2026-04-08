@@ -161,7 +161,7 @@ mapa_setor AS (
 ),
 antecip AS (
   -- Antecipações dos consumers desta campanha dentro da janela de tempo possível
-  SELECT consumer_id, created_at AS ts_antecip
+  SELECT anticipation_id, consumer_id, created_at AS ts_antecip
   FROM benefits.anticipation_request
   WHERE request_status = 'FINISH'
     AND consumer_id IN (SELECT DISTINCT consumer_id FROM comms)
