@@ -308,13 +308,18 @@ function atualizarScore(){
     });
 }
 
-// Esconder o botão se não estiver em localhost (HTTPS bloqueia fetch para HTTP)
+// Verificar se servidor local está acessível — esconder botão só se offline
 (function(){
-  var h = window.location.hostname;
-  if(h !== 'localhost' && h !== '127.0.0.1'){
-    var btn = document.getElementById('btn-atualizar-score');
-    if(btn) btn.style.display = 'none';
-  }
+  fetch('http://localhost:5001/status', {method:'GET'})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      // servidor respondeu — botão permanece visível (não faz nada)
+    })
+    .catch(function(){
+      // servidor offline — esconder botão
+      var btn = document.getElementById('btn-atualizar-score');
+      if(btn) btn.style.display = 'none';
+    });
 })();
 </script>
 
