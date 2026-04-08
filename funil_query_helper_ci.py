@@ -235,7 +235,8 @@ antecip AS (
 ),
 cruzado AS (
   -- Atribuição: antecipação ocorreu APÓS o envio e dentro de 24h do envio
-  SELECT DISTINCT c.consumer_id
+  -- Uma linha por antecipação (mesmo consumer pode ter múltiplas no período)
+  SELECT a.anticipation_id, c.consumer_id
   FROM comms c
   JOIN antecip a ON c.consumer_id = a.consumer_id
   WHERE a.ts_antecip > c.sent_at
@@ -248,7 +249,7 @@ SELECT
   COUNT(DISTINCT CASE WHEN c.is_delivered = true THEN c.consumer_id END) AS entregues,
   COUNT(DISTINCT CASE WHEN c.is_opened    = true THEN c.consumer_id END) AS abriram,
   COUNT(DISTINCT CASE WHEN c.is_clicked   = true THEN c.consumer_id END) AS clicaram,
-  COUNT(DISTINCT cr.consumer_id)                                         AS anteciparam
+  COUNT(cr.anticipation_id)                                             AS anteciparam
 FROM comms c
 LEFT JOIN mapa_setor ms ON c.consumer_id = ms.consumer_id
 LEFT JOIN cruzado cr    ON c.consumer_id = cr.consumer_id
