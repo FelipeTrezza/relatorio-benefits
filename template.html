@@ -580,29 +580,65 @@ function render(){
 // ─── ATUALIZAR ────────────────────────────────────────────────────────────────
 async function refreshData(){
   const btn = document.getElementById('btn-refresh');
+  const upd = document.getElementById('upd-ts');
+
+  function setBtnState(label){
+    if(upd) upd.textContent = label;
+  }
+
   btn.classList.add('spinning');
   btn.disabled = true;
-  btn.title = 'Buscando dados novos...';
+  setBtnState('conectando...');
 
   try {
-    // Chama o servidor local que roda a query no Databricks e republica
-    const resp = await fetch('http://localhost:5001/atualizar/contas', {
-      method: 'POST',
-      signal: AbortSignal.timeout(300000) // 5 min
-    });
-    if (resp.ok) {
-      // Aguarda 3s para o GitHub Pages propagar e recarrega
-      setTimeout(() => { window.location.reload(); }, 3000);
-    } else {
-      throw new Error('servidor retornou ' + resp.status);
+    // 1. Disparar atualização
+    const resp = await fetch('http://localhost:5001/atualizar/contas', { method:'POST' });
+
+    if(resp.status === 409){
+      setBtnState('servidor ocupado');
+      alert('⚠️ Servidor está rodando outra atualização.\nTente novamente em alguns segundos.');
+      btn.classList.remove('spinning');
+      btn.disabled = false;
+      return;
     }
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+
+    setBtnState('atualizando...');
+
+    // 2. Polling até terminar (máx 5 min)
+    let tentativas = 0;
+    while(tentativas < 60){
+      await new Promise(r => setTimeout(r, 5000));
+      tentativas++;
+      const s = await fetch('http://localhost:5001/status').then(r=>r.json());
+      setBtnState(`aguardando... ${tentativas*5}s`);
+
+      if(!s.running){
+        if(s.status === 'success'){
+          setBtnState('✅ pronto!');
+          setTimeout(() => { window.location.reload(); }, 1500);
+        } else {
+          setBtnState('erro');
+          btn.classList.remove('spinning');
+          btn.disabled = false;
+          alert('❌ Erro ao atualizar dados.\nVerifique o terminal.');
+        }
+        return;
+      }
+    }
+    // Timeout
+    setBtnState('timeout');
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+    alert('⚠️ Timeout — query demorou mais de 5 min.');
+
   } catch(e) {
-    // Servidor local não disponível — só recarrega a página
+    // Servidor local offline
     console.warn('Servidor local indisponível:', e.message);
     btn.classList.remove('spinning');
     btn.disabled = false;
-    btn.title = 'Servidor local offline — rode: python3 ~/relatorio-abertura-contas/atualizar.py';
-    alert('⚠️ Servidor local offline.\n\nPara atualizar os dados, rode:\n\npython3 ~/relatorio-abertura-contas/atualizar.py');
+    setBtnState('offline');
+    alert('⚠️ Servidor local offline.\n\nPara atualizar os dados, rode no terminal:\n\npython3 ~/relatorio-abertura-contas/atualizar.py');
   }
 }
 
