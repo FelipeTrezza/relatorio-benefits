@@ -160,20 +160,21 @@ mapa_setor AS (
   WHERE co.consumer_id IN (SELECT DISTINCT consumer_id FROM comms)
 ),
 antecip AS (
-  -- Filtrado nos consumer_ids de comms + janela de data relevante
-  SELECT DISTINCT consumer_id, date(created_at) AS dt_antecip
+  -- Antecipações dos consumers desta campanha dentro da janela de tempo possível
+  SELECT consumer_id, created_at AS ts_antecip
   FROM benefits.anticipation_request
   WHERE request_status = 'FINISH'
     AND consumer_id IN (SELECT DISTINCT consumer_id FROM comms)
     AND created_at >= '{date_from}'
-    AND created_at <= date_add(cast('{date_to}' AS date), 30)
+    AND created_at <= date_add(cast('{date_to}' AS date), 1)
 ),
 cruzado AS (
+  -- Atribuição: antecipação ocorreu APÓS o envio e dentro de 24h do envio
   SELECT DISTINCT c.consumer_id
   FROM comms c
   JOIN antecip a ON c.consumer_id = a.consumer_id
-  WHERE date(c.sent_at) <= a.dt_antecip
-    AND date(c.sent_at) >= a.dt_antecip - INTERVAL 30 DAYS
+  WHERE a.ts_antecip > c.sent_at
+    AND a.ts_antecip <= c.sent_at + INTERVAL 24 HOURS
 )
 SELECT
   COALESCE(ms.setor, 'Sem vinculo') AS setor,
