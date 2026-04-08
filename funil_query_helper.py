@@ -171,7 +171,7 @@ antecip AS (
 cruzado AS (
   -- Atribuição: antecipação ocorreu APÓS o envio e dentro de 24h do envio
   -- Uma linha por antecipação (mesmo consumer pode ter múltiplas no período)
-  SELECT a.anticipation_id, c.consumer_id
+  SELECT a.anticipation_id, c.consumer_id, a.ts_antecip
   FROM comms c
   JOIN antecip a ON c.consumer_id = a.consumer_id
   WHERE a.ts_antecip > c.sent_at
