@@ -184,7 +184,8 @@ SELECT
   COUNT(DISTINCT CASE WHEN c.is_delivered = true THEN c.consumer_id END)    AS entregues,
   COUNT(DISTINCT CASE WHEN c.is_opened    = true THEN c.consumer_id END)    AS abriram,
   COUNT(DISTINCT CASE WHEN c.is_clicked   = true THEN c.consumer_id END)    AS clicaram,
-  COUNT(cr.anticipation_id)                                                 AS anteciparam
+  COUNT(cr.anticipation_id)                                                 AS anteciparam,
+  COUNT(DISTINCT cr.consumer_id)                                             AS consumers_anteciparam
 FROM comms c
 LEFT JOIN mapa_setor ms ON c.consumer_id = ms.consumer_id
 LEFT JOIN cruzado cr    ON c.consumer_id = cr.consumer_id

@@ -562,6 +562,15 @@ function atualizarScore(){
         <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600">Canal</div>
         <div id="fmkt-canal-tabs" class="rfm-tabs"></div>
       </div>
+      <div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600">Visão Antecipações</div>
+        <div class="rfm-tabs">
+          <button class="rtab active" id="fmkt-ant-total"  onclick="setFMKTAntVisao('total')"
+            title="Conta todas as antecipações — mesmo consumer pode aparecer mais de 1x">📊 Total (multi)</button>
+          <button class="rtab" id="fmkt-ant-unicos" onclick="setFMKTAntVisao('unicos')"
+            title="Conta apenas consumers únicos — 1 consumer = 1, mesmo que tenha antecipado várias vezes">👤 Únicos (1x)</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -602,7 +611,7 @@ function atualizarScore(){
 // ═══════════════════════════════════════════════════════════════════
 //  FUNIL DE CAMPANHA — v4 (simples, robusto, sem dependência de tags)
 // ═══════════════════════════════════════════════════════════════════
-var FMKT_RESULTS={}, FMKT_SETOR_AT='total', FMKT_CANAL_AT='todos', FMKT_CAMP_AT=null;
+var FMKT_RESULTS={}, FMKT_SETOR_AT='total', FMKT_CANAL_AT='todos', FMKT_CAMP_AT=null, FMKT_ANT_VISAO='total';
 var FMKT_CACHE={}; // cache: "activity::dateFrom::dateTo" → resultado JSON
 var CAMP_COLORS=['#21a366','#58a6ff','#bc8cff','#f0883e','#e3b341','#ff7b72'];
 var CANAL_DOT={INAPP:'#bc8cff',PUSH:'#58a6ff',DM:'#f0883e',EMAIL:'#e3b341',WHATSAPP:'#21c25e',SMS:'#8b949e'};
@@ -640,6 +649,13 @@ function getActivities(){
 }
 
 // ── Filtros ────────────────────────────────────────────────────
+function setFMKTAntVisao(visao){
+  FMKT_ANT_VISAO = visao;
+  document.getElementById('fmkt-ant-total').classList.toggle('active',  visao === 'total');
+  document.getElementById('fmkt-ant-unicos').classList.toggle('active', visao === 'unicos');
+  redrawAll();
+}
+
 function setFMKT(val,tipo){
   if(tipo==='setor'){
     FMKT_SETOR_AT=val;
@@ -676,7 +692,9 @@ function getAgg(activityName){
     t.entregues  +=parseInt(row[idx['entregues']])||0;
     t.abriram    +=parseInt(row[idx['abriram']])||0;
     t.clicaram   +=parseInt(row[idx['clicaram']])||0;
-    t.anteciparam+=parseInt(row[idx['anteciparam']])||0;
+    // Visão: total = conta todas antecipações (multi), unicos = 1x por consumer
+    var antField = (FMKT_ANT_VISAO === 'unicos') ? 'consumers_anteciparam' : 'anteciparam';
+    t.anteciparam+=parseInt(row[idx[antField]])||0;
   });
   return t;
 }
@@ -1094,7 +1112,7 @@ function buscarFunil(customDateFrom, customDateTo){
     }
     var btn = document.getElementById('fmkt-btn');
     btn.disabled=true; btn.style.opacity='.5'; btn.textContent='⏳ Enviando…';
-    FMKT_RESULTS={}; FMKT_SETOR_AT='total'; FMKT_CANAL_AT='todos';
+    FMKT_RESULTS={}; FMKT_SETOR_AT='total'; FMKT_CANAL_AT='todos'; FMKT_ANT_VISAO='total';
     document.getElementById('fmkt-result').style.display  = 'none';
     document.getElementById('fmkt-filtros').style.display = 'none';
     document.getElementById('fmkt-offline-banner').style.display = 'none';
