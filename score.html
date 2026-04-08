@@ -571,6 +571,8 @@ function atualizarScore(){
             title="Conta apenas consumers únicos — 1 consumer = 1, mesmo que tenha antecipado várias vezes">👤 Únicos</button>
           <button class="rtab" id="fmkt-ant-novatos" onclick="setFMKTAntVisao('novatos')"
             title="Consumers que anteciparam nas 24h pós campanha E nunca tinham antecipado antes na vida">🆕 1ª vez</button>
+          <button class="rtab" id="fmkt-ant-recompra" onclick="setFMKTAntVisao('recompra')"
+            title="Consumers que anteciparam nas 24h pós campanha E já tinham antecipado antes (reativação / recompra)">🔄 Recompra</button>
         </div>
       </div>
     </div>
@@ -656,6 +658,7 @@ function setFMKTAntVisao(visao){
   document.getElementById('fmkt-ant-total').classList.toggle('active',   visao === 'total');
   document.getElementById('fmkt-ant-unicos').classList.toggle('active',  visao === 'unicos');
   document.getElementById('fmkt-ant-novatos').classList.toggle('active', visao === 'novatos');
+  document.getElementById('fmkt-ant-recompra').classList.toggle('active',visao === 'recompra');
   redrawAll();
 }
 
@@ -695,9 +698,10 @@ function getAgg(activityName){
     t.entregues  +=parseInt(row[idx['entregues']])||0;
     t.abriram    +=parseInt(row[idx['abriram']])||0;
     t.clicaram   +=parseInt(row[idx['clicaram']])||0;
-    // Visão: total = multi, unicos = 1x por consumer, novatos = 1ª vez na vida
+    // Visão: total = multi, unicos = 1x por consumer, novatos = 1ª vez na vida, recompra = já antecipou antes
     var antField = FMKT_ANT_VISAO === 'unicos'   ? 'consumers_anteciparam'
                  : FMKT_ANT_VISAO === 'novatos'  ? 'novatos_anteciparam'
+                 : FMKT_ANT_VISAO === 'recompra' ? 'recompra_anteciparam'
                  : 'anteciparam';
     t.anteciparam+=parseInt(row[idx[antField]])||0;
   });
