@@ -569,6 +569,8 @@ function atualizarScore(){
             title="Conta todas as antecipações — mesmo consumer pode aparecer mais de 1x">📊 Total (multi)</button>
           <button class="rtab" id="fmkt-ant-unicos" onclick="setFMKTAntVisao('unicos')"
             title="Conta apenas consumers únicos — 1 consumer = 1, mesmo que tenha antecipado várias vezes">👤 Únicos</button>
+          <button class="rtab" id="fmkt-ant-novatos" onclick="setFMKTAntVisao('novatos')"
+            title="Consumers que anteciparam nas 24h pós campanha E nunca tinham antecipado antes na vida">🆕 1ª vez</button>
         </div>
       </div>
     </div>
@@ -651,8 +653,9 @@ function getActivities(){
 // ── Filtros ────────────────────────────────────────────────────
 function setFMKTAntVisao(visao){
   FMKT_ANT_VISAO = visao;
-  document.getElementById('fmkt-ant-total').classList.toggle('active',  visao === 'total');
-  document.getElementById('fmkt-ant-unicos').classList.toggle('active', visao === 'unicos');
+  document.getElementById('fmkt-ant-total').classList.toggle('active',   visao === 'total');
+  document.getElementById('fmkt-ant-unicos').classList.toggle('active',  visao === 'unicos');
+  document.getElementById('fmkt-ant-novatos').classList.toggle('active', visao === 'novatos');
   redrawAll();
 }
 
@@ -692,8 +695,10 @@ function getAgg(activityName){
     t.entregues  +=parseInt(row[idx['entregues']])||0;
     t.abriram    +=parseInt(row[idx['abriram']])||0;
     t.clicaram   +=parseInt(row[idx['clicaram']])||0;
-    // Visão: total = conta todas antecipações (multi), unicos = 1x por consumer
-    var antField = (FMKT_ANT_VISAO === 'unicos') ? 'consumers_anteciparam' : 'anteciparam';
+    // Visão: total = multi, unicos = 1x por consumer, novatos = 1ª vez na vida
+    var antField = FMKT_ANT_VISAO === 'unicos'   ? 'consumers_anteciparam'
+                 : FMKT_ANT_VISAO === 'novatos'  ? 'novatos_anteciparam'
+                 : 'anteciparam';
     t.anteciparam+=parseInt(row[idx[antField]])||0;
   });
   return t;

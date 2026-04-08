@@ -176,6 +176,20 @@ cruzado AS (
   JOIN antecip a ON c.consumer_id = a.consumer_id
   WHERE a.ts_antecip > c.sent_at
     AND a.ts_antecip <= c.sent_at + INTERVAL 24 HOURS
+),
+primeira_vida AS (
+  -- Primeira antecipação FINISH de cada consumer em todo o histórico
+  SELECT consumer_id, MIN(created_at) AS primeira_antecip
+  FROM benefits.anticipation_request
+  WHERE request_status = 'FINISH'
+  GROUP BY consumer_id
+),
+novatos AS (
+  -- Consumers que anteciparam nas 24h E essa foi a primeira vez na vida
+  SELECT DISTINCT cr.consumer_id
+  FROM cruzado cr
+  JOIN primeira_vida pv ON cr.consumer_id = pv.consumer_id
+  WHERE cr.ts_antecip = pv.primeira_antecip
 )
 SELECT
   COALESCE(ms.setor, 'Sem vinculo') AS setor,
@@ -185,10 +199,12 @@ SELECT
   COUNT(DISTINCT CASE WHEN c.is_opened    = true THEN c.consumer_id END)    AS abriram,
   COUNT(DISTINCT CASE WHEN c.is_clicked   = true THEN c.consumer_id END)    AS clicaram,
   COUNT(cr.anticipation_id)                                                 AS anteciparam,
-  COUNT(DISTINCT cr.consumer_id)                                             AS consumers_anteciparam
+  COUNT(DISTINCT cr.consumer_id)                                             AS consumers_anteciparam,
+  COUNT(DISTINCT nv.consumer_id)                                             AS novatos_anteciparam
 FROM comms c
 LEFT JOIN mapa_setor ms ON c.consumer_id = ms.consumer_id
 LEFT JOIN cruzado cr    ON c.consumer_id = cr.consumer_id
+LEFT JOIN novatos nv    ON c.consumer_id = nv.consumer_id
 GROUP BY COALESCE(ms.setor, 'Sem vinculo'), c.channel
 ORDER BY setor, enviados DESC
 """.format(where_comms=where_comms, date_from=date_from, date_to=date_to)
