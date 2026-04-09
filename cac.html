@@ -145,7 +145,6 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
       Análise do Custo de Aquisição de Antecipações Salariais Benefits por canal de marketing.
       Filtro: <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;font-size:11px">journey_name[7] = 'sfpjbene'</code> — apenas campanhas Benefits.
       Conversão = <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;font-size:11px">request_status = 'FINISH'</code> em até <strong style="color:var(--text)">24 horas</strong> após o disparo.
-      WhatsApp calculado por <strong style="color:var(--text)">entrega</strong> (is_delivered = true), demais por envio.
     </p>
     <div class="hero-kpis">
       <div><div class="hk-val" style="color:var(--greenl)">1,21M</div><div class="hk-lbl">Comunicações</div></div>
@@ -159,7 +158,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
   <!-- KPIs -->
   <section id="visao-geral">
     <div class="sec-title">📊 Visão Geral — Março 2026</div>
-    <div class="sec-sub">Campanhas Benefits (sfpjbene) · 5 canais ativos · WhatsApp custo por entrega, demais por envio</div>
+    <div class="sec-sub">Campanhas Benefits (sfpjbene) · 5 canais ativos</div>
     <div class="kpi-grid">
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--greenl);width:100%"></div>
@@ -187,7 +186,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
         <div class="kpi-ic">💰</div>
         <div class="kpi-lbl">Custo Total MKT</div>
         <div class="kpi-val" style="color:var(--yellow)">R$7.703</div>
-        <div class="kpi-sub">WA por entrega · demais por envio</div>
+        <div class="kpi-sub">Custo total R$7.703</div>
       </div>
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--orange);width:100%"></div>
@@ -211,7 +210,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
   <!-- TABELA CANAIS -->
   <section id="canais">
     <div class="sec-title">📡 CAC por Canal — Março 2026</div>
-    <div class="sec-sub">Ordenado por eficiência (menor CAC) · WhatsApp: custo sobre 92.996 entregues · Demais: custo sobre enviados</div>
+    <div class="sec-sub">Ordenado por eficiência (menor CAC) · Custo = volume faturável × tarifa unitária</div>
 
     <div class="tbl-wrap">
       <table>
@@ -219,13 +218,10 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
           <tr>
             <th>#</th>
             <th>Canal</th>
-            <th class="r">Enviados</th>
-            <th class="r">Entregues</th>
-            <th class="r">% Entrega</th>
+            <th class="r">Volume faturável</th>
             <th class="r">Convertidos</th>
-            <th class="r">Conv % (env)</th>
+            <th class="r">Conv%</th>
             <th class="r">Custo Total</th>
-            <th class="r">Base Custo</th>
             <th class="r">CAC</th>
             <th>Eficiência</th>
           </tr>
@@ -234,86 +230,67 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
           <tr>
             <td><span class="rank" style="background:rgba(45,201,116,.2);color:var(--greenl)">1</span></td>
             <td><span class="canal-dot" style="background:var(--yellow)"></span><strong>EMAIL</strong></td>
-            <td class="r">2.211</td>
-            <td class="r">2.174</td>
-            <td class="r">98,33%</td>
+            <td class="r">2.211 enviados</td>
             <td class="r" style="color:var(--yellow)">324</td>
             <td class="r" style="color:var(--yellow)"><strong>14,65%</strong></td>
             <td class="r">R$0,97</td>
-            <td class="r" style="color:var(--muted);font-size:11px">envio</td>
             <td class="r" style="color:var(--greenl)"><strong>R$0,0030</strong></td>
             <td><span class="ef ef-best">🏆 Melhor</span></td>
           </tr>
           <tr>
             <td><span class="rank" style="background:rgba(88,166,255,.15);color:var(--blue)">2</span></td>
             <td><span class="canal-dot" style="background:var(--blue)"></span><strong>PUSH</strong></td>
-            <td class="r">189.392</td>
-            <td class="r">185.479</td>
-            <td class="r">97,93%</td>
+            <td class="r">189.392 enviados</td>
             <td class="r" style="color:var(--blue)">12.130</td>
             <td class="r" style="color:var(--blue)"><strong>6,40%</strong></td>
             <td class="r">R$83</td>
-            <td class="r" style="color:var(--muted);font-size:11px">envio</td>
             <td class="r" style="color:var(--greenl)"><strong>R$0,0069</strong></td>
             <td><span class="ef ef-best">✅ Ótimo</span></td>
           </tr>
           <tr>
             <td><span class="rank" style="background:rgba(188,140,255,.15);color:var(--purple)">3</span></td>
             <td><span class="canal-dot" style="background:var(--purple)"></span><strong>INAPP</strong></td>
-            <td class="r">412.459</td>
-            <td class="r">365.660</td>
-            <td class="r">88,65%</td>
+            <td class="r">412.459 enviados</td>
             <td class="r" style="color:var(--purple)">14.529</td>
             <td class="r" style="color:var(--purple)"><strong>3,52%</strong></td>
             <td class="r">R$181</td>
-            <td class="r" style="color:var(--muted);font-size:11px">envio</td>
             <td class="r" style="color:var(--blue)"><strong>R$0,0125</strong></td>
             <td><span class="ef ef-good">👍 Bom</span></td>
           </tr>
           <tr>
             <td><span class="rank" style="background:rgba(240,136,62,.12);color:var(--orange)">4</span></td>
             <td><span class="canal-dot" style="background:var(--orange)"></span><strong>DM</strong></td>
-            <td class="r">424.396</td>
-            <td class="r" style="color:var(--muted)">—</td>
-            <td class="r" style="color:var(--muted)">—</td>
+            <td class="r">424.396 enviados</td>
             <td class="r" style="color:var(--orange)">1.916</td>
             <td class="r" style="color:var(--orange)"><strong>0,45%</strong></td>
             <td class="r">R$2.546</td>
-            <td class="r" style="color:var(--muted);font-size:11px">envio</td>
             <td class="r" style="color:var(--orange)"><strong>R$1,33</strong></td>
             <td><span class="ef ef-ok">⚠️ Atenção</span></td>
           </tr>
           <tr>
             <td><span class="rank" style="background:rgba(248,81,73,.15);color:var(--red)">5</span></td>
             <td><span class="canal-dot" style="background:#25d366"></span><strong>WHATSAPP</strong></td>
-            <td class="r">176.571</td>
-            <td class="r" style="color:#25d366">92.996</td>
-            <td class="r" style="color:#25d366">52,67%</td>
+            <td class="r">92.996 entregues</td>
             <td class="r" style="color:#25d366">1.178</td>
-            <td class="r" style="color:#25d366"><strong>0,67%</strong></td>
+            <td class="r" style="color:#25d366"><strong>1,27%</strong></td>
             <td class="r">R$4.892</td>
-            <td class="r" style="color:var(--teal);font-size:11px;font-weight:700">entrega ★</td>
             <td class="r" style="color:var(--red)"><strong>R$4,15</strong> ⚠️</td>
             <td><span class="ef ef-bad">❌ Revisar</span></td>
           </tr>
           <tr style="background:rgba(33,163,102,.04);font-weight:700">
             <td colspan="2"><strong>TOTAL</strong></td>
-            <td class="r">1.205.029</td>
-            <td class="r">—</td>
             <td class="r">—</td>
             <td class="r">30.077</td>
             <td class="r">2,49%</td>
             <td class="r">R$7.704</td>
-            <td class="r">—</td>
             <td class="r" style="color:var(--orange)">R$0,26</td>
             <td></td>
           </tr>
         </tbody>
       </table>
     </div>
-
-    <div style="margin-top:8px;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--teal)">
-      ★ <strong>WhatsApp</strong>: custo calculado sobre <strong>92.996 mensagens entregues</strong> (is_delivered = true), não sobre os 176.571 enviados. Taxa de entrega: 52,67%.
+    <div style="margin-top:8px;font-size:11px;color:var(--muted);padding:0 4px">
+      * WhatsApp: volume faturável = mensagens entregues (92.996 de 176.571 enviados). Conv% calculado sobre entregues.
     </div>
 
     <div style="margin-top:20px" class="g2">
@@ -510,13 +487,11 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
         <div style="font-size:13px;font-weight:800;margin-bottom:12px">💬 WHATSAPP — Análise de Break-even</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
           <div>
-            <div class="be-row"><span>Enviados</span><span>176.571</span></div>
-            <div class="be-row"><span>Entregues</span><span style="color:#25d366">92.996 (52,7%)</span></div>
+            <div class="be-row"><span>Volume faturável</span><span style="color:#25d366">92.996 entregues</span></div>
             <div class="be-row"><span>Convertidos</span><span>1.178</span></div>
-            <div class="be-row"><span>Conv% sobre entregues</span><span>1,27%</span></div>
+            <div class="be-row"><span>Conv%</span><span>1,27%</span></div>
           </div>
           <div>
-            <div class="be-row"><span>Custo por entrega</span><span>R$0,0526</span></div>
             <div class="be-row"><span>Custo total</span><span>R$4.892</span></div>
             <div class="be-row"><span>CAC</span><span style="color:var(--red)">R$4,15</span></div>
             <div class="be-row"><span>Receita estimada (0,5%)</span><span>R$~2,00</span></div>
@@ -724,7 +699,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
       <strong style="color:var(--text)">📋 Metodologia</strong><br>
       <strong>Filtro de campanha:</strong> <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">SPLIT(journey_name, '-')[7] = 'sfpjbene'</code> — apenas jornadas Benefits.<br>
       <strong>Conversão:</strong> <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">request_status = 'FINISH'</code> com <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">created_at</code> entre <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">sent_at</code> e <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">sent_at + 24h</code>.<br>
-      <strong>Base de custo:</strong> WhatsApp → <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">is_delivered = true</code> (92.996 msgs) · Demais canais → total enviado.<br>
+      <strong>Volume faturável:</strong> Email/Push/InApp/DM = mensagens enviadas · WhatsApp = mensagens entregues (92.996).<br>
       <strong>Custo unitário:</strong> Email/Push/InApp R$0,00044 · DM R$0,006 · WhatsApp R$0,0526.<br>
       <strong>Setor:</strong> account_id 1420 = INSS · IDs específicos = Grupo · flag_company_sector público/privado · NULL = INSS.<br>
       <strong>Tabelas:</strong> <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">marketing.consumers_campaigns_communications</code> × <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">benefits.anticipation_request</code>.<br>
