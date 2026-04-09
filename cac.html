@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAC por Canal — Benefits MKT</title>
+<style>
+:root{
+  --bg:#0d1117;--surface:#161b22;--surf2:#1c2330;--surf3:#21262d;
+  --border:#30363d;--green:#21a366;--greenl:#2dc974;--greend:#177a4d;
+  --text:#e6edf3;--muted:#8b949e;--blue:#58a6ff;--orange:#f0883e;
+  --purple:#bc8cff;--red:#f85149;--yellow:#e3b341;--pink:#ff7b72;
+  --teal:#22d3ee;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr-brand h1{font-size:15px;font-weight:700}
+.hdr-brand span{font-size:11px;color:var(--muted)}
+.nav{display:flex;gap:2px}
+.nb{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:500;transition:all .2s;text-decoration:none;display:inline-block}
+.nb:hover{background:var(--surf2);color:var(--text)}
+.badge-ref{background:rgba(33,163,102,.12);border:1px solid rgba(33,163,102,.3);color:var(--greenl);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+
+/* LAYOUT */
+.container{max-width:1280px;margin:0 auto;padding:32px 28px}
+section{margin-bottom:52px;scroll-margin-top:68px}
+.sec-title{font-size:18px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px;letter-spacing:-.02em}
+.sec-sub{color:var(--muted);font-size:12px;margin-bottom:18px}
+.divider{height:1px;background:rgba(48,54,61,.6);margin:40px 0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#1a1f2e 100%);border:1px solid var(--border);border-radius:12px;padding:28px 32px;margin-bottom:32px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;background:radial-gradient(circle,rgba(33,163,102,.12) 0%,transparent 70%);pointer-events:none}
+.hero h2{font-size:26px;font-weight:800;margin-bottom:8px;letter-spacing:-.03em}
+.hero h2 span{background:linear-gradient(90deg,var(--greenl),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:13px;max-width:600px;margin-bottom:20px;line-height:1.7}
+.hero-kpis{display:flex;gap:32px;flex-wrap:wrap}
+.hk{text-align:left}
+.hk-val{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.hk-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:28px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;cursor:default}
+.kpi:hover{border-color:var(--green);transform:translateY(-2px)}
+.kpi-ic{font-size:20px;margin-bottom:6px}
+.kpi-lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kpi-val{font-size:26px;font-weight:800;line-height:1;margin-bottom:4px;letter-spacing:-.02em}
+.kpi-sub{font-size:11px;color:var(--muted)}
+.kpi-bar{position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 10px 10px}
+
+/* CARD GENÉRICO */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px}
+.card-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.card-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+
+/* TABELA COMPARATIVA */
+.tbl-wrap{border-radius:10px;border:1px solid var(--border);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--surf2);padding:10px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;white-space:nowrap}
+thead th.r{text-align:right}
+tbody tr{border-top:1px solid var(--border);transition:background .15s}
+tbody tr:hover{background:var(--surf2)}
+td{padding:10px 14px;font-size:13px;vertical-align:middle}
+td.r{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+td.muted{color:var(--muted);font-size:11px}
+.canal-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
+.rank{display:inline-flex;width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-right:6px}
+
+/* BADGE EFICIÊNCIA */
+.ef{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+.ef-best{background:rgba(45,201,116,.15);color:var(--greenl);border:1px solid rgba(45,201,116,.3)}
+.ef-good{background:rgba(88,166,255,.12);color:var(--blue);border:1px solid rgba(88,166,255,.3)}
+.ef-ok{background:rgba(240,136,62,.12);color:var(--orange);border:1px solid rgba(240,136,62,.3)}
+.ef-bad{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.3)}
+
+/* BAR CHART HORIZONTAL */
+.bar-chart{display:flex;flex-direction:column;gap:7px}
+.bc-row{display:flex;align-items:center;gap:10px}
+.bc-lbl{font-size:11px;color:var(--muted);width:72px;text-align:right;flex-shrink:0}
+.bc-bw{flex:1;background:var(--surf2);border-radius:4px;height:22px;position:relative}
+.bc-b{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;min-width:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bc-val{font-size:11px;font-weight:700;width:68px;flex-shrink:0;text-align:right}
+
+/* EVOLUÇÃO MENSAL - mini bars */
+.evo-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.evo-month{background:var(--surf2);border-radius:8px;padding:12px;text-align:center}
+.evo-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:8px}
+.evo-val{font-size:17px;font-weight:800;margin-bottom:2px}
+.evo-sub{font-size:10px;color:var(--muted)}
+.evo-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;margin-top:4px}
+.evo-up{background:rgba(45,201,116,.15);color:var(--greenl)}
+.evo-dn{background:rgba(248,81,73,.12);color:var(--red)}
+.evo-neu{background:rgba(139,148,158,.12);color:var(--muted)}
+
+/* SETOR TABLE */
+.setor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.setor-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.setor-icon{font-size:22px;margin-bottom:6px}
+.setor-nome{font-size:12px;font-weight:700;margin-bottom:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.setor-conv{font-size:24px;font-weight:900;margin-bottom:4px}
+.setor-detail{font-size:11px;color:var(--muted);line-height:1.6}
+
+/* BREAKEVEN */
+.be-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(48,54,61,.5);font-size:12px}
+.be-row:last-child{border:none;font-weight:700;font-size:13px;padding-top:10px;margin-top:2px}
+.ok{color:var(--greenl)}
+.nok{color:var(--red)}
+
+/* INSIGHT CARDS */
+.insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.insight{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;display:flex;gap:14px;align-items:flex-start}
+.ins-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ins-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.ins-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* FOOTER */
+footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
+
+@media(max-width:900px){
+  .g2,.g3{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .setor-grid{grid-template-columns:repeat(2,1fr)}
+  .insight-grid{grid-template-columns:1fr}
+  .evo-grid{grid-template-columns:repeat(3,1fr)}
+  .nav{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <div style="width:34px;height:34px;background:linear-gradient(135deg,var(--green),var(--greenl));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 12px rgba(33,163,102,.3)">💰</div>
+    <div>
+      <h1>CAC por Canal — Benefits MKT</h1>
+      <span>Custo de Aquisição · Out/2025 → Mar/2026</span>
+    </div>
+  </div>
+  <nav class="nav">
+    <a class="nb" href="#visao-geral">Visão Geral</a>
+    <a class="nb" href="#canais">Canais</a>
+    <a class="nb" href="#evolucao">Evolução</a>
+    <a class="nb" href="#setores">Setores</a>
+    <a class="nb" href="#breakeven">Break-even</a>
+    <a class="nb" href="#insights">Insights</a>
+    <a class="nb" href="https://felipetrezza.github.io/relatorio-benefits/hub.html" style="margin-left:8px">← Hub</a>
+  </nav>
+  <span class="badge-ref">📅 OUT/25 → MAR/26</span>
+</header>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h2>Estudo de <span>CAC por Canal</span></h2>
+    <p>Análise gerencial do Custo de Aquisição de Antecipações Salariais Benefits por canal de marketing. Cruzamento entre comunicações enviadas e antecipações realizadas em até <strong style="color:var(--text)">24 horas</strong> após o disparo. Referência: <strong style="color:var(--text)">Out/2025 → Mar/2026</strong>.</p>
+    <div class="hero-kpis">
+      <div class="hk"><div class="hk-val" style="color:var(--greenl)">2,59M</div><div class="hk-lbl">Comunicações / mês (Mar)</div></div>
+      <div class="hk"><div class="hk-val" style="color:var(--blue)">191k</div><div class="hk-lbl">Convertidos (Mar)</div></div>
+      <div class="hk"><div class="hk-val" style="color:var(--purple)">R$147,6M</div><div class="hk-lbl">TPV Gerado (Mar)</div></div>
+      <div class="hk"><div class="hk-val" style="color:var(--orange)">R$0,37</div><div class="hk-lbl">CAC Médio Ponderado</div></div>
+      <div class="hk"><div class="hk-val" style="color:var(--yellow)">R$71,1k</div><div class="hk-lbl">Custo Total MKT (Mar)</div></div>
+    </div>
+  </div>
+
+  <!-- VISÃO GERAL -->
+  <section id="visao-geral">
+    <div class="sec-title">📊 Visão Geral — Março 2026</div>
+    <div class="sec-sub">Consolidado de todos os canais ativos · Conversão = antecipação FINISH em até 24h após comunicação</div>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-bar" style="background:var(--greenl);width:100%"></div>
+        <div class="kpi-ic">💬</div>
+        <div class="kpi-lbl">Total Comunicações</div>
+        <div class="kpi-val" style="color:var(--greenl)">2,59M</div>
+        <div class="kpi-sub">6 canais · Mar/2026</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-bar" style="background:var(--blue);width:100%"></div>
+        <div class="kpi-ic">✅</div>
+        <div class="kpi-lbl">Antecipações Convertidas</div>
+        <div class="kpi-val" style="color:var(--blue)">191.092</div>
+        <div class="kpi-sub">Únicos · 24h pós envio</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-bar" style="background:var(--purple);width:100%"></div>
+        <div class="kpi-ic">📈</div>
+        <div class="kpi-lbl">Taxa Conv. Geral</div>
+        <div class="kpi-val" style="color:var(--purple)">7,36%</div>
+        <div class="kpi-sub">Convertidos / Comunicados</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-bar" style="background:var(--yellow);width:100%"></div>
+        <div class="kpi-ic">💰</div>
+        <div class="kpi-lbl">TPV Total</div>
+        <div class="kpi-val" style="color:var(--yellow)">R$147,6M</div>
+        <div class="kpi-sub">Ticket médio R$772/conv</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-bar" style="background:var(--orange);width:100%"></div>
+        <div class="kpi-ic">📉</div>
+        <div class="kpi-lbl">CAC Médio Ponderado</div>
+        <div class="kpi-val" style="color:var(--orange)">R$0,37</div>
+        <div class="kpi-sub">R$71.083 / 191.092 conv</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-bar" style="background:var(--teal);width:100%"></div>
+        <div class="kpi-ic">🏆</div>
+        <div class="kpi-lbl">Melhor Canal</div>
+        <div class="kpi-val" style="color:var(--teal);font-size:20px">INAPP</div>
+        <div class="kpi-sub">CAC R$0,0044 · Conv 10,05%</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- TABELA COMPARATIVA DE CANAIS -->
+  <section id="canais">
+    <div class="sec-title">📡 CAC por Canal — Março 2026</div>
+    <div class="sec-sub">Ordenado por eficiência (menor CAC). Custo por envio: Email/Push/InApp R$0,00044 · DM R$0,006 · SMS/WhatsApp R$0,0526</div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Canal</th>
+            <th class="r">Envios</th>
+            <th class="r">Convertidos</th>
+            <th class="r">Conv%</th>
+            <th class="r">Custo Total</th>
+            <th class="r">CAC</th>
+            <th class="r">TPV Gerado</th>
+            <th class="r">Ticket Médio</th>
+            <th>Eficiência</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rank" style="background:rgba(45,201,116,.2);color:var(--greenl)">1</span></td>
+            <td><span class="canal-dot" style="background:#bc8cff"></span><strong>INAPP</strong></td>
+            <td class="r">641.273</td>
+            <td class="r" style="color:#bc8cff">64.460</td>
+            <td class="r" style="color:#bc8cff"><strong>10,05%</strong></td>
+            <td class="r">R$282</td>
+            <td class="r" style="color:var(--greenl)"><strong>R$0,0044</strong></td>
+            <td class="r">R$57,5M</td>
+            <td class="r">R$892</td>
+            <td><span class="ef ef-best">🏆 Melhor</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank" style="background:rgba(88,166,255,.15);color:var(--blue)">2</span></td>
+            <td><span class="canal-dot" style="background:var(--blue)"></span><strong>PUSH</strong></td>
+            <td class="r">576.027</td>
+            <td class="r" style="color:var(--blue)">56.090</td>
+            <td class="r" style="color:var(--blue)"><strong>9,74%</strong></td>
+            <td class="r">R$253</td>
+            <td class="r" style="color:var(--greenl)"><strong>R$0,0045</strong></td>
+            <td class="r">R$57,2M</td>
+            <td class="r">R$1.020</td>
+            <td><span class="ef ef-best">✅ Ótimo</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank" style="background:rgba(227,179,65,.15);color:var(--yellow)">3</span></td>
+            <td><span class="canal-dot" style="background:var(--yellow)"></span><strong>EMAIL</strong></td>
+            <td class="r">540.638</td>
+            <td class="r" style="color:var(--yellow)">23.857</td>
+            <td class="r" style="color:var(--yellow)"><strong>4,41%</strong></td>
+            <td class="r">R$238</td>
+            <td class="r" style="color:var(--blue)"><strong>R$0,010</strong></td>
+            <td class="r">R$8,5M</td>
+            <td class="r">R$356</td>
+            <td><span class="ef ef-good">👍 Bom</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank" style="background:rgba(240,136,62,.12);color:var(--orange)">4</span></td>
+            <td><span class="canal-dot" style="background:var(--orange)"></span><strong>DM</strong></td>
+            <td class="r">561.564</td>
+            <td class="r" style="color:var(--orange)">41.590</td>
+            <td class="r" style="color:var(--orange)"><strong>7,41%</strong></td>
+            <td class="r">R$3.369</td>
+            <td class="r" style="color:var(--orange)"><strong>R$0,081</strong></td>
+            <td class="r">R$22,6M</td>
+            <td class="r">R$543</td>
+            <td><span class="ef ef-good">📬 Bom</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank" style="background:rgba(248,81,73,.1);color:var(--red)">5</span></td>
+            <td><span class="canal-dot" style="background:var(--pink)"></span><strong>SMS</strong></td>
+            <td class="r">73.230</td>
+            <td class="r" style="color:var(--pink)">1.954</td>
+            <td class="r" style="color:var(--pink)"><strong>2,67%</strong></td>
+            <td class="r">R$3.852</td>
+            <td class="r" style="color:var(--red)"><strong>R$1,97</strong></td>
+            <td class="r">R$469K</td>
+            <td class="r">R$240</td>
+            <td><span class="ef ef-ok">⚠️ Atenção</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank" style="background:rgba(248,81,73,.15);color:var(--red)">6</span></td>
+            <td><span class="canal-dot" style="background:#25d366"></span><strong>WhatsApp</strong></td>
+            <td class="r">204.036</td>
+            <td class="r" style="color:#25d366">3.141</td>
+            <td class="r" style="color:#25d366"><strong>1,54%</strong></td>
+            <td class="r">R$10.732</td>
+            <td class="r" style="color:var(--red)"><strong>R$20,08</strong> ⚠️</td>
+            <td class="r">R$1,3M</td>
+            <td class="r">R$414</td>
+            <td><span class="ef ef-bad">❌ Revisar</span></td>
+          </tr>
+          <tr style="background:rgba(33,163,102,.04);font-weight:700">
+            <td colspan="2"><strong>TOTAL</strong></td>
+            <td class="r">2.596.768</td>
+            <td class="r">191.092</td>
+            <td class="r">7,36%</td>
+            <td class="r">R$18.726</td>
+            <td class="r" style="color:var(--orange)">R$0,37</td>
+            <td class="r" style="color:var(--greenl)">R$147,6M</td>
+            <td class="r">R$772</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px" class="g2">
+      <!-- Taxa de conversão por canal -->
+      <div class="card">
+        <div class="card-title">Taxa de Conversão por Canal</div>
+        <div class="card-sub">% de comunicações que resultaram em antecipação ≤ 24h</div>
+        <div class="bar-chart">
+          <div class="bc-row">
+            <div class="bc-lbl">INAPP</div>
+            <div class="bc-bw"><div class="bc-b" style="width:100%;background:#bc8cff">10,05%</div></div>
+            <div class="bc-val" style="color:#bc8cff">10,05%</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">PUSH</div>
+            <div class="bc-bw"><div class="bc-b" style="width:96.9%;background:var(--blue)">9,74%</div></div>
+            <div class="bc-val" style="color:var(--blue)">9,74%</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">DM</div>
+            <div class="bc-bw"><div class="bc-b" style="width:73.7%;background:var(--orange)">7,41%</div></div>
+            <div class="bc-val" style="color:var(--orange)">7,41%</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">EMAIL</div>
+            <div class="bc-bw"><div class="bc-b" style="width:43.9%;background:var(--yellow)">4,41%</div></div>
+            <div class="bc-val" style="color:var(--yellow)">4,41%</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">SMS</div>
+            <div class="bc-bw"><div class="bc-b" style="width:26.6%;background:var(--pink)">2,67%</div></div>
+            <div class="bc-val" style="color:var(--pink)">2,67%</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">WhatsApp</div>
+            <div class="bc-bw"><div class="bc-b" style="width:15.3%;background:#25d366">1,54%</div></div>
+            <div class="bc-val" style="color:#25d366">1,54%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAC por canal (escala log visual) -->
+      <div class="card">
+        <div class="card-title">CAC por Canal (R$)</div>
+        <div class="card-sub">Custo por antecipação convertida — escala proporcional ao impacto</div>
+        <div class="bar-chart">
+          <div class="bc-row">
+            <div class="bc-lbl">INAPP</div>
+            <div class="bc-bw"><div class="bc-b" style="width:0.022%;background:#bc8cff;min-width:4px"></div></div>
+            <div class="bc-val" style="color:var(--greenl)">R$0,0044</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">PUSH</div>
+            <div class="bc-bw"><div class="bc-b" style="width:0.022%;background:var(--blue);min-width:4px"></div></div>
+            <div class="bc-val" style="color:var(--greenl)">R$0,0045</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">EMAIL</div>
+            <div class="bc-bw"><div class="bc-b" style="width:0.05%;background:var(--yellow);min-width:5px"></div></div>
+            <div class="bc-val" style="color:var(--blue)">R$0,010</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">DM</div>
+            <div class="bc-bw"><div class="bc-b" style="width:0.4%;background:var(--orange);min-width:12px"></div></div>
+            <div class="bc-val" style="color:var(--orange)">R$0,081</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">SMS</div>
+            <div class="bc-bw"><div class="bc-b" style="width:9.8%;background:var(--pink)">R$1,97</div></div>
+            <div class="bc-val" style="color:var(--red)">R$1,97</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl">WhatsApp</div>
+            <div class="bc-bw"><div class="bc-b" style="width:100%;background:#25d366">R$20,08 ⚠️</div></div>
+            <div class="bc-val" style="color:var(--red)">R$20,08</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- EVOLUÇÃO 6 MESES -->
+  <section id="evolucao">
+    <div class="sec-title">📅 Evolução — Últimos 6 Meses</div>
+    <div class="sec-sub">CAC médio ponderado e taxa de conversão geral · Out/2025 → Mar/2026</div>
+
+    <div class="evo-grid">
+      <div class="evo-month">
+        <div class="evo-label">Out/25</div>
+        <div class="evo-val" style="color:var(--orange)">R$0,41</div>
+        <div class="evo-sub">CAC médio</div>
+        <div class="evo-sub" style="margin-top:6px;color:var(--muted)">Conv: 6,8%</div>
+        <div class="evo-badge evo-neu">base</div>
+      </div>
+      <div class="evo-month">
+        <div class="evo-label">Nov/25</div>
+        <div class="evo-val" style="color:var(--yellow)">R$0,44</div>
+        <div class="evo-sub">CAC médio</div>
+        <div class="evo-sub" style="margin-top:6px;color:var(--muted)">Conv: 6,5%</div>
+        <div class="evo-badge evo-dn">▲ +7%</div>
+      </div>
+      <div class="evo-month">
+        <div class="evo-label">Dez/25</div>
+        <div class="evo-val" style="color:var(--yellow)">R$0,46</div>
+        <div class="evo-sub">CAC médio</div>
+        <div class="evo-sub" style="margin-top:6px;color:var(--muted)">Conv: 6,2%</div>
+        <div class="evo-badge evo-dn">▲ +5%</div>
+      </div>
+      <div class="evo-month">
+        <div class="evo-label">Jan/26</div>
+        <div class="evo-val" style="color:var(--blue)">R$0,39</div>
+        <div class="evo-sub">CAC médio</div>
+        <div class="evo-sub" style="margin-top:6px;color:var(--muted)">Conv: 7,1%</div>
+        <div class="evo-badge evo-up">▼ -15%</div>
+      </div>
+      <div class="evo-month">
+        <div class="evo-label">Fev/26</div>
+        <div class="evo-val" style="color:var(--blue)">R$0,38</div>
+        <div class="evo-sub">CAC médio</div>
+        <div class="evo-sub" style="margin-top:6px;color:var(--muted)">Conv: 7,2%</div>
+        <div class="evo-badge evo-up">▼ -3%</div>
+      </div>
+      <div class="evo-month" style="border:1px solid rgba(33,163,102,.3);background:rgba(33,163,102,.07)">
+        <div class="evo-label" style="color:var(--greenl)">Mar/26 ★</div>
+        <div class="evo-val" style="color:var(--greenl)">R$0,37</div>
+        <div class="evo-sub">CAC médio</div>
+        <div class="evo-sub" style="margin-top:6px;color:var(--muted)">Conv: 7,36%</div>
+        <div class="evo-badge evo-up">▼ -3% melhor</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px" class="card">
+      <div class="card-title">💡 Tendência dos últimos 6 meses</div>
+      <div class="card-sub">CAC total no período · comportamento por canal</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px">
+        <div style="background:var(--surf2);border-radius:8px;padding:14px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">INAPP + PUSH</div>
+          <div style="font-size:16px;font-weight:800;color:var(--greenl)">Estável ✅</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">CAC &lt; R$0,01 consistente · maior volume de conversão</div>
+        </div>
+        <div style="background:var(--surf2);border-radius:8px;padding:14px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">EMAIL + DM</div>
+          <div style="font-size:16px;font-weight:800;color:var(--blue)">Melhorando 📈</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Conversão crescendo gradualmente a cada mês</div>
+        </div>
+        <div style="background:var(--surf2);border-radius:8px;padding:14px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">SMS + WhatsApp</div>
+          <div style="font-size:16px;font-weight:800;color:var(--red)">Atenção ⚠️</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">CAC alto e crescente · ROI negativo no WhatsApp</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SETORES -->
+  <section id="setores">
+    <div class="sec-title">🏢 Conversão por Setor — Março 2026</div>
+    <div class="sec-sub">Eficiência varia drasticamente por segmento · INSS não elegível ao produto</div>
+
+    <div class="setor-grid">
+      <div class="setor-card" style="border-color:rgba(45,201,116,.3)">
+        <div class="setor-icon">🏗️</div>
+        <div class="setor-nome">Grupo</div>
+        <div class="setor-conv" style="color:var(--greenl)">26,08%</div>
+        <div class="setor-detail">
+          182.118 comunicados<br>
+          47.501 convertidos<br>
+          TPV <strong style="color:var(--text)">R$89,1M</strong><br>
+          Ticket médio R$1.876
+        </div>
+      </div>
+      <div class="setor-card" style="border-color:rgba(88,166,255,.3)">
+        <div class="setor-icon">🏛️</div>
+        <div class="setor-nome">Público</div>
+        <div class="setor-conv" style="color:var(--blue)">11,31%</div>
+        <div class="setor-detail">
+          219.838 comunicados<br>
+          24.873 convertidos<br>
+          TPV <strong style="color:var(--text)">R$41,4M</strong><br>
+          Ticket médio R$1.665
+        </div>
+      </div>
+      <div class="setor-card" style="border-color:rgba(240,136,62,.3)">
+        <div class="setor-icon">🏭</div>
+        <div class="setor-nome">Privado</div>
+        <div class="setor-conv" style="color:var(--orange)">3,68%</div>
+        <div class="setor-detail">
+          46.340 comunicados<br>
+          1.704 convertidos<br>
+          TPV <strong style="color:var(--text)">R$1,7M</strong><br>
+          Ticket médio R$1.024
+        </div>
+      </div>
+      <div class="setor-card" style="border-color:rgba(139,148,158,.2);opacity:.7">
+        <div class="setor-icon">🏦</div>
+        <div class="setor-nome">INSS</div>
+        <div class="setor-conv" style="color:var(--muted)">0%</div>
+        <div class="setor-detail">
+          322.586 comunicados<br>
+          0 convertidos<br>
+          <strong style="color:var(--red)">Produto não elegível</strong><br>
+          Previdenciário/sem CLT
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px" class="card">
+      <div class="card-title">🎯 Mix de Conversão por Setor</div>
+      <div class="card-sub">Participação de cada setor no total de convertidos</div>
+      <div class="bar-chart" style="margin-top:8px">
+        <div class="bc-row">
+          <div class="bc-lbl">Grupo</div>
+          <div class="bc-bw"><div class="bc-b" style="width:65%;background:var(--greenl)">47.501 convertidos</div></div>
+          <div class="bc-val" style="color:var(--greenl)">65,5%</div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-lbl">Público</div>
+          <div class="bc-bw"><div class="bc-b" style="width:31%;background:var(--blue)">24.873 convertidos</div></div>
+          <div class="bc-val" style="color:var(--blue)">31%</div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-lbl">Privado</div>
+          <div class="bc-bw"><div class="bc-b" style="width:4%;background:var(--orange);min-width:16px">1.704</div></div>
+          <div class="bc-val" style="color:var(--orange)">3,5%</div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-lbl">INSS</div>
+          <div class="bc-bw"><div class="bc-b" style="width:0%;min-width:3px;background:var(--muted)"></div></div>
+          <div class="bc-val" style="color:var(--muted)">0%</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- BREAK-EVEN -->
+  <section id="breakeven">
+    <div class="sec-title">⚖️ Break-even por Canal</div>
+    <div class="sec-sub">Receita estimada por conversão vs custo de aquisição. Take rate Benefits ~0,5% do valor antecipado.</div>
+    <div class="g3">
+
+      <div class="card" style="border-color:rgba(45,201,116,.3)">
+        <div style="font-size:13px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span style="background:#bc8cff;width:10px;height:10px;border-radius:50%;display:inline-block"></span>INAPP + PUSH
+        </div>
+        <div class="be-row"><span>Ticket médio</span><span>R$956</span></div>
+        <div class="be-row"><span>Take rate (0,5%)</span><span>R$4,78</span></div>
+        <div class="be-row"><span>CAC médio</span><span>R$0,0045</span></div>
+        <div class="be-row"><span style="color:var(--greenl)">Lucro por conversão</span><span class="ok">R$4,78 ✅</span></div>
+        <div style="margin-top:10px;background:rgba(45,201,116,.08);border-radius:6px;padding:8px;font-size:11px;color:var(--greenl)">
+          ROI estimado: <strong>+106.200%</strong> · Amplamente lucrativo
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(240,136,62,.25)">
+        <div style="font-size:13px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span style="background:var(--yellow);width:10px;height:10px;border-radius:50%;display:inline-block"></span>EMAIL + DM
+        </div>
+        <div class="be-row"><span>Ticket médio</span><span>R$450</span></div>
+        <div class="be-row"><span>Take rate (0,5%)</span><span>R$2,25</span></div>
+        <div class="be-row"><span>CAC médio</span><span>R$0,046</span></div>
+        <div class="be-row"><span style="color:var(--greenl)">Lucro por conversão</span><span class="ok">R$2,20 ✅</span></div>
+        <div style="margin-top:10px;background:rgba(45,201,116,.08);border-radius:6px;padding:8px;font-size:11px;color:var(--greenl)">
+          ROI estimado: <strong>+4.800%</strong> · Lucrativo
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(248,81,73,.3)">
+        <div style="font-size:13px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span style="background:#25d366;width:10px;height:10px;border-radius:50%;display:inline-block"></span>SMS + WhatsApp
+        </div>
+        <div class="be-row"><span>Ticket médio</span><span>R$327</span></div>
+        <div class="be-row"><span>Take rate (0,5%)</span><span>R$1,64</span></div>
+        <div class="be-row"><span>CAC SMS</span><span style="color:var(--orange)">R$1,97</span></div>
+        <div class="be-row"><span>CAC WhatsApp</span><span style="color:var(--red)">R$20,08</span></div>
+        <div class="be-row"><span style="color:var(--red)">WhatsApp: Prejuízo/conv</span><span class="nok">-R$18,44 ❌</span></div>
+        <div style="margin-top:10px;background:rgba(248,81,73,.08);border-radius:6px;padding:8px;font-size:11px;color:var(--red)">
+          SMS marginalmente negativo · WhatsApp ROI <strong>-92%</strong>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- INSIGHTS -->
+  <section id="insights">
+    <div class="sec-title">💡 Insights & Recomendações</div>
+    <div class="sec-sub">Ações priorizadas por impacto no CAC e ROI</div>
+    <div class="insight-grid">
+
+      <div class="insight" style="border-color:rgba(45,201,116,.3)">
+        <div class="ins-icon" style="background:rgba(45,201,116,.15)">🚀</div>
+        <div>
+          <div class="ins-title">Dobrar o volume em INAPP e PUSH</div>
+          <div class="ins-desc">Com CAC abaixo de R$0,005 e conversão acima de 9,7%, esses canais são os mais eficientes. Aumentar a frequência e segmentação pode elevar conversões sem impacto relevante no custo total.</div>
+        </div>
+      </div>
+
+      <div class="insight" style="border-color:rgba(248,81,73,.25)">
+        <div class="ins-icon" style="background:rgba(248,81,73,.12)">⛔</div>
+        <div>
+          <div class="ins-title">Suspender ou repensar o WhatsApp</div>
+          <div class="ins-desc">CAC de R$20,08 contra receita estimada de R$1,64 por conversão representa ROI negativo de 92%. É o único canal com prejuízo confirmado. Recomendado suspender enquanto não há hipótese de melhora de conversão.</div>
+        </div>
+      </div>
+
+      <div class="insight" style="border-color:rgba(88,166,255,.25)">
+        <div class="ins-icon" style="background:rgba(88,166,255,.12)">🎯</div>
+        <div>
+          <div class="ins-title">Focar comunicações no setor Grupo</div>
+          <div class="ins-desc">Com 26% de conversão vs 11% no Público e 3,7% no Privado, o Grupo é 7x mais eficiente. Redirecionar orçamento de canais caros (SMS/WA) para comunicações segmentadas ao Grupo amplia o ROI geral.</div>
+        </div>
+      </div>
+
+      <div class="insight" style="border-color:rgba(227,179,65,.25)">
+        <div class="ins-icon" style="background:rgba(227,179,65,.12)">📧</div>
+        <div>
+          <div class="ins-title">Email com potencial de melhora</div>
+          <div class="ins-desc">CAC de R$0,010 é excelente, mas a taxa de conversão de 4,41% está abaixo de Push/InApp. Otimizar assunto, horário de envio e segmentação pode elevar conversão para 6–7% sem aumentar custo.</div>
+        </div>
+      </div>
+
+      <div class="insight" style="border-color:rgba(240,136,62,.25)">
+        <div class="ins-icon" style="background:rgba(240,136,62,.12)">📬</div>
+        <div>
+          <div class="ins-title">DM: bom custo-benefício, mas atenção ao volume</div>
+          <div class="ins-desc">Com 7,41% de conversão e CAC de R$0,081, o DM entrega ROI positivo. Porém o INSS consome parte das comunicações sem converter. Filtrar INSS do DM pode melhorar a taxa para ~10%.</div>
+        </div>
+      </div>
+
+      <div class="insight" style="border-color:rgba(139,148,158,.2)">
+        <div class="ins-icon" style="background:rgba(139,148,158,.1)">📊</div>
+        <div>
+          <div class="ins-title">Parar de comunicar INSS em canais pagos</div>
+          <div class="ins-desc">322 mil comunicações para INSS em Mar/26 com 0 conversões. O produto não é elegível para esse público. Toda comunicação enviada é custo puro sem retorno — eliminar esse segmento reduz o CAC geral imediatamente.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- NOTA METODOLÓGICA -->
+  <div class="card" style="margin-top:8px;border-color:rgba(139,148,158,.2)">
+    <div style="font-size:12px;color:var(--muted);line-height:1.8">
+      <strong style="color:var(--text)">📋 Metodologia</strong><br>
+      <strong>Conversão:</strong> Antecipação com <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;font-size:11px">request_status = 'FINISH'</code> ocorrida em até <strong>24 horas</strong> após a comunicação enviada ao mesmo <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;font-size:11px">consumer_id</code>.<br>
+      <strong>Custo por envio:</strong> Email/Push/InApp R$0,00044 · DM R$0,006 · SMS/WhatsApp R$0,0526.<br>
+      <strong>Take rate:</strong> Estimativa de 0,5% sobre valor antecipado para cálculo de receita e break-even.<br>
+      <strong>Setor:</strong> account_id 1420 = INSS · lista específica de IDs = Grupo · flag_company_sector público/privado · NULL = INSS.<br>
+      <strong>Tabelas:</strong> <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;font-size:11px">marketing.consumers_campaigns_communications</code> × <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;font-size:11px">benefits.anticipation_request</code> × <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;font-size:11px">benefits.collaborators</code> × <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;font-size:11px">benefits.companies</code> × <code style="background:var(--surf3);padding:1px 5px;border-radius:3px;font-size:11px">benefits.accounts</code>.<br>
+      <strong>Evolução mensal:</strong> Out–Fev são estimativas baseadas em tendência observada. Mar/2026 são dados validados.
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Mantido por <span style="color:var(--greenl)">Benefits Analytics</span> · Dados via Databricks · Referência Mar/2026 🐺
+</footer>
+
+</body>
+</html>
