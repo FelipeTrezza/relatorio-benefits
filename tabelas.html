@@ -138,7 +138,7 @@
     .sum-card.warn .sc-val { color: var(--yellow); }
     .sum-card.err  .sc-val { color: var(--red); }
     .sum-card.health { cursor: default; }
-    .sum-card.health .sc-val { color: #21a366; font-size: 22px; }
+    .sum-card.health .sc-val { color: #f0883e; font-size: 22px; }
     /* hint de filtro */
     .sum-card:not(.health)::after {
       content: "clique para filtrar";
@@ -194,8 +194,8 @@
     .health-bar-fill {
       height: 100%;
       border-radius: 6px;
-      background: #21a366;
-      width: 82%;
+      background: #f0883e;
+      width: 73%;
       transition: width .5s ease;
     }
     .health-label {
@@ -413,7 +413,7 @@
     </div>
     <div class="header-right">
       <div>
-        <div class="updated-at">Gerado em <strong>08/04/2026 às 11:19</strong></div>
+        <div class="updated-at">Gerado em <strong>09/04/2026 às 09:15</strong></div>
 
       </div>
       <button id="btn-atualizar" onclick="atualizarTabelas()">
@@ -428,11 +428,11 @@
 
   <div class="summary">
     <div class="sum-card health">
-      <div class="sc-val">Saudável</div>
+      <div class="sc-val">Atenção</div>
       <div class="sc-lbl">Status geral</div>
     </div>
     <div class="sum-card ok" onclick="filtrar('status-ok', this)" title="Filtrar tabelas atualizadas">
-      <div class="sc-val">9</div>
+      <div class="sc-val">8</div>
       <div class="sc-lbl">✅ Atualizadas</div>
     </div>
     <div class="sum-card warn" onclick="filtrar('status-warn', this)" title="Filtrar tabelas com atraso">
@@ -440,7 +440,7 @@
       <div class="sc-lbl">⚠️ Com atraso</div>
     </div>
     <div class="sum-card err" onclick="filtrar('status-error', this)" title="Filtrar tabelas com problema">
-      <div class="sc-val">0</div>
+      <div class="sc-val">1</div>
       <div class="sc-lbl">❌ Com problema</div>
     </div>
     <div class="sum-card" style="border-color:var(--border); cursor:default">
@@ -453,7 +453,7 @@
     <div class="health-bar-bg">
       <div class="health-bar-fill"></div>
     </div>
-    <div class="health-label">82% das tabelas atualizadas</div>
+    <div class="health-label">73% das tabelas atualizadas</div>
   </div>
 
   <div class="table-wrap">
@@ -481,9 +481,9 @@
             
           </td>
           <td class="col-col"><code>updated_at</code></td>
-          <td class="col-date">08/04/2026 10:50</td>
-          <td class="col-rows">1.901.775</td>
-          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="01/04: 435.149"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="02/04: 69.454"><div class="spark-bar" style="height:4px"></div></div><div class="spark-day" data-tip="03/04: 20.870"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="04/04: 987"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="05/04: 938"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="06/04: 31.208"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="07/04: 24.077"><div class="spark-bar" style="height:3px"></div></div></div></td>
+          <td class="col-date">09/04/2026 07:49</td>
+          <td class="col-rows">1.901.891</td>
+          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="02/04: 67.486"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="03/04: 20.799"><div class="spark-bar" style="height:8px"></div></div><div class="spark-day" data-tip="04/04: 964"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="05/04: 903"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="06/04: 31.104"><div class="spark-bar" style="height:12px"></div></div><div class="spark-day" data-tip="07/04: 24.007"><div class="spark-bar" style="height:9px"></div></div><div class="spark-day" data-tip="08/04: 9.123"><div class="spark-bar" style="height:4px"></div></div></div></td>
           <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
         <tr data-status="status-ok">
@@ -493,9 +493,9 @@
             
           </td>
           <td class="col-col"><code>updated_at</code></td>
-          <td class="col-date">07/04/2026 10:32</td>
-          <td class="col-rows">1.664</td>
-          <td class="col-spark"><div class="sparkbar" title="⚠️ dia(s) sem dados"><div class="spark-day" data-tip="01/04: 3"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="02/04: 1"><div class="spark-bar" style="height:9px"></div></div><div class="spark-day" data-tip="03/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="04/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="05/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="06/04: 2"><div class="spark-bar" style="height:17px"></div></div><div class="spark-day" data-tip="07/04: 1"><div class="spark-bar" style="height:9px"></div></div></div></td>
+          <td class="col-date">08/04/2026 17:58</td>
+          <td class="col-rows">1.665</td>
+          <td class="col-spark"><div class="sparkbar" title="⚠️ dia(s) sem dados"><div class="spark-day" data-tip="02/04: 1"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="03/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="04/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="05/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="06/04: 2"><div class="spark-bar" style="height:6px"></div></div><div class="spark-day" data-tip="07/04: 1"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="08/04: 8"><div class="spark-bar" style="height:26px"></div></div></div></td>
           <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
         <tr data-status="status-ok">
@@ -517,9 +517,9 @@
             
           </td>
           <td class="col-col"><code>sent_bacen_at</code></td>
-          <td class="col-date">08/04/2026 01:07</td>
-          <td class="col-rows">119.556.681</td>
-          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="01/04: 23.710"><div class="spark-bar" style="height:24px"></div></div><div class="spark-day" data-tip="02/04: 22.166"><div class="spark-bar" style="height:22px"></div></div><div class="spark-day" data-tip="03/04: 21.629"><div class="spark-bar" style="height:22px"></div></div><div class="spark-day" data-tip="04/04: 18.410"><div class="spark-bar" style="height:18px"></div></div><div class="spark-day" data-tip="05/04: 17.501"><div class="spark-bar" style="height:18px"></div></div><div class="spark-day" data-tip="06/04: 24.320"><div class="spark-bar" style="height:24px"></div></div><div class="spark-day" data-tip="07/04: 25.944"><div class="spark-bar" style="height:26px"></div></div></div></td>
+          <td class="col-date">09/04/2026 01:08</td>
+          <td class="col-rows">119.593.820</td>
+          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="02/04: 22.166"><div class="spark-bar" style="height:22px"></div></div><div class="spark-day" data-tip="03/04: 21.629"><div class="spark-bar" style="height:22px"></div></div><div class="spark-day" data-tip="04/04: 18.410"><div class="spark-bar" style="height:18px"></div></div><div class="spark-day" data-tip="05/04: 17.501"><div class="spark-bar" style="height:17px"></div></div><div class="spark-day" data-tip="06/04: 24.320"><div class="spark-bar" style="height:24px"></div></div><div class="spark-day" data-tip="07/04: 25.945"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="08/04: 26.048"><div class="spark-bar" style="height:26px"></div></div></div></td>
           <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
         <tr data-status="status-ok">
@@ -529,9 +529,9 @@
             
           </td>
           <td class="col-col"><code>created_at</code></td>
-          <td class="col-date">08/04/2026 10:50</td>
-          <td class="col-rows">7.453.628</td>
-          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="01/04: 13.030"><div class="spark-bar" style="height:13px"></div></div><div class="spark-day" data-tip="02/04: 15.676"><div class="spark-bar" style="height:15px"></div></div><div class="spark-day" data-tip="03/04: 16.979"><div class="spark-bar" style="height:17px"></div></div><div class="spark-day" data-tip="04/04: 23.767"><div class="spark-bar" style="height:23px"></div></div><div class="spark-day" data-tip="05/04: 21.947"><div class="spark-bar" style="height:22px"></div></div><div class="spark-day" data-tip="06/04: 26.451"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="07/04: 25.367"><div class="spark-bar" style="height:25px"></div></div></div></td>
+          <td class="col-date">09/04/2026 08:50</td>
+          <td class="col-rows">7.478.336</td>
+          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="02/04: 15.676"><div class="spark-bar" style="height:15px"></div></div><div class="spark-day" data-tip="03/04: 16.979"><div class="spark-bar" style="height:16px"></div></div><div class="spark-day" data-tip="04/04: 23.767"><div class="spark-bar" style="height:23px"></div></div><div class="spark-day" data-tip="05/04: 21.947"><div class="spark-bar" style="height:21px"></div></div><div class="spark-day" data-tip="06/04: 26.451"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="07/04: 25.367"><div class="spark-bar" style="height:25px"></div></div><div class="spark-day" data-tip="08/04: 26.919"><div class="spark-bar" style="height:26px"></div></div></div></td>
           <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
         <tr data-status="status-ok">
@@ -541,9 +541,9 @@
             
           </td>
           <td class="col-col"><code>updated_at</code></td>
-          <td class="col-date">07/04/2026 21:50</td>
-          <td class="col-rows">20.678.412</td>
-          <td class="col-spark"><div class="sparkbar" title="⚠️ dia(s) sem dados"><div class="spark-day" data-tip="01/04: 374.681"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="02/04: 11.823"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="03/04: 40.401"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="04/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="05/04: 2"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="06/04: 64.933"><div class="spark-bar" style="height:5px"></div></div><div class="spark-day" data-tip="07/04: 22.170"><div class="spark-bar" style="height:3px"></div></div></div></td>
+          <td class="col-date">09/04/2026 01:40</td>
+          <td class="col-rows">20.684.717</td>
+          <td class="col-spark"><div class="sparkbar" title="⚠️ dia(s) sem dados"><div class="spark-day" data-tip="02/04: 11.823"><div class="spark-bar" style="height:5px"></div></div><div class="spark-day" data-tip="03/04: 40.401"><div class="spark-bar" style="height:16px"></div></div><div class="spark-day" data-tip="04/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="05/04: 2"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="06/04: 64.933"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="07/04: 22.170"><div class="spark-bar" style="height:9px"></div></div><div class="spark-day" data-tip="08/04: 6.390"><div class="spark-bar" style="height:3px"></div></div></div></td>
           <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
         <tr data-status="status-warn">
@@ -553,12 +553,12 @@
             
           </td>
           <td class="col-col"><code>metric_date</code></td>
-          <td class="col-date">06/04/2026</td>
-          <td class="col-rows">159.434.544.835</td>
-          <td class="col-spark"><div class="sparkbar" title="⚠️ dia(s) sem dados"><div class="spark-day" data-tip="01/04: 79.448.635"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="02/04: 79.470.801"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="03/04: 79.492.430"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="04/04: 79.510.840"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="05/04: 79.528.341"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="06/04: 79.552.668"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="07/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div></div></td>
+          <td class="col-date">07/04/2026</td>
+          <td class="col-rows">159.514.123.457</td>
+          <td class="col-spark"><div class="sparkbar" title="⚠️ dia(s) sem dados"><div class="spark-day" data-tip="02/04: 79.470.801"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="03/04: 79.492.430"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="04/04: 79.510.840"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="05/04: 79.528.341"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="06/04: 79.552.668"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="07/04: 79.578.622"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="08/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div></div></td>
           <td class="col-status"><span class="badge status-warn">2d atrás</span></td>
         </tr>
-        <tr data-status="status-warn">
+        <tr data-status="status-error">
           <td class="col-table">
             <span class="table-name">marketing.consumers_campaigns_communications</span>
             <span class="table-desc">Comunicações de campanhas de marketing</span>
@@ -567,8 +567,8 @@
           <td class="col-col"><code>sent_at</code></td>
           <td class="col-date">05/04/2026 23:59</td>
           <td class="col-rows">16.315.251.223</td>
-          <td class="col-spark"><div class="sparkbar" title="⚠️ dia(s) sem dados"><div class="spark-day" data-tip="01/04: 92.096.705"><div class="spark-bar" style="height:20px"></div></div><div class="spark-day" data-tip="02/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="03/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="04/04: 74"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="05/04: 119.087.637"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="06/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="07/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div></div></td>
-          <td class="col-status"><span class="badge status-warn">2d atrás</span></td>
+          <td class="col-spark"><div class="sparkbar" title="⚠️ dia(s) sem dados"><div class="spark-day" data-tip="02/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="03/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="04/04: 74"><div class="spark-bar" style="height:3px"></div></div><div class="spark-day" data-tip="05/04: 119.087.637"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="06/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="07/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div><div class="spark-day" data-tip="08/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div></div></td>
+          <td class="col-status"><span class="badge status-error">3d atrás</span></td>
         </tr>
         <tr data-status="status-ok">
           <td class="col-table">
@@ -577,12 +577,12 @@
             
           </td>
           <td class="col-col"><code>created_at</code></td>
-          <td class="col-date">08/04/2026 02:50</td>
-          <td class="col-rows">50.976.559</td>
-          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="01/04: 139.824"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="02/04: 124.359"><div class="spark-bar" style="height:23px"></div></div><div class="spark-day" data-tip="03/04: 87.576"><div class="spark-bar" style="height:16px"></div></div><div class="spark-day" data-tip="04/04: 113.591"><div class="spark-bar" style="height:21px"></div></div><div class="spark-day" data-tip="05/04: 77.223"><div class="spark-bar" style="height:14px"></div></div><div class="spark-day" data-tip="06/04: 85.994"><div class="spark-bar" style="height:16px"></div></div><div class="spark-day" data-tip="07/04: 77.324"><div class="spark-bar" style="height:14px"></div></div></div></td>
+          <td class="col-date">09/04/2026 02:50</td>
+          <td class="col-rows">51.054.204</td>
+          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="02/04: 124.359"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="03/04: 87.576"><div class="spark-bar" style="height:18px"></div></div><div class="spark-day" data-tip="04/04: 113.591"><div class="spark-bar" style="height:24px"></div></div><div class="spark-day" data-tip="05/04: 77.223"><div class="spark-bar" style="height:16px"></div></div><div class="spark-day" data-tip="06/04: 85.994"><div class="spark-bar" style="height:18px"></div></div><div class="spark-day" data-tip="07/04: 77.324"><div class="spark-bar" style="height:16px"></div></div><div class="spark-day" data-tip="08/04: 77.319"><div class="spark-bar" style="height:16px"></div></div></div></td>
           <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
-        <tr data-status="status-ok">
+        <tr data-status="status-warn">
           <td class="col-table">
             <span class="table-name">picpay.all_transactions</span>
             <span class="table-desc">Transações consolidadas PicPay</span>
@@ -591,8 +591,8 @@
           <td class="col-col"><code>created_at</code></td>
           <td class="col-date">07/04/2026 23:59</td>
           <td class="col-rows">23.757.252.001</td>
-          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="01/04: 26.345.438"><div class="spark-bar" style="height:24px"></div></div><div class="spark-day" data-tip="02/04: 28.343.389"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="03/04: 23.662.849"><div class="spark-bar" style="height:22px"></div></div><div class="spark-day" data-tip="04/04: 25.731.664"><div class="spark-bar" style="height:24px"></div></div><div class="spark-day" data-tip="05/04: 20.570.780"><div class="spark-bar" style="height:19px"></div></div><div class="spark-day" data-tip="06/04: 25.403.180"><div class="spark-bar" style="height:23px"></div></div><div class="spark-day" data-tip="07/04: 27.920.453"><div class="spark-bar" style="height:26px"></div></div></div></td>
-          <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
+          <td class="col-spark"><div class="sparkbar" title="⚠️ dia(s) sem dados"><div class="spark-day" data-tip="02/04: 28.343.389"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="03/04: 23.662.849"><div class="spark-bar" style="height:22px"></div></div><div class="spark-day" data-tip="04/04: 25.731.664"><div class="spark-bar" style="height:24px"></div></div><div class="spark-day" data-tip="05/04: 20.570.780"><div class="spark-bar" style="height:19px"></div></div><div class="spark-day" data-tip="06/04: 25.403.180"><div class="spark-bar" style="height:23px"></div></div><div class="spark-day" data-tip="07/04: 27.920.453"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="08/04: faltando dados"><div class="spark-bar gap" style="height:3px"></div></div></div></td>
+          <td class="col-status"><span class="badge status-warn">1d atrás</span></td>
         </tr>
         <tr data-status="status-ok">
           <td class="col-table">
@@ -601,9 +601,9 @@
             
           </td>
           <td class="col-col"><code>created_at</code></td>
-          <td class="col-date">08/04/2026 00:28</td>
-          <td class="col-rows">37.486.856</td>
-          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="01/04: 122.980"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="02/04: 105.832"><div class="spark-bar" style="height:22px"></div></div><div class="spark-day" data-tip="03/04: 70.594"><div class="spark-bar" style="height:15px"></div></div><div class="spark-day" data-tip="04/04: 89.823"><div class="spark-bar" style="height:19px"></div></div><div class="spark-day" data-tip="05/04: 55.276"><div class="spark-bar" style="height:12px"></div></div><div class="spark-day" data-tip="06/04: 56.782"><div class="spark-bar" style="height:12px"></div></div><div class="spark-day" data-tip="07/04: 50.612"><div class="spark-bar" style="height:11px"></div></div></div></td>
+          <td class="col-date">09/04/2026 00:28</td>
+          <td class="col-rows">37.535.797</td>
+          <td class="col-spark"><div class="sparkbar" title="últimos 7 dias"><div class="spark-day" data-tip="02/04: 105.832"><div class="spark-bar" style="height:26px"></div></div><div class="spark-day" data-tip="03/04: 70.594"><div class="spark-bar" style="height:17px"></div></div><div class="spark-day" data-tip="04/04: 89.823"><div class="spark-bar" style="height:22px"></div></div><div class="spark-day" data-tip="05/04: 55.276"><div class="spark-bar" style="height:14px"></div></div><div class="spark-day" data-tip="06/04: 56.782"><div class="spark-bar" style="height:14px"></div></div><div class="spark-day" data-tip="07/04: 50.612"><div class="spark-bar" style="height:12px"></div></div><div class="spark-day" data-tip="08/04: 48.935"><div class="spark-bar" style="height:12px"></div></div></div></td>
           <td class="col-status"><span class="badge status-ok">Atualizado</span></td>
         </tr>
       </tbody>
