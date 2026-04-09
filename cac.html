@@ -365,9 +365,9 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
   <!-- SETORES -->
   <section id="setores">
     <div class="sec-title">🏢 Conversão por Setor — Março 2026</div>
-    <div class="sec-sub">Campanhas sfpjbene · account_id 1420 = INSS · lista específica = Grupo · flag_company_sector para Público/Privado</div>
+    <div class="sec-sub">Campanhas sfpjbene · INSS não recebe comunicações desta jornada · account_id 1420 = INSS · lista específica = Grupo · flag_company_sector para Público/Privado</div>
 
-    <div class="setor-grid">
+    <div class="setor-grid" style="grid-template-columns:repeat(3,1fr)">
       <div class="setor-card" style="border-color:rgba(45,201,116,.3)">
         <div class="setor-icon">🏗️</div>
         <div class="setor-nome">Grupo</div>
@@ -401,22 +401,11 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
           Ticket médio R$1.024
         </div>
       </div>
-      <div class="setor-card" style="border-color:rgba(139,148,158,.2);opacity:.65">
-        <div class="setor-icon">🏦</div>
-        <div class="setor-nome">INSS</div>
-        <div class="setor-conv" style="color:var(--muted)">0%</div>
-        <div class="setor-detail">
-          322.586 comunicados<br>
-          0 convertidos<br>
-          <strong style="color:var(--red)">Produto não elegível</strong><br>
-          Previdenciário / sem CLT
-        </div>
-      </div>
     </div>
 
     <div style="margin-top:16px" class="card">
       <div class="card-title">Mix de Convertidos por Setor</div>
-      <div class="card-sub">Participação no total de conversões</div>
+      <div class="card-sub">Participação no total de conversões · campanhas sfpjbene</div>
       <div class="bar-chart" style="margin-top:8px">
         <div class="bc-row">
           <div class="bc-lbl">Grupo</div>
@@ -432,11 +421,6 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
           <div class="bc-lbl">Privado</div>
           <div class="bc-bw"><div class="bc-b" style="width:3.5%;background:var(--orange);min-width:20px">1.704</div></div>
           <div class="bc-val" style="color:var(--orange)">3,5%</div>
-        </div>
-        <div class="bc-row">
-          <div class="bc-lbl">INSS</div>
-          <div class="bc-bw"><div class="bc-b" style="min-width:3px;background:var(--muted)"></div></div>
-          <div class="bc-val" style="color:var(--muted)">0%</div>
         </div>
       </div>
     </div>
@@ -675,10 +659,10 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
       </div>
 
       <div class="insight" style="border-color:rgba(139,148,158,.2)">
-        <div class="ins-icon" style="background:rgba(139,148,158,.1)">🏦</div>
+        <div class="ins-icon" style="background:rgba(139,148,158,.1)">👥</div>
         <div>
-          <div class="ins-title">Excluir INSS das campanhas sfpjbene</div>
-          <div class="ins-desc">Se houver INSS no mix sfpjbene, cada envio é custo puro com 0% de conversão. Adicionar filtro <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;font-size:10px">AND account_id != 1420</code> na segmentação de audiência elimina esse desperdício.</div>
+          <div class="ins-title">27k envios sem vínculo identificado</div>
+          <div class="ins-desc">4.575 consumers das campanhas sfpjbene não têm registro ativo em <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;font-size:10px">benefits.collaborators</code>. Podem ser colaboradores desligados recentemente ou com dado desatualizado. Vale validar a segmentação para garantir que apenas colaboradores ativos recebam as comunicações.</div>
         </div>
       </div>
 
@@ -701,7 +685,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
       <strong>Conversão:</strong> <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">request_status = 'FINISH'</code> com <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">created_at</code> entre <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">sent_at</code> e <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">sent_at + 24h</code>.<br>
       <strong>Volume faturável:</strong> Email/Push/InApp/DM = mensagens enviadas · WhatsApp = mensagens entregues (92.996).<br>
       <strong>Custo unitário:</strong> Email/Push/InApp R$0,00044 · DM R$0,006 · WhatsApp R$0,0526.<br>
-      <strong>Setor:</strong> account_id 1420 = INSS · IDs específicos = Grupo · flag_company_sector público/privado · NULL = INSS.<br>
+      <strong>Setor:</strong> IDs específicos = Grupo · flag_company_sector público/privado. INSS não recebe comunicações sfpjbene.<br>
       <strong>Tabelas:</strong> <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">marketing.consumers_campaigns_communications</code> × <code style="background:var(--surf3);padding:1px 5px;border-radius:3px">benefits.anticipation_request</code>.<br>
       <strong>Análise de toques:</strong> Histórico completo Set/2025 → Abr/2026. Contagem de comunicações sfpjbene recebidas antes ou no dia da primeira antecipação da vida do consumer. 49.297 consumers analisados.<br> campo is_delivered retornou 0 para DM — custo calculado por envio. Verificar se canal registra entrega.
     </div>
