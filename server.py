@@ -37,6 +37,7 @@ SCRIPTS = {
     "contas":       CONTAS_SCRIPT,
     "tabelas":      TABELAS_SCRIPT,
     "score":        BASE_DIR / "atualizar_score.py",
+    "cac":          BASE_DIR / "atualizar_cac.py",
 }
 
 def get_python():
@@ -255,6 +256,8 @@ class Handler(BaseHTTPRequestHandler):
             names = ["tabelas"]
         elif self.path == "/atualizar/score":
             names = ["score"]
+        elif self.path == "/atualizar/cac":
+            names = ["cac"]
         else:
             self.send_json(404, {"error": "endpoint invalido"})
             return

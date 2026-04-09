@@ -134,6 +134,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
     <a class="nb" href="https://felipetrezza.github.io/relatorio-benefits/hub.html" style="margin-left:8px">← Hub</a>
   </nav>
   <span class="badge-ref">📅 MAR/2026 · sfpjbene</span>
+  <button id="btn-atualizar" onclick="atualizarCAC()" style="background:rgba(33,163,102,.15);border:1px solid rgba(33,163,102,.35);color:var(--greenl);cursor:pointer;padding:5px 14px;border-radius:6px;font-size:12px;font-weight:600;transition:all .2s">🔄 Atualizar dados</button>
 </header>
 
 <div class="container">
@@ -818,8 +819,58 @@ function setToqueSetor(setor) {
   renderToques(setor);
 }
 
-// Inicializar com total
-document.addEventListener('DOMContentLoaded', () => renderToques('total'));
+// ─── BOTÃO ATUALIZAR ──────────────────────────────────────────────────────
+function atualizarCAC() {
+  const btn = document.getElementById('btn-atualizar');
+  let seg = 0;
+
+  fetch('http://localhost:5001/status', { method: 'GET' })
+    .catch(() => {
+      alert('Servidor local offline.\n\nPara atualizar manualmente:\n  python3 ~/relatorio-benefits/atualizar_cac.py');
+      return null;
+    })
+    .then(r => {
+      if (!r) return;
+      fetch('http://localhost:5001/atualizar/cac', { method: 'POST' })
+        .then(res => {
+          if (res.status === 409) {
+            alert('Servidor ocupado com outra atualização. Tente em alguns instantes.');
+            return;
+          }
+          btn.disabled = true;
+          btn.style.opacity = '0.7';
+          const timer = setInterval(() => {
+            seg += 5;
+            btn.textContent = `⏳ aguardando... ${seg}s`;
+            fetch('http://localhost:5001/status')
+              .then(r2 => r2.json())
+              .then(s => {
+                if (!s.running) {
+                  clearInterval(timer);
+                  if (s.status === 'success') {
+                    btn.textContent = '✅ Atualizado!';
+                    setTimeout(() => location.reload(), 1200);
+                  } else {
+                    btn.textContent = '❌ Erro — tente novamente';
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                  }
+                }
+              });
+          }, 5000);
+        });
+    });
+}
+
+// Ocultar botão se servidor offline ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+  renderToques('total');
+  fetch('http://localhost:5001/status', { method: 'GET' })
+    .catch(() => {
+      const btn = document.getElementById('btn-atualizar');
+      if (btn) btn.style.display = 'none';
+    });
+});
 </script>
 
 <footer>
