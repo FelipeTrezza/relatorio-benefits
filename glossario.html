@@ -468,6 +468,7 @@
       <li><a href="#score">🎯 Score</a></li>
       <li><a href="#tabelas">🗄️ Monitor de Tabelas</a></li>
       <li><a href="#tv">📺 Dashboard TV</a></li>
+      <li><a href="#cac">💰 Estudo de CAC por Canal</a></li>
     </ul>
   </nav>
 
@@ -1063,6 +1064,156 @@ antecipando <span class="kw">AS</span> (
       </div>
 
       <div class="source-note"><strong>Gerado a partir de:</strong> antecipacoes.html (DATA + DATA2) e pix.html (DATA_PIX) — nenhuma query adicional é executada.</div>
+    </div>
+
+  </div><!-- /content -->
+
+    <div class="section-divider"></div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- 7. CAC POR CANAL                                                -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="cac" class="report-section" style="--accent:#e3b341;border-left:4px solid #e3b341">
+      <div class="report-header">
+        <div class="report-icon">💰</div>
+        <div class="report-meta">
+          <div class="report-title">Estudo de CAC por Canal — Benefits MKT</div>
+          <div class="report-url">felipetrezza.github.io/relatorio-benefits/cac.html</div>
+        </div>
+        <a class="report-access" href="https://felipetrezza.github.io/relatorio-benefits/cac.html" target="_blank">Acessar →</a>
+      </div>
+
+      <div class="tags">
+        <span class="tag ty">MKT</span>
+        <span class="tag tg">CAC</span>
+        <span class="tag tb">Canais</span>
+        <span class="tag tp">Conversão</span>
+        <span class="tag tm">Abr/2026</span>
+      </div>
+
+      <p class="report-desc">Análise de Custo de Aquisição por Canal (CAC) para campanhas Benefits MKT. Cruza comunicações enviadas com antecipações realizadas nas <strong>24h seguintes</strong> ao envio, por canal (Push, InApp, DM, WhatsApp, Email) e por setor (Grupo, Público, Privado, INSS). Também inclui análise da jornada de toques até a primeira antecipação.</p>
+
+      <div class="block-label">Filtros e regras de campanha</div>
+      <div class="rules-list">
+        <div class="rule rc-yellow"><strong>Filtro de campanha:</strong>&nbsp;<code>SPLIT(journey_name, '-')[7] = 'sfpjbene'</code> — apenas campanhas Benefits MKT.</div>
+        <div class="rule rc-yellow"><strong>Exclusão de journeys educacionais:</strong>&nbsp;<code>LOWER(journey_name) NOT LIKE '%educacional%'</code> — journeys educacionais são excluídos da análise de CAC pois têm perfil de conversão completamente diferente (ex: Grupo convertia bem nessa categoria, inflando os números).</div>
+        <div class="rule rc-blue"><strong>Janela de conversão:</strong>&nbsp;Antecipação deve ocorrer estritamente <strong>após</strong> o envio e dentro de <strong>24 horas</strong> — <code>ts_antecip &gt; sent_at AND ts_antecip &lt;= sent_at + INTERVAL 24 HOURS</code>.</div>
+        <div class="rule rc-orange"><strong>EMAIL removido da análise principal:</strong>&nbsp;100% das comunicações de email eram journeys educacionais. Após o filtro, a base de email fica vazia — canal não aparece na tabela principal.</div>
+      </div>
+
+      <div class="block-label">Regra de custo por canal</div>
+      <div class="rules-list">
+        <div class="rule rc-green"><strong>Email / Push / InApp:</strong>&nbsp;Custo por <strong>envio</strong> — R$0,00044/envio. Volume faturável = total enviado.</div>
+        <div class="rule rc-green"><strong>DM (Direct Mail):</strong>&nbsp;Custo por <strong>envio</strong> — R$0,006/envio. Volume faturável = total enviado.</div>
+        <div class="rule rc-yellow"><strong>WhatsApp:</strong>&nbsp;Custo por <strong>entrega</strong> (<code>is_delivered = true</code>) — R$0,0526/entrega. Volume faturável = total entregue (≠ enviado). Nota de rodapé explica a diferença no relatório.</div>
+      </div>
+
+      <div class="block-label">Dados Mar/2026 validados (sem educacional)</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">📲</div><div><div class="sec-name">PUSH — Melhor canal ativo</div><div class="sec-desc">189.361 enviados · 12.129 conv · Conv 6,41% · <strong>CAC R$0,007</strong></div></div></div>
+        <div class="sec-item"><div class="sec-ic">📱</div><div><div class="sec-name">INAPP</div><div class="sec-desc">412.453 enviados · 14.529 conv · Conv 3,52% · <strong>CAC R$0,013</strong></div></div></div>
+        <div class="sec-item"><div class="sec-ic">✉️</div><div><div class="sec-name">DM (Direct Mail)</div><div class="sec-desc">424.331 enviados · 1.916 conv · Conv 0,45% · <strong>CAC R$1,33</strong>. Fecha 42,7% das conversões como último toque.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">💬</div><div><div class="sec-name">WhatsApp — único canal com prejuízo</div><div class="sec-desc">92.986 entregues · 1.178 conv · Conv 0,67% · <strong>CAC R$4,15</strong>. ROI -52% (CAC &gt; receita ~R$2,00).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📊</div><div><div class="sec-name">TOTAL</div><div class="sec-desc">1.202.703 vol. faturável · 29.752 conv · Conv 2,47% · <strong>CAC R$0,26</strong></div></div></div>
+      </div>
+
+      <div class="block-label">Conversão por setor (Mar/2026, sem educacional)</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">🏛️</div><div><div class="sec-name">Público — maior conv%</div><div class="sec-desc">49.078 comunicados · 6.296 conv · <strong>12,83%</strong> · TPV R$3,82M · Ticket R$254</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏗️</div><div><div class="sec-name">Grupo</div><div class="sec-desc">108.257 comunicados · 9.872 conv · <strong>9,12%</strong> · TPV R$5,95M · Ticket R$245</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏭</div><div><div class="sec-name">Privado</div><div class="sec-desc">11.257 comunicados · 590 conv · <strong>5,24%</strong> · TPV R$185k · Ticket R$136</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🚫</div><div><div class="sec-name">INSS — sem conversão</div><div class="sec-desc">0% de conversão — produto não aplicável (previdenciário, sem vínculo CLT ativo). Comunicações = custo puro.</div></div></div>
+      </div>
+
+      <div class="block-label">Análise de toques até a primeira antecipação</div>
+      <div class="rules-list">
+        <div class="rule rc-blue"><strong>Base:</strong>&nbsp;Set/2025 → Abr/2026 · ~49.128 consumers · histórico completo de comunicações sfpjbene (sem educacional).</div>
+        <div class="rule rc-blue"><strong>8,96%</strong> convertem na <strong>1ª comunicação</strong>. ~33% convertem com até 5 toques. Mediana: ~12 comunicações para converter.</div>
+        <div class="rule rc-yellow"><strong>37,99% precisam de 21+ toques</strong> — ciclo longo, mediana de 79 dias. Grupo tem o ciclo mais longo (44% precisam de 21+), Privado tem o mais curto (22%).</div>
+        <div class="rule rc-orange"><strong>Canal que "fecha a venda" (último toque antes da conversão):</strong>&nbsp;DM 42,7% · WhatsApp 21,0% · Push 19,2% · InApp 14,7%. DM e WhatsApp fecham a venda — Push e InApp aquecem o lead.</div>
+      </div>
+
+      <div class="block-label">Toques por setor</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">🏭</div><div><div class="sec-name">Privado — ciclo mais curto</div><div class="sec-desc">Conv 1ª comm: 11,36% · Mediana: ~10 toques · 21+: 22%</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏛️</div><div><div class="sec-name">Público</div><div class="sec-desc">Conv 1ª comm: 10,04% · Mediana: ~13 toques · 21+: 37%</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📊</div><div><div class="sec-name">Total</div><div class="sec-desc">Conv 1ª comm: 8,96% · Mediana: ~12 toques · 21+: 38%</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏗️</div><div><div class="sec-name">Grupo — ciclo mais longo</div><div class="sec-desc">Conv 1ª comm: 6,88% · Mediana: ~14 toques · 21+: 44%</div></div></div>
+      </div>
+
+      <div class="block-label">Principais achados e alertas</div>
+      <div class="rules-list">
+        <div class="rule rc-orange"><strong>⚠️ WhatsApp com prejuízo:</strong>&nbsp;Único canal onde CAC (R$4,15) supera a receita gerada (~R$2,00). ROI negativo de -52%. Revisar estratégia ou renegociar contrato.</div>
+        <div class="rule rc-yellow"><strong>💡 DM é canal de aquecimento, não de conversão direta:</strong>&nbsp;CAC alto (R$1,33) mas fecha 42,7% das vendas como último toque. O papel dele é encerrar o funil, não iniciar.</div>
+        <div class="rule rc-green"><strong>✅ PUSH é o melhor canal ativo:</strong>&nbsp;CAC R$0,007, conv 6,41%. Melhor custo-benefício absoluto.</div>
+        <div class="rule rc-blue"><strong>💎 INSS = custo puro:</strong>&nbsp;0% de conversão comprovada. Cada real investido nesse segmento é desperdício direto.</div>
+      </div>
+
+      <div class="source-note"><strong>Tabelas:</strong> marketing.consumers_campaigns_communications · benefits.anticipation_request · benefits.collaborators · benefits.companies · benefits.accounts</div>
+
+      <button class="query-toggle-btn" onclick="toggleQuery('q-cac', this)">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 12.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z"/></svg>
+        Ver Query SQL
+      </button>
+      <div id="q-cac" class="query-panel">
+        <div class="query-panel-header">
+          <span>📄 cac_canal.sql — <em>CAC por canal cruzado com antecipações 24h</em></span>
+          <button class="copy-btn" onclick="copyQuery('q-cac', this)">Copiar</button>
+        </div>
+<pre class="query-code"><span class="kw">WITH</span> colabs <span class="kw">AS</span> (
+    <span class="kw">SELECT DISTINCT</span> col.consumer_id, col.company_id
+    <span class="kw">FROM</span> benefits.collaborators col
+    <span class="kw">WHERE</span> col.resignation_date <span class="kw">IS NULL</span> <span class="kw">AND</span> col.consumer_id <span class="kw">IS NOT NULL</span>
+),
+base_empresa <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> col.consumer_id, comp.account_id, comp.flag_company_sector
+    <span class="kw">FROM</span> colabs col
+    <span class="kw">LEFT JOIN</span> benefits.companies comp <span class="kw">ON</span> col.company_id = comp.company_id
+),
+colabs_enriquecido <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        a.consumer_id,
+        <span class="kw">CASE</span>
+            <span class="kw">WHEN</span> b.account_id = <span class="nm">1420</span>                                                     <span class="kw">THEN</span> <span class="st">'INSS'</span>
+            <span class="kw">WHEN</span> b.account_id <span class="kw">IN</span> (<span class="nm">6,52,57,58,60,62,65,73,100,3170,3675</span>)             <span class="kw">THEN</span> <span class="st">'grupo'</span>
+            <span class="kw">WHEN</span> b.account_id <span class="kw">IS NULL</span>                                                    <span class="kw">THEN</span> <span class="st">'INSS'</span>
+            <span class="kw">ELSE</span> <span class="fn">COALESCE</span>(a.flag_company_sector, <span class="st">'private'</span>)
+        <span class="kw">END AS</span> setor
+    <span class="kw">FROM</span> base_empresa a
+    <span class="kw">LEFT JOIN</span> benefits.accounts b <span class="kw">ON</span> a.account_id = b.account_id
+),
+comms <span class="kw">AS</span> (
+    <span class="kw">SELECT DISTINCT</span> c.consumer_id, c.channel, c.journey_name, c.sent_at
+    <span class="kw">FROM</span> marketing.consumers_campaigns_communications c
+    <span class="kw">INNER JOIN</span> colabs_enriquecido ce <span class="kw">ON</span> c.consumer_id = <span class="fn">CAST</span>(ce.consumer_id <span class="kw">AS STRING</span>)
+    <span class="kw">WHERE</span> <span class="fn">SPLIT</span>(c.journey_name, <span class="st">'-'</span>)[<span class="nm">7</span>] = <span class="st">'sfpjbene'</span>
+      <span class="kw">AND</span> <span class="fn">LOWER</span>(c.journey_name) <span class="kw">NOT LIKE</span> <span class="st">'%educacional%'</span>
+      <span class="kw">AND</span> c.sent_at &gt;= <span class="st">"2026-03-01"</span> <span class="kw">AND</span> c.sent_at &lt; <span class="st">"2026-04-01"</span>
+),
+antecip <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> consumer_id, created_at <span class="kw">AS</span> ts_antecip, request_value
+    <span class="kw">FROM</span> benefits.anticipation_request
+    <span class="kw">WHERE</span> request_status = <span class="st">'FINISH'</span>
+      <span class="kw">AND</span> created_at &gt;= <span class="st">"2026-03-01"</span> <span class="kw">AND</span> created_at &lt; <span class="st">"2026-04-02"</span>
+)
+<span class="kw">SELECT</span>
+    ce.setor,
+    c.channel,
+    <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> c.consumer_id)                                                             <span class="kw">AS</span> comunicados,
+    <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> a.consumer_id)                                                             <span class="kw">AS</span> convertidos_24h,
+    <span class="fn">ROUND</span>(<span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> a.consumer_id)*<span class="nm">100.0</span> / <span class="fn">NULLIF</span>(<span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> c.consumer_id),<span class="nm">0</span>), <span class="nm">2</span>) <span class="kw">AS</span> pct_conversao,
+    <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> a.consumer_id <span class="kw">IS NOT NULL THEN</span> a.request_value <span class="kw">ELSE</span> <span class="nm">0</span> <span class="kw">END</span>), <span class="nm">2</span>)        <span class="kw">AS</span> tpv,
+    <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> a.consumer_id <span class="kw">IS NOT NULL THEN</span> a.request_value <span class="kw">ELSE</span> <span class="nm">0</span> <span class="kw">END</span>)
+          / <span class="fn">NULLIF</span>(<span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> a.consumer_id),<span class="nm">0</span>), <span class="nm">2</span>)                                      <span class="kw">AS</span> ticket_medio
+<span class="kw">FROM</span> comms c
+<span class="kw">INNER JOIN</span> colabs_enriquecido ce <span class="kw">ON</span> c.consumer_id = <span class="fn">CAST</span>(ce.consumer_id <span class="kw">AS STRING</span>)
+<span class="kw">LEFT JOIN</span> antecip a
+    <span class="kw">ON</span> <span class="fn">CAST</span>(c.consumer_id <span class="kw">AS BIGINT</span>) = a.consumer_id
+   <span class="kw">AND</span> a.ts_antecip &gt; c.sent_at
+   <span class="kw">AND</span> a.ts_antecip &lt;= c.sent_at + <span class="kw">INTERVAL</span> <span class="nm">24</span> <span class="kw">HOURS</span>
+<span class="kw">GROUP BY</span> ce.setor, c.channel
+<span class="kw">ORDER BY</span> ce.setor, convertidos_24h <span class="kw">DESC</span></pre>
+      </div>
     </div>
 
   </div><!-- /content -->
