@@ -96,6 +96,13 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
 .ins-title{font-size:13px;font-weight:700;margin-bottom:4px}
 .ins-desc{font-size:12px;color:var(--muted);line-height:1.6}
 
+.tbtn{background:var(--surf2);border:1px solid var(--border);color:var(--muted);cursor:pointer;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;transition:all .2s}
+.tbtn:hover{border-color:var(--green);color:var(--text)}
+.tbtn-active{background:rgba(33,163,102,.15);border-color:rgba(33,163,102,.4);color:var(--greenl)}
+.tbtn{background:var(--surf2);border:1px solid var(--border);color:var(--muted);cursor:pointer;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;transition:all .2s}
+.tbtn:hover{border-color:var(--green);color:var(--text)}
+.tbtn-active{background:rgba(33,163,102,.15);border-color:rgba(33,163,102,.4);color:var(--greenl)}
+
 footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
 
 @media(max-width:900px){
@@ -534,40 +541,48 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
     <div class="sec-title">🔁 Toques até a Primeira Antecipação</div>
     <div class="sec-sub">Histórico completo Set/2025 → Abr/2026 · Apenas consumers que fizeram a <strong>primeira antecipação da vida</strong> · 49.297 consumers analisados</div>
 
-    <!-- KPIs de toque -->
+    <!-- Filtro por setor -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <button onclick="setToqueSetor('total')"  id="tbtn-total"   class="tbtn tbtn-active">📊 Total</button>
+      <button onclick="setToqueSetor('grupo')"  id="tbtn-grupo"   class="tbtn">🏗️ Grupo</button>
+      <button onclick="setToqueSetor('public')" id="tbtn-public"  class="tbtn">🏛️ Público</button>
+      <button onclick="setToqueSetor('private')"id="tbtn-private" class="tbtn">🏭 Privado</button>
+    </div>
+
+    <!-- KPIs dinâmicos -->
     <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--greenl);width:100%"></div>
         <div class="kpi-ic">⚡</div>
         <div class="kpi-lbl">Converteram na 1ª comm</div>
-        <div class="kpi-val" style="color:var(--greenl)">8,96%</div>
-        <div class="kpi-sub">4.415 consumers · sem retoque</div>
+        <div class="kpi-val" style="color:var(--greenl)" id="tk-pct1">8,96%</div>
+        <div class="kpi-sub" id="tk-abs1">4.415 consumers</div>
       </div>
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--blue);width:100%"></div>
         <div class="kpi-ic">📬</div>
         <div class="kpi-lbl">Converteram em até 5</div>
-        <div class="kpi-val" style="color:var(--blue)">33,06%</div>
-        <div class="kpi-sub">16.300 consumers acumulado</div>
+        <div class="kpi-val" style="color:var(--blue)" id="tk-pct5">33,06%</div>
+        <div class="kpi-sub" id="tk-abs5">16.300 consumers acumulado</div>
       </div>
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--purple);width:100%"></div>
         <div class="kpi-ic">📊</div>
         <div class="kpi-lbl">Mediana de toques</div>
-        <div class="kpi-val" style="color:var(--purple)">~12</div>
-        <div class="kpi-sub">50% converteu com até 12 comms</div>
+        <div class="kpi-val" style="color:var(--purple)" id="tk-mediana">~12</div>
+        <div class="kpi-sub" id="tk-mediana-sub">50% converteu com até 12</div>
       </div>
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--orange);width:100%"></div>
         <div class="kpi-ic">🔁</div>
         <div class="kpi-lbl">Precisaram de 21+</div>
-        <div class="kpi-val" style="color:var(--orange)">38,2%</div>
-        <div class="kpi-sub">18.834 consumers — longo ciclo</div>
+        <div class="kpi-val" style="color:var(--orange)" id="tk-pct21">38,2%</div>
+        <div class="kpi-sub" id="tk-abs21">18.834 consumers — longo ciclo</div>
       </div>
     </div>
 
     <div class="g2">
-      <!-- Tabela de faixas -->
+      <!-- Tabela dinâmica -->
       <div>
         <div class="tbl-wrap">
           <table>
@@ -580,94 +595,19 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
                 <th class="r">Mediana dias</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><span style="background:rgba(45,201,116,.15);color:var(--greenl);padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">1ª comunicação</span></td>
-                <td class="r">4.415</td><td class="r" style="color:var(--greenl)">8,96%</td><td class="r">1,0</td><td class="r">1 dia</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td class="r">3.510</td><td class="r">7,12%</td><td class="r">1,6</td><td class="r">3 dias</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td class="r">3.499</td><td class="r">7,10%</td><td class="r">2,2</td><td class="r">5 dias</td>
-              </tr>
-              <tr>
-                <td>4 – 5</td>
-                <td class="r">4.876</td><td class="r">9,89%</td><td class="r">2,8</td><td class="r">7 dias</td>
-              </tr>
-              <tr>
-                <td>6 – 10</td>
-                <td class="r">6.752</td><td class="r">13,70%</td><td class="r">3,5</td><td class="r">11 dias</td>
-              </tr>
-              <tr>
-                <td>11 – 20</td>
-                <td class="r">7.411</td><td class="r">15,03%</td><td class="r">4,1</td><td class="r">26 dias</td>
-              </tr>
-              <tr style="background:rgba(240,136,62,.05)">
-                <td><span style="color:var(--orange);font-weight:700">21+</span></td>
-                <td class="r">18.834</td><td class="r" style="color:var(--orange)">38,21%</td><td class="r">4,9</td><td class="r">79 dias</td>
-              </tr>
-              <tr style="font-weight:700;background:rgba(33,163,102,.04)">
-                <td>TOTAL</td>
-                <td class="r">49.297</td><td class="r">100%</td><td class="r">—</td><td class="r">—</td>
-              </tr>
-            </tbody>
+            <tbody id="toques-tbody"></tbody>
           </table>
         </div>
         <div style="margin-top:10px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue)">
-          💡 Quanto mais canais distintos o consumer recebe, maior o ciclo — quem usa 1 canal mediana de 1 dia, quem usa 5 canais mediana de 79 dias.
+          💡 Quanto mais canais distintos o consumer recebe, maior o ciclo — quem usa 1 canal converte em 1 dia, quem usa 5 canais mediana de 79 dias.
         </div>
       </div>
 
-      <!-- Curva acumulada visual -->
+      <!-- Curva acumulada dinâmica -->
       <div class="card">
         <div class="card-title">Curva Acumulada de Conversão</div>
         <div class="card-sub">% de consumers que converteram com até N comunicações</div>
-        <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px">
-          <!-- barras de 1 a 20, proporcionais ao pct_acum -->
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">1</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:8.96%;height:100%;background:var(--greenl);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">8,96%</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">2</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:16.08%;height:100%;background:var(--greenl);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">16,1%</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">3</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:23.17%;height:100%;background:var(--greenl);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">23,2%</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">5</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:33.06%;height:100%;background:var(--blue);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">33,1%</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">7</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:39.77%;height:100%;background:var(--blue);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">39,8%</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">10</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:46.76%;height:100%;background:var(--blue);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">46,8%</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">12</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:50.79%;height:100%;background:var(--purple);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">50,8% ← metade</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">15</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:55.63%;height:100%;background:var(--purple);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">55,6%</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">20</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:61.79%;height:100%;background:var(--orange);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">61,8%</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">21+</div>
-            <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px"><div style="width:100%;height:100%;background:var(--orange);border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white">100% (38,2% restante precisou de 21+)</div></div>
-          </div>
-        </div>
+        <div id="curva-wrap" style="display:flex;flex-direction:column;gap:5px;margin-top:4px"></div>
         <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap;font-size:10px;color:var(--muted)">
           <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--greenl);display:inline-block"></span>Rápidos (1–3)</span>
           <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue);display:inline-block"></span>Médio (4–10)</span>
@@ -793,6 +733,135 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
   </div>
 
 </div>
+
+<script>
+// ─── DADOS POR SETOR ───────────────────────────────────────────────────────
+const TOQUES = {
+  total: [
+    { faixa:'1ª comunicação', consumers:4415,  pct:8.96,  canais:1.0, dias:1  },
+    { faixa:'2',              consumers:3510,  pct:7.12,  canais:1.6, dias:3  },
+    { faixa:'3',              consumers:3499,  pct:7.10,  canais:2.2, dias:5  },
+    { faixa:'4 – 5',          consumers:4876,  pct:9.89,  canais:2.8, dias:7  },
+    { faixa:'6 – 10',         consumers:6752,  pct:13.70, canais:3.5, dias:11 },
+    { faixa:'11 – 20',        consumers:7411,  pct:15.03, canais:4.1, dias:26 },
+    { faixa:'21+',            consumers:18834, pct:38.21, canais:4.9, dias:79 },
+  ],
+  grupo: [
+    { faixa:'1ª comunicação', consumers:1392, pct:6.96,  canais:1.0, dias:1   },
+    { faixa:'2',              consumers:1059, pct:5.29,  canais:1.7, dias:2   },
+    { faixa:'3',              consumers:1314, pct:6.57,  canais:2.2, dias:5   },
+    { faixa:'4 – 5',          consumers:1769, pct:8.84,  canais:2.7, dias:6   },
+    { faixa:'6 – 10',         consumers:2505, pct:12.52, canais:3.4, dias:12  },
+    { faixa:'11 – 20',        consumers:3054, pct:15.27, canais:4.2, dias:35  },
+    { faixa:'21+',            consumers:8910, pct:44.54, canais:5.0, dias:100 },
+  ],
+  public: [
+    { faixa:'1ª comunicação', consumers:2254, pct:9.88,  canais:1.0, dias:1  },
+    { faixa:'2',              consumers:1864, pct:8.17,  canais:1.6, dias:5  },
+    { faixa:'3',              consumers:1545, pct:6.77,  canais:2.1, dias:7  },
+    { faixa:'4 – 5',          consumers:2087, pct:9.15,  canais:2.8, dias:9  },
+    { faixa:'6 – 10',         consumers:3209, pct:14.07, canais:3.6, dias:12 },
+    { faixa:'11 – 20',        consumers:3333, pct:14.61, canais:4.1, dias:21 },
+    { faixa:'21+',            consumers:8522, pct:37.35, canais:4.8, dias:73 },
+  ],
+  private: [
+    { faixa:'1ª comunicação', consumers:771,  pct:11.66, canais:1.0, dias:0  },
+    { faixa:'2',              consumers:602,  pct:9.11,  canais:1.7, dias:2  },
+    { faixa:'3',              consumers:652,  pct:9.86,  canais:2.4, dias:3  },
+    { faixa:'4 – 5',          consumers:1023, pct:15.48, canais:3.0, dias:4  },
+    { faixa:'6 – 10',         consumers:1053, pct:15.93, canais:3.5, dias:8  },
+    { faixa:'11 – 20',        consumers:1048, pct:15.85, canais:4.1, dias:24 },
+    { faixa:'21+',            consumers:1461, pct:22.10, canais:4.7, dias:68 },
+  ],
+};
+
+// Pontos fixos da curva acumulada por setor
+const CURVA = {
+  total:   [{n:1,p:8.96},{n:2,p:16.08},{n:3,p:23.17},{n:5,p:33.06},{n:7,p:39.77},{n:10,p:46.76},{n:12,p:50.79},{n:15,p:55.63},{n:20,p:61.79},{n:'21+',p:100}],
+  grupo:   [{n:1,p:6.96},{n:2,p:12.25},{n:3,p:18.82},{n:5,p:27.66},{n:7,p:33.61},{n:10,p:40.14},{n:12,p:43.70},{n:15,p:48.26},{n:20,p:55.46},{n:'21+',p:100}],
+  public:  [{n:1,p:9.88},{n:2,p:18.05},{n:3,p:24.82},{n:5,p:34.97},{n:7,p:41.26},{n:10,p:47.97},{n:12,p:51.53},{n:15,p:55.90},{n:20,p:62.65},{n:'21+',p:100}],
+  private: [{n:1,p:11.66},{n:2,p:20.77},{n:3,p:30.63},{n:5,p:46.11},{n:7,p:53.49},{n:10,p:59.42},{n:12,p:62.49},{n:15,p:66.21},{n:20,p:72.07},{n:'21+',p:100}],
+};
+
+const CORES_CURVA = {1:'var(--greenl)',2:'var(--greenl)',3:'var(--greenl)',5:'var(--blue)',7:'var(--blue)',10:'var(--blue)',12:'var(--purple)',15:'var(--purple)',20:'var(--orange)'};
+
+function fmt(n){ return n.toLocaleString('pt-BR'); }
+
+function renderToques(setor) {
+  const dados = TOQUES[setor];
+  const total = dados.reduce((s,r) => s + r.consumers, 0);
+
+  // KPIs
+  const r1   = dados[0];
+  const r5   = dados.slice(0,4).reduce((s,r)=>s+r.consumers,0); // faixas 1,2,3,4-5
+  const r21  = dados[dados.length-1];
+  // mediana: faixa onde acumulado passa de 50%
+  let acum = 0, mediana = '—';
+  const MEDIANAS = {total:'~12', grupo:'~14', public:'~13', private:'~10'};
+  mediana = MEDIANAS[setor];
+
+  document.getElementById('tk-pct1').textContent   = r1.pct.toFixed(2).replace('.',',') + '%';
+  document.getElementById('tk-abs1').textContent   = fmt(r1.consumers) + ' consumers';
+  document.getElementById('tk-pct5').textContent   = (dados.slice(0,4).reduce((s,r)=>s+r.pct,0)).toFixed(2).replace('.',',') + '%';
+  document.getElementById('tk-abs5').textContent   = fmt(r5) + ' consumers acumulado';
+  document.getElementById('tk-mediana').textContent = mediana;
+  document.getElementById('tk-mediana-sub').textContent = '50% converteu com até ' + mediana.replace('~','') + ' comms';
+  document.getElementById('tk-pct21').textContent  = r21.pct.toFixed(2).replace('.',',') + '%';
+  document.getElementById('tk-abs21').textContent  = fmt(r21.consumers) + ' consumers — longo ciclo';
+
+  // Tabela
+  const tbody = document.getElementById('toques-tbody');
+  tbody.innerHTML = dados.map((r,i) => {
+    const is21  = r.faixa === '21+';
+    const is1   = i === 0;
+    const rowStyle = is21 ? 'background:rgba(240,136,62,.05)' : (i === dados.length ? 'font-weight:700;background:rgba(33,163,102,.04)' : '');
+    const faixaHtml = is1
+      ? `<span style="background:rgba(45,201,116,.15);color:var(--greenl);padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">1ª comunicação</span>`
+      : is21
+        ? `<span style="color:var(--orange);font-weight:700">21+</span>`
+        : r.faixa;
+    const pctColor = is1 ? 'style="color:var(--greenl)"' : is21 ? 'style="color:var(--orange)"' : '';
+    return `<tr style="${rowStyle}">
+      <td>${faixaHtml}</td>
+      <td class="r">${fmt(r.consumers)}</td>
+      <td class="r" ${pctColor}>${r.pct.toFixed(2).replace('.',',')}%</td>
+      <td class="r">${r.canais.toFixed(1)}</td>
+      <td class="r">${r.dias === 0 ? '< 1 dia' : r.dias + (r.dias === 1 ? ' dia' : ' dias')}</td>
+    </tr>`;
+  }).join('') + `<tr style="font-weight:700;background:rgba(33,163,102,.04)">
+    <td>TOTAL</td>
+    <td class="r">${fmt(total)}</td>
+    <td class="r">100%</td>
+    <td class="r">—</td>
+    <td class="r">—</td>
+  </tr>`;
+
+  // Curva acumulada
+  const curva = CURVA[setor];
+  const wrap  = document.getElementById('curva-wrap');
+  wrap.innerHTML = curva.map(({n, p}) => {
+    const cor   = typeof n === 'number' ? (CORES_CURVA[n] || 'var(--orange)') : 'var(--orange)';
+    const label = p === 100
+      ? `100% (${r21.pct.toFixed(1)}% precisou de 21+)`
+      : `${p.toFixed(1).replace('.',',')}%${p > 49 && p < 52 ? ' ← metade' : ''}`;
+    return `<div style="display:flex;align-items:center;gap:8px">
+      <div style="width:28px;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0">${n}</div>
+      <div style="flex:1;background:var(--surf2);border-radius:3px;height:16px">
+        <div style="width:${p}%;height:100%;background:${cor};border-radius:3px;display:flex;align-items:center;padding-left:4px;font-size:9px;font-weight:700;color:white;min-width:4px">${label}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setToqueSetor(setor) {
+  document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('tbtn-active'));
+  document.getElementById('tbtn-' + setor).classList.add('tbtn-active');
+  renderToques(setor);
+}
+
+// Inicializar com total
+document.addEventListener('DOMContentLoaded', () => renderToques('total'));
+</script>
 
 <footer>
   Mantido por <span style="color:var(--greenl)">Benefits Analytics</span> · Dados via Databricks · Referência Mar/2026 🐺
