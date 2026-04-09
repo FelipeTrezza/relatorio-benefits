@@ -349,21 +349,21 @@ function atualizarScore(){
   <div class="kpi" title="Vidas com conta PicPay ativa (sent_bacen_at not null)">
     <div class="kpi-ic">💳</div>
     <div class="kpi-lbl">Com Conta PicPay</div>
-    <div class="kpi-val" id="kpi-conta">915.5k</div>
+    <div class="kpi-val" id="kpi-conta">915.7k</div>
     <div class="kpi-sub" id="kpi-conta-sub">52% das vidas</div>
     <div class="kpi-bar" id="kpi-conta-bar" style="width:52%;background:var(--purple)"></div>
   </div>
   <div class="kpi" title="Com conta E margem habilitada no mês vigente">
     <div class="kpi-ic">📐</div>
     <div class="kpi-lbl">Com Margem Ativa</div>
-    <div class="kpi-val" id="kpi-margem">850.5k</div>
+    <div class="kpi-val" id="kpi-margem">850.4k</div>
     <div class="kpi-sub" id="kpi-margem-sub">93% dos com conta</div>
     <div class="kpi-bar" id="kpi-margem-bar" style="width:93%;background:var(--green)"></div>
   </div>
   <div class="kpi" title="Usuários ativos no app nos últimos 30 dias (MAU)">
     <div class="kpi-ic">📱</div>
     <div class="kpi-lbl">MAU 30 dias</div>
-    <div class="kpi-val" id="kpi-mau">685.2k</div>
+    <div class="kpi-val" id="kpi-mau">685.3k</div>
     <div class="kpi-sub" id="kpi-mau-sub">75% dos com conta</div>
     <div class="kpi-bar" id="kpi-mau-bar" style="width:62%;background:var(--yellow)"></div>
   </div>
@@ -377,7 +377,7 @@ function atualizarScore(){
   <div class="kpi" title="Antecipações FINISH no mês vigente">
     <div class="kpi-ic">⚡</div>
     <div class="kpi-lbl" id="kpi-ant-lbl">Antecipando Abr/26</div>
-    <div class="kpi-val" id="kpi-ant">48.4k</div>
+    <div class="kpi-val" id="kpi-ant">52.8k</div>
     <div class="kpi-sub" id="kpi-ant-sub">8% MAU c/ margem</div>
     <div class="kpi-bar" id="kpi-ant-bar" style="width:14%;background:var(--greenl)"></div>
   </div>
@@ -391,7 +391,7 @@ function atualizarScore(){
   <div class="kpi" title="MAU ativo mas sem margem habilitada — upsell in-app">
     <div class="kpi-ic">🔔</div>
     <div class="kpi-lbl">MAU Sem Margem</div>
-    <div class="kpi-val" id="kpi-mausemmargem">45.4k</div>
+    <div class="kpi-val" id="kpi-mausemmargem">45.5k</div>
     <div class="kpi-sub" id="kpi-mausemmargem-sub">MAU sem acesso</div>
     <div class="kpi-bar" id="kpi-mausemmargem-bar" style="width:7%;background:var(--pink)"></div>
   </div>
@@ -1279,39 +1279,39 @@ window.addEventListener('resize',function(){if(Object.keys(FMKT_RESULTS).length)
 var SETOR_DATA = {
   total: {
     label:'Total', icon:'📊', cor:'var(--green)',
-    vidas:'1.75M', conta:'915.5k', semConta:'832.8k', pctConta:'52%',
-    comMargem:'850.5k', semMargem:'61.9k',
-    mau:'685.2k', mauComMargem:'639.7k', mauSemMargem:'45.4k',
-    antecipando:'48.4k',
+    vidas:'1.75M', conta:'915.7k', semConta:'832.8k', pctConta:'52%',
+    comMargem:'850.4k', semMargem:'61.9k',
+    mau:'685.3k', mauComMargem:'639.7k', mauSemMargem:'45.5k',
+    antecipando:'52.8k',
     atv:52, cmg:93,
     mauPct:75, ant:8
   },
   publico: {
     label:'Público', icon:'🏛️', cor:'var(--blue)',
-    vidas:'1.14M', conta:'342.3k', semConta:'797.9k', pctConta:'30%',
-    comMargem:'340.4k', semMargem:'1.9k',
-    mau:'170.1k', mauComMargem:'169.1k', mauSemMargem:'962',
-    antecipando:'12.8k',
+    vidas:'1.14M', conta:'342.4k', semConta:'797.8k', pctConta:'30%',
+    comMargem:'340.6k', semMargem:'1.9k',
+    mau:'170.2k', mauComMargem:'169.2k', mauSemMargem:'912',
+    antecipando:'14.1k',
     atv:30, cmg:99,
     mauPct:50, ant:8
   },
   grupo: {
     label:'Grupo', icon:'🏗️', cor:'var(--purple)',
-    vidas:'193.3k', conta:'186.1k', semConta:'7.2k', pctConta:'96%',
-    comMargem:'161.1k', semMargem:'25.0k',
-    mau:'180.6k', mauComMargem:'160.2k', mauSemMargem:'20.4k',
-    antecipando:'34.8k',
+    vidas:'193.4k', conta:'185.8k', semConta:'7.6k', pctConta:'96%',
+    comMargem:'160.8k', semMargem:'25.0k',
+    mau:'180.3k', mauComMargem:'159.9k', mauSemMargem:'20.5k',
+    antecipando:'37.8k',
     atv:96, cmg:87,
-    mauPct:97, ant:22
+    mauPct:97, ant:24
   },
   privado: {
     label:'Privado', icon:'🏭', cor:'var(--orange)',
     vidas:'65.0k', conta:'54.4k', semConta:'10.6k', pctConta:'84%',
-    comMargem:'21.2k', semMargem:'33.2k',
-    mau:'37.8k', mauComMargem:'13.9k', mauSemMargem:'23.8k',
-    antecipando:'812',
+    comMargem:'21.2k', semMargem:'33.3k',
+    mau:'37.8k', mauComMargem:'13.9k', mauSemMargem:'23.9k',
+    antecipando:'896',
     atv:84, cmg:39,
-    mauPct:69, ant:6
+    mauPct:70, ant:6
   }
 };
 
@@ -2839,7 +2839,7 @@ function setDST(s){
 </footer>
 
 <script>
-const DATA = {"funil": {"vidas": 1748297, "contas": 915463, "com_margem": 850541, "sem_margem": 61904, "sem_conta": 832834, "mau": 568812, "mau_margem": 529550, "antecipando": 48366}, "setores": {"public": {"nome": "Público", "cor": "#58a6ff", "vidas": 1140181, "contas": 342317, "com_margem": 340379, "sem_margem": 1938, "sem_conta": 797864, "mau": 170073, "mau_margem": 169111, "antecipando": 12771}, "grupo": {"nome": "Grupo", "cor": "#bc8cff", "vidas": 193270, "contas": 186069, "com_margem": 161129, "sem_margem": 24964, "sem_conta": 7201, "mau": 180550, "mau_margem": 160186, "antecipando": 34783}, "private": {"nome": "Privado", "cor": "#f0883e", "vidas": 64989, "contas": 54389, "com_margem": 21167, "sem_margem": 33223, "sem_conta": 10600, "mau": 37758, "mau_margem": 13910, "antecipando": 812}}, "historico": {"meses": ["2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"], "antecipacoes": [914780, 643105, 297542, 283756, 301715, 362676, 379431, 426177, 408313, 427362, 418432, 311532, 148001], "consumers": [311292, 189695, 70441, 72496, 75637, 85638, 87693, 95200, 89920, 94568, 93789, 81399, 48366], "tpv": [155.1, 71.7, 53.8, 48.5, 61.3, 73.2, 75.0, 83.6, 76.9, 80.5, 77.9, 47.6, 17.4], "ticket": [170, 112, 181, 171, 203, 202, 198, 196, 188, 188, 186, 153, 118]}, "freq_dist": [["1x (só uma vez)", 116259, 1.0], ["2-3x", 83864, 2.4], ["4-6x", 70353, 5.0], ["7-12x", 63826, 8.4], ["13x+", 89670, 41.9]], "recencia": [["0-30d", 79261, 223.6, 259.85], ["31-60d", 35010, 325.4, 342.41], ["61-90d", 11955, 148.7, 352.12], ["91-180d", 19661, 101.4, 360.38], ["181-365d", 278085, 30.5, 234.22]], "dist_valor": [["Até R$200", 3725892, 297272, 75.84], ["R$200-500", 839912, 283376, 323.02], ["R$500-1k", 269296, 83134, 685.01], ["R$1k-2k", 123145, 37660, 1056.86], ["R$2k-5k", 5111, 2039, 2561.55], ["R$5k+", 13, 6, 7260.19]], "cashin": {"meses": ["2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"], "series": {"WALLETS": [121.51, 153.06, 68.54, 51.53, 46.37, 58.92, 70.79, 72.68, 81.26, 74.56, 76.89, 73.52, 43.74, 15.81], "PIX": [0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.39, 1.75, 2.5, 2.54, 1.12], "BENEFITS": [2.09, 1.97, 2.09, 2.24, 2.15, 2.41, 2.37, 2.33, 2.29, 1.95, 1.85, 1.85, 1.3, 0.48], "INSS_CARD": [0.0, 0.12, 1.09, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}}};
+const DATA = {"funil": {"vidas": 1748460, "contas": 915694, "com_margem": 850435, "sem_margem": 61904, "sem_conta": 832766, "mau": 568600, "mau_margem": 529261, "antecipando": 52793}, "setores": {"public": {"nome": "Público", "cor": "#58a6ff", "vidas": 1140229, "contas": 342421, "com_margem": 340569, "sem_margem": 1852, "sem_conta": 797808, "mau": 170153, "mau_margem": 169241, "antecipando": 14104}, "grupo": {"nome": "Grupo", "cor": "#bc8cff", "vidas": 193360, "contas": 185782, "com_margem": 160816, "sem_margem": 25004, "sem_conta": 7578, "mau": 180322, "mau_margem": 159881, "antecipando": 37793}, "private": {"nome": "Privado", "cor": "#f0883e", "vidas": 65014, "contas": 54417, "com_margem": 21159, "sem_margem": 33259, "sem_conta": 10597, "mau": 37843, "mau_margem": 13925, "antecipando": 896}}, "historico": {"meses": ["2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"], "antecipacoes": [914780, 643105, 297542, 283756, 301715, 362676, 379431, 426177, 408313, 427362, 418432, 311532, 179845], "consumers": [311292, 189695, 70441, 72496, 75637, 85638, 87693, 95200, 89920, 94568, 93789, 81399, 52793], "tpv": [155.1, 71.7, 53.8, 48.5, 61.3, 73.2, 75.0, 83.6, 76.9, 80.5, 77.9, 47.6, 22.3], "ticket": [170, 112, 181, 171, 203, 202, 198, 196, 188, 188, 186, 153, 124]}, "freq_dist": [["1x (só uma vez)", 122050, 1.0], ["2-3x", 83804, 2.4], ["4-6x", 73791, 5.0], ["7-12x", 53686, 8.3], ["13x+", 89852, 42.0]], "recencia": [["0-30d", 79198, 225.5, 258.29], ["31-60d", 35469, 322.3, 345.12], ["61-90d", 11842, 147.2, 352.59], ["91-180d", 18469, 98.3, 366.66], ["181-365d", 278205, 28.9, 231.18]], "dist_valor": [["Até R$200", 3677549, 297226, 76.02], ["R$200-500", 832211, 274630, 322.66], ["R$500-1k", 269204, 83117, 684.64], ["R$1k-2k", 123164, 37668, 1057.04], ["R$2k-5k", 5118, 2041, 2561.41], ["R$5k+", 13, 6, 7260.19]], "cashin": {"meses": ["2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"], "series": {"WALLETS": [121.51, 153.06, 68.54, 51.53, 46.37, 58.92, 70.79, 72.68, 81.26, 74.56, 76.89, 73.52, 43.74, 20.33], "PIX": [0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.39, 1.75, 2.5, 2.54, 1.38], "BENEFITS": [2.09, 1.97, 2.09, 2.24, 2.15, 2.41, 2.37, 2.33, 2.29, 1.95, 1.85, 1.85, 1.3, 0.58], "INSS_CARD": [0.0, 0.12, 1.09, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}}};
 
 window.addEventListener('scroll',()=>{
   document.getElementById('stb').classList.toggle('vis', window.scrollY>400);
