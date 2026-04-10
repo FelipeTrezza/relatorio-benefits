@@ -20,7 +20,8 @@ SCRIPT_DIR         = Path(__file__).parent
 SCORE_PATH         = Path.home() / "score-antecipacoes" / "index.html"
 
 MES_ATUAL = date.today().strftime("%Y-%m")
-MES_LABEL = date.today().strftime("%b/%y").capitalize()
+_MESES_PT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
+MES_LABEL = f"{_MESES_PT[date.today().month - 1]}/{date.today().strftime('%y')}"
 
 print(f"[{datetime.now().strftime('%H:%M:%S')}] Iniciando atualização Score — {MES_ATUAL}")
 
@@ -520,6 +521,85 @@ html = re_mod.sub(r'📱 [\d,\.]+k MAU 30d',
                   f'📱 {fmt_k(mau_30).replace(".",",")} MAU 30d', html)
 html = re_mod.sub(r'💳 [\d,\.]+k com conta \(\d+%\)',
                   f'💳 {fmt_k(com_conta).replace(".",",")} com conta ({pct_conta}%)', html)
+
+# ── Atualizar funil visual (fn2-val, fn2-drop, sec-sub) ────────────────
+# Valores derivados para os drops entre etapas
+sem_conta_funil   = total_v - com_conta          # vidas sem conta
+sem_margem_funil  = sem_margem                   # com conta mas sem margem
+mau_sem_margem_f  = com_margem - mau_geral_m     # com margem mas não MAU
+nao_anteciparam   = mau_geral_m - antecipando    # MAU+margem que não anteciparam
+pct_ant_mau       = round(antecipando / mau_geral_m * 100) if mau_geral_m else 0
+
+def fk(n):  # formata como "528,7k" ou "1,35M"
+    return fmt_k(n).replace(".", ",")
+
+# sec-sub do funil: "Do total de X vidas elegíveis até as Yk que anteciparam em Mês/AA."
+html = re_mod.sub(
+    r'Do total de [\d,\.]+[kM] vidas elegíveis até as [\d,\.]+[kM] que anteciparam em \w+/\d+\.',
+    f'Do total de {fk(total_v)} vidas elegíveis até as {fk(antecipando)} que anteciparam em {mes_str}.',
+    html
+)
+
+# fn2-val: Total Vidas Elegíveis
+html = re_mod.sub(
+    r'(<span class="fn2-val">)[\d,\.]+[kM](</span>\s*<span class="fn2-pct">100%)',
+    r'\g<1>' + fk(total_v) + r'\2',
+    html
+)
+# fn2-drop: sem conta PicPay
+html = re_mod.sub(
+    r'▼ [\d,\.]+[kM] sem conta PicPay',
+    f'▼ {fk(sem_conta_funil)} sem conta PicPay',
+    html
+)
+# fn2-val: Com Conta PicPay
+html = re_mod.sub(
+    r'(<span class="fn2-val">)[\d,\.]+[kM](</span>\s*<span class="fn2-pct">\d+% do total)',
+    r'\g<1>' + fk(com_conta) + r'\2',
+    html
+)
+# fn2-drop: com conta mas sem margem
+html = re_mod.sub(
+    r'▼ [\d,\.]+[kM] com conta mas sem margem habilitada',
+    f'▼ {fk(sem_margem_funil)} com conta mas sem margem habilitada',
+    html
+)
+# fn2-val: Conta + Margem Ativa
+html = re_mod.sub(
+    r'(<span class="fn2-val">)[\d,\.]+[kM](</span>\s*<span class="fn2-pct">\d+% dos c/ conta)',
+    r'\g<1>' + fk(com_margem) + r'\2',
+    html
+)
+# fn2-drop: têm margem mas não são MAU
+html = re_mod.sub(
+    r'▼ [\d,\.]+[kM] têm margem mas não são MAU no app',
+    f'▼ {fk(mau_sem_margem_f)} têm margem mas não são MAU no app',
+    html
+)
+# fn2-val: MAU 30d + Margem
+html = re_mod.sub(
+    r'(<span class="fn2-val">)[\d,\.]+[kM](</span>\s*<span class="fn2-pct">\d+% dos c/ margem)',
+    r'\g<1>' + fk(mau_geral_m) + r'\2',
+    html
+)
+# fn2-drop: MAU + margem que não anteciparam
+html = re_mod.sub(
+    r'▼ [\d,\.]+[kM] MAU \+ margem que',
+    f'▼ {fk(nao_anteciparam)} MAU + margem que',
+    html
+)
+# fn2-val: Antecipando (último step — tem style inline)
+html = re_mod.sub(
+    r'(<span class="fn2-val"[^>]*>)[\d,\.]+[kM](</span>\s*<span class="fn2-pct">\d+% MAU c/ margem)',
+    r'\g<1>' + fk(antecipando) + r'\2',
+    html
+)
+# fn2-pct: % MAU c/ margem (último step)
+html = re_mod.sub(
+    r'(\d+)% MAU c/ margem(</span>)',
+    f'{pct_ant_mau}% MAU c/ margem\\2',
+    html
+)
 
 # Atualizar tag de atualização (timestamp)
 ts = datetime.now().strftime("%d/%m/%Y %H:%M")
