@@ -131,6 +131,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
     <a class="nb" href="#setores">Setores</a>
     <a class="nb" href="#toques">Toques</a>
     <a class="nb" href="#recorrencia">Recorrência</a>
+    <a class="nb" href="#horario">Horário</a>
     <a class="nb" href="#insights">Insights</a>
     <a class="nb" href="https://felipetrezza.github.io/relatorio-benefits/hub.html" style="margin-left:8px">← Hub</a>
   </nav>
@@ -653,6 +654,27 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
 
   <div class="divider"></div>
 
+  <!-- HORÁRIO -->
+  <section id="horario">
+    <div class="sec-title">⏰ Antecipações por Horário</div>
+    <div class="sec-sub">Distribuição de antecipações ao longo do dia · Set/2025–Abr/2026 · selecione os meses para comparar</div>
+    <div class="card">
+      <div class="card-title">Antecipações por hora — comparativo mensal</div>
+      <div class="card-sub">Cada linha = um mês · clique para ativar/desativar</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px" id="hor-tabs"></div>
+      <div style="position:relative;height:260px">
+        <svg id="hor-svg" width="100%" height="100%" viewBox="0 0 1100 260" preserveAspectRatio="none"></svg>
+      </div>
+      <div style="margin-top:14px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue);line-height:1.7">
+        💡 <strong>00h é o maior pico</strong> em todos os meses — processamento automático de crédito consignado.
+        <strong>9h–11h</strong> é o segundo pico, perfil de antecipação ativa no horário comercial.
+        Vale mínimo entre <strong>2h–5h</strong> em todos os meses.
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
   <!-- INSIGHTS -->
   <section id="insights">
     <div class="sec-title">💡 Insights & Recomendações</div>
@@ -1129,6 +1151,84 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btn) btn.style.display = 'none';
     });
 });
+
+// ── HORÁRIO ──────────────────────────────────────────────────────────────────
+(function(){
+  const HOR = {"Set/25":[25310,9723,6390,5904,7141,10290,17046,20865,21860,22956,22367,21970,20725,18244,16331,16071,17308,17750,17267,15095,12087,9204,6367,4405],"Out/25":[27260,10176,6720,6198,7284,11551,19607,22964,23821,24697,23683,23034,21330,18878,16926,17023,17536,17743,16929,14877,11624,8861,6485,4224],"Nov/25":[32122,11490,7290,6515,8061,13537,21869,26093,28125,28778,28195,26634,24072,20597,18378,18410,18831,18659,18518,16164,12674,9720,6846,4599],"Dez/25":[30787,11097,7311,6585,7892,13137,21226,25072,26767,26946,26805,25950,23297,19681,17636,17188,18151,17639,16870,15194,12420,9612,6537,4513],"Jan/26":[34366,12308,7580,6558,6899,10487,17975,23115,27290,29499,29137,28256,24961,21605,19163,18859,19303,18907,17875,16333,13429,10576,7498,5383],"Fev/26":[30772,11287,7429,6569,7374,11047,18934,23850,26349,27578,27267,26383,24112,20578,18435,19052,20258,19776,18830,16411,13190,10264,7618,5069],"Mar/26":[20744,8825,5884,5495,6094,8351,13399,16458,17685,18503,18399,18244,17315,15576,14648,15034,15781,15863,15334,13833,10886,8566,6380,4235],"Abr/26":[17332,7537,5289,4646,5348,7078,10887,13278,14300,14484,14586,13846,12555,9562,8818,9314,9475,9662,9270,7917,6324,5062,3671,2501]};
+  const CORES = {"Set/25":"#a371f7","Out/25":"#58a6ff","Nov/25":"#f0883e","Dez/25":"#e3b341","Jan/26":"#2dc974","Fev/26":"#ff4d4f","Mar/26":"#ffffff","Abr/26":"#39d353"};
+  const MESES = Object.keys(HOR);
+  const active = new Set(["Jan/26","Fev/26","Mar/26","Abr/26"]); // últimos 4 por padrão
+
+  const PAD = {t:12,r:8,b:24,l:40};
+  const VW=1100, VH=260;
+  const W=VW-PAD.l-PAD.r, H=VH-PAD.t-PAD.b;
+
+  function fmt(n){ return n>=1e3?(n/1e3).toFixed(0)+'k':n; }
+
+  function draw(){
+    const vis = MESES.filter(m=>active.has(m));
+    const maxV = vis.length ? Math.max(...vis.flatMap(m=>HOR[m])) : 1;
+    const xS = h => PAD.l + h*(W/23);
+    const yS = v => PAD.t + H*(1 - v/maxV);
+
+    let out = '';
+    // grid horizontal
+    [0,.25,.5,.75,1].forEach(t=>{
+      const y = PAD.t + H*t;
+      const v = Math.round(maxV*(1-t));
+      out += `<line x1="${PAD.l}" y1="${y.toFixed(1)}" x2="${PAD.l+W}" y2="${y.toFixed(1)}" stroke="#21262d" stroke-width="1"/>`;
+      out += `<text x="${PAD.l-4}" y="${(y+4).toFixed(1)}" fill="#4d5562" font-size="10" text-anchor="end">${fmt(v)}</text>`;
+    });
+    // labels X
+    [0,2,4,6,8,10,12,14,16,18,20,22,23].forEach(h=>{
+      out += `<text x="${xS(h).toFixed(1)}" y="${(PAD.t+H+16).toFixed(1)}" fill="#4d5562" font-size="10" text-anchor="middle">${String(h).padStart(2,'0')}h</text>`;
+    });
+    // linhas
+    for(const mes of vis){
+      const vals = HOR[mes];
+      const pts  = vals.map((v,h)=>`${xS(h).toFixed(1)},${yS(v).toFixed(1)}`).join(' ');
+      const area = [...vals.map((v,h)=>`${xS(h).toFixed(1)},${yS(v).toFixed(1)}`),
+                    `${xS(23).toFixed(1)},${(PAD.t+H).toFixed(1)}`,
+                    `${xS(0).toFixed(1)},${(PAD.t+H).toFixed(1)}`].join(' ');
+      const c = CORES[mes];
+      out += `<polygon points="${area}" fill="${c}" fill-opacity=".07"/>`;
+      out += `<polyline points="${pts}" fill="none" stroke="${c}" stroke-width="1.8" stroke-linejoin="round"/>`;
+      // label no pico
+      const pico = vals.indexOf(Math.max(...vals));
+      out += `<circle cx="${xS(pico).toFixed(1)}" cy="${yS(vals[pico]).toFixed(1)}" r="3" fill="${c}"/>`;
+    }
+    document.getElementById('hor-svg').innerHTML = out;
+  }
+
+  // tabs
+  const tabsEl = document.getElementById('hor-tabs');
+  tabsEl.innerHTML = MESES.map(m=>`
+    <button onclick="horToggle('${m}')" id="hortab-${m.replace('/','_')}"
+      style="padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;
+             border:1px solid ${active.has(m)?CORES[m]:'var(--border)'};
+             color:${active.has(m)?'#000':'var(--muted)'};
+             background:${active.has(m)?CORES[m]:'transparent'};
+             transition:.15s">
+      ${m}
+    </button>`).join('');
+
+  window.horToggle = function(m){
+    const btn = document.getElementById('hortab-'+m.replace('/','_'));
+    if(active.has(m)){
+      active.delete(m);
+      btn.style.background='transparent';
+      btn.style.color='var(--muted)';
+      btn.style.borderColor='var(--border)';
+    } else {
+      active.add(m);
+      btn.style.background=CORES[m];
+      btn.style.color='#000';
+      btn.style.borderColor=CORES[m];
+    }
+    draw();
+  };
+  draw();
+})();
 </script>
 
 <footer>
