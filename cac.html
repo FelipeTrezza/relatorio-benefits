@@ -779,6 +779,174 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
         ⚠️ <strong>Paradoxo da saturação:</strong> a combinação mais frequente (DM + INAPP + PUSH + WHATSAPP · 31% da base) tem apenas 2,35% de conversão — a menor entre todas. Consumers que recebem 4 canais diferentes provavelmente já estão saturados ou são perfis menos propensos a antecipar.
       </div>
     </div>
+
+    <!-- CAC por combo -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">💰 CAC por Combinação de Canais</div>
+      <div class="card-sub">Custo total do combo ÷ conversões · WhatsApp por entrega · demais por envio · ordenado por CAC</div>
+      <div class="tbl-wrap" style="margin-top:10px">
+        <table>
+          <thead>
+            <tr>
+              <th>Combinação</th>
+              <th class="r">Consumers</th>
+              <th class="r">Conv%</th>
+              <th class="r">Convertidos</th>
+              <th class="r">Custo Total</th>
+              <th class="r">CAC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:rgba(45,201,116,.04)">
+              <td><span class="canal-dot" style="background:var(--yellow)"></span><strong>EMAIL</strong></td>
+              <td class="r">384</td><td class="r">100,00%</td><td class="r">384</td>
+              <td class="r">R$0,17</td>
+              <td class="r" style="color:var(--greenl)"><strong>R$0,0004</strong></td>
+            </tr>
+            <tr style="background:rgba(45,201,116,.04)">
+              <td><span class="canal-dot" style="background:var(--purple)"></span><strong>INAPP</strong></td>
+              <td class="r">10.774</td><td class="r">61,82%</td><td class="r">6.661</td>
+              <td class="r">R$7,10</td>
+              <td class="r" style="color:var(--greenl)"><strong>R$0,0011</strong></td>
+            </tr>
+            <tr style="background:rgba(45,201,116,.04)">
+              <td><span class="canal-dot" style="background:var(--yellow)"></span><span class="canal-dot" style="background:var(--purple)"></span><span class="canal-dot" style="background:var(--blue)"></span><strong>EMAIL + INAPP + PUSH</strong></td>
+              <td class="r">214</td><td class="r">100,00%</td><td class="r">214</td>
+              <td class="r">R$0,37</td>
+              <td class="r" style="color:var(--greenl)"><strong>R$0,0017</strong></td>
+            </tr>
+            <tr style="background:rgba(45,201,116,.04)">
+              <td><span class="canal-dot" style="background:var(--blue)"></span><strong>PUSH</strong></td>
+              <td class="r">9.096</td><td class="r">24,05%</td><td class="r">2.188</td>
+              <td class="r">R$4,51</td>
+              <td class="r" style="color:var(--greenl)"><strong>R$0,0021</strong></td>
+            </tr>
+            <tr style="background:rgba(88,166,255,.04);border-left:3px solid var(--blue)">
+              <td><span class="canal-dot" style="background:var(--purple)"></span><span class="canal-dot" style="background:var(--blue)"></span><strong>INAPP + PUSH ⭐</strong></td>
+              <td class="r">34.352</td><td class="r" style="color:var(--blue)"><strong>79,74%</strong></td><td class="r" style="color:var(--blue)">27.392</td>
+              <td class="r">R$38,24</td>
+              <td class="r" style="color:var(--greenl)"><strong>R$0,0014</strong></td>
+            </tr>
+            <tr>
+              <td><span class="canal-dot" style="background:var(--orange)"></span><strong>DM + EMAIL</strong></td>
+              <td class="r">122</td><td class="r">100,00%</td><td class="r">122</td>
+              <td class="r">R$1,13</td>
+              <td class="r" style="color:var(--blue)"><strong>R$0,0093</strong></td>
+            </tr>
+            <tr>
+              <td><span class="canal-dot" style="background:var(--orange)"></span><span class="canal-dot" style="background:var(--blue)"></span><strong>DM + PUSH</strong></td>
+              <td class="r">300</td><td class="r">78,67%</td><td class="r">236</td>
+              <td class="r">R$2,16</td>
+              <td class="r" style="color:var(--blue)"><strong>R$0,0092</strong></td>
+            </tr>
+            <tr>
+              <td><span class="canal-dot" style="background:var(--orange)"></span><strong>DM</strong></td>
+              <td class="r">3.597</td><td class="r">12,79%</td><td class="r">460</td>
+              <td class="r">R$36,07</td>
+              <td class="r" style="color:var(--blue)"><strong>R$0,0784</strong></td>
+            </tr>
+            <tr>
+              <td><span class="canal-dot" style="background:var(--purple)"></span><span class="canal-dot" style="background:var(--blue)"></span><span class="canal-dot" style="background:#25d366"></span>INAPP + PUSH + WHATSAPP</td>
+              <td class="r">3.938</td><td class="r">33,14%</td><td class="r">1.305</td>
+              <td class="r">R$179,71</td>
+              <td class="r" style="color:var(--blue)"><strong>R$0,1377</strong></td>
+            </tr>
+            <tr>
+              <td><span class="canal-dot" style="background:var(--orange)"></span><span class="canal-dot" style="background:var(--purple)"></span><span class="canal-dot" style="background:var(--blue)"></span>DM + INAPP + PUSH</td>
+              <td class="r">9.811</td><td class="r">15,70%</td><td class="r">1.540</td>
+              <td class="r">R$279,54</td>
+              <td class="r" style="color:var(--orange)"><strong>R$0,1815</strong></td>
+            </tr>
+            <tr>
+              <td><span class="canal-dot" style="background:#25d366"></span>WHATSAPP</td>
+              <td class="r">4.842</td><td class="r">21,21%</td><td class="r">1.027</td>
+              <td class="r">R$209,56</td>
+              <td class="r" style="color:var(--orange)"><strong>R$0,2040</strong></td>
+            </tr>
+            <tr>
+              <td><span class="canal-dot" style="background:var(--purple)"></span><span class="canal-dot" style="background:#25d366"></span>INAPP + WHATSAPP</td>
+              <td class="r">12.281</td><td class="r">4,07%</td><td class="r">500</td>
+              <td class="r">R$690,91</td>
+              <td class="r" style="color:var(--orange)"><strong>R$1,3818</strong></td>
+            </tr>
+            <tr>
+              <td><span class="canal-dot" style="background:var(--orange)"></span><span class="canal-dot" style="background:#25d366"></span>DM + WHATSAPP</td>
+              <td class="r">1.181</td><td class="r">4,83%</td><td class="r">57</td>
+              <td class="r">R$94,65</td>
+              <td class="r" style="color:var(--red)"><strong>R$1,6605</strong></td>
+            </tr>
+            <tr style="background:rgba(248,81,73,.04)">
+              <td><span class="canal-dot" style="background:var(--orange)"></span><span class="canal-dot" style="background:var(--purple)"></span><span class="canal-dot" style="background:#25d366"></span>DM + INAPP + WHATSAPP</td>
+              <td class="r">17.209</td><td class="r">1,51%</td><td class="r">260</td>
+              <td class="r">R$1.402,61</td>
+              <td class="r" style="color:var(--red)"><strong>R$5,3947</strong></td>
+            </tr>
+            <tr style="background:rgba(248,81,73,.06)">
+              <td><span class="canal-dot" style="background:var(--orange)"></span><span class="canal-dot" style="background:var(--purple)"></span><span class="canal-dot" style="background:var(--blue)"></span><span class="canal-dot" style="background:#25d366"></span><strong>DM + INAPP + PUSH + WHATSAPP ⚠️</strong></td>
+              <td class="r">50.761</td><td class="r" style="color:var(--red)">2,35%</td><td class="r">1.193</td>
+              <td class="r">R$4.564,99</td>
+              <td class="r" style="color:var(--red)"><strong>R$3,8265</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mini chart visual CAC -->
+      <div style="margin-top:16px">
+        <div class="card-title" style="margin-bottom:8px">CAC Visual por Combo (escala proporcional)</div>
+        <div class="bar-chart">
+          <div class="bc-row">
+            <div class="bc-lbl" style="width:160px;font-size:10px">EMAIL</div>
+            <div class="bc-bw"><div class="bc-b" style="width:0.01%;background:var(--yellow);min-width:3px"></div></div>
+            <div class="bc-val" style="color:var(--greenl)">R$0,0004</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl" style="width:160px;font-size:10px">INAPP</div>
+            <div class="bc-bw"><div class="bc-b" style="width:0.02%;background:var(--purple);min-width:3px"></div></div>
+            <div class="bc-val" style="color:var(--greenl)">R$0,0011</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl" style="width:160px;font-size:10px">INAPP + PUSH ⭐</div>
+            <div class="bc-bw"><div class="bc-b" style="width:0.03%;background:var(--blue);min-width:4px"></div></div>
+            <div class="bc-val" style="color:var(--greenl)">R$0,0014</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl" style="width:160px;font-size:10px">PUSH</div>
+            <div class="bc-bw"><div class="bc-b" style="width:0.04%;background:var(--blue);min-width:4px"></div></div>
+            <div class="bc-val" style="color:var(--greenl)">R$0,0021</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl" style="width:160px;font-size:10px">DM</div>
+            <div class="bc-bw"><div class="bc-b" style="width:1.4%;background:var(--orange)"></div></div>
+            <div class="bc-val" style="color:var(--blue)">R$0,0784</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl" style="width:160px;font-size:10px">INAPP+PUSH+WA</div>
+            <div class="bc-bw"><div class="bc-b" style="width:2.5%;background:var(--orange)"></div></div>
+            <div class="bc-val" style="color:var(--orange)">R$0,1377</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl" style="width:160px;font-size:10px">WHATSAPP</div>
+            <div class="bc-bw"><div class="bc-b" style="width:3.8%;background:#25d366"></div></div>
+            <div class="bc-val" style="color:var(--orange)">R$0,2040</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl" style="width:160px;font-size:10px">INAPP + WHATSAPP</div>
+            <div class="bc-bw"><div class="bc-b" style="width:25.5%;background:#25d366">R$1,38</div></div>
+            <div class="bc-val" style="color:var(--red)">R$1,3818</div>
+          </div>
+          <div class="bc-row">
+            <div class="bc-lbl" style="width:160px;font-size:10px">DM+INAPP+WHATSAPP</div>
+            <div class="bc-bw"><div class="bc-b" style="width:100%;background:var(--red)">R$5,39 — pior combo (alto custo, 1,51% conv)</div></div>
+            <div class="bc-val" style="color:var(--red)">R$5,3947</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue)">
+        ⭐ <strong>INAPP + PUSH</strong> é o combo ideal: maior volume (34k consumers), melhor conversão (79,7%) e CAC de apenas R$0,0014. <strong>DM + INAPP + WHATSAPP</strong> é o pior combo — R$5,39 de CAC com apenas 1,51% de conversão, afetando 17k consumers.
+      </div>
+    </div>
   </section>
 
   <div class="divider"></div>
