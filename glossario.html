@@ -1089,46 +1089,57 @@ antecipando <span class="kw">AS</span> (
         <span class="tag tm">Abr/2026</span>
       </div>
 
-      <p class="report-desc">Análise de Custo de Aquisição por Canal (CAC) para campanhas Benefits MKT. Cruza comunicações enviadas com antecipações realizadas nas <strong>24h seguintes</strong> ao envio, por canal (Push, InApp, DM, WhatsApp, Email) e por setor (Grupo, Público, Privado, INSS). Também inclui análise da jornada de toques até a primeira antecipação.</p>
+      <p class="report-desc">Análise de Custo de Aquisição por Canal (CAC) para campanhas Benefits MKT. Cruza comunicações enviadas com antecipações realizadas nas <strong>24h seguintes</strong> ao envio, por canal (Email, Push, InApp, DM, WhatsApp) e por setor (Grupo, Público, Privado). Inclui filtro global por mês (Set/25–Abr/26), análise de toques até a primeira antecipação, recorrência de canais, CAC por combo e distribuição por horário.</p>
+
+      <div class="block-label">Seções do relatório</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">📊</div><div><div class="sec-name">Visão Geral</div><div class="sec-desc">5 KPIs: Total comunicações · Antecipações convertidas · Taxa conv. geral · Custo total MKT · CAC médio ponderado. Filtro global por mês (tabs).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📡</div><div><div class="sec-name">CAC por Canal</div><div class="sec-desc">Tabela ordenada por CAC: Email R$0,003 · Push R$0,007 · InApp R$0,013 · DM R$1,33 · WhatsApp R$4,15. Inclui gráficos de barras de conv% e CAC.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏢</div><div><div class="sec-name">Conversão por Setor</div><div class="sec-desc">Grupo 26,08% · Público 11,31% · Privado 3,68%. Cards com comunicados, convertidos, TPV e ticket médio. INSS excluído (sem comunicações sfpjbene).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🔁</div><div><div class="sec-name">Toques até 1ª Antecipação</div><div class="sec-desc">Histórico Set/25–Abr/26 · 49.297 consumers · tabela de distribuição com curva acumulada · filtro por setor · canal que fechou a venda (último toque).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🔀</div><div><div class="sec-name">Recorrência de Canais</div><div class="sec-desc">Nº de canais distintos que cada consumer recebe × conv%/comm. Tabela de combos com CAC/comm. Melhor combo: INAPP+PUSH.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">⏰</div><div><div class="sec-name">Horário de Antecipações</div><div class="sec-desc">Distribuição por hora do dia · comparativo mensal · filtro por setor. Pico às 00h (processamento automático) e 9h–11h (uso ativo). Vale mínimo 2h–5h.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">💡</div><div><div class="sec-name">Insights & Recomendações</div><div class="sec-desc">6 insights priorizados por impacto: ampliar Email, otimizar Push, suspender/revisar WhatsApp, validar DM, segmento sem vínculo, focar no Grupo.</div></div></div>
+      </div>
 
       <div class="block-label">Filtros e regras de campanha</div>
       <div class="rules-list">
-        <div class="rule rc-yellow"><strong>Filtro de campanha:</strong>&nbsp;<code>SPLIT(journey_name, '-')[7] = 'sfpjbene'</code> — apenas campanhas Benefits MKT.</div>
-        <div class="rule rc-yellow"><strong>Exclusão de journeys educacionais:</strong>&nbsp;<code>LOWER(journey_name) NOT LIKE '%educacional%'</code> — journeys educacionais são excluídos da análise de CAC pois têm perfil de conversão completamente diferente (ex: Grupo convertia bem nessa categoria, inflando os números).</div>
+        <div class="rule rc-yellow"><strong>Filtro de campanha:</strong>&nbsp;<code>SPLIT(journey_name, '-')[7] = 'sfpjbene'</code> — apenas campanhas Benefits MKT. Filtro global de mês aplicado via tabs (Set/25–Abr/26).</div>
         <div class="rule rc-blue"><strong>Janela de conversão:</strong>&nbsp;Antecipação deve ocorrer estritamente <strong>após</strong> o envio e dentro de <strong>24 horas</strong> — <code>ts_antecip &gt; sent_at AND ts_antecip &lt;= sent_at + INTERVAL 24 HOURS</code>.</div>
-        <div class="rule rc-orange"><strong>EMAIL removido da análise principal:</strong>&nbsp;100% das comunicações de email eram journeys educacionais. Após o filtro, a base de email fica vazia — canal não aparece na tabela principal.</div>
+        <div class="rule rc-orange"><strong>Nota sobre EMAIL:</strong>&nbsp;Nos dados agregados (Mar/2026 completo), EMAIL aparece com CAC R$0,003 e conv 14,65% — base de 2.211 envios. Em análises anteriores sem educacional, o EMAIL sumia pois era 100% educacional. No cac.html o EMAIL está visível porque não há filtro de exclusão de educacional — são dados brutos por mês.</div>
+        <div class="rule rc-yellow"><strong>Segmento sem vínculo:</strong>&nbsp;4.575 consumers das campanhas sfpjbene não têm registro ativo em <code>benefits.collaborators</code> — possíveis desligados recentes ou dado desatualizado.</div>
       </div>
 
       <div class="block-label">Regra de custo por canal</div>
       <div class="rules-list">
         <div class="rule rc-green"><strong>Email / Push / InApp:</strong>&nbsp;Custo por <strong>envio</strong> — R$0,00044/envio. Volume faturável = total enviado.</div>
-        <div class="rule rc-green"><strong>DM (Direct Mail):</strong>&nbsp;Custo por <strong>envio</strong> — R$0,006/envio. Volume faturável = total enviado.</div>
-        <div class="rule rc-yellow"><strong>WhatsApp:</strong>&nbsp;Custo por <strong>entrega</strong> (<code>is_delivered = true</code>) — R$0,0526/entrega. Volume faturável = total entregue (≠ enviado). Nota de rodapé explica a diferença no relatório.</div>
+        <div class="rule rc-green"><strong>DM (Direct Mail):</strong>&nbsp;Custo por <strong>envio</strong> — R$0,006/envio. Volume faturável = total enviado. Atenção: <code>is_delivered</code> retorna null/false para DM — canal não registra entrega, custo calculado sempre por envio.</div>
+        <div class="rule rc-yellow"><strong>WhatsApp:</strong>&nbsp;Custo por <strong>entrega</strong> (<code>is_delivered = true</code>) — R$0,0526/entrega. Volume faturável = total entregue. Taxa de entrega: apenas 52,7% (92.996 de 176.571 enviados). Conv% calculado sobre entregues.</div>
       </div>
 
-      <div class="block-label">Dados Mar/2026 validados (sem educacional)</div>
+      <div class="block-label">Dados Mar/2026 — tabela canais</div>
       <div class="sections-grid">
-        <div class="sec-item"><div class="sec-ic">📲</div><div><div class="sec-name">PUSH — Melhor canal ativo</div><div class="sec-desc">189.361 enviados · 12.129 conv · Conv 6,41% · <strong>CAC R$0,007</strong></div></div></div>
-        <div class="sec-item"><div class="sec-ic">📱</div><div><div class="sec-name">INAPP</div><div class="sec-desc">412.453 enviados · 14.529 conv · Conv 3,52% · <strong>CAC R$0,013</strong></div></div></div>
-        <div class="sec-item"><div class="sec-ic">✉️</div><div><div class="sec-name">DM (Direct Mail)</div><div class="sec-desc">424.331 enviados · 1.916 conv · Conv 0,45% · <strong>CAC R$1,33</strong>. Fecha 42,7% das conversões como último toque.</div></div></div>
-        <div class="sec-item"><div class="sec-ic">💬</div><div><div class="sec-name">WhatsApp — único canal com prejuízo</div><div class="sec-desc">92.986 entregues · 1.178 conv · Conv 0,67% · <strong>CAC R$4,15</strong>. ROI -52% (CAC &gt; receita ~R$2,00).</div></div></div>
-        <div class="sec-item"><div class="sec-ic">📊</div><div><div class="sec-name">TOTAL</div><div class="sec-desc">1.202.703 vol. faturável · 29.752 conv · Conv 2,47% · <strong>CAC R$0,26</strong></div></div></div>
+        <div class="sec-item"><div class="sec-ic">📧</div><div><div class="sec-name">EMAIL — mais eficiente</div><div class="sec-desc">2.211 enviados · 325 conv · Conv <strong>14,65%</strong> · Custo R$0,97 · <strong>CAC R$0,003</strong>. Base pequena — maior oportunidade de escalar.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📲</div><div><div class="sec-name">PUSH — melhor volume/custo</div><div class="sec-desc">178.326 enviados · 9.895 conv · Conv <strong>5,55%</strong> · Custo R$78 · <strong>CAC R$0,008</strong>. Entrega 97,9%.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📱</div><div><div class="sec-name">INAPP</div><div class="sec-desc">395.527 enviados · 11.562 conv · Conv <strong>2,92%</strong> · Custo R$174 · <strong>CAC R$0,015</strong>.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">✉️</div><div><div class="sec-name">DM — canal de aquecimento</div><div class="sec-desc">424.397 enviados · 1.918 conv · Conv <strong>0,45%</strong> · Custo R$2.546 · <strong>CAC R$1,33</strong>. Fecha 41,7% das conversões como último toque.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">💬</div><div><div class="sec-name">WhatsApp — ROI negativo</div><div class="sec-desc">92.946 entregues · 1.178 conv · Conv <strong>0,67%</strong> · Custo R$4.889 · <strong>CAC R$4,15</strong>. ROI -52% (CAC &gt; receita ~R$2,00).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📊</div><div><div class="sec-name">TOTAL Mar/2026</div><div class="sec-desc">Custo total R$7.703 · 30.077 conv · Conv 2,49% · <strong>CAC médio R$0,26</strong></div></div></div>
       </div>
 
-      <div class="block-label">Conversão por setor (Mar/2026, sem educacional)</div>
+      <div class="block-label">Conversão por setor (Mar/2026)</div>
       <div class="sections-grid">
-        <div class="sec-item"><div class="sec-ic">🏛️</div><div><div class="sec-name">Público — maior conv%</div><div class="sec-desc">49.078 comunicados · 6.296 conv · <strong>12,83%</strong> · TPV R$3,82M · Ticket R$254</div></div></div>
-        <div class="sec-item"><div class="sec-ic">🏗️</div><div><div class="sec-name">Grupo</div><div class="sec-desc">108.257 comunicados · 9.872 conv · <strong>9,12%</strong> · TPV R$5,95M · Ticket R$245</div></div></div>
-        <div class="sec-item"><div class="sec-ic">🏭</div><div><div class="sec-name">Privado</div><div class="sec-desc">11.257 comunicados · 590 conv · <strong>5,24%</strong> · TPV R$185k · Ticket R$136</div></div></div>
-        <div class="sec-item"><div class="sec-ic">🚫</div><div><div class="sec-name">INSS — sem conversão</div><div class="sec-desc">0% de conversão — produto não aplicável (previdenciário, sem vínculo CLT ativo). Comunicações = custo puro.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏗️</div><div><div class="sec-name">Grupo — maior conv%</div><div class="sec-desc">182.118 comunicados · 47.501 conv · <strong>26,08%</strong> · TPV R$89,1M · Ticket R$1.876</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏛️</div><div><div class="sec-name">Público</div><div class="sec-desc">219.838 comunicados · 24.873 conv · <strong>11,31%</strong> · TPV R$41,4M · Ticket R$1.665</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏭</div><div><div class="sec-name">Privado</div><div class="sec-desc">46.340 comunicados · 1.704 conv · <strong>3,68%</strong> · TPV R$1,7M · Ticket R$1.024</div></div></div>
       </div>
 
       <div class="block-label">Análise de toques até a primeira antecipação</div>
       <div class="rules-list">
-        <div class="rule rc-blue"><strong>Base:</strong>&nbsp;Set/2025 → Abr/2026 · ~49.128 consumers · histórico completo de comunicações sfpjbene (sem educacional).</div>
-        <div class="rule rc-blue"><strong>8,96%</strong> convertem na <strong>1ª comunicação</strong>. ~33% convertem com até 5 toques. Mediana: ~12 comunicações para converter.</div>
-        <div class="rule rc-yellow"><strong>37,99% precisam de 21+ toques</strong> — ciclo longo, mediana de 79 dias. Grupo tem o ciclo mais longo (44% precisam de 21+), Privado tem o mais curto (22%).</div>
-        <div class="rule rc-orange"><strong>Canal que "fecha a venda" (último toque antes da conversão):</strong>&nbsp;DM 42,7% · WhatsApp 21,0% · Push 19,2% · InApp 14,7%. DM e WhatsApp fecham a venda — Push e InApp aquecem o lead.</div>
+        <div class="rule rc-blue"><strong>Base:</strong>&nbsp;Set/2025 → Abr/2026 · 49.297 consumers · apenas quem fez a <strong>primeira antecipação da vida</strong> no período.</div>
+        <div class="rule rc-blue"><strong>8,96%</strong> convertem na 1ª comunicação · <strong>33,06%</strong> com até 5 toques · Mediana: <strong>~12 comunicações</strong>.</div>
+        <div class="rule rc-yellow"><strong>38,2% precisam de 21+ toques</strong> — ciclo longo, mediana de 79 dias. Grupo tem o ciclo mais longo (44% precisam de 21+), Privado tem o mais curto (22%).</div>
+        <div class="rule rc-orange"><strong>Canal que fechou a venda (último toque):</strong>&nbsp;DM 41,7% · WhatsApp 20,98% · Push 19,27% · InApp 14,59% · Email 2,18% · SMS 1,31%. DM e WhatsApp fecham o funil — Push e InApp aquecem.</div>
       </div>
 
       <div class="block-label">Toques por setor</div>
@@ -1139,13 +1150,30 @@ antecipando <span class="kw">AS</span> (
         <div class="sec-item"><div class="sec-ic">🏗️</div><div><div class="sec-name">Grupo — ciclo mais longo</div><div class="sec-desc">Conv 1ª comm: 6,88% · Mediana: ~14 toques · 21+: 44%</div></div></div>
       </div>
 
+      <div class="block-label">Recorrência de canais</div>
+      <div class="rules-list">
+        <div class="rule rc-blue"><strong>1 canal:</strong>&nbsp;5,31% das comms · 28.693 consumers · Conv/comm: <strong>13,70%</strong> — menor exposição, maior taxa.</div>
+        <div class="rule rc-blue"><strong>2 canais:</strong>&nbsp;27,28% das comms · 51.644 consumers · Conv/comm: <strong>7,16%</strong> — grupo mais equilibrado.</div>
+        <div class="rule rc-yellow"><strong>4 canais:</strong>&nbsp;45,78% das comms · 51.295 consumers · Conv/comm: <strong>0,25%</strong> — maior volume de comms, menor eficiência por disparo.</div>
+        <div class="rule rc-green"><strong>Melhor combo:</strong>&nbsp;INAPP+PUSH — maior conv% e menor CAC/comm entre combos com volume expressivo. Combos com WhatsApp têm CAC/comm alto pelo custo por entrega.</div>
+      </div>
+
+      <div class="block-label">Horário de antecipações</div>
+      <div class="rules-list">
+        <div class="rule rc-orange"><strong>00h = maior pico</strong> em todos os meses — processamento automático de crédito consignado.</div>
+        <div class="rule rc-blue"><strong>9h–11h</strong> = segundo pico — perfil de antecipação ativa no horário comercial.</div>
+        <div class="rule rc-yellow"><strong>Vale mínimo:</strong>&nbsp;2h–5h em todos os meses. Filtro por setor disponível (Total · Grupo · Público · Privado).</div>
+      </div>
+
       <div class="block-label">Principais achados e alertas</div>
       <div class="rules-list">
-        <div class="rule rc-orange"><strong>⚠️ WhatsApp com prejuízo:</strong>&nbsp;Único canal onde CAC (R$4,15) supera a receita gerada (~R$2,00). ROI negativo de -52%. Revisar estratégia ou renegociar contrato.</div>
-        <div class="rule rc-yellow"><strong>💡 DM é canal de aquecimento, não de conversão direta:</strong>&nbsp;CAC alto (R$1,33) mas fecha 42,7% das vendas como último toque. O papel dele é encerrar o funil, não iniciar.</div>
-        <div class="rule rc-green"><strong>✅ PUSH é o melhor canal ativo:</strong>&nbsp;CAC R$0,007, conv 6,41%. Melhor custo-benefício absoluto.</div>
-        <div class="rule rc-blue"><strong>💎 INSS = custo puro:</strong>&nbsp;0% de conversão comprovada. Cada real investido nesse segmento é desperdício direto.</div>
-      </div>
+        <div class="rule rc-green"><strong>✅ Email — ampliar base:</strong>&nbsp;CAC R$0,003 e conv 14,65% — melhor canal, mas apenas 2.211 envios. Ampliar lista de emails válidos é a alavanca de menor custo disponível.</div>
+        <div class="rule rc-green"><strong>✅ Push — manter e segmentar:</strong>&nbsp;CAC R$0,008 com 9.895 conversões. Segmentar por setor (priorizar Grupo) pode elevar conv de 5,5% para acima de 10%.</div>
+        <div class="rule rc-orange"><strong>⚠️ WhatsApp — ROI negativo:</strong>&nbsp;CAC R$4,15 vs receita ~R$2,00 = prejuízo por conversão. Taxa de entrega 52,7% agrava o problema. Suspender ou testar com segmento menor e mais qualificado.</div>
+        <div class="rule rc-yellow"><strong>💡 DM — canal de aquecimento:</strong>&nbsp;Conv direta 0,45% mas fecha 41,7% das vendas como último toque. Não cortar — reposicionar como fechador de funil.</div>
+        <div class="rule rc-blue"><strong>🎯 Focar no Grupo:</strong>&nbsp;Conv 26% vs 11% Público vs 3,7% Privado. Especialmente em canais caros (DM, WhatsApp), segmentar para Grupo maximiza retorno por real.</div>
+        <div class="rule rc-blue"><strong>⚠️ 4.575 consumers sem vínculo:</strong>&nbsp;Não têm registro ativo em <code>benefits.collaborators</code>. Validar segmentação para não comunicar colaboradores desligados.</div>
+      
 
       <div class="source-note"><strong>Tabelas:</strong> marketing.consumers_campaigns_communications · benefits.anticipation_request · benefits.collaborators · benefits.companies · benefits.accounts</div>
 
