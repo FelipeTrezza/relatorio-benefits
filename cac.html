@@ -111,6 +111,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
   .setor-grid{grid-template-columns:repeat(2,1fr)}
   .insight-grid{grid-template-columns:1fr}
   .nav{display:none}
+  .rec-asym{grid-template-columns:1fr!important}
 }
 </style>
 </head>
@@ -598,61 +599,59 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
       </div>
     </div>
 
-    <div class="g2" style="margin-bottom:16px">
+    <!-- grid assimétrico: card menor (canais) + card maior (combos) -->
+    <div class="rec-asym" style="display:grid;grid-template-columns:1fr 2fr;gap:16px;align-items:start;margin-bottom:16px">
 
-      <!-- Tabela qtd canais x conversão base comms -->
-      <div class="card">
-        <div class="card-title">Nº de Canais × Comunicações</div>
-        <div class="card-sub">Base: total de comunicações enviadas · consumers e conv como complemento</div>
-        <div class="tbl-wrap" style="margin-top:8px">
+      <!-- Tabela qtd canais x conversão base comms — card compacto -->
+      <div class="card" style="border-color:rgba(88,166,255,.25)">
+        <div class="card-title">📊 Nº de Canais × Conv%</div>
+        <div class="card-sub" style="margin-bottom:8px">Base: comunicações enviadas</div>
+        <div class="tbl-wrap">
           <table>
             <thead>
               <tr>
-                <th style="white-space:nowrap;min-width:100px">Canais</th>
-                <th class="r">Total Comms</th>
+                <th>Canais</th>
                 <th class="r">% Comms</th>
-                <th class="r" style="color:var(--muted)">Consumers</th>
-                <th class="r" style="color:var(--muted)">Convertidos</th>
-                <th class="r">Conv% / Comm</th>
-                <th class="r" style="color:var(--muted)">Conv% / Cons</th>
+                <th class="r">Conv%/Comm</th>
+                <th class="r" style="color:var(--muted)">Conv%/Cons</th>
               </tr>
             </thead>
             <tbody id="rec-tbody"></tbody>
           </table>
         </div>
-        <div style="margin-top:10px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue)">
-          💡 45,8% das comunicações vão para consumers que recebem 4 canais — com apenas 0,25% de conversão por comm. O grupo de 2 canais tem 27% das comms e 7,16% de conv/comm.
+        <div style="margin-top:10px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--blue);line-height:1.5">
+          💡 <strong>2 canais</strong> = sweet spot: 27% das comms, 7,16% conv/comm.<br>
+          4 canais tem 46% das comms mas só 0,25% conv/comm.
         </div>
       </div>
 
-    </div>
-
-
-    <!-- CAC por combo -->
-    <div class="card" style="margin-top:16px">
-      <div class="card-title">💰 CAC por Combinação de Canais</div>
-      <div class="card-sub">Base: comunicações enviadas · Custo total ÷ conversões (por consumer) e ÷ comunicações (por comm) · ordenado por consumers</div>
-      <div class="tbl-wrap" style="margin-top:10px">
-        <table>
-          <thead>
-            <tr>
-              <th>Combinação</th>
-              <th class="r">Total Comms</th>
-              <th class="r">Comms/Consumer</th>
-              <th class="r" style="color:var(--muted)">Consumers</th>
-              <th class="r">Conv%</th>
-              <th class="r">Custo Total</th>
-              <th class="r">CAC/Consumer</th>
-              <th class="r">CAC/Comm</th>
-            </tr>
-          </thead>
-          <tbody id="combo-tbody"></tbody>
-        </table>
+      <!-- CAC por combo — card principal, mais largo -->
+      <div class="card" style="border-color:rgba(45,201,116,.2)">
+        <div class="card-title">💰 CAC por Combinação de Canais</div>
+        <div class="card-sub">Custo total ÷ conversões · ordenado por consumers · base: comunicações enviadas</div>
+        <div class="tbl-wrap" style="margin-top:10px">
+          <table>
+            <thead>
+              <tr>
+                <th>Combinação</th>
+                <th class="r">Total Comms</th>
+                <th class="r">Comms/Consumer</th>
+                <th class="r" style="color:var(--muted)">Consumers</th>
+                <th class="r">Conv%</th>
+                <th class="r">Custo Total</th>
+                <th class="r">CAC/Consumer</th>
+                <th class="r">CAC/Comm</th>
+              </tr>
+            </thead>
+            <tbody id="combo-tbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:12px;background:rgba(45,201,116,.06);border:1px solid rgba(45,201,116,.2);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--greenl)">
+          ⭐ <strong>INAPP + PUSH</strong> — melhor combo em volume: maior conv%, CAC/consumer e CAC/comm mais baixos entre os combos expressivos.
+          Combos com WHATSAPP tendem a ter CAC/comm alto por conta do custo por entrega.
+        </div>
       </div>
-      <div style="margin-top:12px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue)">
-        ⭐ <strong>INAPP + PUSH</strong> — melhor combo em volume: maior conv%, CAC/consumer e CAC/comm mais baixos entre os combos expressivos.
-        Combos com WHATSAPP tendem a ter CAC/comm alto por conta do custo por entrega.
-      </div>
+
     </div>
   </section>
 
