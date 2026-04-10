@@ -638,7 +638,6 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
               <th class="r" style="color:var(--muted)">Consumers</th>
               <th class="r">Conv%</th>
               <th class="r">Custo Total</th>
-              <th class="r">CAC/Consumer</th>
               <th class="r">CAC/Comm</th>
             </tr>
           </thead>
@@ -646,7 +645,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
         </table>
       </div>
       <div style="margin-top:12px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue)">
-        ⭐ <strong>INAPP + PUSH</strong> — melhor combo em volume: maior conv%, CAC/consumer e CAC/comm mais baixos entre os combos expressivos.
+        ⭐ <strong>INAPP + PUSH</strong> — melhor combo em volume: maior conv% e CAC/comm mais baixo entre os combos expressivos.
         Combos com WHATSAPP tendem a ter CAC/comm alto por conta do custo por entrega.
       </div>
     </div>
@@ -890,12 +889,11 @@ function renderCombos() {
     const tbody = document.getElementById('combo-tbody');
     if(!tbody) return;
     tbody.innerHTML = combos.map(c => {
-        const cacCor     = c.cac_pc   < 0.1  ? 'var(--greenl)' : c.cac_pc   < 1 ? 'var(--blue)' : c.cac_pc   < 3 ? 'var(--orange)' : 'var(--red)';
         const cacCommCor = c.cac_comm < 0.001 ? 'var(--greenl)' : c.cac_comm < 0.005 ? 'var(--blue)' : c.cac_comm < 0.015 ? 'var(--orange)' : 'var(--red)';
         const convCor    = c.conv_pct > 70 ? 'var(--greenl)' : c.conv_pct > 30 ? 'var(--blue)' : c.conv_pct > 10 ? 'var(--orange)' : 'var(--red)';
         const dots = c.combo.split('+').map(ch =>
             `<span class="canal-dot" style="background:${CANAL_COR[ch.trim()] || 'var(--muted)'}"></span>`).join('');
-        const badge = c.conv_pct > 95 ? ' ✨' : c.conv_pct > 70 ? ' ⭐' : c.cac_pc > 3 ? ' ⚠️' : '';
+        const badge = c.conv_pct > 95 ? ' ✨' : c.conv_pct > 70 ? ' ⭐' : c.cac_comm > 0.015 ? ' ⚠️' : '';
         return `<tr>
           <td>${dots}<span style="font-size:12px">${c.combo.replace(/\+/g,' + ')}${badge}</span></td>
           <td class="r"><strong>${fmt(c.total_comms)}</strong></td>
@@ -903,7 +901,6 @@ function renderCombos() {
           <td class="r" style="color:var(--muted);font-size:11px">${fmt(c.consumers)}</td>
           <td class="r" style="color:${convCor}"><strong>${fmtPct(c.conv_pct)}</strong></td>
           <td class="r">${fmtR(c.custo)}</td>
-          <td class="r" style="color:${cacCor}"><strong>${fmtR(c.cac_pc,4)}</strong></td>
           <td class="r" style="color:${cacCommCor}"><strong>${c.cac_comm.toFixed(6).replace('.',',')}</strong></td>
         </tr>`;
     }).join('');
