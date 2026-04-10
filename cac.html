@@ -1205,8 +1205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cx = xS(h), cy = yS(v);
         // ponto
         out+=`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.5" fill="${c}"/>`;
-        // rótulo — alterna acima/abaixo para não colidir entre linhas
-        // posiciona acima da linha (com margem), exceto se muito perto do topo
+        // rotulo: acima da linha, exceto se muito perto do topo
         const labelY = cy < PAD.t+14 ? cy+13 : cy-6;
         const anchor  = h===0 ? 'start' : h===23 ? 'end' : 'middle';
         out+=`<text x="${cx.toFixed(1)}" y="${labelY.toFixed(1)}" fill="${c}" fill-opacity=".85" font-size="9" font-weight="600" text-anchor="${anchor}">${fmtN(v)}</text>`;
@@ -1254,22 +1253,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(active.has(m)){
       active.delete(m);
       btn.style.background='transparent'; btn.style.color='var(--muted)'; btn.style.borderColor='var(--border)';
-    } else {
-      active.add(m);
-      btn.style.background=c; btn.style.color='#000'; btn.style.borderColor=c;
-    }
-    draw();
-  };
-  draw();
-})();
-  }).join('');
-
-  window.horToggle = function(m){
-    const btn=document.getElementById('hortab-'+m.replace('/','_'));
-    const c=CORES[m];
-    if(active.has(m)){
-      active.delete(m);
-      btn.style.cssText+=`;background:transparent;color:var(--muted);border-color:var(--border)`;
     } else {
       active.add(m);
       btn.style.background=c; btn.style.color='#000'; btn.style.borderColor=c;
