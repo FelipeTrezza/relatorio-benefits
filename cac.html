@@ -608,7 +608,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
           <table>
             <thead>
               <tr>
-                <th>Canais</th>
+                <th style="white-space:nowrap;min-width:100px">Canais</th>
                 <th class="r">Total Comms</th>
                 <th class="r">% Comms</th>
                 <th class="r" style="color:var(--muted)">Consumers</th>
@@ -881,9 +881,9 @@ function renderRecorrencia() {
         const tot = rec.reduce((s,r)=>s+r.total_comms,0);
         tbody.innerHTML = rec.map(r => {
             const dest  = r.qtd_canais===2?'background:rgba(88,166,255,.04);border-left:2px solid var(--blue)':r.qtd_canais===5?'background:rgba(188,140,255,.04);border-left:2px solid var(--purple)':'';
-            const label = r.qtd_canais===2?'<strong>2 canais ⭐</strong>':r.qtd_canais===5?'<strong>5 canais ✨</strong>':r.qtd_canais+' canal'+(r.qtd_canais>1?'is':'');
+            const label = r.qtd_canais===2?'<strong style="white-space:nowrap">2 canais ⭐</strong>':r.qtd_canais===5?'<strong style="white-space:nowrap">5 canais ✨</strong>':(r.qtd_canais+' canal'+(r.qtd_canais>1?'is':''));
             const cCor  = r.conv_pct_comm>5?'var(--greenl)':r.conv_pct_comm>1?'var(--blue)':r.conv_pct_comm>0.3?'var(--orange)':'var(--red)';
-            return '<tr style="'+dest+'"><td>'+label+'</td><td class="r"><strong>'+fmt(r.total_comms)+'</strong></td><td class="r">'+fmtPct(r.pct_comms)+'</td><td class="r" style="color:var(--muted);font-size:11px">'+fmt(r.consumers)+'</td><td class="r" style="color:var(--muted);font-size:11px">'+fmt(r.convertidos)+'</td><td class="r" style="color:'+cCor+'"><strong>'+fmtPct(r.conv_pct_comm)+'</strong></td><td class="r" style="color:var(--muted);font-size:11px">'+fmtPct(r.conv_pct_consumer)+'</td></tr>';
+            return '<tr style="'+dest+'"><td style="white-space:nowrap">'+label+'</td><td class="r"><strong>'+fmt(r.total_comms)+'</strong></td><td class="r">'+fmtPct(r.pct_comms)+'</td><td class="r" style="color:var(--muted);font-size:11px">'+fmt(r.consumers)+'</td><td class="r" style="color:var(--muted);font-size:11px">'+fmt(r.convertidos)+'</td><td class="r" style="color:'+cCor+'"><strong>'+fmtPct(r.conv_pct_comm)+'</strong></td><td class="r" style="color:var(--muted);font-size:11px">'+fmtPct(r.conv_pct_consumer)+'</td></tr>';
         }).join('')+'<tr style="font-weight:700;background:rgba(33,163,102,.04)"><td>TOTAL</td><td class="r">'+fmt(tot)+'</td><td class="r">100%</td><td colspan="4" class="r" style="color:var(--muted)">—</td></tr>';
     }
     const bar = document.getElementById('bar-excl-canais');
