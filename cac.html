@@ -628,7 +628,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
     <!-- CAC por combo -->
     <div class="card" style="margin-bottom:16px">
       <div class="card-title">💰 CAC por Combinação de Canais</div>
-      <div class="card-sub">Base: comunicações enviadas · Custo total ÷ conversões (por consumer) e ÷ comunicações (por comm) · ordenado por consumers</div>
+      <div class="card-sub">Base: comunicações enviadas · Custo total ÷ conversões · ordenado por total de comunicações</div>
       <div class="tbl-wrap" style="margin-top:10px">
         <table>
           <thead>
@@ -916,7 +916,7 @@ function renderRecorrencia() {
 
 
 function renderCombos() {
-    const combos = (DADOS.combo[MES_ATIVO] || []).slice(0,15);
+    const combos = (DADOS.combo[MES_ATIVO] || []).slice().sort((a,b)=>b.total_comms-a.total_comms).slice(0,15);
     const tbody = document.getElementById('combo-tbody');
     if(!tbody) return;
     tbody.innerHTML = combos.map(c => {
