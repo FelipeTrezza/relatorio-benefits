@@ -214,8 +214,15 @@ html = re.sub(
 
 # ─ Hero KPIs ─────────────────────────────────────────────────────────────────
 total_env = sum(c["enviados"] for c in canais.values())
+
+def fmt_compacto(v):
+    """Formato compacto: 1,18M / 895k / 245"""
+    if v >= 1_000_000: return f"{v/1_000_000:.2f}M".replace(".",",")
+    if v >= 1_000:     return f"{v/1_000:.0f}k"
+    return str(v)
+
 html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">Comunicações)',
-              f'\\g<1>{fmt_num(total_env)}\\2', html)
+              f'\\g<1>{fmt_compacto(total_env)}\\2', html)
 html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">CAC Médio Ponderado)',
               f'\\g<1>R${cac_medio:.2f}\\2'.replace(".",","), html)
 html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">Custo Total MKT)',
@@ -227,6 +234,9 @@ cac_val_str  = f"R${cac_medio:.2f}".replace(".",",")
 custo_str    = fmt_brl(total_custo)
 
 html = re.sub(r'(<div class="kpi-val"[^>]*>)[^<]+(</div>\s*<div class="kpi-sub">5 canais)',
+              f'\\g<1>{fmt_num(total_env)}\\2', html)
+# kpi-total-env por ID
+html = re.sub(r'(<div class="kpi-val"[^>]*id="kpi-total-env"[^>]*>)[^<]+(</div>)',
               f'\\g<1>{fmt_num(total_env)}\\2', html)
 # kpi-total-conv por ID (mais robusto que pelo sub-text)
 html = re.sub(r'(<div class="kpi-val"[^>]*id="kpi-total-conv"[^>]*>)[^<]+(</div>)',
