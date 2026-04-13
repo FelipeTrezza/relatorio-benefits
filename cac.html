@@ -914,7 +914,8 @@ function renderRecorrencia() {
 
 
 function renderCombos() {
-    const seq = (SEQ_DADOS[MES_ATIVO] || []);
+    const MES_SEQ = {"2025-09":"Set/25","2025-10":"Out/25","2025-11":"Nov/25","2025-12":"Dez/25","2026-01":"Jan/26","2026-02":"Fev/26","2026-03":"Mar/26","2026-04":"Abr/26"};
+    const seq = (SEQ_DADOS[MES_SEQ[MES_ATIVO]] || []);
     const tbody = document.getElementById('combo-tbody');
     if(!tbody) return;
     tbody.innerHTML = seq.map((c,i) => {
