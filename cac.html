@@ -111,8 +111,64 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
   .setor-grid{grid-template-columns:repeat(2,1fr)}
   .insight-grid{grid-template-columns:1fr}
   .nav{display:none}
-
+  .score-cards{grid-template-columns:repeat(2,1fr)}
 }
+
+/* ── Score de Canais ─────────────────────────────────── */
+.score-racional{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:14px 18px;font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:20px}
+.score-racional strong{color:#58a6ff}
+.score-racional b{color:var(--text)}
+.score-formula{margin:10px 0 4px;padding:10px 14px;background:rgba(0,0,0,.3);border-radius:6px;font-family:monospace;font-size:11px;color:var(--muted);line-height:1.9}
+.score-formula span{color:var(--green)}
+.score-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.score-card{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:14px 12px;text-align:center}
+.sc-name{font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:8px}
+.sc-num{font-size:32px;font-weight:800;line-height:1;margin-bottom:2px}
+.sc-deno{font-size:10px;color:var(--muted);margin-bottom:8px}
+.sc-delta{font-size:10px;padding:2px 7px;border-radius:10px;display:inline-block;margin-bottom:10px;font-weight:600}
+.sc-delta-up{background:rgba(33,163,102,.12);color:var(--greenl)}
+.sc-delta-eq{background:rgba(139,148,158,.1);color:var(--muted)}
+.dim-bars{display:flex;flex-direction:column;gap:5px;text-align:left}
+.db-row{display:flex;align-items:center;gap:5px}
+.db-lbl{font-size:9px;color:var(--muted);width:58px;flex-shrink:0;line-height:1.3}
+.db-bg{flex:1;height:4px;background:var(--surf3);border-radius:2px;overflow:hidden}
+.db-fill{height:100%;border-radius:2px}
+.db-val{font-size:9px;color:var(--muted);width:22px;text-align:right;flex-shrink:0}
+/* tabela de sequências */
+.seq-table{width:100%;border-collapse:collapse;font-size:12px}
+.seq-table thead th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500}
+.seq-table thead th.r{text-align:right}
+.seq-table thead th.c{text-align:center}
+.seq-table tbody tr{border-bottom:1px solid var(--surf2);transition:background .12s;cursor:default}
+.seq-table tbody tr:hover{background:rgba(255,255,255,.025)}
+.seq-table tbody td{padding:10px 10px;vertical-align:middle}
+.seq-table tbody td.r{text-align:right}
+.seq-table tbody td.c{text-align:center}
+tr.seq-otima td:first-child{border-left:3px solid var(--greenl)}
+tr.seq-boa   td:first-child{border-left:3px solid #58a6ff}
+tr.seq-media td:first-child{border-left:3px solid var(--orange)}
+tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
+.sbadge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:24px;border-radius:6px;font-size:12px;font-weight:700}
+.sbadge-otima{background:rgba(33,163,102,.12);color:var(--greenl)}
+.sbadge-boa{background:rgba(88,166,255,.12);color:#58a6ff}
+.sbadge-media{background:rgba(240,136,62,.12);color:var(--orange)}
+.sbadge-fraca{background:rgba(248,81,73,.12);color:var(--red)}
+.sbar-bg{flex:1;height:4px;background:var(--surf3);border-radius:2px;overflow:hidden;min-width:40px}
+.sbar-fill{height:100%;border-radius:2px}
+.seq-pills{display:flex;align-items:center;gap:3px;flex-wrap:nowrap}
+.seq-pill{padding:2px 6px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.sp-INAPP{background:rgba(88,166,255,.15);color:#58a6ff}
+.sp-PUSH{background:rgba(63,185,80,.15);color:#3fb950}
+.sp-DM{background:rgba(188,140,255,.15);color:#bc8cff}
+.sp-WHATSAPP{background:rgba(240,136,62,.15);color:var(--orange)}
+.sp-dim{background:rgba(139,148,158,.08);color:var(--muted);opacity:.55}
+.sp-score{font-size:9px;padding:1px 4px;border-radius:7px;background:rgba(255,255,255,.05);color:var(--muted);font-weight:600}
+.seq-sec-hdr{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:5px 10px;background:rgba(255,255,255,.02);margin:2px 0}
+.seq-ganho{font-size:11px;color:var(--muted)}
+.seq-ganho .gv{font-weight:700}
+.seq-legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.seq-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.seq-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -131,6 +187,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
     <a class="nb" href="#setores">Setores</a>
     <a class="nb" href="#toques">Toques</a>
     <a class="nb" href="#recorrencia">Recorrência</a>
+    <a class="nb" href="#score">Score Canais</a>
     <a class="nb" href="#horario">Horário</a>
     <a class="nb" href="#insights">Insights</a>
     <a class="nb" href="https://felipetrezza.github.io/relatorio-benefits/hub.html" style="margin-left:8px">← Hub</a>
@@ -650,6 +707,70 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
         Combos com WHATSAPP tendem a ter CAC/comm alto por conta do custo por entrega.
       </div>
     </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCORE DE CANAIS
+  ════════════════════════════════════════════════════════════ -->
+  <section id="score">
+    <div class="sec-title">🏅 Score de Canais & Sequências</div>
+    <div class="sec-sub">Score dessazonalizado · 7 meses de histórico (Set/25–Mar/26) · Racional completo abaixo</div>
+
+    <!-- Racional -->
+    <div class="score-racional">
+      <strong>Por que criar um score em vez de usar só Conv%?</strong><br>
+      Usar conversão isolada gera três vieses críticos: <b>(1) viés de intenção</b> — INAPP só entrega quando o app está aberto, capturando consumers que já iam antecipar; <b>(2) viés de segmentação</b> — a correlação entre volume de PUSH e conv% é r=+0,91, ou seja, quem o sistema escolhe enviar impacta mais o número do que o canal em si; <b>(3) volatilidade extrema</b> — PUSH variou de 23% a 92% em 7 meses, o que inviabiliza comparações pontuais.<br><br>
+      <strong>Solução: score multidimensional dessazonalizado</strong> — 4 dimensões independentes, média ponderada de 7 meses com peso crescente para meses mais recentes (Set/25=1× → Mar/26=3×).<br><br>
+      <div class="score-formula">
+Score = <span>Alcance(25%)</span> + <span>Custo(30%)</span> + <span>Conv. Estabilizada(30%)</span> + <span>Consistência(15%)</span><br>
+Alcance            = taxa_entrega_ponderada / 100 × 10<br>
+Custo              = (1 − custo_envio / max_custo) × 10  [max = R$0,0526 WA]<br>
+Conv. Estabilizada = média_ponderada(conv%_exclusivo, 7m) / 100 × 10<br>
+Consistência       = max(0, (70pp − desvio_padrão) / 70) × 10<br>
+Pesos temporais    = Set/25=1× · Out=1× · Nov=1,5× · Dez=1,5× · Jan=2× · Fev=2,5× · Mar=3×
+      </div>
+      <strong>Limitação:</strong> Conv. Estabilizada ainda carrega viés de segmentação (mede audiência + canal). Eliminação completa exigiria A/B controlado com audiência randomizada.
+    </div>
+
+    <!-- Score cards por canal -->
+    <div class="score-cards" id="score-cards-wrap"></div>
+
+    <!-- Legenda -->
+    <div class="seq-legend">
+      <span style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Score da seq:</span>
+      <div class="seq-legend-item"><div class="seq-legend-dot" style="background:var(--greenl)"></div>≥ 7,5 Ótima</div>
+      <div class="seq-legend-item"><div class="seq-legend-dot" style="background:#58a6ff"></div>6,5–7,5 Boa</div>
+      <div class="seq-legend-item"><div class="seq-legend-dot" style="background:var(--orange)"></div>5,0–6,5 Média</div>
+      <div class="seq-legend-item"><div class="seq-legend-dot" style="background:var(--red)"></div>&lt; 5,0 Fraca</div>
+      <span style="flex:1"></span>
+      <span style="font-size:10px;color:var(--muted)">Hover para detalhes · último canal tem maior peso no score</span>
+    </div>
+
+    <!-- Tabela -->
+    <div style="overflow-x:auto">
+      <table class="seq-table">
+        <thead>
+          <tr>
+            <th style="width:34%">Sequência (1º → último canal)</th>
+            <th class="c" style="width:10%">Score seq.</th>
+            <th class="r">Consumers</th>
+            <th class="r">Conv%</th>
+            <th class="r">Anteciparam</th>
+            <th class="r">CAC</th>
+            <th style="width:12%">Canal âncora</th>
+            <th style="width:14%">Ganho s/ canal fraco</th>
+          </tr>
+        </thead>
+        <tbody id="score-seq-tbody"></tbody>
+      </table>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:12px">
+      ✦ <b>Canal âncora</b> = maior score individual na sequência ·
+      <b>Ganho s/ canal fraco</b> = variação no score se o pior canal fosse removido ·
+      Scores individuais: PUSH 7,9 · INAPP 7,8 · DM 4,3 · WA 3,6
+    </p>
   </section>
 
   <div class="divider"></div>
@@ -1302,6 +1423,190 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   draw();
+})();
+
+// ═══════════════════════════════════════════════════════
+// SCORE DE CANAIS
+// ═══════════════════════════════════════════════════════
+(function() {
+
+const CANAL_COR = { INAPP:'#58a6ff', PUSH:'#3fb950', DM:'#bc8cff', WHATSAPP:'var(--orange)' };
+
+// Scores individuais dessazonalizados (7 meses ponderados, Set/25–Mar/26)
+const SCORE_IND = {
+  PUSH:     { total:7.94, d1:9.85, d2:9.92, d3:5.29, d4:6.08, cor:'#3fb950', borda:'rgba(63,185,80,.3)'  },
+  INAPP:    { total:7.75, d1:9.09, d2:9.92, d3:4.46, d4:7.75, cor:'#58a6ff', borda:'rgba(88,166,255,.3)' },
+  DM:       { total:4.34, d1:0.00, d2:8.86, d3:2.26, d4:6.71, cor:'#bc8cff', borda:'rgba(188,140,255,.3)'},
+  WHATSAPP: { total:3.59, d1:7.29, d2:0.00, d3:1.83, d4:8.11, cor:'#f0883e', borda:'rgba(240,136,62,.3)' },
+};
+
+// Pesos por posição na sequência (último canal = mais relevante)
+const PESOS_POS = { 1:[1.0], 2:[0.4,0.6], 3:[0.2,0.3,0.5], 4:[0.1,0.2,0.3,0.4] };
+
+// Dados de sequência Mar/26 (usa SEQ_DADOS já disponível)
+const MES_SEQ = 'Mar/26';
+const CLASSE_COR = { otima:'var(--greenl)', boa:'#58a6ff', media:'var(--orange)', fraca:'var(--red)' };
+
+function scoreSeq(canais) {
+  const p = PESOS_POS[canais.length] || canais.map(() => 1/canais.length);
+  return canais.reduce((s, c, i) => s + (SCORE_IND[c]?.total || 0) * p[i], 0);
+}
+function classe(s) {
+  return s >= 7.5 ? 'otima' : s >= 6.5 ? 'boa' : s >= 5.0 ? 'media' : 'fraca';
+}
+function fmt(n)  { return Number(n).toLocaleString('pt-BR'); }
+function fmtP(n) { return Number(n).toFixed(2).replace('.',',') + '%'; }
+function fmtC(n) { return 'R$' + Number(n).toFixed(4).replace('.',','); }
+
+// ── Render score cards ────────────────────────────────
+function renderScoreCards() {
+  const wrap = document.getElementById('score-cards-wrap');
+  if (!wrap) return;
+  const dim_labels = ['Alcance real','Efic. custo','Conv. estab.','Consistência'];
+  const dim_pesos  = ['25%','30%','30%','15%'];
+  const order = ['PUSH','INAPP','DM','WHATSAPP'];
+  const delta = { PUSH:'+0,7', INAPP:'+0,8', DM:'+0,2', WHATSAPP:'+0,4' };
+
+  wrap.innerHTML = order.map(c => {
+    const s = SCORE_IND[c];
+    const dims = [s.d1, s.d2, s.d3, s.d4];
+    const barsHtml = dims.map((v, i) => `
+      <div class="db-row">
+        <div class="db-lbl">${dim_labels[i]}<br><span style="color:var(--muted);font-size:8px">${dim_pesos[i]}</span></div>
+        <div class="db-bg"><div class="db-fill" style="width:${v*10}%;background:${s.cor}"></div></div>
+        <div class="db-val" style="${v < 1 ? 'color:var(--red)' : ''}">${v.toFixed(1)}</div>
+      </div>`).join('');
+    const isUp = delta[c].startsWith('+');
+    return `<div class="score-card" style="border-color:${s.borda}">
+      <div class="sc-name" style="color:${s.cor}">${c}</div>
+      <div class="sc-num" style="color:${s.cor}">${s.total.toFixed(1)}</div>
+      <div class="sc-deno">/10</div>
+      <div class="sc-delta ${isUp?'sc-delta-up':'sc-delta-eq'}">${isUp?'↑':'≈'} ${delta[c]} vs. mês único</div>
+      <div class="dim-bars">${barsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Render tabela de sequências ───────────────────────
+function renderScoreSeq() {
+  const tbody = document.getElementById('score-seq-tbody');
+  if (!tbody) return;
+
+  const rawData = (typeof SEQ_DADOS !== 'undefined' && SEQ_DADOS[MES_SEQ]) ? SEQ_DADOS[MES_SEQ] : [];
+
+  // Calcular scores
+  const rows = rawData.map(r => {
+    const canais = r.seq.replace(/ > /g, '>').split('>').map(c => c.trim());
+    const pesos  = PESOS_POS[canais.length] || canais.map(() => 1/canais.length);
+    const sc     = canais.reduce((s, c, i) => s + (SCORE_IND[c]?.total || 0) * pesos[i], 0);
+    const melhor = canais.reduce((a, b) => (SCORE_IND[a]?.total||0) >= (SCORE_IND[b]?.total||0) ? a : b);
+    const pior   = canais.length > 1 ? canais.reduce((a, b) => (SCORE_IND[a]?.total||0) <= (SCORE_IND[b]?.total||0) ? a : b) : null;
+    let scSemPior = sc, ganho = 0;
+    if (pior) {
+      const sem = canais.filter(c => c !== pior);
+      const p2  = PESOS_POS[sem.length] || sem.map(() => 1/sem.length);
+      scSemPior = sem.reduce((s, c, i) => s + (SCORE_IND[c]?.total || 0) * p2[i], 0);
+      ganho     = scSemPior - sc;
+    }
+    return { ...r, canais, pesos, sc, melhor, pior, scSemPior, ganho,
+             classe: classe(sc), consumers: +r.consumers, convertidos: +r.convertidos,
+             conv_pct: +r.conv_pct, cac: +r.cac };
+  }).sort((a, b) => b.sc - a.sc);
+
+  const secoes = [
+    { key:'otima', label:'✅ Ótimas — Score ≥ 7,5' },
+    { key:'boa',   label:'🔵 Boas — Score 6,5–7,5' },
+    { key:'media', label:'⚠️ Médias — Score 5,0–6,5' },
+    { key:'fraca', label:'❌ Fracas — Score < 5,0' },
+  ];
+
+  let html = '';
+  secoes.forEach(sec => {
+    const grupo = rows.filter(r => r.classe === sec.key);
+    if (!grupo.length) return;
+    html += `<tr><td colspan="8"><div class="seq-sec-hdr" style="color:${CLASSE_COR[sec.key]}">${sec.label}</div></td></tr>`;
+    grupo.forEach(r => {
+      const cor = CLASSE_COR[r.classe];
+      const pct = (r.sc / 10 * 100).toFixed(0);
+      // pills com score embutido
+      const pillsHtml = r.canais.map((c, i) => {
+        const isPior = c === r.pior && r.canais.length > 1;
+        return (i > 0 ? '<span style="color:var(--muted);font-size:10px">›</span>' : '') +
+          `<span class="seq-pill sp-${c} ${isPior ? 'sp-dim' : ''}">${c}</span>` +
+          `<span class="sp-score">${(SCORE_IND[c]?.total||0).toFixed(1)}</span>`;
+      }).join('');
+      // canal âncora
+      const aCor = CANAL_COR[r.melhor] || 'var(--text)';
+      const ancHtml = `<span style="color:${aCor};font-weight:600;font-size:11px">● ${r.melhor} <span style="color:var(--muted);font-size:10px">${(SCORE_IND[r.melhor]?.total||0).toFixed(1)}</span></span>`;
+      // ganho
+      let ganhoHtml = '—';
+      if (r.ganho > 0.05) {
+        const gc = r.ganho >= 2 ? 'var(--red)' : r.ganho >= 1 ? 'var(--orange)' : 'var(--muted)';
+        const pc = CANAL_COR[r.pior] || 'var(--muted)';
+        ganhoHtml = `<div class="seq-ganho"><span class="gv" style="color:${gc}">+${r.ganho.toFixed(2)}</span> <span>sem </span><span style="color:${pc};font-weight:600;font-size:10px">${r.pior}</span> <span style="color:var(--muted);font-size:10px">→ ${r.scSemPior.toFixed(2)}</span></div>`;
+      }
+      // conv% color
+      const convCol = r.conv_pct >= 20 ? 'var(--greenl)' : r.conv_pct >= 10 ? 'var(--orange)' : 'var(--red)';
+      const cacCol  = r.cac < 0.01 ? 'var(--greenl)' : r.cac < 0.05 ? '#58a6ff' : r.cac < 0.09 ? 'var(--orange)' : 'var(--red)';
+
+      html += `<tr class="seq-${r.classe}">
+        <td><div class="seq-pills">${pillsHtml}</div></td>
+        <td class="c">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+            <span class="sbadge sbadge-${r.classe}">${r.sc.toFixed(2)}</span>
+            <div style="display:flex;align-items:center;gap:4px;width:100%">
+              <div class="sbar-bg"><div class="sbar-fill" style="width:${pct}%;background:${cor}"></div></div>
+            </div>
+          </div>
+        </td>
+        <td class="r" style="color:var(--text)">${fmt(r.consumers)}</td>
+        <td class="r"><span style="color:${convCol};font-weight:${r.conv_pct>=20?700:600}">${fmtP(r.conv_pct)}</span></td>
+        <td class="r" style="color:var(--greenl);font-weight:600">${fmt(r.convertidos)}</td>
+        <td class="r"><span style="color:${cacCol};font-weight:600">${fmtC(r.cac)}</span></td>
+        <td>${ancHtml}</td>
+        <td>${ganhoHtml}</td>
+      </tr>`;
+    });
+  });
+
+  tbody.innerHTML = html;
+
+  // Tooltip
+  const tip = document.createElement('div');
+  tip.style.cssText = 'position:fixed;background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px 14px;font-size:11px;line-height:1.8;pointer-events:none;display:none;z-index:999;min-width:210px;box-shadow:0 8px 24px rgba(0,0,0,.5)';
+  document.body.appendChild(tip);
+
+  tbody.querySelectorAll('tr[class^="seq-"]').forEach((tr, idx) => {
+    const r = rows.filter(x => !['otima','boa','media','fraca'].includes(x))[idx] || rows[idx];
+    // remap pelo índice visual
+  });
+
+  // Hover com dados do rows
+  const trs = tbody.querySelectorAll('tr.seq-otima, tr.seq-boa, tr.seq-media, tr.seq-fraca');
+  let ri = 0;
+  trs.forEach(tr => {
+    const d = rows[ri++];
+    if (!d) return;
+    const detalhe = d.canais.map((c, i) => `${c}:${(SCORE_IND[c]?.total||0).toFixed(1)} ×${d.pesos[i].toFixed(1)}`).join('  +  ');
+    tr.addEventListener('mouseenter', e => {
+      tip.innerHTML = `<b style="color:var(--text);display:block;margin-bottom:4px">${d.seq}</b>
+        <div style="display:flex;justify-content:space-between;gap:16px;color:var(--muted)"><span>Score seq.</span><span style="color:${CLASSE_COR[d.classe]};font-weight:700">${d.sc.toFixed(2)}</span></div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">${detalhe}</div>
+        <div style="display:flex;justify-content:space-between;gap:16px;color:var(--muted)"><span>Consumers</span><span style="color:var(--text)">${fmt(d.consumers)}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:16px;color:var(--muted)"><span>Conv%</span><span style="color:var(--greenl)">${fmtP(d.conv_pct)}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:16px;color:var(--muted)"><span>Anteciparam</span><span style="color:var(--greenl)">${fmt(d.convertidos)}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:16px;color:var(--muted)"><span>CAC</span><span>${fmtC(d.cac)}</span></div>
+        ${d.ganho > 0.05 ? `<div style="display:flex;justify-content:space-between;gap:16px;color:var(--muted)"><span>Ganho s/ ${d.pior}</span><span style="color:var(--orange)">+${d.ganho.toFixed(2)} → ${d.scSemPior.toFixed(2)}</span></div>` : ''}`;
+      tip.style.display = 'block';
+    });
+    tr.addEventListener('mousemove', e => { tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px'; });
+    tr.addEventListener('mouseleave', () => { tip.style.display='none'; });
+  });
+}
+
+renderScoreCards();
+renderScoreSeq();
+
 })();
 </script>
 
