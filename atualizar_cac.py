@@ -216,26 +216,67 @@ html = re.sub(
 total_env = sum(c["enviados"] for c in canais.values())
 html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">Comunicações)',
               f'\\g<1>{fmt_num(total_env)}\\2', html)
-html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">Convertidos)',
-              f'\\g<1>{fmt_num(total_conv)}\\2', html)
-html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">Conv\. Geral)',
-              f'\\g<1>{total_conv/total_env*100:.2f}%\\2'.replace(".",","), html)
 html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">CAC Médio Ponderado)',
               f'\\g<1>R${cac_medio:.2f}\\2'.replace(".",","), html)
 html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">Custo Total MKT)',
               f'\\g<1>{fmt_brl(total_custo)}\\2', html)
 
 # ─ KPI cards visão geral ─────────────────────────────────────────────────────
+conv_pct_str = f"{total_conv/total_env*100:.2f}%".replace(".",",")
+cac_val_str  = f"R${cac_medio:.2f}".replace(".",",")
+custo_str    = fmt_brl(total_custo)
+
 html = re.sub(r'(<div class="kpi-val"[^>]*>)[^<]+(</div>\s*<div class="kpi-sub">5 canais)',
               f'\\g<1>{fmt_num(total_env)}\\2', html)
-html = re.sub(r'(<div class="kpi-val"[^>]*>)[^<]+(</div>\s*<div class="kpi-sub">Únicos)',
+# kpi-total-conv por ID (mais robusto que pelo sub-text)
+html = re.sub(r'(<div class="kpi-val"[^>]*id="kpi-total-conv"[^>]*>)[^<]+(</div>)',
               f'\\g<1>{fmt_num(total_conv)}\\2', html)
+# kpi-conv-pct por ID
+html = re.sub(r'(<div class="kpi-val"[^>]*id="kpi-conv-pct"[^>]*>)[^<]+(</div>)',
+              f'\\g<1>{conv_pct_str}\\2', html)
+# kpi-sub "Convertidos / Enviados" (fallback genérico)
 html = re.sub(r'(<div class="kpi-val"[^>]*>)[^<]+(</div>\s*<div class="kpi-sub">Convertidos / Enviados)',
-              f'\\g<1>{total_conv/total_env*100:.2f}%\\2'.replace(".",","), html)
-html = re.sub(r'(<div class="kpi-val"[^>]*>)[^<]+(</div>\s*<div class="kpi-sub">Custo total)',
-              f'\\g<1>{fmt_brl(total_custo)}\\2', html)
-html = re.sub(r'(<div class="kpi-val"[^>]*>)[^<]+(</div>\s*<div class="kpi-sub">R\$[\d\.\,]+ / [\d\.]+ conv)',
-              f'\\g<1>R${cac_medio:.2f}\\2'.replace(".",","), html)
+              f'\\g<1>{conv_pct_str}\\2', html)
+# kpi-custo-total por ID + kpi-sub "Custo total X" (atualiza os dois juntos)
+html = re.sub(
+    r'(<div class="kpi-val"[^>]*id="kpi-custo-total"[^>]*>)[^<]+(</div>\s*<div class="kpi-sub">)Custo total[^<]*(</div>)',
+    f'\\g<1>{custo_str}\\2Custo total {custo_str}\\3', html
+)
+# kpi-cac-medio por ID + kpi-sub "R$X / N.NNN conv." (atualiza os dois juntos)
+html = re.sub(
+    r'(<div class="kpi-val"[^>]*id="kpi-cac-medio"[^>]*>)[^<]+(</div>\s*<div class="kpi-sub">)R\$[\d\.\,]+ / [\d\.]+ conv\.(</div>)',
+    f'\\g<1>{cac_val_str}\\2{custo_str} / {fmt_num(total_conv)} conv.\\3',
+    html
+)
+
+# ─ Hero KPIs: Convertidos e Conv. Geral (hk-val não têm IDs) ─────────────────
+html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">Convertidos)',
+              f'\\g<1>{fmt_num(total_conv)}\\2', html)
+html = re.sub(r'(<div class="hk-val"[^>]*>)[^<]+(</div><div class="hk-lbl">Conv\. Geral)',
+              f'\\g<1>{conv_pct_str}\\2', html)
+
+# ─ Linha TOTAL da tabela de canais ───────────────────────────────────────────
+# Col order: TOTAL | — | conv | conv% | custo | CAC
+# [a] conv
+html = re.sub(
+    r'(<td colspan="2"><strong>TOTAL</strong></td>\s*<td class="r">—</td>\s*<td class="r">)[\d\.]+',
+    f'\\g<1>{fmt_num(total_conv)}', html
+)
+# [b] conv% — busca a célula após conv
+html = re.sub(
+    r'(TOTAL</strong></td>[^<]*<td[^>]*>—</td>[^<]*<td[^>]*>[\d\.]+</td>[^<]*<td[^>]*>)[\d,]+%',
+    f'\\g<1>{conv_pct_str}', html
+)
+# [c] custo
+html = re.sub(
+    r'(TOTAL</strong></td>[^<]*<td[^>]*>—</td>[^<]*<td[^>]*>[\d\.]+</td>[^<]*<td[^>]*>[\d,]+%</td>[^<]*<td[^>]*>)R\$[\d\.\,]+k?',
+    f'\\g<1>{custo_str}', html
+)
+# [d] CAC — célula com color orange
+html = re.sub(
+    r'(<td class="r" style="color:var\(--orange\)">)R\$[\d,\.]+(</td>\s*<td></td>)',
+    f'\\g<1>{cac_val_str}\\2', html
+)
 
 # ─ Rodapé data ───────────────────────────────────────────────────────────────
 html = re.sub(
