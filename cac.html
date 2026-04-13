@@ -636,6 +636,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
               <th>Sequência (1º → último canal)</th>
               <th class="r" style="color:var(--muted)">Consumers</th>
               <th class="r">Conv%</th>
+              <th class="r" style="color:var(--greenl)">Anteciparam</th>
               <th class="r" style="color:var(--muted)">Disparos</th>
               <th class="r" style="color:var(--muted)">Disp/Consumer</th>
               <th class="r">CAC</th>
@@ -938,10 +939,12 @@ function renderCombos() {
         const cacFmt = cac === 0 ? '—' : fmtR(cac, 4);
         const disparos = parseInt(c.total_disparos || 0);
         const disp_pc  = parseFloat(c.disparos_pc || 0);
+        const anteciparam = parseInt(c.convertidos || 0);
         return `<tr>
           <td>${dots} <span style="font-size:11px">${setas}${badge}</span></td>
           <td class="r" style="color:var(--muted);font-size:11px">${fmt(cons)}</td>
           <td class="r" style="color:${convCor}"><strong>${fmtPct(conv)}</strong></td>
+          <td class="r" style="color:var(--greenl);font-size:11px">${fmt(anteciparam)}</td>
           <td class="r" style="color:var(--muted);font-size:11px">${fmt(disparos)}</td>
           <td class="r" style="color:var(--muted);font-size:11px">${disp_pc.toFixed(1).replace('.',',')}</td>
           <td class="r" style="color:${cacCor}"><strong>${cacFmt}</strong></td>
