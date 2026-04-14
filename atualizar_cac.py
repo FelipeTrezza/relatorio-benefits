@@ -131,88 +131,77 @@ GROUP BY sc.setor
 ORDER BY convertidos DESC
 """, label="setor")
 
-# ── Query Last Click 7d — partindo da comunicação ────────────────────────────
-# Lógica correta: comunicação enviada → olha 7d para frente → houve antecipação?
-# 1ª vida = primeira antecipação da vida do consumer aconteceu nessa janela
-# recompra = consumer já tinha antecipado antes do envio
-print("[3/4] Buscando conversão last-click (7d, partindo da comunicação)...")
+# ── Query Last Click 7d — lógica correta ─────────────────────────────────────
+# Fluxo:
+#   1. Para cada antecipação, busca TODAS as comms sfpjbene nos 7d anteriores
+#   2. Seleciona a comunicação mais recente (MAX sent_at) → last click real
+#   3. O canal dessa comunicação recebe 100% do crédito
+#   4. 1ª vida = primeira antecipação da vida caiu nessa conversão
+#   5. Recompra = consumer já tinha antecipado antes
+# Assim um consumer com múltiplos canais na janela credita apenas o último.
+print("[3/4] Buscando conversão last-click (7d, último canal antes da antecipação)...")
 _, rows_lc = run_q(f"""
-WITH meses AS (
-    -- Todos os meses desde Set/25 até o mês atual
-    SELECT DISTINCT DATE_FORMAT(sent_at, 'yyyy-MM') AS mes
-    FROM marketing.consumers_campaigns_communications
-    WHERE SPLIT(journey_name, '-')[7] = 'sfpjbene'
-      AND LOWER(journey_name) NOT LIKE '%educacional%'
-      AND sent_at >= '2025-09-01'
-      AND sent_at < '{hoje}'
-),
-comms AS (
-    -- Uma linha por (consumer, canal, mês) — distinct para evitar contar múltiplos
-    -- disparos do mesmo consumer no mesmo canal/mês como N oportunidades
-    SELECT DISTINCT
-        CAST(c.consumer_id AS BIGINT) AS consumer_id,
-        c.channel,
-        DATE_FORMAT(c.sent_at, 'yyyy-MM') AS mes,
-        MIN(c.sent_at) AS primeiro_envio   -- primeiro disparo do mês para janela
-    FROM marketing.consumers_campaigns_communications c
-    WHERE SPLIT(c.journey_name, '-')[7] = 'sfpjbene'
-      AND LOWER(c.journey_name) NOT LIKE '%educacional%'
-      AND c.sent_at >= '2025-09-01'
-      AND c.sent_at < '{hoje}'
-    GROUP BY CAST(c.consumer_id AS BIGINT), c.channel, DATE_FORMAT(c.sent_at, 'yyyy-MM')
+WITH antecipacoes AS (
+    -- Todas as antecipações do período histórico
+    SELECT
+        consumer_id,
+        created_at                              AS ts_antecip,
+        DATE_FORMAT(created_at, 'yyyy-MM')      AS mes
+    FROM benefits.anticipation_request
+    WHERE request_status = 'FINISH'
+      AND created_at >= '2025-09-01'
+      AND created_at < '{hoje}'
 ),
 primeira_antecip_vida AS (
-    -- Data da primeira antecipação de toda a vida de cada consumer
+    -- Primeira antecipação de toda a vida de cada consumer
     SELECT consumer_id, MIN(created_at) AS ts_primeira
     FROM benefits.anticipation_request
     WHERE request_status = 'FINISH'
     GROUP BY consumer_id
 ),
-antecip_mes AS (
-    -- Antecipações por consumer e mês (para a janela de 7d)
+comms_janela AS (
+    -- Para cada antecipação, todas as comms sfpjbene nos 7d anteriores
     SELECT
-        consumer_id,
-        DATE_FORMAT(created_at, 'yyyy-MM') AS mes,
-        MIN(created_at) AS ts_antecip   -- primeira antecipação do mês
-    FROM benefits.anticipation_request
-    WHERE request_status = 'FINISH'
-      AND created_at >= '2025-09-01'
-      AND created_at < '{hoje}'
-    GROUP BY consumer_id, DATE_FORMAT(created_at, 'yyyy-MM')
-),
-atribuicoes AS (
-    -- Partindo da comunicação, verifica se houve antecipação nos 7d seguintes
-    SELECT
-        c.mes,
-        c.channel,
-        c.consumer_id,
+        a.consumer_id,
         a.ts_antecip,
+        a.mes,
+        c.channel,
+        c.sent_at,
+        ROW_NUMBER() OVER (
+            PARTITION BY a.consumer_id, a.ts_antecip
+            ORDER BY c.sent_at DESC          -- mais recente primeiro = last click
+        ) AS rn
+    FROM antecipacoes a
+    JOIN marketing.consumers_campaigns_communications c
+        ON CAST(c.consumer_id AS BIGINT) = a.consumer_id
+       AND c.sent_at <= a.ts_antecip                     -- comunicação antes da antecipação
+       AND c.sent_at >  a.ts_antecip - INTERVAL 7 DAYS  -- dentro dos 7 dias
+       AND SPLIT(c.journey_name, '-')[7] = 'sfpjbene'
+       AND LOWER(c.journey_name) NOT LIKE '%educacional%'
+),
+last_click AS (
+    -- Apenas o último canal antes de cada antecipação (rn = 1)
+    SELECT
+        cj.consumer_id,
+        cj.ts_antecip,
+        cj.mes,
+        cj.channel,
         pv.ts_primeira,
         CASE
-            WHEN a.ts_antecip IS NULL THEN 'nao_converteu'
-            WHEN pv.ts_primeira IS NULL THEN 'nao_converteu'
-            -- 1ª vida: a primeira antecipação de toda a vida está dentro da janela
-            WHEN pv.ts_primeira > c.primeiro_envio
-             AND pv.ts_primeira <= c.primeiro_envio + INTERVAL 7 DAYS THEN 'primeira_vida'
-            -- Recompra: já tinha antecipado antes do envio
-            WHEN pv.ts_primeira < c.primeiro_envio THEN 'recompra'
-            ELSE 'nao_converteu'
+            WHEN pv.ts_primeira = cj.ts_antecip THEN 'primeira_vida'  -- esta antecipação é a 1ª da vida
+            WHEN pv.ts_primeira < cj.ts_antecip THEN 'recompra'       -- já antecipou antes
+            ELSE 'nao_classif'
         END AS tipo
-    FROM comms c
-    LEFT JOIN antecip_mes a
-        ON c.consumer_id = a.consumer_id
-       AND c.mes = a.mes
-       AND a.ts_antecip > c.primeiro_envio
-       AND a.ts_antecip <= c.primeiro_envio + INTERVAL 7 DAYS
-    LEFT JOIN primeira_antecip_vida pv
-        ON c.consumer_id = pv.consumer_id
+    FROM comms_janela cj
+    JOIN primeira_antecip_vida pv ON cj.consumer_id = pv.consumer_id
+    WHERE cj.rn = 1
 )
 SELECT
     mes,
     channel,
     tipo,
     COUNT(DISTINCT consumer_id) AS consumers
-FROM atribuicoes
+FROM last_click
 WHERE tipo IN ('primeira_vida', 'recompra')
 GROUP BY mes, channel, tipo
 ORDER BY mes, channel, tipo
