@@ -221,7 +221,119 @@ for row in rows_lc:
 
 print(f"   LC_DADOS: {len(lc_dados)} meses calculados (lógica comunicação → 7d frente)")
 
-print("[4/4] Calculando métricas e atualizando HTML...")
+# ── Query Recorrência v2 — base last-click (antecipação → 7d para trás) ──────
+# Três dimensões com a mesma base de verdade:
+#   1. mix_canais  — quantos canais distintos tocaram o consumer nos 7d antes
+#   2. last_canal  — qual foi o último canal (já em LC_DADOS, aqui para enriquecer)
+#   3. combo_canais— set de canais recebidos (sem ordem), ranking por taxa
+# Âncora: antecipação. Janela: 7d para trás. Last-click: sent_at DESC rn=1.
+print("[4/5] Buscando recorrência de canais (last-click, 7d para trás)...")
+_, rows_rec = run_q(f"""
+WITH antecipacoes AS (
+    SELECT
+        consumer_id,
+        created_at                          AS ts_antecip,
+        DATE_FORMAT(created_at, 'yyyy-MM')  AS mes
+    FROM benefits.anticipation_request
+    WHERE request_status = 'FINISH'
+      AND created_at >= '2025-09-01'
+      AND created_at < '{hoje}'
+),
+comms_janela AS (
+    -- Todas as comms sfpjbene nos 7d antes de cada antecipação
+    SELECT
+        a.consumer_id,
+        a.ts_antecip,
+        a.mes,
+        c.channel,
+        c.sent_at,
+        ROW_NUMBER() OVER (
+            PARTITION BY a.consumer_id, a.ts_antecip
+            ORDER BY c.sent_at DESC   -- mais recente = last click (rn=1)
+        ) AS rn
+    FROM antecipacoes a
+    JOIN marketing.consumers_campaigns_communications c
+        ON CAST(c.consumer_id AS BIGINT) = a.consumer_id
+       AND c.sent_at <= a.ts_antecip
+       AND c.sent_at >  a.ts_antecip - INTERVAL 7 DAYS
+       AND SPLIT(c.journey_name, '-')[7] = 'sfpjbene'
+       AND LOWER(c.journey_name) NOT LIKE '%educacional%'
+),
+base AS (
+    -- Uma linha por (consumer, antecipação): canais distintos, último canal
+    SELECT
+        mes,
+        consumer_id,
+        ts_antecip,
+        COUNT(DISTINCT channel)                             AS n_canais,
+        MAX(CASE WHEN rn = 1 THEN channel END)             AS last_canal,
+        -- Combo: canais distintos ordenados alfabeticamente (ex: DM+INAPP+PUSH)
+        ARRAY_JOIN(SORT_ARRAY(COLLECT_SET(channel)), '+')  AS combo
+    FROM comms_janela
+    GROUP BY mes, consumer_id, ts_antecip
+)
+-- 1. Mix de canais: quantos canais distintos o consumer recebeu
+SELECT
+    'mix'           AS dim,
+    mes,
+    CAST(n_canais AS STRING)  AS chave,
+    COUNT(*)        AS antecipacoes,
+    COUNT(DISTINCT consumer_id) AS consumers
+FROM base
+GROUP BY mes, n_canais
+
+UNION ALL
+
+-- 2. Last canal: qual foi o último canal antes da antecipação
+SELECT
+    'last'          AS dim,
+    mes,
+    last_canal      AS chave,
+    COUNT(*)        AS antecipacoes,
+    COUNT(DISTINCT consumer_id) AS consumers
+FROM base
+WHERE last_canal IS NOT NULL
+GROUP BY mes, last_canal
+
+UNION ALL
+
+-- 3. Combo de canais: set de canais recebidos nos 7d (sem ordem)
+SELECT
+    'combo'         AS dim,
+    mes,
+    combo           AS chave,
+    COUNT(*)        AS antecipacoes,
+    COUNT(DISTINCT consumer_id) AS consumers
+FROM base
+WHERE combo IS NOT NULL AND combo != ''
+GROUP BY mes, combo
+
+ORDER BY dim, mes, antecipacoes DESC
+""", label="recorrencia_lc")
+
+# Organizar REC2_DADOS: {mes: {mix: [{n_canais, antecipacoes, consumers}], last: {canal: {ant, cons}}, combo: [...]}}
+rec2 = {}
+for row in rows_rec:
+    dim, mes, chave, antecipacoes, consumers = row
+    mes = str(mes); dim = str(dim); chave = str(chave)
+    antecipacoes = int(antecipacoes or 0); consumers = int(consumers or 0)
+    if mes not in rec2:
+        rec2[mes] = {"mix": [], "last": {}, "combo": []}
+    if dim == "mix":
+        rec2[mes]["mix"].append({"n": int(chave), "ant": antecipacoes, "cons": consumers})
+    elif dim == "last":
+        rec2[mes]["last"][chave] = {"ant": antecipacoes, "cons": consumers}
+    elif dim == "combo":
+        rec2[mes]["combo"].append({"combo": chave, "ant": antecipacoes, "cons": consumers})
+
+# Ordenar mix por n_canais, combo por antecipacoes desc (já vem da query)
+for mes in rec2:
+    rec2[mes]["mix"].sort(key=lambda x: x["n"])
+    rec2[mes]["combo"] = rec2[mes]["combo"][:30]  # top 30 combos
+
+print(f"   REC2_DADOS: {len(rec2)} meses | ex Mar/26 mix={len(rec2.get('2026-03',{}).get('mix',[]))} grupos")
+
+print("[5/5] Calculando métricas e atualizando HTML...")
 
 # ── Custo por canal ───────────────────────────────────────────────────────────
 CUSTO = {
@@ -411,6 +523,21 @@ if lc_dados:
         print("  ⚠️  LC_DADOS: padrão não encontrado no HTML")
 else:
     print("  ⚠️  LC_DADOS: nenhuma linha retornada pela query")
+
+# ─ REC2_DADOS — substituir dados de recorrência com lógica last-click ────────
+if rec2:
+    rec2_json = json.dumps(rec2, ensure_ascii=False, separators=(',', ':'))
+    html, n = re.subn(
+        r'const REC2_DADOS = ({.*?});',
+        f'const REC2_DADOS = {rec2_json};',
+        html, count=1, flags=re.DOTALL
+    )
+    if n:
+        print(f"  ✅ REC2_DADOS atualizado — {len(rec2)} meses")
+    else:
+        print("  ⚠️  REC2_DADOS: padrão não encontrado no HTML (primeira carga?)")
+else:
+    print("  ⚠️  REC2_DADOS: nenhuma linha retornada pela query")
 
 # ─ Salvar ────────────────────────────────────────────────────────────────────
 CAC_PATH.write_text(html, encoding="utf-8")
