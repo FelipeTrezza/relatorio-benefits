@@ -294,66 +294,11 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
             <th class="r">CAC</th>
           </tr>
         </thead>
-        <tbody>
-
-          <tr>
-            <td><span class="rank" style="background:rgba(45,201,116,.2);color:var(--greenl)">1</span></td>
-            <td><span class="canal-dot" style="background:var(--yellow)"></span><strong>EMAIL</strong></td>
-            <td class="r">2.211 enviados</td>
-            <td class="r" style="color:var(--yellow)">324</td>
-            <td class="r" style="color:var(--yellow)"><strong>14,65%</strong></td>
-            <td class="r">R$0,97</td>
-            <td class="r" style="color:var(--greenl)"><strong>R$0,0030</strong></td>
-          </tr>
-          <tr>
-            <td><span class="rank" style="background:rgba(88,166,255,.15);color:var(--blue)">2</span></td>
-            <td><span class="canal-dot" style="background:var(--blue)"></span><strong>PUSH</strong></td>
-            <td class="r">189.392 enviados</td>
-            <td class="r" style="color:var(--blue)">12.130</td>
-            <td class="r" style="color:var(--blue)"><strong>6,41%</strong></td>
-            <td class="r">R$83</td>
-            <td class="r" style="color:var(--greenl)"><strong>R$0,0069</strong></td>
-          </tr>
-          <tr>
-            <td><span class="rank" style="background:rgba(188,140,255,.15);color:var(--purple)">3</span></td>
-            <td><span class="canal-dot" style="background:var(--purple)"></span><strong>INAPP</strong></td>
-            <td class="r">412.459 enviados</td>
-            <td class="r" style="color:var(--purple)">14.529</td>
-            <td class="r" style="color:var(--purple)"><strong>3,52%</strong></td>
-            <td class="r">R$181</td>
-            <td class="r" style="color:var(--blue)"><strong>R$0,0125</strong></td>
-          </tr>
-          <tr>
-            <td><span class="rank" style="background:rgba(240,136,62,.12);color:var(--orange)">4</span></td>
-            <td><span class="canal-dot" style="background:var(--orange)"></span><strong>DM</strong></td>
-            <td class="r">424.396 enviados</td>
-            <td class="r" style="color:var(--orange)">1.916</td>
-            <td class="r" style="color:var(--orange)"><strong>0,45%</strong></td>
-            <td class="r">R$2.546</td>
-            <td class="r" style="color:var(--orange)"><strong>R$1,33</strong></td>
-          </tr>
-          <tr>
-            <td><span class="rank" style="background:rgba(248,81,73,.15);color:var(--red)">5</span></td>
-            <td><span class="canal-dot" style="background:#25d366"></span><strong>WHATSAPP</strong></td>
-            <td class="r">92.996 entregues</td>
-            <td class="r" style="color:#25d366">1.178</td>
-            <td class="r" style="color:#25d366"><strong>1,27%</strong></td>
-            <td class="r">R$4.892</td>
-            <td class="r" style="color:var(--red)"><strong>R$4,15</strong> ⚠️</td>
-          </tr>
-          <tr style="background:rgba(33,163,102,.04);font-weight:700">
-            <td colspan="2"><strong>TOTAL</strong></td>
-            <td class="r">—</td>
-            <td class="r">24.878</td>
-            <td class="r">2,11%</td>
-            <td class="r">R$7,7k</td>
-            <td class="r" style="color:var(--orange)">R$0,31</td>
-            <td></td>
-          </tr>
+        <tbody id="canais-tbody">
         </tbody>
       </table>
     </div>
-    <div style="margin-top:8px;font-size:11px;color:var(--muted);padding:0 4px">
+    <div style="margin-top:8px;font-size:11px;color:var(--muted);padding:0 4px" id="wa-nota">
       * WhatsApp: volume faturável = mensagens entregues (92.996 de 176.571 enviados). Conv% calculado sobre entregues.
     </div>
 
@@ -361,65 +306,13 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
       <div class="card">
         <div class="card-title">Taxa de Conversão por Canal</div>
         <div class="card-sub">% de enviados que anteciparam em até 24h</div>
-        <div class="bar-chart">
-          <div class="bc-row">
-            <div class="bc-lbl">EMAIL</div>
-            <div class="bc-bw"><div class="bc-b" style="width:100%;background:var(--yellow)">14,65%</div></div>
-            <div class="bc-val" style="color:var(--yellow)">14,65%</div>
-          </div>
-          <div class="bc-row">
-            <div class="bc-lbl">PUSH</div>
-            <div class="bc-bw"><div class="bc-b" style="width:43.7%;background:var(--blue)">6,40%</div></div>
-            <div class="bc-val" style="color:var(--blue)">6,40%</div>
-          </div>
-          <div class="bc-row">
-            <div class="bc-lbl">INAPP</div>
-            <div class="bc-bw"><div class="bc-b" style="width:24%;background:var(--purple)">3,52%</div></div>
-            <div class="bc-val" style="color:var(--purple)">3,52%</div>
-          </div>
-          <div class="bc-row">
-            <div class="bc-lbl">WHATSAPP</div>
-            <div class="bc-bw"><div class="bc-b" style="width:4.6%;background:#25d366;min-width:30px">0,67%</div></div>
-            <div class="bc-val" style="color:#25d366">0,67%</div>
-          </div>
-          <div class="bc-row">
-            <div class="bc-lbl">DM</div>
-            <div class="bc-bw"><div class="bc-b" style="width:3.1%;background:var(--orange);min-width:30px">0,45%</div></div>
-            <div class="bc-val" style="color:var(--orange)">0,45%</div>
-          </div>
-        </div>
+        <div class="bar-chart" id="bar-conv-canais"></div>
       </div>
 
       <div class="card">
         <div class="card-title">CAC por Canal (R$)</div>
         <div class="card-sub">Custo por antecipação convertida — escala proporcional</div>
-        <div class="bar-chart">
-          <div class="bc-row">
-            <div class="bc-lbl">EMAIL</div>
-            <div class="bc-bw"><div class="bc-b" style="width:0.07%;background:var(--yellow);min-width:4px"></div></div>
-            <div class="bc-val" style="color:var(--greenl)">R$0,0030</div>
-          </div>
-          <div class="bc-row">
-            <div class="bc-lbl">PUSH</div>
-            <div class="bc-bw"><div class="bc-b" style="width:0.17%;background:var(--blue);min-width:6px"></div></div>
-            <div class="bc-val" style="color:var(--greenl)">R$0,0069</div>
-          </div>
-          <div class="bc-row">
-            <div class="bc-lbl">INAPP</div>
-            <div class="bc-bw"><div class="bc-b" style="width:0.3%;background:var(--purple);min-width:8px"></div></div>
-            <div class="bc-val" style="color:var(--blue)">R$0,0125</div>
-          </div>
-          <div class="bc-row">
-            <div class="bc-lbl">DM</div>
-            <div class="bc-bw"><div class="bc-b" style="width:32%;background:var(--orange)">R$1,33</div></div>
-            <div class="bc-val" style="color:var(--orange)">R$1,33</div>
-          </div>
-          <div class="bc-row">
-            <div class="bc-lbl">WHATSAPP</div>
-            <div class="bc-bw"><div class="bc-b" style="width:100%;background:#25d366">R$4,15 ⚠️</div></div>
-            <div class="bc-val" style="color:var(--red)">R$4,15</div>
-          </div>
-        </div>
+        <div class="bar-chart" id="bar-cac-canais"></div>
       </div>
     </div>
   </section>
