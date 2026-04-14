@@ -321,7 +321,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <!-- Gráfico de barras por canal -->
     <div class="card">
       <div class="card-title" id="conv-chart-title">📊 Conversões por Canal — Total</div>
-      <div class="card-sub">Last click 7 dias · barras = conversões absolutas · % = share do canal no tipo</div>
+      <div class="card-sub">Last click 7 dias · barra = taxa conversão (conv LC ÷ enviados totais) · canais ordenados por taxa</div>
       <div id="conv-bar-chart" style="display:flex;flex-direction:column;gap:10px;margin-top:16px"></div>
     </div>
 
@@ -1132,59 +1132,68 @@ function renderConversao() {
     const pv  = d.primeira_vida || {};
     const rc  = d.recompra      || {};
 
-    // Totais
-    const totalPV = Object.values(pv).reduce((a,b) => a+b, 0);
-    const totalRC = Object.values(rc).reduce((a,b) => a+b, 0);
+    // Totais last-click (para os KPIs de split)
+    const totalPV  = Object.values(pv).reduce((a,b) => a+b, 0);
+    const totalRC  = Object.values(rc).reduce((a,b) => a+b, 0);
     const totalAll = totalPV + totalRC;
 
-    // KPIs
+    // KPIs: volume de conversões atribuídas e split
     setText('conv-kpi-pv',      fmt(totalPV));
     setText('conv-kpi-pv-pct',  totalAll > 0 ? fmtPct(totalPV/totalAll*100) + ' do total' : '—');
     setText('conv-kpi-rc',      fmt(totalRC));
     setText('conv-kpi-rc-pct',  totalAll > 0 ? fmtPct(totalRC/totalAll*100) + ' do total' : '—');
     setText('conv-kpi-total',   fmt(totalAll));
 
-    // Dados do gráfico conforme tipo
-    const COR = {EMAIL:'#e3b341',PUSH:'#58a6ff',INAPP:'#bc8cff',DM:'#f0883e',WHATSAPP:'#25d366',SMS:'#ff7b72'};
+    // Denominador: enviados totais por canal (DADOS.canal)
+    const canalData = (DADOS.canal || {})[mes] || {};
+
+    const COR   = {EMAIL:'#e3b341',PUSH:'#58a6ff',INAPP:'#bc8cff',DM:'#f0883e',WHATSAPP:'#25d366',SMS:'#ff7b72'};
     const ORDEM = ['PUSH','INAPP','DM','WHATSAPP','EMAIL','SMS'];
 
-    let dataMap = {};
-    let titulo = '';
+    // Conversões LC por canal conforme visão selecionada
+    let convMap = {};
+    let titulo  = '';
     if (CONV_TIPO === 'total') {
-        ORDEM.forEach(c => { dataMap[c] = (pv[c]||0) + (rc[c]||0); });
-        titulo = '📊 Conversões por Canal — Total (last click 7d)';
+        ORDEM.forEach(c => { convMap[c] = (pv[c]||0) + (rc[c]||0); });
+        titulo = '📲 Taxa de Conversão Last Click por Canal (last click 7d / disparos totais)';
     } else if (CONV_TIPO === 'primeira_vida') {
-        ORDEM.forEach(c => { dataMap[c] = pv[c]||0; });
-        titulo = '🆕 1ª Antecipação da Vida por Canal (last click 7d)';
+        ORDEM.forEach(c => { convMap[c] = pv[c]||0; });
+        titulo = '🆕 Taxa Conversão — 1ª Antecipação da Vida (last click 7d / disparos totais)';
     } else {
-        ORDEM.forEach(c => { dataMap[c] = rc[c]||0; });
-        titulo = '🔄 Recompra por Canal (last click 7d)';
+        ORDEM.forEach(c => { convMap[c] = rc[c]||0; });
+        titulo = '🔄 Taxa Conversão — Recompra (last click 7d / disparos totais)';
     }
     setText('conv-chart-title', titulo);
 
-    // Ordenar por valor desc
+    // Montar entries com taxa = convLC / enviados_totais
     const entries = ORDEM
-        .map(c => ({canal: c, val: dataMap[c]||0}))
-        .filter(e => e.val > 0)
-        .sort((a,b) => b.val - a.val);
+        .map(c => {
+            const convLC  = convMap[c] || 0;
+            const enviados = (canalData[c] && canalData[c].enviados) || 0;
+            const taxa     = enviados > 0 ? convLC / enviados * 100 : 0;
+            return { canal: c, convLC, enviados, taxa };
+        })
+        .filter(e => e.convLC > 0 || e.enviados > 0)
+        .filter(e => e.enviados > 0)
+        .sort((a,b) => b.taxa - a.taxa);
 
-    const maxVal = Math.max(...entries.map(e => e.val), 1);
-    const totalFiltro = entries.reduce((a,e) => a+e.val, 0);
+    const maxTaxa = Math.max(...entries.map(e => e.taxa), 0.001);
 
     const wrap = document.getElementById('conv-bar-chart');
     if (!wrap) return;
     wrap.innerHTML = entries.map(e => {
-        const pct = totalFiltro > 0 ? (e.val/totalFiltro*100).toFixed(1) : '0';
-        const w   = Math.max((e.val/maxVal*100).toFixed(1), 2);
-        const cor = COR[e.canal] || '#8b949e';
-        return `<div style="display:flex;align-items:center;gap:10px">
+        const taxaFmt = e.taxa.toFixed(2).replace('.', ',') + '%';
+        const w       = Math.max((e.taxa / maxTaxa * 100).toFixed(1), 1);
+        const cor     = COR[e.canal] || '#8b949e';
+        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
             <div style="width:72px;font-size:12px;font-weight:600;color:${cor};text-align:right">${e.canal}</div>
             <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;height:28px;position:relative">
                 <div style="width:${w}%;height:100%;background:linear-gradient(90deg,${cor}cc,${cor}44);border-radius:4px;transition:width .4s ease;display:flex;align-items:center;padding-left:10px">
-                    <span style="font-size:11px;font-weight:600;color:#fff;white-space:nowrap">${fmt(e.val)}</span>
+                    <span style="font-size:11px;font-weight:600;color:#fff;white-space:nowrap">${fmt(e.convLC)} LC</span>
                 </div>
             </div>
-            <div style="width:48px;font-size:11px;color:${cor};font-weight:600;text-align:right">${pct}%</div>
+            <div style="width:56px;font-size:12px;color:${cor};font-weight:700;text-align:right">${taxaFmt}</div>
+            <div style="width:80px;font-size:10px;color:var(--muted);text-align:right">${fmt(e.enviados)} env.</div>
         </div>`;
     }).join('');
 
