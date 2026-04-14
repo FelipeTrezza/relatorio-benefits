@@ -739,7 +739,7 @@ function renderKpis() {
     setText('kpi-custo-total', fmtR(totalCusto));
     setText('kpi-cac-medio',   fmtR(cac));
     setText('sub-canais',      subCanais);
-    renderChartCanal();
+    requestAnimationFrame(() => renderChartCanal());
 }
 
 function setText(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
@@ -1462,6 +1462,20 @@ function atualizarCAC() {
 // ── Inicialização ────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   setMes('2026-03');
+
+  // Garante render do gráfico após layout calculado
+  const canvas = document.getElementById('chart-canal');
+  if (canvas) {
+    const ro = new ResizeObserver(entries => {
+      if (entries[0].contentRect.width > 0) {
+        renderChartCanal();
+      }
+    });
+    ro.observe(canvas);
+    // Fallback: forçar render após 100ms
+    setTimeout(() => renderChartCanal(), 100);
+  }
+
   fetch('http://localhost:5001/status', { method: 'GET' })
     .catch(() => {
       const btn = document.getElementById('btn-atualizar');
