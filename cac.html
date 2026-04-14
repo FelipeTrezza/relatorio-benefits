@@ -1255,10 +1255,12 @@ function renderTudo() {
     console.log('[renderTudo] chamado');
     const label = MES_LABELS[MES_ATIVO] || MES_ATIVO;
     ['titulo-mes', 'titulo-canais', 'titulo-rec', 'titulo-score'].forEach(id => setText(id, label));
-    renderKpis();
-    renderConversao();
-    renderRec2();
-    if (typeof renderScoreSeq === 'function') renderScoreSeq();
+    try { renderKpis(); } catch(e) { console.warn('renderKpis erro:', e.message); }
+    try { renderConversao(); } catch(e) { console.warn('renderConversao erro:', e.message); }
+    try { renderRec2(); } catch(e) { console.error('renderRec2 erro:', e.message, e.stack); }
+    if (typeof renderScoreSeq === 'function') {
+        try { renderScoreSeq(); } catch(e) { console.warn('renderScoreSeq erro:', e.message); }
+    }
 }
 
 
