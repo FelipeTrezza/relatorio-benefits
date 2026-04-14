@@ -354,7 +354,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <!-- Last-click por canal -->
     <div class="card" style="margin-bottom:16px">
       <div class="card-title">📍 Last Click por Canal</div>
-      <div class="card-sub">Taxa = antecipações last-click ÷ comunicações enviadas pelo canal · último canal nos 7d recebe 100% do crédito</div>
+      <div class="card-sub">Antecipações last-click · enviados pelo canal · % = ant ÷ enviados · último canal nos 7d recebe 100% do crédito</div>
       <div id="rec-last-bars" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
     </div>
 
@@ -1211,15 +1211,19 @@ function renderRec2() {
             const enviados = lcMes[canal]?.enviados || 0;
             const taxa     = enviados > 0 ? (v.ant / enviados * 100) : null;
             const taxaFmt  = taxa !== null ? taxa.toFixed(2).replace('.', ',') + '%' : '—';
-            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-              <div style="width:72px;font-size:12px;font-weight:600;color:${cor};text-align:right">${canal}</div>
-              <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;height:28px">
+            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+              <!-- label canal -->
+              <div style="width:76px;font-size:12px;font-weight:700;color:${cor};text-align:right;flex-shrink:0">${canal}</div>
+              <!-- barra -->
+              <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;height:28px;min-width:0">
                 <div style="width:${w}%;height:100%;background:linear-gradient(90deg,${cor}cc,${cor}44);border-radius:4px;display:flex;align-items:center;padding-left:10px">
-                  <span style="font-size:11px;font-weight:600;color:#fff;white-space:nowrap">${fmt(v.ant)}</span>
+                  <span style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap">${fmt(v.ant)} ant.</span>
                 </div>
               </div>
-              <div style="width:52px;font-size:12px;color:${cor};font-weight:700;text-align:right">${taxaFmt}</div>
-              <div style="width:80px;font-size:10px;color:var(--muted);text-align:right">${fmt(v.cons)} cons.</div>
+              <!-- enviados -->
+              <div style="width:90px;font-size:11px;color:var(--muted);text-align:right;flex-shrink:0;white-space:nowrap">${enviados > 0 ? fmt(enviados) + ' env.' : '—'}</div>
+              <!-- taxa -->
+              <div style="width:58px;font-size:13px;color:${cor};font-weight:800;text-align:right;flex-shrink:0">${taxaFmt}</div>
             </div>`;
         }).join('');
     }
