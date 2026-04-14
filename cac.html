@@ -361,12 +361,12 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <!-- Combos de canais -->
     <div class="card">
       <div class="card-title">🧩 Combos de Canais</div>
-      <div class="card-sub">Set de canais recebidos nos 7d antes da antecipação (sem ordem) · top 20 por volume · % = share do total de antecipações atribuídas</div>
+      <div class="card-sub">Sequência de canais nos 7d antes da antecipação · ordem: último → primeiro · top 20 por volume</div>
       <div class="tbl-wrap" style="margin-top:10px">
         <table>
           <thead>
             <tr>
-              <th>Canais recebidos (combo)</th>
+              <th>Canais recebidos <span style="font-size:10px;color:var(--muted)">(último ← ... ← primeiro)</span></th>
               <th class="r">Antecipações</th>
               <th class="r">% total</th>
               <th class="r" style="color:var(--muted)">Consumers</th>
@@ -1229,9 +1229,14 @@ function renderRec2() {
             const dots   = canais.map(ch =>
                 `<span class="canal-dot" style="background:${CANAL_COR[ch.trim()] || 'var(--muted)'}"></span>`
             ).join('');
-            const tags = canais.map(ch => {
+            // canais[0] = último recebido, canais[N-1] = primeiro recebido
+            const tags = canais.map((ch, idx) => {
                 const cor = CANAL_COR[ch.trim()] || 'var(--muted)';
-                return `<span style="color:${cor};font-weight:600;font-size:11px;background:${cor}18;padding:1px 6px;border-radius:10px;margin-right:3px">${ch}</span>`;
+                const isLast = idx === 0;
+                const sep = idx < canais.length - 1
+                    ? `<span style="color:var(--muted);margin:0 3px;font-size:10px">←</span>`
+                    : '';
+                return `<span style="color:${cor};font-weight:${isLast?'700':'600'};font-size:11px;background:${cor}18;padding:1px 6px;border-radius:10px;margin-right:2px${isLast?';border:1px solid '+cor+'44':''}">${ch}</span>${sep}`;
             }).join('');
             const pct = totalCombo > 0 ? (r.ant / totalCombo * 100).toFixed(1).replace('.', ',') + '%' : '—';
             const highlight = i === 0;

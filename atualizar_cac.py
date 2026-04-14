@@ -261,15 +261,26 @@ comms_janela AS (
 ),
 base AS (
     -- Uma linha por (consumer, antecipação): canais distintos, último canal
+    -- Para preservar a ordem last→first no combo, usamos uma CTE ordenada antes do GROUP BY
     SELECT
         mes,
         consumer_id,
         ts_antecip,
-        COUNT(DISTINCT channel)                             AS n_canais,
-        MAX(CASE WHEN rn = 1 THEN channel END)             AS last_canal,
-        -- Combo: canais distintos ordenados alfabeticamente (ex: DM+INAPP+PUSH)
-        ARRAY_JOIN(SORT_ARRAY(COLLECT_SET(channel)), '+')  AS combo
-    FROM comms_janela
+        COUNT(DISTINCT channel)            AS n_canais,
+        MAX(CASE WHEN rn = 1 THEN channel END) AS last_canal,
+        -- Combo ordenado do último para o primeiro canal recebido
+        -- collect_list preserva a ordem das linhas; ordenamos por rn ASC (rn=1 = mais recente)
+        ARRAY_JOIN(
+            ARRAY_DISTINCT(
+                collect_list(channel)
+            ),
+            '+'
+        ) AS combo
+    FROM (
+        SELECT mes, consumer_id, ts_antecip, channel, rn
+        FROM comms_janela
+        ORDER BY mes, consumer_id, ts_antecip, rn ASC  -- rn=1 = mais recente (sent_at DESC)
+    )
     GROUP BY mes, consumer_id, ts_antecip
 )
 -- 1. Mix de canais: quantos canais distintos o consumer recebeu
