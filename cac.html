@@ -354,7 +354,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <!-- Last-click por canal -->
     <div class="card" style="margin-bottom:16px">
       <div class="card-title">📍 Last Click por Canal</div>
-      <div class="card-sub">Último canal recebido antes de cada antecipação · um canal recebe 100% do crédito · ordenado por antecipações</div>
+      <div class="card-sub">Taxa = antecipações last-click ÷ comunicações enviadas pelo canal · último canal nos 7d recebe 100% do crédito</div>
       <div id="rec-last-bars" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
     </div>
 
@@ -1201,13 +1201,16 @@ function renderRec2() {
     // ── Last-click por canal ───────────────────────────────────────────────
     const lastWrap = document.getElementById('rec-last-bars');
     if (lastWrap) {
+        // taxa = antecipações last-click ÷ enviados pelo canal (LC_DADOS)
+        const lcMes   = (LC_DADOS[mes] && typeof LC_DADOS[mes] === 'object' && !Array.isArray(LC_DADOS[mes])) ? LC_DADOS[mes] : {};
         const entries = Object.entries(last).sort((a, b) => b[1].ant - a[1].ant);
         const maxAnt  = Math.max(...entries.map(e => e[1].ant), 1);
-        const totalLC = entries.reduce((s, e) => s + e[1].ant, 0);
         lastWrap.innerHTML = entries.map(([canal, v]) => {
-            const cor   = CANAL_COR[canal] || 'var(--muted)';
-            const w     = Math.max((v.ant / maxAnt * 100).toFixed(1), 1);
-            const share = totalLC > 0 ? (v.ant / totalLC * 100).toFixed(1).replace('.', ',') + '%' : '—';
+            const cor      = CANAL_COR[canal] || '#8b949e';
+            const w        = Math.max((v.ant / maxAnt * 100).toFixed(1), 1);
+            const enviados = lcMes[canal]?.enviados || 0;
+            const taxa     = enviados > 0 ? (v.ant / enviados * 100) : null;
+            const taxaFmt  = taxa !== null ? taxa.toFixed(2).replace('.', ',') + '%' : '—';
             return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
               <div style="width:72px;font-size:12px;font-weight:600;color:${cor};text-align:right">${canal}</div>
               <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;height:28px">
@@ -1215,7 +1218,7 @@ function renderRec2() {
                   <span style="font-size:11px;font-weight:600;color:#fff;white-space:nowrap">${fmt(v.ant)}</span>
                 </div>
               </div>
-              <div style="width:52px;font-size:12px;color:${cor};font-weight:700;text-align:right">${share}</div>
+              <div style="width:52px;font-size:12px;color:${cor};font-weight:700;text-align:right">${taxaFmt}</div>
               <div style="width:80px;font-size:10px;color:var(--muted);text-align:right">${fmt(v.cons)} cons.</div>
             </div>`;
         }).join('');
