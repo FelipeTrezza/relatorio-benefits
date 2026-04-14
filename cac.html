@@ -1310,6 +1310,15 @@ function atualizarCAC() {
 // ── Inicialização ────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   setMes('2026-03');
+  // Garantia: renderRec2 executada após renderização inicial
+  setTimeout(() => {
+    try {
+      renderRec2();
+      console.log('[DOMContentLoaded] renderRec2 executada via fallback');
+    } catch(e) {
+      console.error('[DOMContentLoaded] renderRec2 fallback erro:', e.message);
+    }
+  }, 300);
 
   // Garante render do gráfico após layout calculado
   const canvas = document.getElementById('chart-canal');
