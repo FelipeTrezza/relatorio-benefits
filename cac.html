@@ -1226,6 +1226,9 @@ function renderTudo() {
     if (typeof renderScoreSeq === 'function') {
         try { renderScoreSeq(); } catch(e) { console.warn('renderScoreSeq erro:', e.message); }
     }
+    if (typeof renderScoreCards === 'function') {
+        try { renderScoreCards(); } catch(e) { console.warn('renderScoreCards erro:', e.message); }
+    }
 }
 
 
@@ -1596,5 +1599,6 @@ window.renderScoreCards = renderScoreCards;
   Mantido por <span style="color:var(--greenl)">Benefits Analytics</span> · Dados via Databricks · Referência APR/26 🐺
 </footer>
 
+<div id="hor-tip" style="display:none;position:fixed;background:#1c2128;border:1px solid #30363d;border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:200;min-width:140px;"></div>
 </body>
 </html>
