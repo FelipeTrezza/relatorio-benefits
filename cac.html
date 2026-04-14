@@ -269,7 +269,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
         <div class="kpi-ic">📉</div>
         <div class="kpi-lbl">CAC Médio Ponderado</div>
         <div class="kpi-val" style="color:var(--orange)" id="kpi-cac-medio">R$0,49</div>
-        <div class="kpi-sub">R$12,1k / 24.878 conv.</div>
+        <div class="kpi-sub" id="kpi-cac-sub">Σ(CAC × comms) / Σ(comms)</div>
       </div>
     </div>
   </section>
@@ -698,11 +698,16 @@ function setMes(mes) {
 function renderKpis() {
     const canal = DADOS.canal[MES_ATIVO] || {};
     let totalEnv=0, totalConv=0, totalCusto=0, canaisAtivos=0;
+    let sumCacComms=0, sumComms=0;
     for(const [c,v] of Object.entries(canal)) {
         totalEnv += v.enviados; totalConv += v.convertidos;
         totalCusto += v.custo; canaisAtivos++;
+        // CAC ponderado por comunicações: Σ(CAC_canal × comms) / Σ(comms)
+        const cacCanal = v.convertidos > 0 ? v.custo / v.convertidos : 0;
+        sumCacComms += cacCanal * v.enviados;
+        sumComms    += v.enviados;
     }
-    const cac = totalConv > 0 ? totalCusto/totalConv : 0;
+    const cac = sumComms > 0 ? sumCacComms / sumComms : 0;
     setText('kpi-total-env',   fmt(totalEnv));
     setText('kpi-total-conv',  fmt(totalConv));
     setText('kpi-conv-pct',    fmtPct(totalConv/Math.max(totalEnv,1)*100));
