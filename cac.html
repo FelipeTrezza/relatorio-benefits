@@ -268,8 +268,17 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
         <div class="kpi-ic">📉</div>
         <div class="kpi-lbl">CAC Médio Ponderado</div>
         <div class="kpi-val" style="color:var(--orange)" id="kpi-cac-medio">R$0,49</div>
-
       </div>
+    </div>
+
+    <!-- Gráfico Comunicados × CAC por canal -->
+    <div class="card" style="margin-top:4px">
+      <div class="card-title">📡 Comunicados e CAC por Canal</div>
+      <div class="card-sub">Barras = volume de comunicações · Linha = CAC ponderado por canal</div>
+      <div style="position:relative;margin-top:16px">
+        <canvas id="chart-canal" style="width:100%;height:260px;display:block"></canvas>
+      </div>
+      <div id="chart-canal-legend" style="display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted)"></div>
     </div>
   </section>
 
@@ -730,9 +739,150 @@ function renderKpis() {
     setText('kpi-custo-total', fmtR(totalCusto));
     setText('kpi-cac-medio',   fmtR(cac));
     setText('sub-canais',      subCanais);
+    renderChartCanal();
 }
 
 function setText(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
+
+// ── Gráfico Comunicados × CAC por canal ──────────────────────────────────────
+function renderChartCanal() {
+    const canvas = document.getElementById('chart-canal');
+    if (!canvas) return;
+
+    const canalData = DADOS.canal[MES_ATIVO] || {};
+    const ORDEM = ['EMAIL','PUSH','INAPP','DM','WHATSAPP','SMS'];
+    const canais = CANAL_ATIVO === 'TODOS'
+        ? ORDEM.filter(c => canalData[c])
+        : ORDEM.filter(c => c === CANAL_ATIVO && canalData[c]);
+    if (!canais.length) return;
+
+    const COR = {EMAIL:'#e3b341',PUSH:'#58a6ff',INAPP:'#bc8cff',DM:'#f0883e',WHATSAPP:'#25d366',SMS:'#ff7b72'};
+
+    const W = canvas.offsetWidth || 640;
+    const H = 260;
+    canvas.width  = W * window.devicePixelRatio;
+    canvas.height = H * window.devicePixelRatio;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.clearRect(0, 0, W, H);
+
+    const PAD = {top:20, right:60, bottom:48, left:70};
+    const gW = W - PAD.left - PAD.right;
+    const gH = H - PAD.top  - PAD.bottom;
+
+    const enviados = canais.map(c => canalData[c].enviados);
+    const cacs     = canais.map(c => {
+        const v = canalData[c];
+        return v.convertidos > 0 ? v.custo / v.convertidos : 0;
+    });
+
+    const maxEnv = Math.max(...enviados) || 1;
+    const maxCac = Math.max(...cacs)     || 1;
+
+    const barW = Math.min(gW / canais.length * 0.55, 80);
+    const step  = gW / canais.length;
+
+    // Grid linhas horizontais
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+        const y = PAD.top + gH - (gH / 4 * i);
+        ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gW, y); ctx.stroke();
+    }
+
+    // Eixo Y esquerdo — Comunicados
+    ctx.fillStyle = 'rgba(139,148,158,0.8)';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 4; i++) {
+        const val = maxEnv / 4 * i;
+        const y   = PAD.top + gH - (gH / 4 * i);
+        const lbl = val >= 1e6 ? (val/1e6).toFixed(1)+'M' : val >= 1e3 ? (val/1e3).toFixed(0)+'k' : val.toFixed(0);
+        ctx.fillText(lbl, PAD.left - 8, y + 4);
+    }
+
+    // Eixo Y direito — CAC
+    ctx.textAlign = 'left';
+    for (let i = 0; i <= 4; i++) {
+        const val = maxCac / 4 * i;
+        const y   = PAD.top + gH - (gH / 4 * i);
+        ctx.fillText('R$' + val.toFixed(val < 1 ? 2 : 1).replace('.',','), PAD.left + gW + 8, y + 4);
+    }
+
+    // Barras
+    canais.forEach((c, i) => {
+        const x   = PAD.left + step * i + step / 2 - barW / 2;
+        const bH  = (enviados[i] / maxEnv) * gH;
+        const y   = PAD.top + gH - bH;
+        const cor = COR[c] || '#8b949e';
+
+        // Barra com gradiente
+        const grad = ctx.createLinearGradient(0, y, 0, y + bH);
+        grad.addColorStop(0, cor);
+        grad.addColorStop(1, cor + '44');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barW, bH, [4, 4, 0, 0]);
+        ctx.fill();
+
+        // Label valor no topo da barra
+        ctx.fillStyle = cor;
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        const lbl = enviados[i] >= 1e6 ? (enviados[i]/1e6).toFixed(2)+'M'
+                  : enviados[i] >= 1e3 ? (enviados[i]/1e3).toFixed(0)+'k'
+                  : enviados[i].toString();
+        ctx.fillText(lbl, x + barW / 2, y - 5);
+
+        // Label canal no eixo X
+        ctx.fillStyle = 'rgba(139,148,158,0.9)';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.fillText(c, x + barW / 2, PAD.top + gH + 16);
+    });
+
+    // Linha CAC
+    const lineCor = '#f0883e';
+    ctx.strokeStyle = lineCor;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    canais.forEach((c, i) => {
+        const cx = PAD.left + step * i + step / 2;
+        const cy = PAD.top + gH - (cacs[i] / maxCac) * gH;
+        i === 0 ? ctx.moveTo(cx, cy) : ctx.lineTo(cx, cy);
+    });
+    ctx.stroke();
+
+    // Pontos e labels CAC na linha
+    canais.forEach((c, i) => {
+        const cx  = PAD.left + step * i + step / 2;
+        const cy  = PAD.top + gH - (cacs[i] / maxCac) * gH;
+        const lbl = 'R$' + cacs[i].toFixed(cacs[i] < 1 ? 4 : 2).replace('.',',');
+
+        // Ponto
+        ctx.fillStyle = '#0d1117';
+        ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = lineCor; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2); ctx.stroke();
+
+        // Label acima do ponto
+        ctx.fillStyle = lineCor;
+        ctx.font = 'bold 9px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(lbl, cx, cy - 10);
+    });
+
+    // Legenda
+    const legend = document.getElementById('chart-canal-legend');
+    if (legend) {
+        legend.innerHTML =
+            `<span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:2px;background:rgba(88,166,255,0.6);display:inline-block"></span>Barras = Comunicados enviados</span>` +
+            `<span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:2px;background:#f0883e;display:inline-block;border-radius:1px"></span>Linha = CAC ponderado (R$)</span>`;
+    }
+}
 
 // ── Render tabela de canais ───────────────────────────────────────────────────
 // ── Render combos ─────────────────────────────────────────────────────────────
