@@ -1201,14 +1201,14 @@ function renderRec2() {
     // ── Last-click por canal ───────────────────────────────────────────────
     const lastWrap = document.getElementById('rec-last-bars');
     if (lastWrap) {
-        // taxa = antecipações last-click ÷ enviados pelo canal (LC_DADOS)
-        const lcMes   = (LC_DADOS[mes] && typeof LC_DADOS[mes] === 'object' && !Array.isArray(LC_DADOS[mes])) ? LC_DADOS[mes] : {};
+        // taxa = antecipações last-click ÷ enviados pelo canal (DADOS.canal)
+        const canalMes = (DADOS.canal && DADOS.canal[mes]) ? DADOS.canal[mes] : {};
         const entries = Object.entries(last).sort((a, b) => b[1].ant - a[1].ant);
         const maxAnt  = Math.max(...entries.map(e => e[1].ant), 1);
         lastWrap.innerHTML = entries.map(([canal, v]) => {
             const cor      = CANAL_COR[canal] || '#8b949e';
             const w        = Math.max((v.ant / maxAnt * 100).toFixed(1), 1);
-            const enviados = lcMes[canal]?.enviados || 0;
+            const enviados = canalMes[canal]?.enviados || 0;
             const taxa     = enviados > 0 ? (v.ant / enviados * 100) : null;
             const taxaFmt  = taxa !== null ? taxa.toFixed(2).replace('.', ',') + '%' : '—';
             return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
