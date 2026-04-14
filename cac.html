@@ -186,7 +186,6 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <a class="nb" href="#conversao">Last Click</a>
     <a class="nb" href="#recorrencia">Recorrência</a>
     <a class="nb" href="#score">Score Canais</a>
-    <a class="nb" href="#horario">Horário</a>
     <a class="nb" href="#insights">Insights</a>
     <a class="nb" href="https://felipetrezza.github.io/relatorio-benefits/hub.html" style="margin-left:8px">← Hub</a>
   </nav>
@@ -417,37 +416,6 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
       ✦ Scores individuais (last-click 7d · Set/25–Mar/26): <b style="color:#3fb950">PUSH 7,35</b> · <b style="color:#58a6ff">INAPP 6,30</b> · <b style="color:#bc8cff">DM 4,17</b> · <b style="color:#f0883e">WA 3,43</b> ·
       Canal âncora = maior score na sequência · Ganho = melhora ao remover o canal mais fraco
     </p>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- HORÁRIO -->
-
-  <section id="horario">
-    <div class="sec-title">⏰ Antecipações por Horário</div>
-    <div class="sec-sub">Distribuição de antecipações ao longo do dia · Set/2025–Abr/2026</div>
-    <div class="card">
-      <div class="card-title">Antecipações por hora — comparativo mensal</div>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
-        <div style="display:flex;gap:6px;flex-wrap:wrap" id="hor-tabs"></div>
-        <div style="width:1px;height:20px;background:var(--border);flex-shrink:0"></div>
-        <div style="display:flex;gap:6px" id="hor-setor-tabs">
-          <button onclick="horSetSetor('total')"   id="horsec-total"   style="padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--green);color:#000;background:var(--green);transition:.15s">Total</button>
-          <button onclick="horSetSetor('grupo')"   id="horsec-grupo"   style="padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:transparent;transition:.15s">Grupo</button>
-          <button onclick="horSetSetor('public')"  id="horsec-public"  style="padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:transparent;transition:.15s">Público</button>
-          <button onclick="horSetSetor('private')" id="horsec-private" style="padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:transparent;transition:.15s">Privado</button>
-        </div>
-      </div>
-      <div id="hor-tip" style="display:none;position:fixed;background:#1c2128;border:1px solid #30363d;border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:200;min-width:140px;box-shadow:0 4px 16px rgba(0,0,0,.5)"></div>
-      <div style="position:relative;height:300px">
-        <svg id="hor-svg" width="100%" height="100%" viewBox="0 0 1140 300" preserveAspectRatio="none" style="overflow:visible"></svg>
-      </div>
-      <div style="margin-top:14px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue);line-height:1.7">
-        💡 <strong>00h é o maior pico</strong> em todos os meses — processamento automático de crédito consignado.
-        <strong>9h–11h</strong> é o segundo pico, perfil de antecipação ativa no horário comercial.
-        Vale mínimo entre <strong>2h–5h</strong> em todos os meses.
-      </div>
-    </div>
   </section>
 
   <div class="divider"></div>
