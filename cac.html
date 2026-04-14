@@ -715,7 +715,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
        SCORE DE CANAIS
   ════════════════════════════════════════════════════════════ -->
   <section id="score">
-    <div class="sec-title">🏅 Score de Canais & Sequências</div>
+    <div class="sec-title">🏅 Score de Canais & Sequências — <span id="titulo-score">Março 2026</span></div>
     <div class="sec-sub">Score dessazonalizado · 7 meses de histórico (Set/25–Mar/26) · Racional completo abaixo</div>
 
     <!-- Racional -->
@@ -1110,13 +1110,14 @@ function renderToquesGlobal() {
 
 function renderTudo() {
     const label = MES_LABELS[MES_ATIVO] || MES_ATIVO;
-    ['titulo-mes','titulo-canais','titulo-rec','titulo-toques'].forEach(id => setText(id, label));
+    ['titulo-mes','titulo-canais','titulo-rec','titulo-toques','titulo-score'].forEach(id => setText(id, label));
     renderKpis();
     renderCanais();
     renderRecorrencia();
     renderCombos();
     renderToquesGlobal();
     renderToques(SETOR_ATIVO || 'total');
+    if (typeof renderScoreSeq === 'function') renderScoreSeq();
 }
 
 
@@ -1492,7 +1493,11 @@ function renderScoreSeq() {
   const tbody = document.getElementById('score-seq-tbody');
   if (!tbody) return;
 
-  const rawData = (typeof SEQ_DADOS !== 'undefined' && SEQ_DADOS[MES_SEQ]) ? SEQ_DADOS[MES_SEQ] : [];
+  // Mapear MES_ATIVO ('2026-03') → chave do SEQ_DADOS ('Mar/26')
+  const MES_MAP = {"2025-09":"Set/25","2025-10":"Out/25","2025-11":"Nov/25","2025-12":"Dez/25","2026-01":"Jan/26","2026-02":"Fev/26","2026-03":"Mar/26","2026-04":"Abr/26"};
+  const mesLabel = (typeof MES_ATIVO !== 'undefined' ? MES_MAP[MES_ATIVO] : null) || MES_SEQ;
+
+  const rawData = (typeof SEQ_DADOS !== 'undefined' && SEQ_DADOS[mesLabel]) ? SEQ_DADOS[mesLabel] : [];
 
   // Calcular scores
   const rows = rawData.map(r => {
