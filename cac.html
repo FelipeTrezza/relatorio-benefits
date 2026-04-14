@@ -318,12 +318,6 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
       <div id="conv-bar-chart" style="display:flex;flex-direction:column;gap:10px;margin-top:16px"></div>
     </div>
 
-    <!-- Evolução mensal -->
-    <div class="card" style="margin-top:16px">
-      <div class="card-title">📈 Evolução Mensal por Tipo de Conversão</div>
-      <div class="card-sub">Barras empilhadas · 1ª vida vs Recompra por mês</div>
-      <canvas id="chart-conv-evolucao" style="width:100%;height:280px;display:block;margin-top:16px"></canvas>
-    </div>
   </section>
 
   <div class="divider"></div>
@@ -1190,134 +1184,7 @@ function renderConversao() {
         </div>`;
     }).join('');
 
-    // Gráfico evolução mensal
-    renderChartConvEvolucao();
 }
-
-function renderChartConvEvolucao() {
-    const canvas = document.getElementById('chart-conv-evolucao');
-    if (!canvas) return;
-
-    const MESES   = ['2025-09','2025-10','2025-11','2025-12','2026-01','2026-02','2026-03','2026-04'];
-    const M_LABEL = ['Set/25','Out/25','Nov/25','Dez/25','Jan/26','Fev/26','Mar/26','Abr/26'];
-
-    const pvTotais  = MESES.map(m => Object.values(LC_DADOS[m]?.primeira_vida||{}).reduce((a,b)=>a+b,0));
-    const rcTotais  = MESES.map(m => Object.values(LC_DADOS[m]?.recompra||{}).reduce((a,b)=>a+b,0));
-    const allTotais = MESES.map((_,i) => pvTotais[i] + rcTotais[i]);
-
-    const maxVal = Math.max(...allTotais, 1);
-
-    function niceMax(raw) {
-        if (raw === 0) return 1;
-        const exp  = Math.pow(10, Math.floor(Math.log10(raw)));
-        const frac = raw / exp;
-        const nice = frac <= 1 ? 1 : frac <= 2 ? 2 : frac <= 5 ? 5 : 10;
-        return nice * exp;
-    }
-    const yMax  = niceMax(maxVal);
-    const TICKS = 5;
-
-    const W = canvas.offsetWidth || 700;
-    const H = 280;
-    canvas.width  = W * window.devicePixelRatio;
-    canvas.height = H * window.devicePixelRatio;
-    canvas.style.width  = W + 'px';
-    canvas.style.height = H + 'px';
-
-    const ctx = canvas.getContext('2d');
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    ctx.clearRect(0, 0, W, H);
-
-    const PAD  = {top:40, right:20, bottom:52, left:72};
-    const gW   = W - PAD.left - PAD.right;
-    const gH   = H - PAD.top  - PAD.bottom;
-    const step = gW / MESES.length;
-    const barW = Math.min(step * 0.7, 70);
-
-    function xOf(i) { return PAD.left + i * step + step / 2; }
-
-    // Grid + eixo Y
-    ctx.font = '10px Inter, sans-serif';
-    for (let i = 0; i <= TICKS; i++) {
-        const y   = PAD.top + (gH / TICKS) * (TICKS - i);
-        const val = yMax / TICKS * i;
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gW, y); ctx.stroke();
-        const lbl = val >= 1e3 ? (val/1e3).toFixed(0)+'k' : val.toFixed(0);
-        ctx.fillStyle = 'rgba(139,148,158,0.8)';
-        ctx.textAlign = 'right';
-        ctx.fillText(lbl, PAD.left - 8, y + 3.5);
-    }
-
-    // Barras empilhadas: recompra em baixo (azul), primeira_vida em cima (verde)
-    MESES.forEach(function(m, i) {
-        const x    = xOf(i) - barW / 2;
-        const pvH  = (pvTotais[i]  / yMax) * gH;
-        const rcH  = (rcTotais[i]  / yMax) * gH;
-        const allH = pvH + rcH;
-        const yBot = PAD.top + gH;
-
-        // Recompra (azul) — base
-        if (rcH > 0) {
-            const gradRC = ctx.createLinearGradient(0, yBot - rcH, 0, yBot);
-            gradRC.addColorStop(0, '#58a6ffcc'); gradRC.addColorStop(1, '#58a6ff33');
-            ctx.fillStyle = gradRC;
-            ctx.beginPath();
-            ctx.rect(x, yBot - rcH, barW, rcH);
-            ctx.fill();
-        }
-
-        // 1ª vida (verde) — topo
-        if (pvH > 0) {
-            const yPV = yBot - allH;
-            const gradPV = ctx.createLinearGradient(0, yPV, 0, yPV + pvH);
-            gradPV.addColorStop(0, '#3fb95099'); gradPV.addColorStop(1, '#3fb95044');
-            ctx.fillStyle = gradPV;
-            ctx.beginPath();
-            if (ctx.roundRect) ctx.roundRect(x, yPV, barW, pvH, [4,4,0,0]);
-            else ctx.rect(x, yPV, barW, pvH);
-            ctx.fill();
-        }
-
-        // Label total no topo
-        const total = allTotais[i];
-        if (total > 0) {
-            const lbl = total >= 1e3 ? (total/1e3).toFixed(1)+'k' : total.toString();
-            ctx.fillStyle = 'rgba(200,210,220,0.85)';
-            ctx.font = 'bold 9px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(lbl, xOf(i), PAD.top + gH - allH - 5);
-        }
-
-        // Label eixo X
-        ctx.fillStyle = 'rgba(200,210,220,0.7)';
-        ctx.font = '10px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(M_LABEL[i], xOf(i), PAD.top + gH + 18);
-        if (m === '2026-04') {
-            ctx.fillStyle = 'rgba(255,200,0,0.55)';
-            ctx.font = '8px Inter, sans-serif';
-            ctx.fillText('parcial', xOf(i), PAD.top + gH + 30);
-        }
-    });
-
-    // Legenda
-    const items = [{cor:'#3fb950', label:'1ª Antecipação da Vida'},{cor:'#58a6ff', label:'Recompra'}];
-    let lx = PAD.left;
-    const ly = PAD.top - 18;
-    items.forEach(function(it) {
-        ctx.fillStyle = it.cor + 'cc';
-        ctx.fillRect(lx, ly - 8, 12, 9);
-        ctx.fillStyle = 'rgba(200,210,220,0.7)';
-        ctx.font = '10px Inter, sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(it.label, lx + 16, ly);
-        lx += ctx.measureText(it.label).width + 40;
-    });
-}
-
-
 
 // ── Render recorrência (base = comunicações) ──────────────────────────────────
 const REC_DADOS = {"recorrencia":{"2025-09":[{"qtd_canais":1,"total_comms":103933,"pct_comms":6.33,"consumers":91461,"convertidos":5568,"conv_pct_consumer":6.09,"conv_pct_comm":5.3573},{"qtd_canais":2,"total_comms":147976,"pct_comms":9.01,"consumers":33090,"convertidos":5552,"conv_pct_consumer":16.78,"conv_pct_comm":3.752},{"qtd_canais":3,"total_comms":414091,"pct_comms":25.22,"consumers":61568,"convertidos":3998,"conv_pct_consumer":6.49,"conv_pct_comm":0.9655},{"qtd_canais":4,"total_comms":311375,"pct_comms":18.97,"consumers":22752,"convertidos":2022,"conv_pct_consumer":8.89,"conv_pct_comm":0.6494},{"qtd_canais":5,"total_comms":661085,"pct_comms":40.27,"consumers":33811,"convertidos":1543,"conv_pct_consumer":4.56,"conv_pct_comm":0.2334},{"qtd_canais":6,"total_comms":3170,"pct_comms":0.19,"consumers":4,"convertidos":2,"conv_pct_consumer":50.0,"conv_pct_comm":0.0631}],"2025-10":[{"qtd_canais":1,"total_comms":149467,"pct_comms":4.7,"consumers":87762,"convertidos":19973,"conv_pct_consumer":22.76,"conv_pct_comm":13.3628},{"qtd_canais":2,"total_comms":221391,"pct_comms":6.97,"consumers":46674,"convertidos":13566,"conv_pct_consumer":29.07,"conv_pct_comm":6.1276},{"qtd_canais":3,"total_comms":311859,"pct_comms":9.82,"consumers":29463,"convertidos":5593,"conv_pct_consumer":18.98,"conv_pct_comm":1.7934},{"qtd_canais":4,"total_comms":943735,"pct_comms":29.71,"consumers":45818,"convertidos":3527,"conv_pct_consumer":7.7,"conv_pct_comm":0.3737},{"qtd_canais":5,"total_comms":1547369,"pct_comms":48.71,"consumers":63916,"convertidos":2557,"conv_pct_consumer":4.0,"conv_pct_comm":0.1652},{"qtd_canais":6,"total_comms":3117,"pct_comms":0.1,"consumers":16,"convertidos":3,"conv_pct_consumer":18.75,"conv_pct_comm":0.0962}],"2025-11":[{"qtd_canais":1,"total_comms":95976,"pct_comms":3.3,"consumers":69500,"convertidos":7010,"conv_pct_consumer":10.09,"conv_pct_comm":7.3039},{"qtd_canais":2,"total_comms":317513,"pct_comms":10.93,"consumers":53635,"convertidos":20738,"conv_pct_consumer":38.67,"conv_pct_comm":6.5314},{"qtd_canais":3,"total_comms":593799,"pct_comms":20.44,"consumers":38642,"convertidos":12105,"conv_pct_consumer":31.33,"conv_pct_comm":2.0386},{"qtd_canais":4,"total_comms":1888936,"pct_comms":65.04,"consumers":100834,"convertidos":7865,"conv_pct_consumer":7.8,"conv_pct_comm":0.4164},{"qtd_canais":5,"total_comms":8173,"pct_comms":0.28,"consumers":367,"convertidos":22,"conv_pct_consumer":5.99,"conv_pct_comm":0.2692}],"2025-12":[{"qtd_canais":1,"total_comms":95033,"pct_comms":2.98,"consumers":22566,"convertidos":12398,"conv_pct_consumer":54.94,"conv_pct_comm":13.046},{"qtd_canais":2,"total_comms":622642,"pct_comms":19.55,"consumers":72822,"convertidos":40409,"conv_pct_consumer":55.49,"conv_pct_comm":6.4899},{"qtd_canais":3,"total_comms":565897,"pct_comms":17.77,"consumers":39757,"convertidos":9884,"conv_pct_consumer":24.86,"conv_pct_comm":1.7466},{"qtd_canais":4,"total_comms":1900560,"pct_comms":59.69,"consumers":86048,"convertidos":2648,"conv_pct_consumer":3.08,"conv_pct_comm":0.1393}],"2026-01":[{"qtd_canais":1,"total_comms":167258,"pct_comms":5.76,"consumers":74357,"convertidos":8626,"conv_pct_consumer":11.6,"conv_pct_comm":5.1573},{"qtd_canais":2,"total_comms":422722,"pct_comms":14.56,"consumers":67233,"convertidos":14730,"conv_pct_consumer":21.91,"conv_pct_comm":3.4846},{"qtd_canais":3,"total_comms":791574,"pct_comms":27.26,"consumers":77863,"convertidos":27672,"conv_pct_consumer":35.54,"conv_pct_comm":3.4958},{"qtd_canais":4,"total_comms":1497603,"pct_comms":51.58,"consumers":80592,"convertidos":4738,"conv_pct_consumer":5.88,"conv_pct_comm":0.3164},{"qtd_canais":5,"total_comms":20053,"pct_comms":0.69,"consumers":1005,"convertidos":604,"conv_pct_consumer":60.1,"conv_pct_comm":3.012},{"qtd_canais":6,"total_comms":4372,"pct_comms":0.15,"consumers":85,"convertidos":5,"conv_pct_consumer":5.88,"conv_pct_comm":0.1144}],"2026-02":[{"qtd_canais":1,"total_comms":230822,"pct_comms":10.81,"consumers":61152,"convertidos":24887,"conv_pct_consumer":40.7,"conv_pct_comm":10.7819},{"qtd_canais":2,"total_comms":361026,"pct_comms":16.91,"consumers":39593,"convertidos":13937,"conv_pct_consumer":35.2,"conv_pct_comm":3.8604},{"qtd_canais":3,"total_comms":658341,"pct_comms":30.84,"consumers":44321,"convertidos":8926,"conv_pct_consumer":20.14,"conv_pct_comm":1.3558},{"qtd_canais":4,"total_comms":870820,"pct_comms":40.8,"consumers":54423,"convertidos":3541,"conv_pct_consumer":6.51,"conv_pct_comm":0.4066},{"qtd_canais":5,"total_comms":11163,"pct_comms":0.52,"consumers":508,"convertidos":507,"conv_pct_consumer":99.8,"conv_pct_comm":4.5418},{"qtd_canais":6,"total_comms":2188,"pct_comms":0.1,"consumers":5,"convertidos":3,"conv_pct_consumer":60.0,"conv_pct_comm":0.1371}],"2026-03":[{"qtd_canais":1,"total_comms":78273,"pct_comms":5.31,"consumers":28693,"convertidos":10720,"conv_pct_consumer":37.36,"conv_pct_comm":13.6957},{"qtd_canais":2,"total_comms":401931,"pct_comms":27.28,"consumers":51644,"convertidos":28765,"conv_pct_consumer":55.7,"conv_pct_comm":7.1567},{"qtd_canais":3,"total_comms":302102,"pct_comms":20.51,"consumers":31457,"convertidos":3567,"conv_pct_consumer":11.34,"conv_pct_comm":1.1807},{"qtd_canais":4,"total_comms":674470,"pct_comms":45.78,"consumers":51295,"convertidos":1719,"conv_pct_consumer":3.35,"conv_pct_comm":0.2549},{"qtd_canais":5,"total_comms":16389,"pct_comms":1.11,"consumers":607,"convertidos":589,"conv_pct_consumer":97.03,"conv_pct_comm":3.5939}],"2026-04":[{"qtd_canais":1,"total_comms":78261,"pct_comms":16.6,"consumers":45887,"convertidos":6427,"conv_pct_consumer":14.01,"conv_pct_comm":8.2123},{"qtd_canais":2,"total_comms":382703,"pct_comms":81.18,"consumers":69479,"convertidos":24174,"conv_pct_consumer":34.79,"conv_pct_comm":6.3166},{"qtd_canais":3,"total_comms":10318,"pct_comms":2.19,"consumers":2238,"convertidos":573,"conv_pct_consumer":25.6,"conv_pct_comm":5.5534},{"qtd_canais":4,"total_comms":137,"pct_comms":0.03,"consumers":22,"convertidos":21,"conv_pct_consumer":95.45,"conv_pct_comm":15.3285}]},"exclusivo":{"2025-09":[{"canal":"DM","total_comms":67782,"consumers":66690,"convertidos":531,"conv_pct_comm":0.7834,"conv_pct_consumer":0.8},{"canal":"SMS","total_comms":14794,"consumers":12718,"convertidos":1139,"conv_pct_comm":7.6991,"conv_pct_consumer":8.96},{"canal":"WHATSAPP","total_comms":10431,"consumers":5340,"convertidos":2428,"conv_pct_comm":23.2768,"conv_pct_consumer":45.47},{"canal":"PUSH","total_comms":9819,"consumers":5962,"convertidos":1372,"conv_pct_comm":13.9729,"conv_pct_consumer":23.01},{"canal":"INAPP","total_comms":1107,"consumers":751,"convertidos":98,"conv_pct_comm":8.8528,"conv_pct_consumer":13.05}],"2025-10":[{"canal":"DM","total_comms":70447,"consumers":61322,"convertidos":7053,"conv_pct_comm":10.0118,"conv_pct_consumer":11.5},{"canal":"PUSH","total_comms":58411,"consumers":12774,"convertidos":11717,"conv_pct_comm":20.0596,"conv_pct_consumer":91.73},{"canal":"EMAIL","total_comms":9184,"consumers":8949,"convertidos":67,"conv_pct_comm":0.7295,"conv_pct_consumer":0.75},{"canal":"INAPP","total_comms":5499,"consumers":1273,"convertidos":533,"conv_pct_comm":9.6927,"conv_pct_consumer":41.87},{"canal":"WHATSAPP","total_comms":5048,"consumers":2567,"convertidos":597,"conv_pct_comm":11.8265,"conv_pct_consumer":23.26},{"canal":"SMS","total_comms":878,"consumers":877,"convertidos":6,"conv_pct_comm":0.6834,"conv_pct_consumer":0.68}],"2025-11":[{"canal":"DM","total_comms":63214,"consumers":56319,"convertidos":1523,"conv_pct_comm":2.4093,"conv_pct_consumer":2.7},{"canal":"INAPP","total_comms":19032,"consumers":6988,"convertidos":3451,"conv_pct_comm":18.1326,"conv_pct_consumer":49.38},{"canal":"WHATSAPP","total_comms":8688,"consumers":4428,"convertidos":921,"conv_pct_comm":10.6008,"conv_pct_consumer":20.8},{"canal":"PUSH","total_comms":4996,"consumers":1739,"convertidos":1091,"conv_pct_comm":21.8375,"conv_pct_consumer":62.74},{"canal":"EMAIL","total_comms":46,"consumers":26,"convertidos":24,"conv_pct_comm":52.1739,"conv_pct_consumer":92.31}],"2025-12":[{"canal":"DM","total_comms":50655,"consumers":11207,"convertidos":7416,"conv_pct_comm":14.6402,"conv_pct_consumer":66.17},{"canal":"INAPP","total_comms":22717,"consumers":4246,"convertidos":1607,"conv_pct_comm":7.074,"conv_pct_consumer":37.85},{"canal":"PUSH","total_comms":15675,"consumers":3344,"convertidos":2905,"conv_pct_comm":18.5327,"conv_pct_consumer":86.87},{"canal":"WHATSAPP","total_comms":5986,"consumers":3769,"convertidos":470,"conv_pct_comm":7.8517,"conv_pct_consumer":12.47}],"2026-01":[{"canal":"EMAIL","total_comms":71152,"consumers":35535,"convertidos":174,"conv_pct_comm":0.2445,"conv_pct_consumer":0.49},{"canal":"WHATSAPP","total_comms":33927,"consumers":20666,"convertidos":410,"conv_pct_comm":1.2085,"conv_pct_consumer":1.98},{"canal":"INAPP","total_comms":33807,"consumers":10172,"convertidos":5288,"conv_pct_comm":15.6417,"conv_pct_consumer":51.99},{"canal":"PUSH","total_comms":17287,"consumers":2818,"convertidos":1827,"conv_pct_comm":10.5686,"conv_pct_consumer":64.83},{"canal":"DM","total_comms":8306,"consumers":2428,"convertidos":896,"conv_pct_comm":10.7874,"conv_pct_consumer":36.9},{"canal":"SMS","total_comms":2779,"consumers":2738,"convertidos":31,"conv_pct_comm":1.1155,"conv_pct_consumer":1.13}],"2026-02":[{"canal":"PUSH","total_comms":155625,"consumers":40538,"convertidos":19454,"conv_pct_comm":12.5006,"conv_pct_consumer":47.99},{"canal":"INAPP","total_comms":57522,"consumers":10904,"convertidos":3573,"conv_pct_comm":6.2115,"conv_pct_consumer":32.77},{"canal":"WHATSAPP","total_comms":7413,"consumers":5514,"convertidos":935,"conv_pct_comm":12.613,"conv_pct_consumer":16.96},{"canal":"DM","total_comms":6264,"consumers":1935,"convertidos":424,"conv_pct_comm":6.7688,"conv_pct_consumer":21.91},{"canal":"EMAIL","total_comms":2234,"consumers":497,"convertidos":497,"conv_pct_comm":22.2471,"conv_pct_consumer":100.0},{"canal":"SMS","total_comms":1764,"consumers":1764,"convertidos":4,"conv_pct_comm":0.2268,"conv_pct_consumer":0.23}],"2026-03":[{"canal":"INAPP","total_comms":39659,"consumers":10774,"convertidos":6661,"conv_pct_comm":16.7957,"conv_pct_consumer":61.82},{"canal":"PUSH","total_comms":23115,"consumers":9096,"convertidos":2188,"conv_pct_comm":9.4657,"conv_pct_consumer":24.05},{"canal":"DM","total_comms":7137,"consumers":3597,"convertidos":460,"conv_pct_comm":6.4453,"conv_pct_consumer":12.79},{"canal":"WHATSAPP","total_comms":6520,"consumers":4842,"convertidos":1027,"conv_pct_comm":15.7515,"conv_pct_consumer":21.21},{"canal":"EMAIL","total_comms":1842,"consumers":384,"convertidos":384,"conv_pct_comm":20.8469,"conv_pct_consumer":100.0}],"2026-04":[{"canal":"INAPP","total_comms":37380,"consumers":6916,"convertidos":5210,"conv_pct_comm":13.9379,"conv_pct_consumer":75.33},{"canal":"DM","total_comms":24955,"consumers":24728,"convertidos":457,"conv_pct_comm":1.8313,"conv_pct_consumer":1.85},{"canal":"PUSH","total_comms":14001,"consumers":12511,"convertidos":283,"conv_pct_comm":2.0213,"conv_pct_consumer":2.26},{"canal":"WHATSAPP","total_comms":1649,"consumers":1572,"convertidos":318,"conv_pct_comm":19.2844,"conv_pct_consumer":20.23},{"canal":"EMAIL","total_comms":276,"consumers":160,"convertidos":159,"conv_pct_comm":57.6087,"conv_pct_consumer":99.38}]}};
@@ -1463,7 +1330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     ro.observe(canvas);
     // Fallback: forçar render após 100ms
-    setTimeout(() => { renderChartMensal(); renderChartCanal(); renderChartConvEvolucao(); }, 100);
+    setTimeout(() => { renderChartMensal(); renderChartCanal(); }, 100);
   }
 
   fetch('http://localhost:5001/status', { method: 'GET' })
