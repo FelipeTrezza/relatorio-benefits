@@ -756,8 +756,220 @@ function renderChartCanal() {
         : ORDEM.filter(c => c === CANAL_ATIVO && canalData[c]);
     if (!canais.length) return;
 
-    const COR = {EMAIL:'#e3b341',PUSH:'#58a6ff',INAPP:'#bc8cff',DM:'#f0883e',WHATSAPP:'#25d366',SMS:'#ff7b72'};
-    const LINE_COR = '#f0883e';
+    const COR     = {EMAIL:'#e3b341',PUSH:'#58a6ff',INAPP:'#bc8cff',DM:'#f0883e',WHATSAPP:'#25d366',SMS:'#ff7b72'};
+    const LINE_COR = '#f5a623';   // laranja mais claro — contrasta melhor
+
+    const W = canvas.offsetWidth || 640;
+    const H = 320;
+    canvas.width  = W * window.devicePixelRatio;
+    canvas.height = H * window.devicePixelRatio;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.clearRect(0, 0, W, H);
+
+    const PAD = {top:50, right:84, bottom:52, left:76};
+    const gW  = W - PAD.left - PAD.right;
+    const gH  = H - PAD.top  - PAD.bottom;
+
+    // Zonas separadas:
+    //   barras ocupam até 72% da altura → linha sempre acima delas
+    const BAR_ZONE  = gH * 0.72;   // altura máxima de qualquer barra
+    const LINE_ZONE = gH;           // linha usa a altura total
+
+    const enviados = canais.map(c => canalData[c].enviados);
+    const cacs     = canais.map(c => {
+        const v = canalData[c];
+        return v.convertidos > 0 ? v.custo / v.convertidos : 0;
+    });
+
+    // Escala inteligente (ticks bonitos)
+    function niceMax(vals) {
+        const raw = Math.max(...vals);
+        if (raw === 0) return 1;
+        const exp  = Math.pow(10, Math.floor(Math.log10(raw)));
+        const frac = raw / exp;
+        const nice = frac <= 1 ? 1 : frac <= 2 ? 2 : frac <= 5 ? 5 : 10;
+        return nice * exp;
+    }
+    const maxEnv = niceMax(enviados);
+    const maxCac = niceMax(cacs);
+    const TICKS  = 5;
+
+    const barW = Math.min(gW / canais.length * 0.52, 72);
+    const step = gW / canais.length;
+
+    // Helpers de posição
+    const barY  = i => PAD.top + gH - (enviados[i] / maxEnv) * BAR_ZONE;
+    const lineY = i => PAD.top + gH - (cacs[i]     / maxCac) * LINE_ZONE;
+
+    // ── Grid ──
+    for (let i = 0; i <= TICKS; i++) {
+        const y = PAD.top + gH - (gH / TICKS * i);
+        ctx.strokeStyle = i === 0 ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.045)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gW, y); ctx.stroke();
+    }
+
+    // ── Eixo Y esquerdo — Comunicados ──
+    ctx.font = '10px Inter, sans-serif';
+    for (let i = 0; i <= TICKS; i++) {
+        const y   = PAD.top + gH - (gH / TICKS * i);
+        const val = maxEnv / TICKS * i;
+        const lbl = val >= 1e6 ? (val/1e6).toFixed(1)+'M'
+                  : val >= 1e3 ? (val/1e3).toFixed(0)+'k'
+                  : val.toFixed(0);
+        ctx.fillStyle = 'rgba(139,148,158,0.85)';
+        ctx.textAlign = 'right';
+        ctx.fillText(lbl, PAD.left - 10, y + 3.5);
+    }
+
+    // ── Eixo Y direito — CAC (laranja) ──
+    for (let i = 0; i <= TICKS; i++) {
+        const y   = PAD.top + gH - (gH / TICKS * i);
+        const val = maxCac / TICKS * i;
+        const lbl = 'R$' + (val < 1 ? val.toFixed(2) : val >= 100 ? val.toFixed(0) : val.toFixed(1)).replace('.',',');
+        ctx.fillStyle = LINE_COR + 'dd';
+        ctx.textAlign = 'left';
+        ctx.fillText(lbl, PAD.left + gW + 10, y + 3.5);
+    }
+
+    // ── Labels de eixo ──
+    ctx.save();
+    ctx.translate(14, PAD.top + gH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = 'rgba(139,148,158,0.55)';
+    ctx.textAlign = 'center';
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillText('Comunicações', 0, 0);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(W - 12, PAD.top + gH / 2);
+    ctx.rotate(Math.PI / 2);
+    ctx.fillStyle = LINE_COR + 'aa';
+    ctx.textAlign = 'center';
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillText('CAC (R$)', 0, 0);
+    ctx.restore();
+
+    // ── Linha divisória (zona barras / linha) — guia visual sutil ──
+    const divY = PAD.top + gH - BAR_ZONE;
+    ctx.strokeStyle = 'rgba(245,166,35,0.12)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath(); ctx.moveTo(PAD.left, divY); ctx.lineTo(PAD.left + gW, divY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // ── Barras (zona inferior — máx 72% gH) ──
+    canais.forEach((c, i) => {
+        const x   = PAD.left + step * i + step / 2 - barW / 2;
+        const bH  = (enviados[i] / maxEnv) * BAR_ZONE;
+        const y   = PAD.top + gH - bH;
+        const cor = COR[c] || '#8b949e';
+
+        const grad = ctx.createLinearGradient(0, y, 0, PAD.top + gH);
+        grad.addColorStop(0, cor + 'bb');
+        grad.addColorStop(1, cor + '18');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x, y, barW, bH, [4,4,0,0]);
+        else ctx.rect(x, y, barW, bH);
+        ctx.fill();
+
+        // Label valor no topo da barra
+        ctx.fillStyle = cor;
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        const lbl = enviados[i] >= 1e6 ? (enviados[i]/1e6).toFixed(2)+'M'
+                  : enviados[i] >= 1e3 ? (enviados[i]/1e3).toFixed(0)+'k'
+                  : enviados[i].toString();
+        ctx.fillText(lbl, x + barW/2, y - 5);
+
+        // Label canal eixo X
+        ctx.fillStyle = 'rgba(200,210,220,0.85)';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.fillText(c, x + barW/2, PAD.top + gH + 18);
+    });
+
+    // ── Área sob a linha CAC ──
+    ctx.beginPath();
+    canais.forEach((c, i) => {
+        const cx = PAD.left + step * i + step / 2;
+        i === 0 ? ctx.moveTo(cx, lineY(i)) : ctx.lineTo(cx, lineY(i));
+    });
+    ctx.lineTo(PAD.left + step * (canais.length - 1) + step / 2, PAD.top + gH);
+    ctx.lineTo(PAD.left + step / 2, PAD.top + gH);
+    ctx.closePath();
+    const aGrad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + gH);
+    aGrad.addColorStop(0, LINE_COR + '28');
+    aGrad.addColorStop(1, LINE_COR + '00');
+    ctx.fillStyle = aGrad;
+    ctx.fill();
+
+    // ── Linha CAC ──
+    ctx.beginPath();
+    ctx.strokeStyle = LINE_COR;
+    ctx.lineWidth = 3;
+    ctx.lineJoin  = 'round';
+    ctx.shadowColor = LINE_COR + '66';
+    ctx.shadowBlur  = 6;
+    canais.forEach((c, i) => {
+        const cx = PAD.left + step * i + step / 2;
+        i === 0 ? ctx.moveTo(cx, lineY(i)) : ctx.lineTo(cx, lineY(i));
+    });
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // ── Pontos + labels CAC ──
+    canais.forEach((c, i) => {
+        const cx  = PAD.left + step * i + step / 2;
+        const cy  = lineY(i);
+        const lbl = cacs[i] < 1 ? 'R$'+cacs[i].toFixed(4).replace('.',',')
+                                 : 'R$'+cacs[i].toFixed(2).replace('.',',');
+
+        // halo
+        ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2);
+        ctx.fillStyle = LINE_COR + '20'; ctx.fill();
+
+        // ponto
+        ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2);
+        ctx.fillStyle = '#0d1117'; ctx.fill();
+        ctx.strokeStyle = LINE_COR; ctx.lineWidth = 2.5;
+        ctx.shadowColor = LINE_COR + '88'; ctx.shadowBlur = 4;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // label com fundo
+        ctx.font = 'bold 9.5px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        const tw = ctx.measureText(lbl).width + 8;
+        const ty = cy - 16;
+        ctx.fillStyle = 'rgba(13,17,23,0.82)';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(cx - tw/2, ty - 10, tw, 14, 3);
+        else ctx.rect(cx - tw/2, ty - 10, tw, 14);
+        ctx.fill();
+        ctx.fillStyle = LINE_COR;
+        ctx.fillText(lbl, cx, ty);
+    });
+
+    // ── Legenda ──
+    const legend = document.getElementById('chart-canal-legend');
+    if (legend) {
+        legend.innerHTML =
+            `<span style="display:flex;align-items:center;gap:5px">
+               <span style="width:12px;height:12px;border-radius:2px;background:rgba(139,148,158,0.35);display:inline-block"></span>
+               Barras (eixo esq.) — Comunicados enviados
+             </span>` +
+            `<span style="display:flex;align-items:center;gap:5px">
+               <span style="width:22px;height:3px;background:${LINE_COR};display:inline-block;border-radius:2px;box-shadow:0 0 4px ${LINE_COR}88"></span>
+               Linha (eixo dir.) — CAC ponderado por canal (R$)
+             </span>`;
+    }
+}
 
     const W = canvas.offsetWidth || 640;
     const H = 300;
