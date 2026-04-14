@@ -131,7 +131,108 @@ GROUP BY sc.setor
 ORDER BY convertidos DESC
 """, label="setor")
 
-print("[3/3] Calculando métricas e atualizando HTML...")
+# ── Query Last Click 7d — partindo da comunicação ────────────────────────────
+# Lógica correta: comunicação enviada → olha 7d para frente → houve antecipação?
+# 1ª vida = primeira antecipação da vida do consumer aconteceu nessa janela
+# recompra = consumer já tinha antecipado antes do envio
+print("[3/4] Buscando conversão last-click (7d, partindo da comunicação)...")
+_, rows_lc = run_q(f"""
+WITH meses AS (
+    -- Todos os meses desde Set/25 até o mês atual
+    SELECT DISTINCT DATE_FORMAT(sent_at, 'yyyy-MM') AS mes
+    FROM marketing.consumers_campaigns_communications
+    WHERE SPLIT(journey_name, '-')[7] = 'sfpjbene'
+      AND LOWER(journey_name) NOT LIKE '%educacional%'
+      AND sent_at >= '2025-09-01'
+      AND sent_at < '{hoje}'
+),
+comms AS (
+    -- Uma linha por (consumer, canal, mês) — distinct para evitar contar múltiplos
+    -- disparos do mesmo consumer no mesmo canal/mês como N oportunidades
+    SELECT DISTINCT
+        CAST(c.consumer_id AS BIGINT) AS consumer_id,
+        c.channel,
+        DATE_FORMAT(c.sent_at, 'yyyy-MM') AS mes,
+        MIN(c.sent_at) AS primeiro_envio   -- primeiro disparo do mês para janela
+    FROM marketing.consumers_campaigns_communications c
+    WHERE SPLIT(c.journey_name, '-')[7] = 'sfpjbene'
+      AND LOWER(c.journey_name) NOT LIKE '%educacional%'
+      AND c.sent_at >= '2025-09-01'
+      AND c.sent_at < '{hoje}'
+    GROUP BY CAST(c.consumer_id AS BIGINT), c.channel, DATE_FORMAT(c.sent_at, 'yyyy-MM')
+),
+primeira_antecip_vida AS (
+    -- Data da primeira antecipação de toda a vida de cada consumer
+    SELECT consumer_id, MIN(created_at) AS ts_primeira
+    FROM benefits.anticipation_request
+    WHERE request_status = 'FINISH'
+    GROUP BY consumer_id
+),
+antecip_mes AS (
+    -- Antecipações por consumer e mês (para a janela de 7d)
+    SELECT
+        consumer_id,
+        DATE_FORMAT(created_at, 'yyyy-MM') AS mes,
+        MIN(created_at) AS ts_antecip   -- primeira antecipação do mês
+    FROM benefits.anticipation_request
+    WHERE request_status = 'FINISH'
+      AND created_at >= '2025-09-01'
+      AND created_at < '{hoje}'
+    GROUP BY consumer_id, DATE_FORMAT(created_at, 'yyyy-MM')
+),
+atribuicoes AS (
+    -- Partindo da comunicação, verifica se houve antecipação nos 7d seguintes
+    SELECT
+        c.mes,
+        c.channel,
+        c.consumer_id,
+        a.ts_antecip,
+        pv.ts_primeira,
+        CASE
+            WHEN a.ts_antecip IS NULL THEN 'nao_converteu'
+            WHEN pv.ts_primeira IS NULL THEN 'nao_converteu'
+            -- 1ª vida: a primeira antecipação de toda a vida está dentro da janela
+            WHEN pv.ts_primeira > c.primeiro_envio
+             AND pv.ts_primeira <= c.primeiro_envio + INTERVAL 7 DAYS THEN 'primeira_vida'
+            -- Recompra: já tinha antecipado antes do envio
+            WHEN pv.ts_primeira < c.primeiro_envio THEN 'recompra'
+            ELSE 'nao_converteu'
+        END AS tipo
+    FROM comms c
+    LEFT JOIN antecip_mes a
+        ON c.consumer_id = a.consumer_id
+       AND c.mes = a.mes
+       AND a.ts_antecip > c.primeiro_envio
+       AND a.ts_antecip <= c.primeiro_envio + INTERVAL 7 DAYS
+    LEFT JOIN primeira_antecip_vida pv
+        ON c.consumer_id = pv.consumer_id
+)
+SELECT
+    mes,
+    channel,
+    tipo,
+    COUNT(DISTINCT consumer_id) AS consumers
+FROM atribuicoes
+WHERE tipo IN ('primeira_vida', 'recompra')
+GROUP BY mes, channel, tipo
+ORDER BY mes, channel, tipo
+""", label="last_click_7d")
+
+# Organizar LC_DADOS: {mes: {primeira_vida: {canal: N}, recompra: {canal: N}}}
+lc_dados = {}
+for row in rows_lc:
+    mes, channel, tipo, consumers = row
+    mes      = str(mes)
+    channel  = str(channel).upper()
+    tipo     = str(tipo)
+    consumers = int(consumers or 0)
+    if mes not in lc_dados:
+        lc_dados[mes] = {"primeira_vida": {}, "recompra": {}}
+    lc_dados[mes][tipo][channel] = consumers
+
+print(f"   LC_DADOS: {len(lc_dados)} meses calculados (lógica comunicação → 7d frente)")
+
+print("[4/4] Calculando métricas e atualizando HTML...")
 
 # ── Custo por canal ───────────────────────────────────────────────────────────
 CUSTO = {
@@ -293,6 +394,34 @@ html = re.sub(
     r'(Referência )[A-Za-záéíóúÁÉÍÓÚ]+/\d{4}',
     f'\\g<1>{MES_LABEL}', html
 )
+
+# ─ LC_DADOS — substituir dados last-click com nova lógica (comunicação → 7d) ─
+if lc_dados:
+    # Mesclar com o que já existe no HTML para preservar meses históricos
+    lc_match = re.search(r'const LC_DADOS = ({.*?});', html, re.DOTALL)
+    if lc_match:
+        try:
+            lc_existente = json.loads(lc_match.group(1))
+        except Exception:
+            lc_existente = {}
+    else:
+        lc_existente = {}
+
+    # Atualizar com os dados recém calculados (sobrescreve meses existentes)
+    lc_existente.update(lc_dados)
+
+    lc_json = json.dumps(lc_existente, ensure_ascii=False, separators=(',', ':'))
+    html, n = re.subn(
+        r'const LC_DADOS = ({.*?});',
+        f'const LC_DADOS = {lc_json};',
+        html, count=1, flags=re.DOTALL
+    )
+    if n:
+        print(f"  ✅ LC_DADOS atualizado — {len(lc_existente)} meses")
+    else:
+        print("  ⚠️  LC_DADOS: padrão não encontrado no HTML")
+else:
+    print("  ⚠️  LC_DADOS: nenhuma linha retornada pela query")
 
 # ─ Salvar ────────────────────────────────────────────────────────────────────
 CAC_PATH.write_text(html, encoding="utf-8")
