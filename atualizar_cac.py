@@ -139,7 +139,7 @@ CUSTO = {
     "PUSH":     {"unit": 0.00044, "base": "enviados"},
     "INAPP":    {"unit": 0.00044, "base": "enviados"},
     "DM":       {"unit": 0.006,   "base": "enviados"},
-    "WHATSAPP": {"unit": 0.0526,  "base": "entregues"},
+    "WHATSAPP": {"unit": 0.0526,  "base": "enviados"},  # custo por comunicação enviada
     "SMS":      {"unit": 0.0526,  "base": "enviados"},
 }
 
