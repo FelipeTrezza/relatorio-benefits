@@ -721,7 +721,7 @@ function renderKpis() {
     setText('kpi-total-env',   fmt(totalEnv));
     setText('kpi-total-conv',  fmt(totalConv));
     setText('kpi-conv-pct',    fmtPct(totalConv/Math.max(totalEnv,1)*100));
-    setText('kpi-custo-total', fmtR(totalCusto));
+    setText('kpi-custo-total', 'R$' + Math.round(totalCusto).toLocaleString('pt-BR'));
     setText('kpi-cac-medio',   fmtR(cac));
     setText('sub-canais',      subCanais);
     requestAnimationFrame(() => renderChartCanal());
