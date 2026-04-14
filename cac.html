@@ -568,7 +568,7 @@ const DADOS = {"canal":{"2025-09":{"DM":{"enviados":539181,"entregues":0,"conver
 const MES_LABELS = {"2025-09": "Setembro 2025", "2025-10": "Outubro 2025", "2025-11": "Novembro 2025", "2025-12": "Dezembro 2025", "2026-01": "Janeiro 2026", "2026-02": "Fevereiro 2026", "2026-03": "Março 2026", "2026-04": "Abril 2026 (parcial)"};
 const PARCIAIS   = ["2026-04"];
 const CUSTO_UNIT = {EMAIL:0.00044,PUSH:0.00044,INAPP:0.00044,DM:0.006,WHATSAPP:0.3092,SMS:0.0526};
-const CANAL_COR  = {EMAIL:'var(--yellow)',PUSH:'var(--blue)',INAPP:'var(--purple)',DM:'var(--orange)',WHATSAPP:'#25d366',SMS:'var(--pink)'};
+const CANAL_COR  = {EMAIL:'#e3b341',PUSH:'#58a6ff',INAPP:'#bc8cff',DM:'#f0883e',WHATSAPP:'#25d366',SMS:'#ff7b72'};
 
 function fmt(n){ return n.toLocaleString('pt-BR'); }
 function fmtR(v,d=2){ return 'R$'+v.toFixed(d).replace('.',','); }
@@ -1474,7 +1474,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ═══════════════════════════════════════════════════════
 (function() {
 
-const CANAL_COR = { INAPP:'#58a6ff', PUSH:'#3fb950', DM:'#bc8cff', WHATSAPP:'var(--orange)' };
+const CANAL_COR = { INAPP:'#58a6ff', PUSH:'#3fb950', DM:'#bc8cff', WHATSAPP:'#f0883e' };
 
 // Scores individuais dessazonalizados (7 meses ponderados, Set/25–Mar/26)
 const SCORE_IND = {
