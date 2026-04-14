@@ -257,6 +257,15 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
       </div>
     </div>
 
+    <!-- Gráfico Custo Total × CAC Ponderado mensal -->
+    <div class="card" style="margin-top:4px">
+      <div class="card-title">📊 Custo Total Growth × CAC Ponderado — Evolução Mensal</div>
+      <div class="card-sub">Barras = Custo Total Growth (R$) · Linha = CAC Médio Ponderado (R$)</div>
+      <div style="position:relative;margin-top:16px">
+        <canvas id="chart-mensal" style="width:100%;height:300px;display:block"></canvas>
+      </div>
+    </div>
+
     <!-- Gráfico Comunicados × CAC por canal -->
     <div class="card" style="margin-top:4px">
       <div class="card-title">📡 Comunicados e CAC por Canal</div>
@@ -724,12 +733,214 @@ function renderKpis() {
     setText('kpi-custo-total', 'R$' + Math.round(totalCusto).toLocaleString('pt-BR'));
     setText('kpi-cac-medio',   fmtR(cac));
     setText('sub-canais',      subCanais);
-    requestAnimationFrame(() => renderChartCanal());
+    requestAnimationFrame(() => { renderChartMensal(); renderChartCanal(); });
 }
 
 function setText(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
 
 // ── Gráfico Comunicados × CAC por canal ──────────────────────────────────────
+function renderChartMensal() {
+    const canvas = document.getElementById('chart-mensal');
+    if (!canvas) return;
+
+    const MESES   = ['2025-09','2025-10','2025-11','2025-12','2026-01','2026-02','2026-03','2026-04'];
+    const M_LABEL = ['Set/25','Out/25','Nov/25','Dez/25','Jan/26','Fev/26','Mar/26','Abr/26'];
+    const BAR_COR = '#58a6ff';
+    const LINE_COR = '#f5a623';
+
+    // Calcular custo total e CAC ponderado por mes
+    const custos = [];
+    const cacs   = [];
+    for (const mes of MESES) {
+        const canais = DADOS.canal[mes] || {};
+        let totalCusto = 0, sumCacW = 0, sumEnv = 0;
+        for (const v of Object.values(canais)) {
+            totalCusto += v.custo;
+            const cacCanal = v.convertidos > 0 ? v.custo / v.convertidos : 0;
+            sumCacW += cacCanal * v.enviados;
+            sumEnv  += v.enviados;
+        }
+        custos.push(Math.round(totalCusto));
+        cacs.push(sumEnv > 0 ? sumCacW / sumEnv : 0);
+    }
+
+    function niceMax(vals) {
+        const raw = Math.max(...vals);
+        if (raw === 0) return 1;
+        const exp  = Math.pow(10, Math.floor(Math.log10(raw)));
+        const frac = raw / exp;
+        const nice = frac <= 1 ? 1 : frac <= 2 ? 2 : frac <= 5 ? 5 : 10;
+        return nice * exp;
+    }
+    const maxCusto = niceMax(custos);
+    const maxCac   = niceMax(cacs);
+    const TICKS    = 5;
+
+    const W = canvas.offsetWidth || 700;
+    const H = 300;
+    canvas.width  = W * window.devicePixelRatio;
+    canvas.height = H * window.devicePixelRatio;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.clearRect(0, 0, W, H);
+
+    const PAD  = {top:40, right:84, bottom:52, left:88};
+    const gW   = W - PAD.left - PAD.right;
+    const gH   = H - PAD.top  - PAD.bottom;
+    const step = gW / MESES.length;
+    const barW = Math.min(step * 0.55, 64);
+
+    function xOf(i)  { return PAD.left + i * step + step / 2; }
+    function barY(v) { return PAD.top + gH - (v / maxCusto) * gH; }
+    function lineY(v){ return PAD.top + gH - (v / maxCac)   * gH; }
+
+    // Grid
+    for (let i = 0; i <= TICKS; i++) {
+        const y = PAD.top + (gH / TICKS) * (TICKS - i);
+        ctx.strokeStyle = i === 0 ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.045)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gW, y); ctx.stroke();
+    }
+
+    // Eixo Y esquerdo — Custo (azul)
+    ctx.font = '10px Inter, sans-serif';
+    for (let i = 0; i <= TICKS; i++) {
+        const y   = PAD.top + (gH / TICKS) * (TICKS - i);
+        const val = maxCusto / TICKS * i;
+        const lbl = val >= 1e6 ? 'R$'+(val/1e6).toFixed(1)+'M'
+                  : val >= 1e3 ? 'R$'+(val/1e3).toFixed(0)+'k'
+                  : 'R$'+val.toFixed(0);
+        ctx.fillStyle = BAR_COR + 'cc';
+        ctx.textAlign = 'right';
+        ctx.fillText(lbl, PAD.left - 8, y + 3.5);
+    }
+
+    // Eixo Y direito — CAC (laranja)
+    for (let i = 0; i <= TICKS; i++) {
+        const y   = PAD.top + (gH / TICKS) * (TICKS - i);
+        const val = maxCac / TICKS * i;
+        const lbl = val < 1 ? 'R$'+val.toFixed(2) : val >= 100 ? 'R$'+val.toFixed(0) : 'R$'+val.toFixed(1);
+        ctx.fillStyle = LINE_COR + 'cc';
+        ctx.textAlign = 'left';
+        ctx.fillText(lbl.replace('.',','), PAD.left + gW + 8, y + 3.5);
+    }
+
+    // Barras
+    MESES.forEach(function(m, i) {
+        const x  = xOf(i) - barW / 2;
+        const bH = (custos[i] / maxCusto) * gH;
+        const y  = PAD.top + gH - bH;
+
+        const grad = ctx.createLinearGradient(0, y, 0, PAD.top + gH);
+        grad.addColorStop(0, BAR_COR + 'cc');
+        grad.addColorStop(1, BAR_COR + '22');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x, y, barW, bH, [4,4,0,0]);
+        else ctx.rect(x, y, barW, bH);
+        ctx.fill();
+
+        // Label valor no topo da barra
+        const lbl = custos[i] >= 1e6 ? 'R$'+(custos[i]/1e6).toFixed(1)+'M'
+                  : 'R$'+(custos[i]/1e3).toFixed(0)+'k';
+        ctx.fillStyle = BAR_COR;
+        ctx.font = 'bold 9px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(lbl, xOf(i), y - 5);
+
+        // Label eixo X
+        ctx.fillStyle = 'rgba(200,210,220,0.7)';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.fillText(M_LABEL[i], xOf(i), PAD.top + gH + 18);
+        if (m === '2026-04') {
+            ctx.fillStyle = 'rgba(255,200,0,0.55)';
+            ctx.font = '8px Inter, sans-serif';
+            ctx.fillText('parcial', xOf(i), PAD.top + gH + 30);
+        }
+    });
+
+    // Area sob a linha CAC
+    ctx.beginPath();
+    MESES.forEach(function(m, i) {
+        i === 0 ? ctx.moveTo(xOf(i), lineY(cacs[i])) : ctx.lineTo(xOf(i), lineY(cacs[i]));
+    });
+    ctx.lineTo(xOf(MESES.length - 1), PAD.top + gH);
+    ctx.lineTo(xOf(0), PAD.top + gH);
+    ctx.closePath();
+    const ag = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + gH);
+    ag.addColorStop(0, LINE_COR + '28'); ag.addColorStop(1, LINE_COR + '00');
+    ctx.fillStyle = ag; ctx.fill();
+
+    // Linha CAC
+    ctx.beginPath();
+    ctx.strokeStyle = LINE_COR;
+    ctx.lineWidth   = 2.5;
+    ctx.lineJoin    = 'round';
+    ctx.shadowColor = LINE_COR + '55';
+    ctx.shadowBlur  = 5;
+    MESES.forEach(function(m, i) {
+        i === 0 ? ctx.moveTo(xOf(i), lineY(cacs[i])) : ctx.lineTo(xOf(i), lineY(cacs[i]));
+    });
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Pontos + labels CAC
+    MESES.forEach(function(m, i) {
+        const cx = xOf(i);
+        const cy = lineY(cacs[i]);
+        const lbl = cacs[i] < 1 ? 'R$'+cacs[i].toFixed(3).replace('.',',')
+                                 : 'R$'+cacs[i].toFixed(2).replace('.',',');
+
+        ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#0d1117'; ctx.fill();
+        ctx.strokeStyle = LINE_COR; ctx.lineWidth = 2;
+        ctx.shadowColor = LINE_COR + '88'; ctx.shadowBlur = 4;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        ctx.font = 'bold 9px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        const tw = ctx.measureText(lbl).width + 6;
+        const ty = cy - 14;
+        ctx.fillStyle = 'rgba(13,17,23,0.85)';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(cx - tw/2, ty - 9, tw, 13, 2);
+        else ctx.rect(cx - tw/2, ty - 9, tw, 13);
+        ctx.fill();
+        ctx.fillStyle = LINE_COR;
+        ctx.fillText(lbl, cx, ty);
+    });
+
+    // Legenda
+    ctx.font = '10px Inter, sans-serif';
+    const items = [
+        {cor: BAR_COR,  label: 'Custo Total Growth (eixo esq.)', tipo: 'bar'},
+        {cor: LINE_COR, label: 'CAC Médio Ponderado (eixo dir.)', tipo: 'line'}
+    ];
+    let lx = PAD.left;
+    const ly = PAD.top - 18;
+    items.forEach(function(it) {
+        if (it.tipo === 'bar') {
+            ctx.fillStyle = it.cor + 'cc';
+            ctx.fillRect(lx, ly - 7, 12, 8);
+        } else {
+            ctx.strokeStyle = it.cor;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.moveTo(lx, ly - 3); ctx.lineTo(lx + 12, ly - 3); ctx.stroke();
+            ctx.beginPath(); ctx.arc(lx + 6, ly - 3, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#0d1117'; ctx.fill();
+            ctx.strokeStyle = it.cor; ctx.lineWidth = 1.5; ctx.stroke();
+        }
+        ctx.fillStyle = 'rgba(200,210,220,0.7)';
+        ctx.textAlign = 'left';
+        ctx.fillText(it.label, lx + 16, ly);
+        lx += ctx.measureText(it.label).width + 40;
+    });
+}
+
 function renderChartCanal() {
     const canvas = document.getElementById('chart-canal');
     if (!canvas) return;
@@ -1256,12 +1467,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (canvas) {
     const ro = new ResizeObserver(entries => {
       if (entries[0].contentRect.width > 0) {
+        renderChartMensal();
         renderChartCanal();
       }
     });
     ro.observe(canvas);
     // Fallback: forçar render após 100ms
-    setTimeout(() => renderChartCanal(), 100);
+    setTimeout(() => { renderChartMensal(); renderChartCanal(); }, 100);
   }
 
   fetch('http://localhost:5001/status', { method: 'GET' })
