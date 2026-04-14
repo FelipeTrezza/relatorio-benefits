@@ -183,7 +183,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
   </div>
   <nav class="nav">
     <a class="nb" href="#visao-geral">Visão Geral</a>
-    <a class="nb" href="#canais">Canais</a>
+
     <a class="nb" href="#setores">Setores</a>
     <a class="nb" href="#toques">Toques</a>
     <a class="nb" href="#recorrencia">Recorrência</a>
@@ -277,48 +277,6 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
   <div class="divider"></div>
 
   <!-- TABELA CANAIS -->
-  <section id="canais">
-    <div class="sec-title">📡 CAC por Canal — <span id="titulo-canais">Março 2026</span></div>
-    <div class="sec-sub">Ordenado por eficiência (menor CAC) · Custo = volume faturável × tarifa unitária</div>
-
-    <div class="tbl-wrap">
-      <table>
-        <thead id="canais-thead">
-          <tr>
-            <th>#</th>
-            <th>Canal</th>
-            <th class="r">Volume faturável</th>
-            <th class="r">Convertidos</th>
-            <th class="r">Conv%</th>
-            <th class="r">Custo Total</th>
-            <th class="r">CAC</th>
-          </tr>
-        </thead>
-        <tbody id="canais-tbody">
-        </tbody>
-      </table>
-    </div>
-    <div style="margin-top:8px;font-size:11px;color:var(--muted);padding:0 4px" id="wa-nota">
-      * WhatsApp: custo calculado sobre mensagens enviadas (176.489). Conv% calculado sobre entregues (92.946 de 176.489 enviados).
-    </div>
-
-    <div style="margin-top:20px" class="g2">
-      <div class="card">
-        <div class="card-title">Taxa de Conversão por Canal</div>
-        <div class="card-sub">% de enviados que anteciparam em até 24h</div>
-        <div class="bar-chart" id="bar-conv-canais"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">CAC por Canal (R$)</div>
-        <div class="card-sub">Custo por antecipação convertida — escala proporcional</div>
-        <div class="bar-chart" id="bar-cac-canais"></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
   <!-- SETORES -->
   <section id="setores">
     <div class="sec-title">🏢 Conversão por Setor — Março 2026</div>
@@ -821,76 +779,6 @@ function renderKpis() {
 function setText(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
 
 // ── Render tabela de canais ───────────────────────────────────────────────────
-function renderCanais() {
-    const canal = DADOS.canal[MES_ATIVO] || {};
-    const ordem = ['EMAIL','PUSH','INAPP','DM','WHATSAPP','SMS'];
-    const linhas = ordem.filter(c => canal[c]).map((c,i) => {
-        const v = canal[c];
-        const volLabel = c==='WHATSAPP' ? fmt(v.entregues)+' entregues' : fmt(v.enviados)+' enviados';
-        const cor = CANAL_COR[c] || 'var(--text)';
-        return `<tr>
-          <td><span class="rank" style="background:rgba(139,148,158,.15);color:var(--muted)">${i+1}</span></td>
-          <td><span class="canal-dot" style="background:${cor}"></span><strong>${c}</strong></td>
-          <td class="r">${volLabel}</td>
-          <td class="r" style="color:${cor}">${fmt(v.convertidos)}</td>
-          <td class="r" style="color:${cor}"><strong>${fmtPct(v.conv_pct)}</strong></td>
-          <td class="r">${fmtR(v.custo)}</td>
-          <td class="r" style="color:${v.cac<0.1?'var(--greenl)':v.cac<1?'var(--blue)':v.cac<3?'var(--orange)':'var(--red)'}"><strong>${fmtR(v.cac,4)}</strong></td>
-        </tr>`;
-    });
-    // total
-    const total = Object.values(canal).reduce((a,v)=>{
-        a.env+=v.enviados; a.conv+=v.convertidos; a.custo+=v.custo; return a;
-    },{env:0,conv:0,custo:0});
-    const cacT = total.conv>0?total.custo/total.conv:0;
-    linhas.push(`<tr style="background:rgba(33,163,102,.04);font-weight:700">
-      <td colspan="2"><strong>TOTAL</strong></td>
-      <td class="r">—</td>
-      <td class="r">${fmt(total.conv)}</td>
-      <td class="r">${fmtPct(total.conv/Math.max(total.env,1)*100)}</td>
-      <td class="r">${fmtR(total.custo)}</td>
-      <td class="r" style="color:var(--orange)"><strong>${fmtR(cacT,4)}</strong></td>
-    </tr>`);
-    const tbody = document.getElementById('canais-tbody');
-    if(tbody) tbody.innerHTML = linhas.join('');
-    // atualiza bar chart conv%
-    renderBarCanais(canal);
-    renderBarCac(canal);
-}
-
-function renderBarCanais(canal) {
-    const ordem = ['EMAIL','PUSH','INAPP','DM','WHATSAPP','SMS'];
-    const max = Math.max(...ordem.filter(c=>canal[c]).map(c=>canal[c].conv_pct));
-    const wrap = document.getElementById('bar-conv-canais');
-    if(!wrap) return;
-    wrap.innerHTML = ordem.filter(c=>canal[c]).map(c => {
-        const v=canal[c]; const cor=CANAL_COR[c]||'var(--text)';
-        const w=max>0?(v.conv_pct/max*100).toFixed(1):0;
-        return `<div class="bc-row">
-          <div class="bc-lbl">${c}</div>
-          <div class="bc-bw"><div class="bc-b" style="width:${w}%;background:${cor};min-width:4px">${fmtPct(v.conv_pct)}</div></div>
-          <div class="bc-val" style="color:${cor}">${fmtPct(v.conv_pct)}</div>
-        </div>`;
-    }).join('');
-}
-
-function renderBarCac(canal) {
-    const ordem = ['EMAIL','PUSH','INAPP','DM','WHATSAPP','SMS'];
-    const max = Math.max(...ordem.filter(c=>canal[c]).map(c=>canal[c].cac));
-    const wrap = document.getElementById('bar-cac-canais');
-    if(!wrap) return;
-    wrap.innerHTML = ordem.filter(c=>canal[c]).map(c => {
-        const v=canal[c]; const cor=CANAL_COR[c]||'var(--text)';
-        const w=max>0?Math.max(v.cac/max*100,0.5).toFixed(1):0.5;
-        const cacCor=v.cac<0.1?'var(--greenl)':v.cac<1?'var(--blue)':v.cac<3?'var(--orange)':'var(--red)';
-        return `<div class="bc-row">
-          <div class="bc-lbl">${c}</div>
-          <div class="bc-bw"><div class="bc-b" style="width:${w}%;background:${cor};min-width:4px">${fmtR(v.cac,4)}</div></div>
-          <div class="bc-val" style="color:${cacCor}">${fmtR(v.cac,4)}</div>
-        </div>`;
-    }).join('');
-}
-
 // ── Render combos ─────────────────────────────────────────────────────────────
 
 // ── Render recorrência (base = comunicações) ──────────────────────────────────
@@ -1005,7 +893,7 @@ function renderTudo() {
     const label = MES_LABELS[MES_ATIVO] || MES_ATIVO;
     ['titulo-mes','titulo-canais','titulo-rec','titulo-toques','titulo-score'].forEach(id => setText(id, label));
     renderKpis();
-    renderCanais();
+
     renderRecorrencia();
     renderCombos();
     renderToquesGlobal();
