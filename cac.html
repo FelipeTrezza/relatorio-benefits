@@ -406,8 +406,7 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
             <th class="r">Antecipações</th>
             <th class="r">Disparos por canal</th>
             <th class="r">% do mês</th>
-            <th style="width:13%">Canal âncora</th>
-            <th style="width:13%">Ganho s/ fraco</th>
+
           </tr>
         </thead>
         <tbody id="score-seq-tbody"></tbody>
@@ -1576,8 +1575,7 @@ function renderScoreSeq() {
         }).join('<br>')
       }</td>
       <td class="r" style="color:var(--muted)">${d.pct}</td>
-      <td><span style="color:${d.aCor};font-weight:700;font-size:11px">● ${d.melhor}</span> <span style="color:var(--muted);font-size:10px">${(SCORE_IND[d.melhor]?.total||0).toFixed(2)}</span></td>
-      <td>${ganhoHtml}</td>
+
     </tr>`;
   }
 
@@ -1590,7 +1588,7 @@ function renderScoreSeq() {
     const pctGrupo   = totalAnt > 0 ? (totalGrupo / totalAnt * 100).toFixed(1).replace('.',',') + '%' : '—';
     // Cabeçalho do bloco
     html += `<tr>
-      <td colspan="6" style="padding:14px 10px 8px;background:${bloco.bg};border-top:2px solid ${bloco.border};border-bottom:1px solid ${bloco.border};">
+      <td colspan="4" style="padding:14px 10px 8px;background:${bloco.bg};border-top:2px solid ${bloco.border};border-bottom:1px solid ${bloco.border};">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:13px;font-weight:800;color:${bloco.cor}">${bloco.label}</span>
           <span style="font-size:11px;color:var(--muted)">Score ${bloco.range}</span>
