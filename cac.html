@@ -404,7 +404,7 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
             <th style="width:36%">Sequência <span style="font-weight:400;color:var(--muted)">(último ★ ← primeiro)</span></th>
             <th class="c" style="width:9%">Score</th>
             <th class="r">Antecipações</th>
-            <th class="r">Consumers</th>
+            <th class="r">Disparos por canal</th>
             <th class="r">% do mês</th>
             <th style="width:13%">Canal âncora</th>
             <th style="width:13%">Ganho s/ fraco</th>
@@ -1506,10 +1506,11 @@ function renderScoreSeq() {
   const tbody = document.getElementById('score-seq-tbody');
   if (!tbody) return;
 
-  const mes    = (typeof MES_ATIVO !== 'undefined' ? MES_ATIVO : '2026-03');
-  const dMes   = REC2_DADOS[mes] || REC2_DADOS['2026-03'] || {};
-  const combos = (dMes.total || dMes).combo || [];
+  const mes      = (typeof MES_ATIVO !== 'undefined' ? MES_ATIVO : '2026-03');
+  const dMes     = REC2_DADOS[mes] || REC2_DADOS['2026-03'] || {};
+  const combos   = (dMes.total || dMes).combo || [];
   const totalAnt = combos.reduce((s, r) => s + r.ant, 0);
+  const canalEnv = (DADOS && DADOS.canal && DADOS.canal[mes]) ? DADOS.canal[mes] : {};
 
   // Tooltip flutuante
   let tip = document.getElementById('score-tip');
@@ -1565,7 +1566,15 @@ function renderScoreSeq() {
       <td><div class="seq-pills">${pills}</div></td>
       <td class="c"><span class="sbadge sbadge-${d.cl}">${d.sc.toFixed(2)}</span></td>
       <td class="r" style="font-weight:600;color:var(--text)">${fmt(d.ant)}</td>
-      <td class="r" style="color:var(--muted);font-size:11px">${fmt(d.cons)}</td>
+      <td class="r" style="font-size:10px;color:var(--muted);line-height:1.6">${
+        d.canais.map(c => {
+          const env = canalEnv[c] ? canalEnv[c].enviados : 0;
+          const cor = CANAL_COR_S[c] || '#8b949e';
+          return env > 0
+            ? \`<span style="color:\${cor};font-weight:600">\${c}</span> \${fmt(env)}\`
+            : \`<span style="color:var(--muted)">\${c} —</span>\`;
+        }).join('<br>')
+      }</td>
       <td class="r" style="color:var(--muted)">${d.pct}</td>
       <td><span style="color:${d.aCor};font-weight:700;font-size:11px">● ${d.melhor}</span> <span style="color:var(--muted);font-size:10px">${(SCORE_IND[d.melhor]?.total||0).toFixed(2)}</span></td>
       <td>${ganhoHtml}</td>
