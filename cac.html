@@ -268,9 +268,8 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--greenl);width:100%"></div>
         <div class="kpi-ic">🎯</div>
-        <div class="kpi-lbl">Conv. Atribuídas ao MKT</div>
+        <div class="kpi-lbl">Antecipações Atribuídas ao Growth</div>
         <div class="kpi-val" style="color:var(--greenl)" id="kpi-conv-mkt">—</div>
-        <div class="kpi-sub" id="kpi-conv-mkt-sub">—</div>
       </div>
     </div>
 
@@ -603,9 +602,7 @@ function renderKpis() {
     const pctImpacto = antUnicas > 0 ? (convMkt / antUnicas * 100).toFixed(1) + '% impacto Growth nas antecipações' : '—';
     setText('kpi-ant-unicas',     fmt(antUnicas));
     setText('kpi-ant-unicas-pct', pctImpacto);
-    const pctMkt = antUnicas > 0 ? (convMkt / antUnicas * 100).toFixed(1) + '% das antecipações distintas' : '—';
     setText('kpi-conv-mkt',     fmt(convMkt));
-    setText('kpi-conv-mkt-sub', pctMkt);
     setText('sub-canais',      subCanais);
     requestAnimationFrame(() => { renderChartMensal(); renderChartCanal(); });
 }
