@@ -269,10 +269,10 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
         <div class="kpi-lbl">Vidas Únicas Impactadas</div>
         <div class="kpi-val" style="color:var(--blue)" id="kpi-vidas-unicas">—</div>
       </div>
-      <div class="kpi">
+      <div class="kpi" id="card-ant-unicas">
         <div class="kpi-bar" style="background:var(--purple);width:100%"></div>
         <div class="kpi-ic">⚡</div>
-        <div class="kpi-lbl" id="lbl-ant-unicas">Antecipações Distintas</div>
+        <div class="kpi-lbl">Antecipações Distintas</div>
         <div class="kpi-val" style="color:var(--purple)" id="kpi-ant-unicas">—</div>
       </div>
       <div class="kpi">
@@ -597,10 +597,9 @@ function renderKpis() {
         setText('kpi-custo-total',  'R$' + Math.round(custo).toLocaleString('pt-BR'));
         setText('kpi-cac-medio',    fmtR(cacR));
         setText('kpi-vidas-unicas', fmt(tp.vidas_unicas || 0));
-        setText('kpi-ant-unicas',   fmt(antU));
-        // No modo total, ajusta label do card para diferenciar do modo mensal
-        const lblAnt = document.getElementById('lbl-ant-unicas');
-        if(lblAnt) lblAnt.textContent = 'CONSUMERS GROWTH DISTINTOS';
+        // No modo total, oculta o card Antecipações Distintas (sem dado correto para o período)
+        const cardAntU = document.getElementById('card-ant-unicas');
+        if(cardAntU) cardAntU.style.display = 'none';
         setText('kpi-conv-mkt',     fmt(convT));
         setText('kpi-conv-mkt-sub', pctImp);
         setText('sub-canais',       'Set/25–Mar/26 · 7 meses acumulados');
@@ -639,9 +638,9 @@ function renderKpis() {
     setText('kpi-cac-medio',   fmtR(cacReal));
     const vidasMes  = VIDAS_UNICAS[MES_ATIVO] || 0;
     setText('kpi-vidas-unicas', fmt(vidasMes));
-    // Restaura label original ao sair do modo total
-    const lblAntM = document.getElementById('lbl-ant-unicas');
-    if(lblAntM) lblAntM.textContent = 'ANTECIPAÇÕES DISTINTAS';
+    // Restaura card ao sair do modo total
+    const cardAntUM = document.getElementById('card-ant-unicas');
+    if(cardAntUM) cardAntUM.style.display = '';
     const antUnicas = ANT_UNICAS[MES_ATIVO] || 0;
     const pctImpacto = antUnicas > 0 ? (convMkt / antUnicas * 100).toFixed(1) + '% das ant. distintas' : '—';
     setText('kpi-ant-unicas', fmt(antUnicas));
