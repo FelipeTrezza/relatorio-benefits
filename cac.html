@@ -349,7 +349,6 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
               <th>Canais recebidos <span style="font-size:10px;color:var(--muted)">(último ← ... ← primeiro)</span></th>
               <th class="r">Antecipações</th>
               <th class="r">% total</th>
-              <th class="r" style="color:var(--muted)">Consumers</th>
             </tr>
           </thead>
           <tbody id="rec-combo-tbody"></tbody>
@@ -1146,13 +1145,11 @@ function renderRec2() {
               <td><span style="color:${cor};font-weight:700">${r.n} canal${r.n > 1 ? 'is' : ''} distintos</span>${best ? ' <span style="font-size:10px;background:rgba(45,201,116,.15);color:var(--greenl);padding:1px 6px;border-radius:10px">mais conv.</span>' : ''}</td>
               <td class="r" style="color:${cor};font-weight:700">${fmt(r.ant)}</td>
               <td class="r" style="color:${cor};font-weight:700">${pct}</td>
-              <td class="r" style="color:var(--muted)">${fmt(r.cons)}</td>
             </tr>`;
         }).join('') + `<tr style="font-weight:700;background:rgba(33,163,102,.04)">
             <td>TOTAL</td>
             <td class="r">${fmt(totalAnt)}</td>
             <td class="r">100%</td>
-            <td class="r" style="color:var(--muted)">—</td>
         </tr>`;
     }
 
@@ -1210,7 +1207,6 @@ function renderRec2() {
               <td>${dots} ${tags}</td>
               <td class="r" style="font-weight:700">${fmt(r.ant)}</td>
               <td class="r" style="color:var(--blue)">${pct}</td>
-              <td class="r" style="color:var(--muted)">${fmt(r.cons)}</td>
             </tr>`;
         }).join('');
     }
