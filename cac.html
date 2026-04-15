@@ -1571,8 +1571,8 @@ function renderScoreSeq() {
           const env = canalEnv[c] ? canalEnv[c].enviados : 0;
           const cor = CANAL_COR_S[c] || '#8b949e';
           return env > 0
-            ? \`<span style="color:\${cor};font-weight:600">\${c}</span> \${fmt(env)}\`
-            : \`<span style="color:var(--muted)">\${c} —</span>\`;
+            ? '<span style="color:' + cor + ';font-weight:600">' + c + '</span> ' + fmt(env)
+            : '<span style="color:var(--muted)">' + c + ' —</span>';
         }).join('<br>')
       }</td>
       <td class="r" style="color:var(--muted)">${d.pct}</td>
