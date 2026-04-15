@@ -395,17 +395,17 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <!-- Racional -->
     <div class="score-racional">
       <strong>Por que criar um score em vez de usar só Conv%?</strong><br>
-      Usar antecipações isoladas por canal gera três vieses: <b>(1) viés de intenção</b> — INAPP só entrega quando o app está aberto; <b>(2) viés de segmentação</b> — quem o sistema escolhe impacta mais que o canal; <b>(3) volatilidade extrema</b> — PUSH variou de 0,75% a 8,87% em 7 meses.<br><br>
+      Usar antecipações isoladas por canal gera três vieses: <b>(1) viés de intenção</b> — INAPP só entrega quando o app está aberto; <b>(2) viés de segmentação</b> — quem o sistema escolhe impacta mais que o canal; <b>(3) volatilidade extrema</b> — PUSH variou de 0,90% a 9,08% em 7 meses (taxa last-click real por mês).<br><br>
       <strong>Novo conceito aplicado:</strong> D3 Conv LC usa a taxa <b>last-click real</b> — antecipações atribuídas ao canal (último nos 7d) ÷ total de comunicações enviadas por aquele canal. Denominador correto, sem inflação por multi-atribuição.<br><br>
       <div class="score-formula">
 Score = <span>Alcance(25%)</span> + <span>Custo(30%)</span> + <span>Conv LC(30%)</span> + <span>Consistência(15%)</span><br>
 D1 Alcance      = taxa_entrega_ponderada / 100 × 10<br>
 D2 Custo        = (1 − custo_unit / max_custo) × 10  [max = R$0,3092 WA]<br>
-D3 Conv LC      = taxa_last_click_pond / max_taxa × 10  [max = 8,87% PUSH Fev/26]<br>
+D3 Conv LC      = taxa_last_click_pond / max_taxa × 10  [max = 4,68% PUSH (ponderado Set/25–Mar/26)]<br>
 D4 Consistência = max(0, 1 − CV) × 10   onde CV = desvio_padrão / média da taxa_LC<br>
 Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Jan/26=2× · Fev/26=2,5× · Mar/26=3×
       </div>
-      <strong>Resultado:</strong> PUSH lidera com melhor equilíbrio entre alcance, custo e conversão LC. DM perde na dimensão Alcance (0,00 — is_delivered não registrado). WHATSAPP perde em Custo (R$0,3092/entrega).
+      <strong>Resultado:</strong> PUSH lidera com score 8,92 — melhor equilíbrio entre alcance, custo e conversão LC (4,68% ponderada). DM perde em Alcance (0,00 — is_delivered não registrado). WHATSAPP perde em Custo (R$0,3092/entrega).
     </div>
 
     <!-- Score cards -->
@@ -1434,10 +1434,10 @@ const CLASSE_COR  = { otima:'#2dc974', boa:'#58a6ff', media:'#f0883e', fraca:'#f
 
 // Score individual — last-click 7d (ant÷enviados), ponderado Set/25–Mar/26
 const SCORE_IND = {
-  PUSH:     { total:7.35, d1:9.85, d2:9.99, d3:5.01, d4:2.61, cor:'#3fb950', borda:'rgba(63,185,80,.3)'   },
-  INAPP:    { total:6.30, d1:9.09, d2:9.99, d3:1.34, d4:4.20, cor:'#58a6ff', borda:'rgba(88,166,255,.3)'  },
-  DM:       { total:4.17, d1:0.00, d2:9.81, d3:1.29, d4:5.63, cor:'#bc8cff', borda:'rgba(188,140,255,.3)' },
-  WHATSAPP: { total:3.43, d1:7.29, d2:0.00, d3:1.67, d4:7.37, cor:'#f0883e', borda:'rgba(240,136,62,.3)'  },
+  PUSH:      { total:8.92, d1:9.85, d2:9.99, d3:10.0, d4:3.09, cor:'#3fb950', borda:'rgba(63,185,80,.3)' },
+  INAPP:     { total:6.77, d1:9.09, d2:9.99, d3:3.06, d4:3.89, cor:'#58a6ff', borda:'rgba(88,166,255,.3)' },
+  DM:        { total:4.79, d1:0.0, d2:9.81, d3:3.07, d4:6.15, cor:'#bc8cff', borda:'rgba(188,140,255,.3)' },
+  WHATSAPP:  { total:4.01, d1:7.29, d2:0.0, d3:3.54, d4:7.48, cor:'#f0883e', borda:'rgba(240,136,62,.3)' },
 };
 
 // Pesos posicionais — índice 0 = último canal recebido = maior peso
