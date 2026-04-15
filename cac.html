@@ -263,13 +263,13 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
         <div class="kpi-ic">⚡</div>
         <div class="kpi-lbl">Antecipações Distintas</div>
         <div class="kpi-val" style="color:var(--purple)" id="kpi-ant-unicas">—</div>
-        <div class="kpi-sub" id="kpi-ant-unicas-pct">—</div>
       </div>
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--greenl);width:100%"></div>
         <div class="kpi-ic">🎯</div>
-        <div class="kpi-lbl">Antecipações Atribuídas ao Growth</div>
+        <div class="kpi-lbl">Antecipações Growth</div>
         <div class="kpi-val" style="color:var(--greenl)" id="kpi-conv-mkt">—</div>
+        <div class="kpi-sub" id="kpi-conv-mkt-sub">—</div>
       </div>
     </div>
 
@@ -599,10 +599,10 @@ function renderKpis() {
     const vidasMes = VIDAS_UNICAS[MES_ATIVO] || 0;
     setText('kpi-vidas-unicas', fmt(vidasMes));
     const antUnicas = ANT_UNICAS[MES_ATIVO] || 0;
-    const pctImpacto = antUnicas > 0 ? (convMkt / antUnicas * 100).toFixed(1) + '% impacto Growth nas antecipações' : '—';
-    setText('kpi-ant-unicas',     fmt(antUnicas));
-    setText('kpi-ant-unicas-pct', pctImpacto);
+    const pctImpacto = antUnicas > 0 ? (convMkt / antUnicas * 100).toFixed(1) + '% das antecipações distintas' : '—';
+    setText('kpi-ant-unicas', fmt(antUnicas));
     setText('kpi-conv-mkt',     fmt(convMkt));
+    setText('kpi-conv-mkt-sub', pctImpacto);
     setText('sub-canais',      subCanais);
     requestAnimationFrame(() => { renderChartMensal(); renderChartCanal(); });
 }
