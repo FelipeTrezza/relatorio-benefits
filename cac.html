@@ -1519,14 +1519,12 @@ function renderScoreSeq() {
     document.body.appendChild(tip);
   }
 
-  const top  = combos.slice(0, 25);
+  // Processar todos os combos e calcular scores
   const rows = [];
-
-  tbody.innerHTML = top.map(r => {
+  combos.forEach(r => {
     const canais = r.combo.split('+');
     const sc     = scoreSeq(canais);
     const cl     = classe(sc);
-    const cor    = CLASSE_COR[cl];
     const pesos  = PESOS_POS[canais.length] || canais.map(() => 1/canais.length);
     const melhor = canais.reduce((a,b) => (SCORE_IND[a]?.total||0) >= (SCORE_IND[b]?.total||0) ? a : b);
     const pior   = canais.length > 1
@@ -1539,34 +1537,64 @@ function renderScoreSeq() {
       scSemPior = sem.reduce((s, c, i) => s + (SCORE_IND[c]?.total||0) * p2[i], 0);
       ganho     = scSemPior - sc;
     }
-    const pct    = totalAnt > 0 ? (r.ant / totalAnt * 100).toFixed(1).replace('.',',') + '%' : '—';
-    const aCor   = SCORE_IND[melhor]?.cor || 'var(--muted)';
+    const pct  = totalAnt > 0 ? (r.ant / totalAnt * 100).toFixed(1).replace('.',',') + '%' : '—';
+    const aCor = SCORE_IND[melhor]?.cor || 'var(--muted)';
+    rows.push({ canais, pesos, sc, cl, melhor, pior, scSemPior, ganho, ant: r.ant, pct, seq: r.combo, aCor });
+  });
 
-    // Pills — índice 0 = último canal = ★
-    const pills = canais.map((c, i) => {
+  // Configuração dos 4 blocos
+  const BLOCOS = [
+    { cl:'otima', label:'🟢 Ótima', range:'≥ 7,5', cor:'#2dc974', bg:'rgba(45,201,116,.06)', border:'rgba(45,201,116,.25)' },
+    { cl:'boa',   label:'🔵 Boa',   range:'6,5–7,5', cor:'#58a6ff', bg:'rgba(88,166,255,.06)', border:'rgba(88,166,255,.25)' },
+    { cl:'media', label:'🟠 Média', range:'5,0–6,5', cor:'#f0883e', bg:'rgba(240,136,62,.06)',  border:'rgba(240,136,62,.25)'  },
+    { cl:'fraca', label:'🔴 Fraca', range:'< 5,0',   cor:'#f85149', bg:'rgba(248,81,73,.06)',   border:'rgba(248,81,73,.25)'   },
+  ];
+
+  function buildRow(d) {
+    const pills = d.canais.map((c, i) => {
       const isLast = i === 0;
-      return `<span class="seq-pill sp-${c}" title="peso ${(pesos[i]*100).toFixed(0)}%${isLast?' — último recebido':''}">${c}${isLast ? ' ★' : ''}</span>`;
+      return `<span class="seq-pill sp-${c}" title="peso ${(d.pesos[i]*100).toFixed(0)}%${isLast?' — último recebido':''}">${c}${isLast ? ' ★' : ''}</span>`;
     }).join('<span style="color:var(--muted);font-size:9px;margin:0 1px">←</span>');
 
-    const ganhoHtml = (ganho > 0.05 && pior)
-      ? `<span style="color:#f0883e;font-size:11px;font-weight:600">+${ganho.toFixed(2)}</span> <span style="color:var(--muted);font-size:10px">sem ${pior}</span>`
+    const ganhoHtml = (d.ganho > 0.05 && d.pior)
+      ? `<span style="color:#f0883e;font-size:11px;font-weight:600">+${d.ganho.toFixed(2)}</span> <span style="color:var(--muted);font-size:10px">sem ${d.pior}</span>`
       : `<span style="color:var(--muted);font-size:10px">—</span>`;
 
-    rows.push({ canais, pesos, sc, cl, melhor, pior, scSemPior, ganho, ant: r.ant, pct, seq: r.combo });
-
-    return `<tr class="seq-${cl}">
+    return `<tr class="seq-${d.cl}" data-seq="${d.seq}" data-idx="${rows.indexOf(d)}">
       <td><div class="seq-pills">${pills}</div></td>
-      <td class="c"><span class="sbadge sbadge-${cl}">${sc.toFixed(2)}</span></td>
-      <td class="r" style="font-weight:600;color:var(--text)">${fmt(r.ant)}</td>
-      <td class="r" style="color:var(--muted)">${pct}</td>
-      <td><span style="color:${aCor};font-weight:700;font-size:11px">● ${melhor}</span> <span style="color:var(--muted);font-size:10px">${(SCORE_IND[melhor]?.total||0).toFixed(2)}</span></td>
+      <td class="c"><span class="sbadge sbadge-${d.cl}">${d.sc.toFixed(2)}</span></td>
+      <td class="r" style="font-weight:600;color:var(--text)">${fmt(d.ant)}</td>
+      <td class="r" style="color:var(--muted)">${d.pct}</td>
+      <td><span style="color:${d.aCor};font-weight:700;font-size:11px">● ${d.melhor}</span> <span style="color:var(--muted);font-size:10px">${(SCORE_IND[d.melhor]?.total||0).toFixed(2)}</span></td>
       <td>${ganhoHtml}</td>
     </tr>`;
-  }).join('');
+  }
 
-  // Hover tooltips
-  tbody.querySelectorAll('tr').forEach((tr, idx) => {
-    const d = rows[idx];
+  // Montar HTML com 4 blocos separados
+  let html = '';
+  BLOCOS.forEach(bloco => {
+    const grupo = rows.filter(r => r.cl === bloco.cl).slice(0, 20);
+    if (grupo.length === 0) return;
+    const totalGrupo = grupo.reduce((s, r) => s + r.ant, 0);
+    const pctGrupo   = totalAnt > 0 ? (totalGrupo / totalAnt * 100).toFixed(1).replace('.',',') + '%' : '—';
+    // Cabeçalho do bloco
+    html += `<tr>
+      <td colspan="6" style="padding:14px 10px 8px;background:${bloco.bg};border-top:2px solid ${bloco.border};border-bottom:1px solid ${bloco.border};">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:13px;font-weight:800;color:${bloco.cor}">${bloco.label}</span>
+          <span style="font-size:11px;color:var(--muted)">Score ${bloco.range}</span>
+          <span style="margin-left:auto;font-size:11px;color:var(--muted)">${grupo.length} sequências · <span style="color:${bloco.cor};font-weight:600">${fmt(totalGrupo)}</span> antecipações (${pctGrupo})</span>
+        </div>
+      </td>
+    </tr>`;
+    html += grupo.map(d => buildRow(d)).join('');
+  });
+
+  tbody.innerHTML = html;
+
+  // Hover tooltips — usando data-idx para mapear linha → row (ignora linhas de cabeçalho)
+  tbody.querySelectorAll('tr[data-idx]').forEach(tr => {
+    const d = rows[+tr.dataset.idx];
     if (!d) return;
     const det = d.canais.map((c,i) =>
       `<span style="color:${SCORE_IND[c]?.cor||'#fff'}">${c}</span>(${(SCORE_IND[c]?.total||0).toFixed(2)}) ×${d.pesos[i].toFixed(2)}`
