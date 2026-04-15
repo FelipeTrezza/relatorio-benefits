@@ -347,26 +347,6 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <div class="sec-title">🔀 Mix de Canais — <span id="titulo-rec">Março 2026</span></div>
     <div class="sec-sub">Base: <strong>antecipações Growth</strong> · canais recebidos nos 7d após o disparo · last-click = último canal antes de antecipar</div>
 
-    <!-- KPIs: Nº de canais distintos -->
-    <div class="kpi-grid" id="rec-mix-kpis" style="margin-bottom:18px"></div>
-
-    <!-- Tabela: mix canais × antecipações -->
-    <div class="card" style="margin-bottom:18px">
-      <div class="card-title">📊 Distribuição por Nº de Canais</div>
-      <div class="card-sub">Quantos canais distintos o consumer recebeu nos 7d após o disparo antes de antecipar</div>
-      <div class="tbl-wrap" style="margin-top:10px">
-        <table>
-          <thead>
-            <tr>
-              <th>Canais distintos recebidos</th>
-              <th class="r">Antecipações</th>
-              <th class="r">% total</th>
-            </tr>
-          </thead>
-          <tbody id="rec-mix-tbody"></tbody>
-        </table>
-      </div>
-    </div>
 
     <!-- Last-click por canal -->
     <div class="card" style="margin-bottom:18px">
@@ -1150,44 +1130,6 @@ function renderRec2() {
     const mix   = d.mix   || [];
     const last  = d.last  || {};
     const combo = d.combo || [];
-
-    // ── KPIs: mix de canais ────────────────────────────────────────────────
-    const totalAnt = mix.reduce((s, r) => s + r.ant, 0);
-    const CORES_MIX = ['var(--greenl)', 'var(--blue)', 'var(--orange)', 'var(--purple)', 'var(--yellow)', 'var(--pink)'];
-    const EMOJIS = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣'];
-    const kpiWrap = document.getElementById('rec-mix-kpis');
-    if (kpiWrap) {
-        kpiWrap.innerHTML = mix.slice(0, 4).map((r, i) => {
-            const cor = CORES_MIX[i] || 'var(--muted)';
-            const pct = totalAnt > 0 ? (r.ant / totalAnt * 100).toFixed(1).replace('.', ',') + '%' : '—';
-            return `<div class="kpi">
-              <div class="kpi-bar" style="background:${cor};width:100%"></div>
-              <div class="kpi-ic">${EMOJIS[r.n - 1] || r.n + ' canais'}</div>
-              <div class="kpi-lbl">${r.n} canal${r.n > 1 ? 'is' : ''} distintos</div>
-              <div class="kpi-val" style="color:${cor}">${pct}</div>
-              <div class="kpi-sub">${fmt(r.ant)} antecipações</div>
-            </div>`;
-        }).join('');
-    }
-
-    // ── Tabela mix ─────────────────────────────────────────────────────────
-    const tbody = document.getElementById('rec-mix-tbody');
-    if (tbody) {
-        tbody.innerHTML = mix.map((r, i) => {
-            const cor  = CORES_MIX[i] || 'var(--muted)';
-            const pct  = totalAnt > 0 ? (r.ant / totalAnt * 100).toFixed(1).replace('.', ',') + '%' : '—';
-            const best = i === 0;
-            return `<tr style="${best ? 'background:rgba(45,201,116,.05)' : ''}">
-              <td><span style="color:${cor};font-weight:700">${r.n} canal${r.n > 1 ? 'is' : ''} distintos</span>${best ? ' <span style="font-size:10px;background:rgba(45,201,116,.15);color:var(--greenl);padding:1px 6px;border-radius:10px">mais conv.</span>' : ''}</td>
-              <td class="r" style="color:${cor};font-weight:700">${fmt(r.ant)}</td>
-              <td class="r" style="color:${cor};font-weight:700">${pct}</td>
-            </tr>`;
-        }).join('') + `<tr style="font-weight:700;background:rgba(33,163,102,.04)">
-            <td>TOTAL</td>
-            <td class="r">${fmt(totalAnt)}</td>
-            <td class="r">100%</td>
-        </tr>`;
-    }
 
     // ── Last-click por canal ───────────────────────────────────────────────
     const lastWrap = document.getElementById('rec-last-bars');
