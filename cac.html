@@ -249,7 +249,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--orange);width:100%"></div>
         <div class="kpi-ic">📉</div>
-        <div class="kpi-lbl">CAC Médio Ponderado</div>
+        <div class="kpi-lbl">CAC Real (custo ÷ ant. Growth)</div>
         <div class="kpi-val" style="color:var(--orange)" id="kpi-cac-medio">R$0,49</div>
       </div>
       <div class="kpi">
@@ -276,7 +276,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <!-- Gráfico Custo Total × CAC Ponderado mensal -->
     <div class="card" style="margin-top:4px">
       <div class="card-title">📊 Custo Total Growth × CAC Ponderado — Evolução Mensal</div>
-      <div class="card-sub">Barras = Custo Total Growth (R$) · Linha = CAC Médio Ponderado (R$)</div>
+      <div class="card-sub">Barras = Custo Total Growth (R$) · Linha = CAC real (custo ÷ Antecipações Growth)</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px" id="mensal-canal-tabs">
         <button class="mbtn mbtn-active" onclick="setMensalCanal('TODOS')">Todos</button>
         <button class="mbtn" onclick="setMensalCanal('EMAIL')"    style="--cbtn-cor:var(--yellow)">✉️ Email</button>
@@ -298,8 +298,8 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
   <!-- SETORES -->
   <!-- TOQUES ATÉ CONVERTER -->
   <section id="conversao">
-    <div class="sec-title">📲 Conversão por Canal — Last Click 7 Dias</div>
-    <div class="sec-sub">Atribuição à <strong>última comunicação</strong> nos 7 dias antes da 1ª antecipação do mês · Abertura por tipo de conversão e canal</div>
+    <div class="sec-title">📲 Antecipações Atribuídas por Canal — Last Click 7 Dias</div>
+    <div class="sec-sub">Atribuição à <strong>última comunicação</strong> nos 7 dias antes da antecipação · Antecipações Growth por canal · abertura por tipo</div>
 
     <!-- Filtro de visão -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
@@ -316,14 +316,14 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--greenl);width:100%"></div>
         <div class="kpi-ic">🆕</div>
-        <div class="kpi-lbl">1ª Antecipação da Vida</div>
+        <div class="kpi-lbl">1ª Antecipação da Vida (Growth)</div>
         <div class="kpi-val" style="color:var(--greenl)" id="conv-kpi-pv">—</div>
         <div class="kpi-sub" id="conv-kpi-pv-pct">— do total atribuído</div>
       </div>
       <div class="kpi">
         <div class="kpi-bar" style="background:var(--blue);width:100%"></div>
         <div class="kpi-ic">🔄</div>
-        <div class="kpi-lbl">Recompra</div>
+        <div class="kpi-lbl">Recompra (Growth)</div>
         <div class="kpi-val" style="color:var(--blue)" id="conv-kpi-rc">—</div>
         <div class="kpi-sub" id="conv-kpi-rc-pct">— do total atribuído</div>
       </div>
@@ -332,7 +332,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <!-- Gráfico de barras por canal -->
     <div class="card">
       <div class="card-title" id="conv-chart-title">📊 Conversões por Canal — Total</div>
-      <div class="card-sub">Partindo da comunicação → antecipação nos 7 dias seguintes · taxa = conversões atribuídas ÷ enviados totais · canais ordenados por taxa</div>
+      <div class="card-sub">Antecipações atribuídas ao Growth (last click 7d) ÷ disparos totais do canal · canais ordenados por taxa</div>
       <div id="conv-bar-chart" style="display:flex;flex-direction:column;gap:10px;margin-top:16px"></div>
     </div>
 
@@ -345,7 +345,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
   <!-- RECORRÊNCIA DE CANAIS -->
   <section id="recorrencia">
     <div class="sec-title">🔀 Mix de Canais — <span id="titulo-rec">Março 2026</span></div>
-    <div class="sec-sub">Base: <strong>antecipações</strong> · canais recebidos nos 7 dias anteriores à conversão · last-click = último canal antes de antecipar</div>
+    <div class="sec-sub">Base: <strong>antecipações Growth</strong> · canais recebidos nos 7d antes · last-click = último canal recebido antes da antecipação</div>
 
     <!-- Filtro tipo -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
@@ -388,7 +388,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <!-- Racional -->
     <div class="score-racional">
       <strong>Por que criar um score em vez de usar só Conv%?</strong><br>
-      Usar conversão isolada gera três vieses: <b>(1) viés de intenção</b> — INAPP só entrega quando o app está aberto; <b>(2) viés de segmentação</b> — quem o sistema escolhe impacta mais que o canal; <b>(3) volatilidade extrema</b> — PUSH variou de 0,75% a 8,87% em 7 meses.<br><br>
+      Usar antecipações isoladas por canal gera três vieses: <b>(1) viés de intenção</b> — INAPP só entrega quando o app está aberto; <b>(2) viés de segmentação</b> — quem o sistema escolhe impacta mais que o canal; <b>(3) volatilidade extrema</b> — PUSH variou de 0,75% a 8,87% em 7 meses.<br><br>
       <strong>Novo conceito aplicado:</strong> D3 Conv LC usa a taxa <b>last-click real</b> — antecipações atribuídas ao canal (último nos 7d) ÷ total de comunicações enviadas por aquele canal. Denominador correto, sem inflação por multi-atribuição.<br><br>
       <div class="score-formula">
 Score = <span>Alcance(25%)</span> + <span>Custo(30%)</span> + <span>Conv LC(30%)</span> + <span>Consistência(15%)</span><br>
@@ -1034,7 +1034,7 @@ function renderChartCanal() {
              </span>` +
             `<span style="display:flex;align-items:center;gap:5px">
                <span style="width:22px;height:3px;background:${LINE_COR};display:inline-block;border-radius:2px;box-shadow:0 0 4px ${LINE_COR}88"></span>
-               Linha (eixo dir.) — CAC ponderado por canal (R$)
+               Linha (eixo dir.) — CAC real = custo ÷ ant. Growth (R$)
              </span>`;
     }
 }
@@ -1069,9 +1069,9 @@ function renderConversao() {
 
     // KPIs: volume de conversões atribuídas e split
     setText('conv-kpi-pv',      fmt(totalPV));
-    setText('conv-kpi-pv-pct',  totalAll > 0 ? fmtPct(totalPV/totalAll*100) + ' do total' : '—');
+    setText('conv-kpi-pv-pct',  totalAll > 0 ? fmtPct(totalPV/totalAll*100) + ' das ant. Growth' : '—');
     setText('conv-kpi-rc',      fmt(totalRC));
-    setText('conv-kpi-rc-pct',  totalAll > 0 ? fmtPct(totalRC/totalAll*100) + ' do total' : '—');
+    setText('conv-kpi-rc-pct',  totalAll > 0 ? fmtPct(totalRC/totalAll*100) + ' das ant. Growth' : '—');
     setText('conv-kpi-total',   fmt(totalAll));
 
     // Denominador: enviados totais por canal (DADOS.canal)
@@ -1085,13 +1085,13 @@ function renderConversao() {
     let titulo  = '';
     if (CONV_TIPO === 'total') {
         ORDEM.forEach(c => { convMap[c] = (pv[c]||0) + (rc[c]||0); });
-        titulo = '📲 Taxa de Conversão Last Click por Canal (last click 7d / disparos totais)';
+        titulo = '📲 Antecipações Growth por Canal — Last Click 7d (atribuídas ÷ disparos totais)';
     } else if (CONV_TIPO === 'primeira_vida') {
         ORDEM.forEach(c => { convMap[c] = pv[c]||0; });
-        titulo = '🆕 Taxa Conversão — 1ª Antecipação da Vida (last click 7d / disparos totais)';
+        titulo = '🆕 Antecipações Growth — 1ª Vida (last click 7d ÷ disparos totais)';
     } else {
         ORDEM.forEach(c => { convMap[c] = rc[c]||0; });
-        titulo = '🔄 Taxa Conversão — Recompra (last click 7d / disparos totais)';
+        titulo = '🔄 Antecipações Growth — Recompra (last click 7d ÷ disparos totais)';
     }
     setText('conv-chart-title', titulo);
 
