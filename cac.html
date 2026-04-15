@@ -404,9 +404,10 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
             <th style="width:36%">Sequência <span style="font-weight:400;color:var(--muted)">(último ★ ← primeiro)</span></th>
             <th class="c" style="width:9%">Score</th>
             <th class="r">Antecipações</th>
+            <th class="r">Consumers</th>
             <th class="r">% do mês</th>
-            <th style="width:14%">Canal âncora</th>
-            <th style="width:14%">Ganho s/ fraco</th>
+            <th style="width:13%">Canal âncora</th>
+            <th style="width:13%">Ganho s/ fraco</th>
           </tr>
         </thead>
         <tbody id="score-seq-tbody"></tbody>
@@ -1539,7 +1540,7 @@ function renderScoreSeq() {
     }
     const pct  = totalAnt > 0 ? (r.ant / totalAnt * 100).toFixed(1).replace('.',',') + '%' : '—';
     const aCor = SCORE_IND[melhor]?.cor || 'var(--muted)';
-    rows.push({ canais, pesos, sc, cl, melhor, pior, scSemPior, ganho, ant: r.ant, pct, seq: r.combo, aCor });
+    rows.push({ canais, pesos, sc, cl, melhor, pior, scSemPior, ganho, ant: r.ant, cons: r.cons || 0, pct, seq: r.combo, aCor });
   });
 
   // Configuração dos 4 blocos
@@ -1564,6 +1565,7 @@ function renderScoreSeq() {
       <td><div class="seq-pills">${pills}</div></td>
       <td class="c"><span class="sbadge sbadge-${d.cl}">${d.sc.toFixed(2)}</span></td>
       <td class="r" style="font-weight:600;color:var(--text)">${fmt(d.ant)}</td>
+      <td class="r" style="color:var(--muted);font-size:11px">${fmt(d.cons)}</td>
       <td class="r" style="color:var(--muted)">${d.pct}</td>
       <td><span style="color:${d.aCor};font-weight:700;font-size:11px">● ${d.melhor}</span> <span style="color:var(--muted);font-size:10px">${(SCORE_IND[d.melhor]?.total||0).toFixed(2)}</span></td>
       <td>${ganhoHtml}</td>
