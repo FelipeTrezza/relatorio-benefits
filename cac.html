@@ -405,7 +405,7 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
             <th class="c" style="width:9%">Score</th>
             <th class="r">Antecipações</th>
             <th class="r">Disparos por canal</th>
-            <th class="r">% do mês</th>
+            <th class="r">Conv%</th>
 
           </tr>
         </thead>
@@ -1538,7 +1538,8 @@ function renderScoreSeq() {
       scSemPior = sem.reduce((s, c, i) => s + (SCORE_IND[c]?.total||0) * p2[i], 0);
       ganho     = scSemPior - sc;
     }
-    const pct  = totalAnt > 0 ? (r.ant / totalAnt * 100).toFixed(1).replace('.',',') + '%' : '—';
+    const totalEnvSeq = canais.reduce((s, c) => s + (canalEnv[c] ? canalEnv[c].enviados : 0), 0);
+    const pct  = totalEnvSeq > 0 ? (r.ant / totalEnvSeq * 100).toFixed(2).replace('.',',') + '%' : '—';
     const aCor = SCORE_IND[melhor]?.cor || 'var(--muted)';
     rows.push({ canais, pesos, sc, cl, melhor, pior, scSemPior, ganho, ant: r.ant, cons: r.cons || 0, pct, seq: r.combo, aCor });
   });
