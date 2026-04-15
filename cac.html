@@ -618,21 +618,19 @@ function renderChartMensal() {
     const BAR_COR = '#58a6ff';
     const LINE_COR = '#f5a623';
 
-    // Calcular custo total e CAC ponderado por mes (respeita MENSAL_CANAL)
+    // Calcular custo total e CAC real (custo ÷ ant. Growth last-click 7d) por mês
     const custos = [];
     const cacs   = [];
     for (const mes of MESES) {
         const canais = DADOS.canal[mes] || {};
-        let totalCusto = 0, sumCacW = 0, sumEnv = 0;
+        let totalCusto = 0;
         for (const [nome, v] of Object.entries(canais)) {
             if (MENSAL_CANAL !== 'TODOS' && nome !== MENSAL_CANAL) continue;
             totalCusto += v.custo;
-            const cacCanal = v.convertidos > 0 ? v.custo / v.convertidos : 0;
-            sumCacW += cacCanal * v.enviados;
-            sumEnv  += v.enviados;
         }
+        const convMes = CONV_MKT[mes] || 0;
         custos.push(Math.round(totalCusto));
-        cacs.push(sumEnv > 0 ? sumCacW / sumEnv : 0);
+        cacs.push(convMes > 0 ? totalCusto / convMes : 0);
     }
 
     function niceMax(vals) {
@@ -789,7 +787,7 @@ function renderChartMensal() {
     ctx.font = '10px Inter, sans-serif';
     const items = [
         {cor: BAR_COR,  label: 'Custo Total Growth (eixo esq.)', tipo: 'bar'},
-        {cor: LINE_COR, label: 'CAC Médio Ponderado (eixo dir.)', tipo: 'line'}
+        {cor: LINE_COR, label: 'CAC Real (eixo dir.)', tipo: 'line'}
     ];
     let lx = PAD.left;
     const ly = PAD.top - 18;
