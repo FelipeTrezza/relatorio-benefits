@@ -1154,19 +1154,22 @@ function renderRec2() {
     const lastWrap = document.getElementById('rec-last-bars');
     if (lastWrap) {
         const canalMes = (DADOS.canal && DADOS.canal[mes]) ? DADOS.canal[mes] : {};
-        const entries = Object.entries(last).sort((a, b) => b[1].ant - a[1].ant);
-        const maxAnt  = Math.max(...entries.map(e => e[1].ant), 1);
+        // suporta {CANAL: N} e {CANAL: {ant: N}}
+        const getAnt = v => (typeof v === 'object' && v !== null) ? (v.ant || 0) : (v || 0);
+        const entries = Object.entries(last).sort((a, b) => getAnt(b[1]) - getAnt(a[1]));
+        const maxAnt  = Math.max(...entries.map(e => getAnt(e[1])), 1);
         lastWrap.innerHTML = entries.map(([canal, v]) => {
+            const ant      = getAnt(v);
             const cor      = CANAL_COR[canal] || '#8b949e';
-            const w        = Math.max((v.ant / maxAnt * 100).toFixed(1), 1);
+            const w        = Math.max((ant / maxAnt * 100).toFixed(1), 1);
             const enviados = canalMes[canal]?.enviados || 0;
-            const taxa     = enviados > 0 ? (v.ant / enviados * 100) : null;
+            const taxa     = enviados > 0 ? (ant / enviados * 100) : null;
             const taxaFmt  = taxa !== null ? taxa.toFixed(2).replace('.', ',') + '%' : '—';
             return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
               <div style="width:76px;font-size:12px;font-weight:700;color:${cor};text-align:right;flex-shrink:0">${canal}</div>
               <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;height:28px;min-width:0">
                 <div style="width:${w}%;height:100%;background:linear-gradient(90deg,${cor}cc,${cor}44);border-radius:4px;display:flex;align-items:center;padding-left:10px">
-                  <span style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap">${fmt(v.ant)} ant.</span>
+                  <span style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap">${fmt(ant)} ant.</span>
                 </div>
               </div>
               <div style="width:90px;font-size:11px;color:var(--muted);text-align:right;flex-shrink:0;white-space:nowrap">${enviados > 0 ? fmt(enviados) + ' env.' : '—'}</div>
