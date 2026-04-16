@@ -63,9 +63,56 @@ tbody tr:hover td{background:rgba(17,199,111,.04)}
 .empty{padding:40px;text-align:center;color:var(--muted)}
 @media(max-width:1100px){.filters{grid-template-columns:1fr 1fr 1fr}.kpis{grid-template-columns:1fr}}
 @media(max-width:720px){.filters{grid-template-columns:1fr}.topbar .badge{margin-left:0}}
+
+/* ── Login overlay ── */
+#login-overlay{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at top right,rgba(17,199,111,.10),transparent 22%),#050816;display:flex;align-items:center;justify-content:center}
+.login-box{background:#11131a;border:1px solid #2b3140;border-radius:20px;padding:40px 44px;width:100%;max-width:400px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.login-logo .icon{width:38px;height:38px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#04150d}
+.login-logo .brand{font-size:16px;font-weight:800}
+.login-logo .brand span{color:var(--green-soft)}
+.login-box h2{font-size:22px;font-weight:900;margin-bottom:6px}
+.login-box p{color:#98a2c6;font-size:13px;margin-bottom:24px}
+.login-field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.login-field label{font-size:12px;color:#98a2c6;text-transform:uppercase;letter-spacing:.07em}
+.login-input-wrap{position:relative;display:flex;align-items:center}
+#login-pw{width:100%;height:46px;background:#0c0f1a;border:1px solid #2b3140;color:#eef2ff;border-radius:11px;padding:0 46px 0 14px;font-size:15px;outline:none}
+#login-pw:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(17,199,111,.14)}
+#login-pw.err{border-color:#ff6b6b;box-shadow:0 0 0 3px rgba(255,107,107,.12);animation:shake .35s ease}
+#toggle-pw{position:absolute;right:13px;background:none;border:none;color:#98a2c6;cursor:pointer;font-size:16px;height:100%;padding:0 2px}
+#toggle-pw:hover{color:#eef2ff}
+#login-err{color:#ff9090;font-size:12px;min-height:18px;margin-top:-10px;margin-bottom:6px}
+#login-btn{width:100%;height:46px;background:var(--green);color:#04150d;border:none;border-radius:11px;font-size:15px;font-weight:900;cursor:pointer;transition:.2s}
+#login-btn:hover{filter:brightness(1.08)}
+#login-btn:disabled{opacity:.6;cursor:default}
+.login-note{margin-top:18px;text-align:center;color:#5a6380;font-size:12px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
 </style>
 </head>
 <body>
+
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="icon">P</div>
+      <div class="brand">Pic<span>Pay</span> Benefits</div>
+    </div>
+    <h2>Acesso restrito</h2>
+    <p>Este relatório contém dados financeiros sensíveis.<br/>Digite a senha para continuar.</p>
+    <div class="login-field">
+      <label>Senha</label>
+      <div class="login-input-wrap">
+        <input id="login-pw" type="password" placeholder="••••••••••••••" autocomplete="current-password"/>
+        <button id="toggle-pw" type="button" title="Mostrar/ocultar">👁</button>
+      </div>
+    </div>
+    <div id="login-err"></div>
+    <button id="login-btn">Entrar</button>
+    <div class="login-note">Acesso apenas para usuários autorizados.</div>
+  </div>
+</div>
+
 <div class="container">
   <div class="topbar">
     <h1>&#9889; Conciliação</h1>
@@ -114,6 +161,57 @@ tbody tr:hover td{background:rgba(17,199,111,.04)}
 </div>
 
 <script>
+
+(function(){
+  const HASH = '0aa1842b3c3c20fe3efbaffd2305d6d586054fd2a5e0442360c37c4b8b6162b5';
+  const SESSION_KEY = 'conc_auth';
+
+  async function sha256(str){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+
+  function unlock(){
+    const ov = document.getElementById('login-overlay');
+    if(ov) ov.remove();
+  }
+
+  async function tryLogin(){
+    const btn = document.getElementById('login-btn');
+    const pw = document.getElementById('login-pw');
+    const err = document.getElementById('login-err');
+    btn.disabled = true;
+    const h = await sha256(pw.value);
+    if(h === HASH){
+      sessionStorage.setItem(SESSION_KEY, '1');
+      unlock();
+    } else {
+      pw.classList.add('err');
+      err.textContent = 'Senha incorreta. Tente novamente.';
+      setTimeout(()=>pw.classList.remove('err'), 400);
+      pw.value = '';
+      pw.focus();
+    }
+    btn.disabled = false;
+  }
+
+  // já autenticado nessa sessão?
+  if(sessionStorage.getItem(SESSION_KEY) === '1'){ unlock(); return; }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const pw = document.getElementById('login-pw');
+    const btn = document.getElementById('login-btn');
+    const toggle = document.getElementById('toggle-pw');
+    if(!pw) return;
+    pw.focus();
+    btn.addEventListener('click', tryLogin);
+    pw.addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });
+    toggle.addEventListener('click', ()=>{
+      pw.type = pw.type==='password' ? 'text' : 'password';
+    });
+  });
+})();
+
 let B=[],F=[],M={},pg=1;const PS=100;
 const $=id=>document.getElementById(id);
 const fmt=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v||0));
