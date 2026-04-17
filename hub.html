@@ -401,30 +401,57 @@
     </div>
   </div>
 
-  <!-- SUMÁRIO -->
-  <div class="section-title">📋 Documentação</div>
+  <!-- DOCUMENTAÇÃO / RECURSOS -->
+  <div class="section-title">📋 Documentação & Recursos</div>
   <div class="grid">
-    <div class="card" style="grid-column:1/-1;border-color:rgba(139,148,158,.25);">
-      <div class="card-content" style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:200px;">
-          <div class="card-title" style="margin-bottom:8px;">📖 &nbsp;Glossário Técnico</div>
-          <div class="card-desc" style="font-size:13px;max-width:520px;">Composição, métricas, regras de negócio e conceitos-chave de cada dashboard. Inclui queries SQL para quem quiser entender os cálculos a fundo.</div>
-          <div class="card-tags" style="margin-top:12px;">
-            <span class="tag tag-muted">Read-only</span>
-            <span class="tag tag-muted">6 relatórios documentados</span>
-            <span class="tag tag-muted">Queries SQL</span>
-          </div>
-        </div>
-        <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/glossario.html" target="_blank" style="background:rgba(139,148,158,.1);border-color:rgba(139,148,158,.3);color:var(--text2);">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Ver Glossário
-        </a>
+    <div class="card" style="border-color:rgba(139,148,158,.25);">
+      <div class="card-icon">📖</div>
+      <div class="card-title">Glossário Técnico</div>
+      <div class="card-desc">Composição, métricas, regras de negócio e conceitos-chave de cada dashboard. Inclui queries SQL para quem quiser entender os cálculos a fundo.</div>
+      <div class="card-tags">
+        <span class="tag tag-muted">Read-only</span>
+        <span class="tag tag-muted">8 relatórios documentados</span>
+        <span class="tag tag-muted">Queries SQL</span>
       </div>
+      <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/glossario.html" target="_blank" style="background:rgba(139,148,158,.1);border-color:rgba(139,148,158,.3);color:var(--text);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Ver Glossário
+      </a>
+    </div>
+
+    <div class="card orange">
+      <div class="card-icon">📊</div>
+      <div class="card-title">Apresentação Gerencial</div>
+      <div class="card-desc">13 slides estilo PicPay com os principais resultados de antecipações. Funil de conversão, KPIs do mês, análise por setor, sazonalidade, frequência e oportunidades de crescimento.</div>
+      <div class="card-tags">
+        <span class="tag tag-orange">13 slides</span>
+        <span class="tag tag-muted">Template PicPay</span>
+        <span class="tag tag-muted">Abr/2026</span>
+      </div>
+      <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/score-apresentacao.html" target="_blank" style="background:rgba(240,136,62,.1);border-color:rgba(240,136,62,.3);color:var(--orange);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Ver Apresentação
+      </a>
+    </div>
+
+    <div class="card green">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Conciliação</div>
+      <div class="card-desc">Extrato de conciliação entre antecipações realizadas e descontos em folha por CPF e convênio (GDF, RJ). Identifica Dívidas, Créditos e registros Quitados com saldo acumulado mês a mês. Acesso restrito.</div>
+      <div class="card-tags">
+        <span class="tag tag-green">GDF · RJ</span>
+        <span class="tag tag-muted">Folha M+1</span>
+        <span class="tag tag-muted">🔒 Restrito</span>
+      </div>
+      <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/conciliador.html" target="_blank">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Acessar Conciliação
+      </a>
     </div>
   </div>
 
   <!-- FERRAMENTA EXTERNA -->
-  <div class="section-title">🔬 Análise de Campanhas</div>
+  <div class="section-title">🔬 Análise de Campanhas MKT</div>
   <div class="grid">
 
     <div class="card" style="border-color:rgba(163,113,247,.3)">
@@ -445,11 +472,11 @@
     <div class="card pink">
       <div class="card-icon">💰</div>
       <div class="card-title">CAC por Canal — Benefits MKT</div>
-      <div class="card-desc">Estudo gerencial de Custo de Aquisição por canal (INAPP, PUSH, Email, DM, SMS, WhatsApp). Conversão em 24h, break-even, análise por setor e insights acionáveis. Últimos 6 meses.</div>
+      <div class="card-desc">Custo de Aquisição por canal (Push, InApp, Email, DM, WhatsApp). Conversão 24h, last-click 7d, mix de canais, score multidimensional (PUSH 7,35 · INAPP 6,30 · DM 4,17 · WA 3,43) e tabela de sequências. Set/25–Abr/26.</div>
       <div class="card-tags">
         <span class="tag tag-green">CAC</span>
-        <span class="tag tag-blue">Conversão 24h</span>
-        <span class="tag tag-muted">Out/25 → Mar/26</span>
+        <span class="tag tag-blue">Last-Click 7d · Score</span>
+        <span class="tag tag-muted">Set/25 → Abr/26</span>
       </div>
       <a class="card-link" href="https://felipetrezza.github.io/relatorio-benefits/cac.html" target="_blank" style="background:rgba(244,114,182,.1);border-color:rgba(244,114,182,.3);color:#f472b6;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
