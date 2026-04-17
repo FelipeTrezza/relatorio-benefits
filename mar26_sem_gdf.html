@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mar/26 Sem GDF — Benefits</title>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --surf2:   #1c2330;
+    --border:  #30363d;
+    --green:   #21a366;
+    --greenl:  #2dc974;
+    --greend:  #177a4d;
+    --text:    #e6edf3;
+    --muted:   #8b949e;
+    --inss:    #58a6ff;
+    --priv:    #f0883e;
+    --grupo:   #bc8cff;
+    --red:     #f85149;
+    --yellow:  #e3b341;
+    /* cor do fundo dos metric-cards — mesmo da foto (cinza claro no light, surf2 no dark) */
+    --card-bg: #1c2330;
+    --card-border: #30363d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px}
+
+  /* ── NAV ──────────────────────────────────────────────────── */
+  .nav-tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:0}
+  .nav-tab{padding:11px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:7px}
+  .nav-tab:hover{color:var(--text)}
+  .nav-tab.active{color:var(--text);border-bottom-color:var(--green);font-weight:600}
+
+  /* ── HEADER ───────────────────────────────────────────────── */
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between}
+  .hdr-left{display:flex;align-items:center;gap:11px}
+  .hdr-logo{width:32px;height:32px}
+  .hdr-title{font-size:16px;font-weight:700}
+  .hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
+  .hdr-right{display:flex;align-items:center;gap:10px}
+  .badge-periodo{background:var(--greend);color:var(--greenl);font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;border:1px solid var(--green)}
+  .btn-refresh{display:flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;white-space:nowrap}
+  .btn-refresh:hover{border-color:var(--green);color:var(--greenl);background:#1a2a22}
+  .btn-refresh svg{transition:transform .6s}
+  .btn-refresh.spinning svg{animation:spin .8s linear infinite}
+  .btn-refresh .upd-ts{font-size:10px;color:var(--muted);font-weight:400}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── MAIN ─────────────────────────────────────────────────── */
+  main{max-width:1520px;margin:0 auto;padding:22px 28px}
+
+  /* ── PERIODO LABEL ───────────────────────────────────────── */
+  .sec-lbl{font-size:15px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+  .sec-lbl::before{content:'';display:inline-block;width:4px;height:16px;background:var(--green);border-radius:2px}
+  .periodo-title{font-size:13px;font-weight:700;color:var(--text)}
+  .periodo-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+    /* ── GRID PRINCIPAL: Total separado + 3 colunas ─────────── */
+  .dashboard-grid{
+    display:grid;
+    grid-template-columns: minmax(200px, 1.15fr) repeat(3, minmax(160px, 1fr));
+    gap: clamp(10px, 1.2vw, 18px);
+    align-items: start;
+  }
+  .setor-col{ display:flex; flex-direction:column; }
+
+  /* ── COLUNA TOTAL ─── destaque forte ─────────────────────── */
+  .setor-col.col-total{
+    background: #0e2318;                          /* verde muito escuro, quase preto-esmeralda */
+    border: 2px solid #21a366;                    /* borda verde sólida, sem opacidade */
+    border-radius: 18px;
+    padding: clamp(10px, 1vw, 16px);
+    box-shadow:
+      0 0 0 1px rgba(33,163,102,.15),             /* halo interno */
+      0 4px 32px rgba(33,163,102,.22),            /* glow externo */
+      inset 0 1px 0 rgba(255,255,255,.04);        /* brilho sutil no topo */
+    position: relative;
+  }
+  .setor-col.col-total .pill-header{
+    font-size: clamp(15px, 1.4vw, 19px);
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #21a366, #2dc974) !important;  /* verde vivo */
+    box-shadow: 0 2px 12px rgba(33,163,102,.45);
+  }
+  /* valor dos cards do Total: branco puro e maior */
+  .setor-col.col-total .mc{
+    background: rgba(33,163,102,.10);
+    border: 1px solid rgba(33,163,102,.30);
+  }
+  .setor-col.col-total .mc-val{
+    color: #ffffff;                              /* branco puro — contrasta com verde dos setores */
+    font-size: clamp(20px, 2vw, 30px);          /* maior que os outros */
+  }
+  .setor-col.col-total .mc-lbl{
+    color: rgba(255,255,255,.6);
+  }
+
+  /* ── PILL HEADER ──────────────────────────────────────────── */
+  .pill-header{
+    border-radius: 40px;
+    padding: clamp(7px,0.7vw,11px) 0;
+    text-align: center;
+    font-size: clamp(13px, 1.2vw, 17px);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: clamp(10px,0.9vw,14px);
+    letter-spacing: .3px;
+  }
+  .pill-total  {background:linear-gradient(135deg,#0d4d2e,#21a366)}
+  .pill-publico{background:linear-gradient(135deg,#1f7a45,#27b96a)}
+  .pill-privado{background:linear-gradient(135deg,#3a8a52,#4db870)}
+  .pill-grupo  {background:linear-gradient(135deg,#5aa668,#7ec87e)}
+
+  /* ── METRIC CARD ─────────────────────────────────────────── */
+  .mc{
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: clamp(10px, 0.9vw, 15px) clamp(10px, 0.9vw, 14px) clamp(8px, 0.7vw, 12px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: clamp(80px, 8vw, 106px);
+    box-sizing: border-box;
+  }
+  .metrics-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 1fr;
+    gap: clamp(6px, 0.7vw, 10px);
+    align-items: stretch;
+  }
+  .mc-lbl{
+    font-size: clamp(9px, 0.7vw, 11px);
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: .1px;
+    line-height: 1.3;
+  }
+  .mc-val{
+    font-size: clamp(18px, 1.8vw, 27px);
+    font-weight: 800;
+    color: var(--greenl);
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+  .mc-delta{
+    font-size: clamp(9px, 0.7vw, 11px);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .mc-delta.up{color:var(--greenl)}
+  .mc-delta.dn{color:var(--red)}
+  .mc-delta.fl{color:var(--muted)}
+
+  /* ── FOOTER ───────────────────────────────────────────────── */
+  footer{text-align:center;padding:18px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-left">
+    <svg class="hdr-logo" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#21a366"/><text x="16" y="21" text-anchor="middle" font-size="14" font-weight="bold" fill="white">P</text></svg>
+    <div>
+      <div class="hdr-sub">Benefits · Antecipações sem DISTRITO FEDERAL (account 892)</div>
+      <div class="hdr-title">Mar/26 — Excluindo GDF</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="badge-periodo" id="badge-periodo">—</span>
+    <span style="font-size:11px;color:#8b949e;padding:7px 14px;border:1px solid #30363d;border-radius:7px;">Referência: Mar/26 fechado</span>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-tabs">
+  <a class="nav-tab" href="index.html">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 2c1.29 0 2.49.38 3.5 1.03L3.03 11.5A5.97 5.97 0 0 1 2 8c0-3.31 2.69-6 6-6zm0 12c-1.29 0-2.49-.38-3.5-1.03l8.47-8.47A5.97 5.97 0 0 1 14 8c0 3.31-2.69 6-6 6z"/></svg>
+    Abertura de Contas
+  </a>
+  <a class="nav-tab active" href="antecipacoes.html">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>
+    Antecipações
+  </a>
+
+  <a class="nav-tab" href="pix.html">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 2a.5.5 0 0 1 .5.5V6h3.5a.5.5 0 0 1 0 1H10v3.5a.5.5 0 0 1-1 0V7H5.5a.5.5 0 0 1 0-1H9V2.5a.5.5 0 0 1 .5-.5z"/></svg>
+    PIX
+  </a>
+  <a class="nav-tab" href="tv.html" target="_blank">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zM13.991 3l.024.001a1.5 1.5 0 0 1 1.48 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-11a1.5 1.5 0 0 1-1.5-1.5v-6A1.5 1.5 0 0 1 2.49 3h11.501zm-9.251.5a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 .5-.5v-5a.5.5 0 0 0-.5-.5h-5z"/></svg>
+    TV
+  </a>
+  <a class="nav-tab" href="tabelas.html">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v1h14V2zm0 2H1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4zm-5 2h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zm0 3h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zm-5-3h3a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2zm0 3h3a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2z"/></svg>
+    Tabelas
+  </a>
+</nav>
+
+<main>
+
+  <!-- PERIODO BAR -->
+  <div class="sec-lbl">Todas as Antecipações</div>
+  <div class="periodo-bar">
+    <div>
+      <div class="periodo-title" id="periodo-title">— vs —</div>
+      <div class="periodo-sub">Comparativo MTD — mesma janela de dias úteis</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD GRID -->
+  
+  <div style="background:#161b22;border:1px solid #30363d;border-left:3px solid #21a366;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:12px;color:#8b949e;line-height:1.5;">
+    <strong style="color:#e6edf3;">Visão de referência — Mar/26 sem GDF</strong><br>
+    Exclui o <strong style="color:#e6edf3;">DISTRITO FEDERAL</strong> (account_id 892).
+    Os valores atuais (sem GDF) são comparados com o mês <strong style="color:#e6edf3;">completo de Março/26</strong> — o delta mostra o quanto o GDF representa.
+    GDF impacta apenas o setor <strong style="color:#e6edf3;">Público</strong>: <strong style="color:#f85149;">-14.731 antecipações (-14,9%)</strong>.
+  </div>
+  <div class="dashboard-grid" id="dashboard-grid">
+    <!-- preenchido por renderDashboard() -->
+  </div>
+
+</main>
+
+<footer>
+  Benefits Analytics · Atualizado em <span id="footer-date"></span>
+</footer>
+
+<script>
+// ================================================================
+// DADOS — injetados por atualizar_antecipacoes.py
+// ================================================================
+const DATA = {
+  "cur_label": "Mar/26 s/ GDF",
+  "prev_label": "Mar/26 c/ GDF",
+  "nota": "Excluindo account_id=892 (DISTRITO FEDERAL). Comparativo: coluna atual = sem GDF, delta = diferença em relação ao mês completo.",
+  "setores": {
+    "public": {
+      "vidas": 21828,
+      "antecipacoes": 83955,
+      "tpv": 16408116.68,
+      "abertura": 2198,
+      "vidas_novas": 1766,
+      "vidas_prv": 27759,
+      "antecip_prv": 98686,
+      "tpv_prv": 19104531.17,
+      "abertura_prv": 0,
+      "vidas_novas_prv": 0
+    },
+    "private": {
+      "vidas": 1992,
+      "antecipacoes": 9009,
+      "tpv": 696959.61,
+      "abertura": 657,
+      "vidas_novas": 264,
+      "vidas_prv": 1992,
+      "antecip_prv": 9009,
+      "tpv_prv": 696959.61,
+      "abertura_prv": 0,
+      "vidas_novas_prv": 0
+    },
+    "grupo": {
+      "vidas": 51648,
+      "antecipacoes": 203837,
+      "tpv": 27777665.78,
+      "abertura": 2417,
+      "vidas_novas": 4192,
+      "vidas_prv": 51648,
+      "antecip_prv": 203837,
+      "tpv_prv": 27777665.78,
+      "abertura_prv": 0,
+      "vidas_novas_prv": 0
+    },
+    "INSS": {
+      "vidas": 0,
+      "antecipacoes": 0,
+      "tpv": 0,
+      "abertura": 903,
+      "vidas_novas": 0,
+      "vidas_prv": 0,
+      "antecip_prv": 0,
+      "tpv_prv": 0,
+      "abertura_prv": 0,
+      "vidas_novas_prv": 0
+    }
+  }
+};
+
+// ================================================================
+// HELPERS
+// ================================================================
+function fmtVal(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return (n/1e9).toFixed(1).replace('.',',') + 'Bi';
+  if (abs >= 1e6) return (n/1e6).toFixed(1).replace('.',',') + 'Mi';
+  if (abs >= 1e3) return (n/1e3).toFixed(1).replace('.',',') + 'k';
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
+}
+function fmtBRL(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e6) return 'R$ ' + (n/1e6).toFixed(1).replace('.',',') + 'Mi';
+  if (abs >= 1e3) return 'R$ ' + (n/1e3).toFixed(1).replace('.',',') + 'K';
+  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
+}
+function fmtTicket(n) {
+  if (!n) return '—';
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
+}
+function fmtInt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return Math.round(n).toLocaleString('pt-BR');
+}
+function delta(cur, prv) {
+  if (!prv) return {cls:'fl', txt:'—'};
+  const p = (cur - prv) / prv * 100;
+  const sign = p >= 0 ? '↑' : '↓';
+  const cls  = p > 0 ? 'up' : p < 0 ? 'dn' : 'fl';
+  return {cls, txt: `${sign}${Math.abs(p).toFixed(2).replace('.',',')}%`};
+}
+
+// ================================================================
+// RENDER
+// ================================================================
+function mc(label, valCur, valPrv, fmt) {
+  const v  = fmt(valCur);
+  const d  = delta(valCur, valPrv);
+  return `<div class="mc">
+    <div class="mc-lbl">${label}</div>
+    <div class="mc-val">${v}</div>
+    <div class="mc-delta ${d.cls}">${d.txt}</div>
+  </div>`;
+}
+
+function renderDashboard() {
+  const D = DATA;
+  const CL = D.cur_label  || 'Atual';
+  const PL = D.prev_label || 'Ant.';
+
+  document.getElementById('periodo-title').textContent = `${CL} vs ${PL}`;
+  document.getElementById('badge-periodo').textContent = `${CL} vs ${PL}`;
+
+  // ordem de colunas: total, public, private, grupo
+  const COLS = [
+    { key: 'total',   label: 'Total',   pill: 'pill-total'   },
+    { key: 'public',  label: 'Público', pill: 'pill-publico' },
+    { key: 'private', label: 'Privado', pill: 'pill-privado' },
+    { key: 'grupo',   label: 'Grupo',   pill: 'pill-grupo'   },
+  ];
+
+  // agrega total a partir dos setores
+  const allSetores = ['public','private','grupo','INSS'];
+  function sumField(field) {
+    return allSetores.reduce((s,k) => s + ((D.setores[k] && D.setores[k][field]) || 0), 0);
+  }
+
+  D.setores.total = {
+    vidas:          sumField('vidas'),
+    vidas_prv:      sumField('vidas_prv'),
+    antecipacoes:   sumField('antecipacoes'),
+    antecip_prv:    sumField('antecip_prv'),
+    tpv:            sumField('tpv'),
+    tpv_prv:        sumField('tpv_prv'),
+    abertura:       sumField('abertura'),
+    abertura_prv:   sumField('abertura_prv'),
+    vidas_novas:    sumField('vidas_novas'),
+    vidas_novas_prv:sumField('vidas_novas_prv'),
+  };
+
+  const grid = document.getElementById('dashboard-grid');
+  grid.innerHTML = '';
+
+  COLS.forEach(col => {
+    const s = D.setores[col.key];
+    if (!s) return;
+
+    const tk_cur = s.vidas     > 0 ? s.tpv     / s.antecipacoes : 0;
+    const tk_prv = s.vidas_prv > 0 ? s.tpv_prv / s.antecip_prv  : 0;
+
+    const extraClass = col.key === 'total' ? ' col-total' : '';
+    const html = `
+    <div class="setor-col${extraClass}">
+      <div class="pill-header ${col.pill}">${col.label}</div>
+      <div class="metrics-grid">
+        ${mc('Vidas Antecipando #',    s.vidas,          s.vidas_prv,       fmtVal)}
+        ${mc('Antecipações #',         s.antecipacoes,   s.antecip_prv,     fmtVal)}
+        ${mc('TPV R$',                 s.tpv,            s.tpv_prv,         fmtBRL)}
+        ${mc('Ticket Médio R$',        tk_cur,           tk_prv,            fmtBRL)}
+        ${mc('Abertura de Conta #',    s.abertura,       s.abertura_prv,    fmtVal)}
+        ${mc('Vidas Novas Antecipando #', s.vidas_novas, s.vidas_novas_prv, fmtInt)}
+      </div>
+    </div>`;
+    grid.insertAdjacentHTML('beforeend', html);
+  });
+}
+
+
+// ================================================================
+// INIT
+// ================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('footer-date').textContent =
+    now.toLocaleDateString('pt-BR',{year:'numeric',month:'long',day:'numeric'}) + ' ' +
+    now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+  renderDashboard();
+});
+
+const REFRESH_ENDPOINT = '/atualizar/antecipacoes';
+
+function refreshData() {
+  const btn = document.getElementById('btn-refresh');
+  const ts  = document.getElementById('upd-ts');
+  const SERVER = 'http://localhost:5001';
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  if (ts) ts.textContent = '...';
+  function tryConnect(attempts) {
+    fetch(SERVER + '/status', { signal: AbortSignal.timeout(3000) })
+      .then(r => r.json())
+      .then(status => {
+        if (status.running) {
+          if (ts) ts.textContent = 'aguarde...';
+          setTimeout(() => tryConnect(attempts), 3000);
+          return;
+        }
+        if (ts) ts.textContent = '...';
+        fetch(SERVER + REFRESH_ENDPOINT, { method: 'POST' })
+          .then(r => r.json())
+          .then(() => pollStatus(SERVER))
+          .catch(() => showError());
+      })
+      .catch(() => {
+        if (attempts > 0) {
+          if (ts) ts.textContent = 'iniciando...';
+          setTimeout(() => tryConnect(attempts - 1), 2000);
+        } else {
+          btn.classList.remove('spinning');
+          btn.disabled = false;
+          if (ts) ts.textContent = 'erro';
+          alert('Servidor local nao encontrado.\n\nRode: servidor-benefits');
+        }
+      });
+  }
+  tryConnect(5);
+}
+
+function pollStatus(SERVER) {
+  const btn = document.getElementById('btn-refresh');
+  const ts  = document.getElementById('upd-ts');
+  const iv = setInterval(() => {
+    fetch(SERVER + '/status').then(r => r.json()).then(s => {
+      if (!s.running) {
+        clearInterval(iv);
+        btn.classList.remove('spinning');
+        btn.disabled = false;
+        if (s.status === 'success' || s.last_status === 'success') {
+          if (ts) ts.textContent = 'atualizado!';
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          if (ts) ts.textContent = 'erro';
+          alert('Erro na atualizacao. Veja o terminal.');
+        }
+      }
+    }).catch(() => { clearInterval(iv); btn.classList.remove('spinning'); btn.disabled = false; });
+  }, 3000);
+}
+
+function showError(msg) {
+  const btn = document.getElementById('btn-refresh');
+  const ts  = document.getElementById('upd-ts');
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+  if (ts) ts.textContent = 'erro';
+  if (msg) console.error(msg);
+}
+
+(function setUpdTs(){
+  const el = document.getElementById('upd-ts');
+  if (!el) return;
+  const now = new Date();
+  el.textContent = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+})();
+</script>
+</body>
+</html>
