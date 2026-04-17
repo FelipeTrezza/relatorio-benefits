@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Mar/26 Sem GDF — Benefits</title>
+<title>Abr/26 vs Mar/26 sem GDF — Benefits</title>
 <style>
   :root {
     --bg:      #0d1117;
@@ -168,13 +168,13 @@
   <div class="hdr-left">
     <svg class="hdr-logo" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#21a366"/><text x="16" y="21" text-anchor="middle" font-size="14" font-weight="bold" fill="white">P</text></svg>
     <div>
-      <div class="hdr-sub">Benefits · Antecipações sem DISTRITO FEDERAL (account 892)</div>
-      <div class="hdr-title">Mar/26 — Excluindo GDF</div>
+      <div class="hdr-sub">Benefits · Comparativo excluindo DISTRITO FEDERAL (account 892) do mês anterior</div>
+      <div class="hdr-title">Abr/26 vs Mar/26 sem GDF</div>
     </div>
   </div>
   <div class="hdr-right">
-    <span class="badge-periodo" id="badge-periodo">—</span>
-    <span style="font-size:11px;color:#8b949e;padding:7px 14px;border:1px solid #30363d;border-radius:7px;">Referência: Mar/26 fechado</span>
+    <span class="badge-periodo">Abr/26 vs Mar/26 s/GDF</span>
+    <span style="font-size:11px;color:#8b949e;padding:7px 14px;border:1px solid #30363d;border-radius:7px;">prev = Mar/26 mês completo sem GDF</span>
   </div>
 </header>
 
@@ -215,12 +215,11 @@
   </div>
 
   <!-- DASHBOARD GRID -->
-  
-  <div style="background:#161b22;border:1px solid #30363d;border-left:3px solid #21a366;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:12px;color:#8b949e;line-height:1.5;">
-    <strong style="color:#e6edf3;">Visão de referência — Mar/26 sem GDF</strong><br>
-    Exclui o <strong style="color:#e6edf3;">DISTRITO FEDERAL</strong> (account_id 892).
-    Os valores atuais (sem GDF) são comparados com o mês <strong style="color:#e6edf3;">completo de Março/26</strong> — o delta mostra o quanto o GDF representa.
-    GDF impacta apenas o setor <strong style="color:#e6edf3;">Público</strong>: <strong style="color:#f85149;">-14.731 antecipações (-14,9%)</strong>.
+    <div style="background:#161b22;border:1px solid #30363d;border-left:3px solid #e3b341;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:12px;color:#8b949e;line-height:1.6;">
+    <strong style="color:#e6edf3;">⚠️ Comparativo assimétrico por design</strong><br>
+    <strong style="color:#e6edf3;">Atual (Abr/26):</strong> mês corrente até o dia de hoje, <em>com</em> GDF.<br>
+    <strong style="color:#e6edf3;">Anterior (Mar/26 s/GDF):</strong> mês completo de Março, <em>excluindo</em> DISTRITO FEDERAL (account 892) — 14.731 antecipações removidas do Público.<br>
+    Objetivo: isolar o crescimento orgânico sem a distorção do GDF na base de comparação.
   </div>
   <div class="dashboard-grid" id="dashboard-grid">
     <!-- preenchido por renderDashboard() -->
@@ -237,56 +236,55 @@
 // DADOS — injetados por atualizar_antecipacoes.py
 // ================================================================
 const DATA = {
-  "cur_label": "Mar/26 s/ GDF",
-  "prev_label": "Mar/26 c/ GDF",
-  "nota": "Excluindo account_id=892 (DISTRITO FEDERAL). Comparativo: coluna atual = sem GDF, delta = diferença em relação ao mês completo.",
+  "cur_label": "Abr/26",
+  "prev_label": "Mar/26 s/GDF",
   "setores": {
     "public": {
-      "vidas": 21828,
-      "antecipacoes": 83955,
-      "tpv": 16408116.68,
-      "abertura": 2198,
-      "vidas_novas": 1766,
-      "vidas_prv": 27759,
-      "antecip_prv": 98686,
-      "tpv_prv": 19104531.17,
-      "abertura_prv": 0,
-      "vidas_novas_prv": 0
+      "vidas": 20077,
+      "antecipacoes": 79807,
+      "tpv": 16423460.5,
+      "abertura": 1363,
+      "vidas_novas": 967,
+      "vidas_prv": 21828,
+      "antecip_prv": 83955,
+      "tpv_prv": 16408116.68,
+      "abertura_prv": 2198,
+      "vidas_novas_prv": 1766
     },
     "private": {
-      "vidas": 1992,
-      "antecipacoes": 9009,
-      "tpv": 696959.61,
-      "abertura": 657,
-      "vidas_novas": 264,
+      "vidas": 1494,
+      "antecipacoes": 4636,
+      "tpv": 373714.49,
+      "abertura": 304,
+      "vidas_novas": 139,
       "vidas_prv": 1992,
       "antecip_prv": 9009,
       "tpv_prv": 696959.61,
-      "abertura_prv": 0,
-      "vidas_novas_prv": 0
+      "abertura_prv": 657,
+      "vidas_novas_prv": 264
     },
     "grupo": {
-      "vidas": 51648,
-      "antecipacoes": 203837,
-      "tpv": 27777665.78,
-      "abertura": 2417,
-      "vidas_novas": 4192,
+      "vidas": 53004,
+      "antecipacoes": 201191,
+      "tpv": 27537185.88,
+      "abertura": 381,
+      "vidas_novas": 5136,
       "vidas_prv": 51648,
       "antecip_prv": 203837,
       "tpv_prv": 27777665.78,
-      "abertura_prv": 0,
-      "vidas_novas_prv": 0
+      "abertura_prv": 2417,
+      "vidas_novas_prv": 4192
     },
     "INSS": {
       "vidas": 0,
       "antecipacoes": 0,
-      "tpv": 0,
-      "abertura": 903,
+      "tpv": 0.0,
+      "abertura": 286,
       "vidas_novas": 0,
       "vidas_prv": 0,
       "antecip_prv": 0,
       "tpv_prv": 0,
-      "abertura_prv": 0,
+      "abertura_prv": 903,
       "vidas_novas_prv": 0
     }
   }
