@@ -173,7 +173,7 @@
     </div>
   </div>
   <div class="hdr-right">
-    <span class="badge-periodo">Abr/26 vs Mar/26 s/GDF</span>
+    <span class="badge-periodo" id="badge-periodo">Abr/26 vs Mar/26 s/GDF</span>
     <span style="font-size:11px;color:#8b949e;padding:7px 14px;border:1px solid #30363d;border-radius:7px;">prev = Mar/26 mês completo sem GDF</span>
   </div>
 </header>
@@ -488,5 +488,9 @@ function showError(msg) {
   el.textContent = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
 })();
 </script>
+
+<!-- IDs ghost para compatibilidade com o JS do template -->
+<span id="btn-refresh" style="display:none"></span>
+<span id="upd-ts" style="display:none"></span>
 </body>
 </html>
