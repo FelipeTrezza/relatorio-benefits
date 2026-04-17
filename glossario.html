@@ -469,6 +469,7 @@
       <li><a href="#tabelas">🗄️ Monitor de Tabelas</a></li>
       <li><a href="#tv">📺 Dashboard TV</a></li>
       <li><a href="#cac">💰 Estudo de CAC por Canal</a></li>
+      <li><a href="#conciliador">⚡ Conciliação</a></li>
     </ul>
   </nav>
 
@@ -1168,6 +1169,77 @@ antecipando <span class="kw">AS</span> (
 
       <div class="source-note"><strong>Tabelas:</strong> marketing.consumers_campaigns_communications · benefits.anticipation_request · benefits.collaborators · benefits.companies · benefits.accounts · consumers.consumers</div>
 
+    </div>
+
+
+    <div class="section-divider"></div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- 8. CONCILIADOR                                                   -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="conciliador" class="report-section" style="border-left:4px solid #11c76f">
+      <div class="report-header">
+        <div class="report-icon">⚡</div>
+        <div class="report-meta">
+          <div class="report-title">Conciliação — Extrato por CPF / Convênio</div>
+          <div class="report-url">felipetrezza.github.io/relatorio-benefits/conciliador.html</div>
+        </div>
+        <a class="report-access" href="https://felipetrezza.github.io/relatorio-benefits/conciliador.html" target="_blank">Acessar →</a>
+      </div>
+
+      <div class="tags">
+        <span class="tag tg">Conciliação</span>
+        <span class="tag tb">GDF · RJ</span>
+        <span class="tag ty">Acesso restrito</span>
+        <span class="tag tm">Folha M+1</span>
+      </div>
+
+      <p class="report-desc">Extrato de conciliação entre antecipações salariais realizadas e descontos em folha recebidos, por CPF e convênio. Permite identificar <strong>Dívidas</strong> (desconto a receber), <strong>Créditos</strong> (desconto em excesso) e registros <strong>Quitados</strong>. Acesso protegido por senha (SHA-256). Dados embutidos em gzip+base64 — navegação instantânea.</p>
+
+      <div class="block-label">Filtros disponíveis</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">🔍</div><div><div class="sec-name">CPF</div><div class="sec-desc">Busca livre por CPF (com ou sem máscara). Quando preenchido, muda para <strong>modo detalhe</strong> — exibe CPF e matrícula linha a linha.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏛️</div><div><div class="sec-name">Convênio</div><div class="sec-desc">Filtro por convênio (GDF, RJ etc.). Detectado automaticamente pelo trecho após <code>_</code> no filename do CSV de retorno.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📅</div><div><div class="sec-name">Mês antecipação</div><div class="sec-desc">Filtro por <code>anomes</code> (YYYYMM). Lista todos os meses com dados — ordem decrescente no sumário, crescente no detalhe.</div></div></div>
+      </div>
+
+      <div class="block-label">Modos de visualização</div>
+      <div class="rules-list">
+        <div class="rule rc-green"><strong>Sumário (padrão):</strong>&nbsp;Sem CPF preenchido. Exibe totais por convênio × mês. CPF e matrícula ocultos (colunas mostram "—"). Ordenação: mês DESC.</div>
+        <div class="rule rc-blue"><strong>Detalhe:</strong>&nbsp;Com CPF preenchido. Exibe todas as linhas do CPF com CPF, matrícula, cada mês de antecipação e saldo acumulado. Ordenação: mês ASC.</div>
+      </div>
+
+      <div class="block-label">Regras de negócio — conciliação</div>
+      <div class="rules-list">
+        <div class="rule rc-yellow"><strong>Shift de retorno M+1:</strong>&nbsp;O arquivo de retorno da Folha M+1 é vinculado ao realizado do mês M. Ex: retorno recebido em Maio/26 é associado às antecipações de Abril/26.</div>
+        <div class="rule rc-yellow"><strong>Órfãos absorvidos:</strong>&nbsp;Retornos sem correspondência direta de CPF+mês são absorvidos no <strong>primeiro mês de realizado</strong> do CPF naquele convênio — nunca descartados.</div>
+        <div class="rule rc-orange"><strong>Status por saldo acumulado:</strong>&nbsp;<code>Dívida</code> = saldo &gt; 0 (desconto ainda a receber) · <code>Crédito</code> = saldo &lt; 0 (desconto em excesso) · <code>Quitado</code> = saldo ≈ 0 (diferença &lt; R$0,005).</div>
+        <div class="rule rc-blue"><strong>Saldo acumulado:</strong>&nbsp;Calculado mês a mês por CPF: <code>saldo = Σ(valor_antecipado) − Σ(desconto)</code>. Cada linha exibe o saldo acumulado até aquele mês.</div>
+        <div class="rule rc-green"><strong>Merge GDF + RJ:</strong>&nbsp;252.042 registros processados. Órfãos absorvidos: 3.117 (R$ 1.909.269,40). Saldo global: R$ 6.547.101,33 (referência Abr/2026).</div>
+      </div>
+
+      <div class="block-label">Estrutura dos dados (colunas)</div>
+      <div class="sections-grid">
+        <div class="sec-item"><div class="sec-ic">🏷️</div><div><div class="sec-name">Convênio</div><div class="sec-desc">Nome do convênio (GDF, RJ). Detectado pelo trecho após <code>_</code> no filename do CSV.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">👤</div><div><div class="sec-name">CPF / Matrícula</div><div class="sec-desc">Visíveis apenas no modo detalhe. No sumário exibem "—" para proteger dados.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📅</div><div><div class="sec-name">Mês antecipação (anomes)</div><div class="sec-desc">Formato YYYYMM. Exibido como MM/AAAA na interface.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">💰</div><div><div class="sec-name">Realizado</div><div class="sec-desc">Soma das antecipações do CPF naquele mês (<code>valor_antecipado</code>).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🔄</div><div><div class="sec-name">Retorno (Folha M+1)</div><div class="sec-desc">Soma dos descontos recebidos em folha vinculados a este mês (<code>desconto</code>).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">📆</div><div><div class="sec-name">Mês desconto</div><div class="sec-desc">Mês(es) em que o desconto foi efetivamente recebido na folha (pode ser múltiplo, separado por vírgula).</div></div></div>
+        <div class="sec-item"><div class="sec-ic">⚖️</div><div><div class="sec-name">Saldo acumulado</div><div class="sec-desc">Verde = Crédito (saldo negativo) · Vermelho = Dívida (saldo positivo) · Cinza = Quitado.</div></div></div>
+        <div class="sec-item"><div class="sec-ic">🏷️</div><div><div class="sec-name">Status</div><div class="sec-desc"><code>Dívida</code> / <code>Crédito</code> / <code>Quitado</code> baseado no saldo acumulado da linha.</div></div></div>
+      </div>
+
+      <div class="block-label">Infraestrutura técnica</div>
+      <div class="rules-list">
+        <div class="rule rc-blue"><strong>Dados inline gzip+base64:</strong>&nbsp;Toda a base (~5.2 MB) é embutida no HTML em formato gzip+base64. Descomprimida no browser via <code>DecompressionStream</code>. Zero chamadas de API — navegação instantânea mesmo offline.</div>
+        <div class="rule rc-blue"><strong>Dois modos de dados:</strong>&nbsp;<code>SUMMARY</code> (agrupado por CPF+convênio+mês, sem CPF exposto) e <code>DETAIL</code> (linha a linha com CPF+matrícula). Carregados simultaneamente no payload.</div>
+        <div class="rule rc-yellow"><strong>Acesso restrito:</strong>&nbsp;Login com senha hasheada em SHA-256 no browser (sem servidor). Sessão salva em <code>sessionStorage</code> — expira ao fechar a aba.</div>
+        <div class="rule rc-green"><strong>Fonte dos CSVs:</strong>&nbsp;Diretório <code>/Users/felipe.rasquinho/Desktop/Conciliador/</code>. Detecta automaticamente <code>realizado_*</code> e <code>retorno_*</code> por convênio. Convênios ativos: GDF, RJ.</div>
+        <div class="rule rc-green"><strong>Paginação:</strong>&nbsp;100 registros por página. Botões Anterior/Próxima com estados desabilitados nas extremidades.</div>
+      </div>
+
+      <div class="source-note"><strong>Fonte:</strong> CSVs de realizado e retorno por convênio · Colunas: cpf, matricula, desconto, anomes (YYYYMM válido) · Processamento: script local de conciliação</div>
     </div>
 
 
