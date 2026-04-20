@@ -275,10 +275,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
         <div class="kpi-lbl">Antecipações Distintas</div>
         <div class="kpi-val" style="color:var(--purple)" id="kpi-ant-unicas">—</div>
       </div>
-      <div class="kpi">
-        <div class="kpi-bar" style="background:var(--greenl);width:100%"></div>
-        <div class="kpi-ic">🎯</div>
-        <div class="kpi-lbl">Antecipações Growth</div>
+      <div class="kpi" id="card-conv-mkt">
         <div class="kpi-val" style="color:var(--greenl)" id="kpi-conv-mkt">—</div>
         <div class="kpi-sub" id="kpi-conv-mkt-sub">—</div>
       </div>
@@ -604,13 +601,18 @@ function renderKpis() {
         setText('kpi-custo-total',  'R$' + Math.round(custo).toLocaleString('pt-BR'));
         setText('kpi-cac-medio',    fmtR(cacR));
         setText('kpi-vidas-unicas', fmt(tp.vidas_unicas || 0));
-        // No modo total: Antecipações Distintas = consumers únicos sem filtro de campanha
-        const cardAntU = document.getElementById('card-ant-unicas');
-        if(cardAntU) cardAntU.style.display = '';
-        setText('kpi-ant-unicas', fmt(antU));
-        setText('kpi-conv-mkt',     fmt(convT));
-        setText('kpi-conv-mkt-sub', pctImp);
-        setText('sub-canais',       'Set/25–Mar/26 · 7 meses acumulados');
+        // Cards Antecipações Distintas e Growth: só aparecem no tipo "primeira_vida"
+        const mostrar = tipoKpi === 'primeira_vida';
+        const cardAntU  = document.getElementById('card-ant-unicas');
+        const cardConvM = document.getElementById('card-conv-mkt');
+        if(cardAntU)  cardAntU.style.display  = mostrar ? '' : 'none';
+        if(cardConvM) cardConvM.style.display = mostrar ? '' : 'none';
+        if (mostrar) {
+            setText('kpi-ant-unicas',   fmt(antU));
+            setText('kpi-conv-mkt',     fmt(convT));
+            setText('kpi-conv-mkt-sub', pctImp);
+        }
+        setText('sub-canais', 'Set/25–Mar/26 · 7 meses acumulados');
         return;
     }
 
@@ -647,15 +649,21 @@ function renderKpis() {
     const vidasMes  = VIDAS_UNICAS[MES_ATIVO] || 0;
     setText('kpi-vidas-unicas', fmt(vidasMes));
     // Restaura card ao sair do modo total
-    const cardAntUM = document.getElementById('card-ant-unicas');
-    if(cardAntUM) cardAntUM.style.display = '';
+    const cardAntUM  = document.getElementById('card-ant-unicas');
+    const cardConvMM = document.getElementById('card-conv-mkt');
+    // Cards Antecipações Distintas e Growth: só aparecem no tipo "primeira_vida"
+    const mostrarCards = tipoKpi === 'primeira_vida';
+    if(cardAntUM)  cardAntUM.style.display  = mostrarCards ? '' : 'none';
+    if(cardConvMM) cardConvMM.style.display = mostrarCards ? '' : 'none';
     const antUnicasTipo = (typeof ANT_UNICAS_TIPO !== 'undefined' && ANT_UNICAS_TIPO[MES_ATIVO])
         ? ANT_UNICAS_TIPO[MES_ATIVO][tipoKpi] || ANT_UNICAS[MES_ATIVO] || 0
         : ANT_UNICAS[MES_ATIVO] || 0;
     const pctImpacto = antUnicasTipo > 0 ? (convMkt / antUnicasTipo * 100).toFixed(1) + '% das ant. distintas' : '—';
-    setText('kpi-ant-unicas', fmt(antUnicasTipo));
-    setText('kpi-conv-mkt',     fmt(convMkt));
-    setText('kpi-conv-mkt-sub', pctImpacto);
+    if (mostrarCards) {
+        setText('kpi-ant-unicas',   fmt(antUnicasTipo));
+        setText('kpi-conv-mkt',     fmt(convMkt));
+        setText('kpi-conv-mkt-sub', pctImpacto);
+    }
     setText('sub-canais',      subCanais);
     requestAnimationFrame(() => { renderChartMensal(); renderChartCanal(); });
 }
