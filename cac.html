@@ -1863,11 +1863,12 @@ function renderCustoGrowth() {
         ctx.font = destaque ? 'bold 10px sans-serif' : '9px sans-serif';
         ctx.textAlign = 'center';
         const tw = ctx.measureText(lb).width + 8;
-        const lbX = x + bW/2, lbY = y - 6;
+        const lbX = x + bW/2;
+        const baseY = PAD.t + IH; // base inferior da barra
         ctx.fillStyle = 'rgba(13,17,23,.88)';
-        ctx.beginPath(); ctx.roundRect(lbX - tw/2, lbY - 11, tw, 13, 3); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(lbX - tw/2, baseY - 14, tw, 13, 3); ctx.fill();
         ctx.fillStyle = destaque ? '#fff' : cor + 'dd';
-        ctx.fillText(lb, lbX, lbY);
+        ctx.fillText(lb, lbX, baseY - 4);
     });
 
     // Grid + eixo Y esquerdo (CAC) e direito (ant. growth)
