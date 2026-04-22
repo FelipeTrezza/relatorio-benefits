@@ -509,8 +509,8 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
 
     <!-- Gráfico linha custo + CAC 1ª vida -->
     <div class="card">
-      <div style="font-size:13px;font-weight:700;margin-bottom:3px">📈 Custo Total × CAC 1ª Antecipação — Evolução Mensal</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Área verde = Custo total investido (R$, eixo esq.) · Linha tracejada roxa = CAC 1ª Antecipação via Growth (R$, eixo dir.) · Set/25–Mar/26</div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:3px">📈 CAC 1ª Antecipação — Evolução Mensal</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">CAC = Custo total ÷ Novos antecipadores Growth (last-click 7d) · Set/25–Mar/26 · mês selecionado destacado</div>
       <canvas id="cg-chart-linha" style="display:block;width:100%" height="200"></canvas>
     </div>
 
@@ -1793,10 +1793,9 @@ function renderCustoGrowth() {
     set('cg-wa-pct',      d.wa_pct + '%');
     set('cg-wa-val',      'R$' + Math.round(d.wa_c).toLocaleString('pt-BR') + ' de R$' + Math.round(d.custo).toLocaleString('pt-BR'));
 
-    // Gráfico linha — sempre mostra acumulado Set/25–Mar/26 (7 meses completos)
+    // Gráfico linha — CAC 1ª Antecipação mês a mês (Set/25–Mar/26)
     const MESES_G = ['2025-09','2025-10','2025-11','2025-12','2026-01','2026-02','2026-03'];
     const LABELS_G = MESES_G.map(m => CG_MES_LABELS[m]);
-    const custos_g = MESES_G.map(m => CG_DADOS_MES[m].custo);
     const cac_g    = MESES_G.map(m => CG_DADOS_MES[m].cac_pv);
 
     const canvas = document.getElementById('cg-chart-linha');
@@ -1804,63 +1803,55 @@ function renderCustoGrowth() {
     canvas.width = canvas.parentElement.clientWidth - 44;
     const ctx = canvas.getContext('2d');
     const W = canvas.width, H = canvas.height;
-    const PAD = {t:28, b:44, l:80, r:80};
+    const PAD = {t:30, b:44, l:60, r:20};
     const IW = W-PAD.l-PAD.r, IH = H-PAD.t-PAD.b;
     const N = LABELS_G.length, gap = IW/N;
     ctx.clearRect(0,0,W,H);
-    const maxC = Math.max(...custos_g)*1.25;
-    const maxA = Math.max(...cac_g)*1.4;
+    const maxA = Math.max(...cac_g)*1.35;
+
     // Destaque do mês selecionado
     const mesSel = CG_MES !== 'total' ? MESES_G.indexOf(CG_MES) : -1;
     if (mesSel >= 0) {
         const x = PAD.l + mesSel*gap;
-        ctx.fillStyle = 'rgba(88,166,255,.07)';
+        ctx.fillStyle = 'rgba(188,140,255,.07)';
         ctx.fillRect(x, PAD.t, gap, IH);
     }
+
     // Grid
     for (let i=0;i<=5;i++) {
         const y=PAD.t+IH*i/5;
         ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
         ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();
-        const vC=maxC*(1-i/5);
-        ctx.fillStyle='rgba(45,201,116,.6)';ctx.font='10px sans-serif';ctx.textAlign='right';
-        ctx.fillText('R$'+(vC>=1000?Math.round(vC/1000)+'K':Math.round(vC)),PAD.l-6,y+4);
-        ctx.fillStyle='rgba(188,140,255,.6)';ctx.textAlign='left';
-        ctx.fillText('R$'+(maxA*(1-i/5)).toFixed(2),W-PAD.r+6,y+4);
+        const v=maxA*(1-i/5);
+        ctx.fillStyle='rgba(188,140,255,.55)';ctx.font='10px sans-serif';ctx.textAlign='right';
+        ctx.fillText('R$'+v.toFixed(2),PAD.l-6,y+4);
     }
-    // Área custo
-    ctx.beginPath();
-    custos_g.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxC*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.lineTo(PAD.l+(N-1)*gap+gap/2,PAD.t+IH);ctx.lineTo(PAD.l+gap/2,PAD.t+IH);ctx.closePath();
-    const gC=ctx.createLinearGradient(0,PAD.t,0,PAD.t+IH);
-    gC.addColorStop(0,'rgba(33,163,102,.4)');gC.addColorStop(1,'rgba(33,163,102,.03)');
-    ctx.fillStyle=gC;ctx.fill();
-    // Linha custo
-    ctx.beginPath();
-    custos_g.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxC*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.strokeStyle='#2dc974';ctx.lineWidth=2.5;ctx.setLineDash([]);ctx.stroke();
-    custos_g.forEach((v,i)=>{
-        const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxC*IH;
-        const destaque = i===mesSel;
-        ctx.fillStyle=destaque?'#fff':'#2dc974';ctx.beginPath();ctx.arc(x,y,destaque?6:4,0,Math.PI*2);ctx.fill();
-        const lb='R$'+Math.round(v/1000)+'K',tw=ctx.measureText(lb).width+10;
-        ctx.font='bold 10px sans-serif';ctx.textAlign='center';
-        ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y-22,tw,16,3);ctx.fill();
-        ctx.fillStyle=destaque?'#fff':'#2dc974';ctx.fillText(lb,x,y-10);
-    });
-    // Linha CAC tracejada
+
+    // Área sob a linha
     ctx.beginPath();
     cac_g.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.strokeStyle='#bc8cff';ctx.lineWidth=2.5;ctx.setLineDash([7,4]);ctx.stroke();ctx.setLineDash([]);
+    ctx.lineTo(PAD.l+(N-1)*gap+gap/2,PAD.t+IH);ctx.lineTo(PAD.l+gap/2,PAD.t+IH);ctx.closePath();
+    const gA=ctx.createLinearGradient(0,PAD.t,0,PAD.t+IH);
+    gA.addColorStop(0,'rgba(188,140,255,.25)');gA.addColorStop(1,'rgba(188,140,255,.02)');
+    ctx.fillStyle=gA;ctx.fill();
+
+    // Linha CAC
+    ctx.beginPath();
+    cac_g.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.strokeStyle='#bc8cff';ctx.lineWidth=2.5;ctx.setLineDash([]);ctx.stroke();
+
+    // Pontos + labels
     cac_g.forEach((v,i)=>{
         const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;
         const destaque = i===mesSel;
-        ctx.fillStyle=destaque?'#fff':'#bc8cff';ctx.beginPath();ctx.arc(x,y,destaque?6:4,0,Math.PI*2);ctx.fill();
-        const lb='R$'+v.toFixed(2),tw=ctx.measureText(lb).width+8;
-        ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-        ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y+8,tw,14,3);ctx.fill();
-        ctx.fillStyle=destaque?'#fff':'#bc8cff';ctx.fillText(lb,x,y+19);
+        ctx.fillStyle=destaque?'#fff':'#bc8cff';
+        ctx.beginPath();ctx.arc(x,y,destaque?6:4,0,Math.PI*2);ctx.fill();
+        const lb='R$'+v.toFixed(2),tw=ctx.measureText(lb).width+10;
+        ctx.font=destaque?'bold 11px sans-serif':'bold 10px sans-serif';ctx.textAlign='center';
+        ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y-22,tw,16,3);ctx.fill();
+        ctx.fillStyle=destaque?'#fff':'#bc8cff';ctx.fillText(lb,x,y-10);
     });
+
     // Labels X
     LABELS_G.forEach((lb,i)=>{
         const destaque = i===mesSel;
@@ -1869,13 +1860,10 @@ function renderCustoGrowth() {
         ctx.fillText(lb,PAD.l+i*gap+gap/2,H-PAD.b+14);
     });
     // Legenda
-    [['#2dc974','Custo Total (eixo esq.)'],['#bc8cff','CAC 1ª Antecipação (eixo dir.)']].forEach(([cor,lb],i)=>{
-        const lx=PAD.l+i*195;
-        ctx.strokeStyle=cor;ctx.lineWidth=2;
-        ctx.beginPath();ctx.moveTo(lx,H-PAD.b+26);ctx.lineTo(lx+20,H-PAD.b+26);ctx.stroke();
-        ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='left';
-        ctx.fillText(lb,lx+24,H-PAD.b+30);
-    });
+    ctx.strokeStyle='#bc8cff';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(PAD.l,H-PAD.b+26);ctx.lineTo(PAD.l+20,H-PAD.b+26);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='left';
+    ctx.fillText('CAC 1ª Antecipação via Growth (R$)',PAD.l+24,H-PAD.b+30);
 
     // Barras canal — usa dados do mês/total selecionado
     const wrap=document.getElementById('cg-canal-bars');if(!wrap)return;
