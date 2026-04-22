@@ -1169,7 +1169,125 @@ antecipando <span class="kw">AS</span> (
 
       <div class="source-note"><strong>Tabelas:</strong> marketing.consumers_campaigns_communications · benefits.anticipation_request · benefits.collaborators · benefits.companies · benefits.accounts · consumers.consumers</div>
 
-    </div>
+      <button class="query-toggle-btn" onclick="toggleQuery('q-cac', this)">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 12.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z"/></svg>
+        Ver Query SQL
+      </button>
+      <div id="q-cac" class="query-panel">
+        <div class="query-panel-header">
+          <span>📄 atualizar_cac.py — <em>3 queries: canal (24h) · setor · last-click 7d</em></span>
+          <button class="copy-btn" onclick="copyQuery('q-cac', this)">Copiar</button>
+        </div>
+<pre class="query-code"><span class="cm">-- [1/3] CAC por canal — janela 24h após envio</span>
+<span class="kw">WITH</span> comms <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> c.consumer_id, c.channel, c.sent_at, c.is_delivered
+    <span class="kw">FROM</span> marketing.consumers_campaigns_communications c
+    <span class="kw">WHERE</span> <span class="fn">SPLIT</span>(c.journey_name, <span class="st">'-'</span>)[<span class="nm">7</span>] = <span class="st">'sfpjbene'</span>
+      <span class="kw">AND</span> <span class="fn">LOWER</span>(c.journey_name) <span class="kw">NOT LIKE</span> <span class="st">'%educacional%'</span>
+      <span class="kw">AND</span> c.sent_at &gt;= <span class="st">'&lt;MES_INI&gt;'</span> <span class="kw">AND</span> c.sent_at &lt; <span class="st">'&lt;HOJE&gt;'</span>
+),
+antecip <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> consumer_id, created_at <span class="kw">AS</span> ts_antecip
+    <span class="kw">FROM</span> benefits.anticipation_request
+    <span class="kw">WHERE</span> request_status = <span class="st">'FINISH'</span>
+      <span class="kw">AND</span> created_at &gt;= <span class="st">'&lt;MES_INI&gt;'</span> <span class="kw">AND</span> created_at &lt; <span class="st">'&lt;HOJE&gt;'</span>
+)
+<span class="kw">SELECT</span>
+    c.channel,
+    <span class="fn">COUNT</span>(*)                                                                AS enviados,
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> c.is_delivered = <span class="kw">true THEN</span> <span class="nm">1</span> <span class="kw">ELSE</span> <span class="nm">0</span> <span class="kw">END</span>)              AS entregues,
+    <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> a.consumer_id)                                           AS convertidos,
+    <span class="fn">ROUND</span>(<span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> a.consumer_id)*<span class="nm">100.0</span>/<span class="fn">COUNT</span>(*), <span class="nm">2</span>)              AS conv_pct
+<span class="kw">FROM</span> comms c
+<span class="kw">LEFT JOIN</span> antecip a
+    <span class="kw">ON</span> <span class="fn">CAST</span>(c.consumer_id <span class="kw">AS BIGINT</span>) = a.consumer_id
+   <span class="kw">AND</span> a.ts_antecip &gt; c.sent_at
+   <span class="kw">AND</span> a.ts_antecip &lt;= c.sent_at + <span class="kw">INTERVAL</span> <span class="nm">24</span> <span class="kw">HOURS</span>
+<span class="kw">GROUP BY</span> c.channel
+<span class="kw">ORDER BY</span> convertidos <span class="kw">DESC</span>
+
+<span class="cm">-- ─────────────────────────────────────────────────────────────────────────</span>
+<span class="cm">-- [2/3] Conversão por setor</span>
+<span class="kw">WITH</span> colabs <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> col.consumer_id, comp.account_id, comp.flag_company_sector
+    <span class="kw">FROM</span> benefits.collaborators col
+    <span class="kw">LEFT JOIN</span> benefits.companies comp <span class="kw">ON</span> col.company_id = comp.company_id
+    <span class="kw">WHERE</span> col.resignation_date <span class="kw">IS NULL AND</span> col.consumer_id <span class="kw">IS NOT NULL</span>
+),
+setor_c <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> consumer_id,
+        <span class="kw">CASE</span>
+            <span class="kw">WHEN</span> account_id <span class="kw">IN</span> (<span class="nm">6,52,57,58,60,62,65,73,100,3170,3675</span>) <span class="kw">THEN</span> <span class="st">'grupo'</span>
+            <span class="kw">ELSE</span> <span class="fn">COALESCE</span>(flag_company_sector, <span class="st">'private'</span>)
+        <span class="kw">END AS</span> setor
+    <span class="kw">FROM</span> colabs
+    <span class="kw">WHERE</span> account_id != <span class="nm">1420</span> <span class="kw">AND</span> account_id <span class="kw">IS NOT NULL</span>
+)
+<span class="kw">SELECT</span>
+    sc.setor,
+    <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> c.consumer_id)                                                             AS comunicados,
+    <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> a.consumer_id)                                                             AS convertidos,
+    <span class="fn">ROUND</span>(<span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> a.consumer_id)*<span class="nm">100.0</span>/<span class="fn">NULLIF</span>(<span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> c.consumer_id),<span class="nm">0</span>),<span class="nm">2</span>) AS conv_pct,
+    <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> a.consumer_id <span class="kw">IS NOT NULL THEN</span> a.request_value <span class="kw">ELSE</span> <span class="nm">0</span> <span class="kw">END</span>),<span class="nm">0</span>)    AS tpv,
+    <span class="fn">ROUND</span>(<span class="fn">AVG</span>(<span class="kw">CASE WHEN</span> a.consumer_id <span class="kw">IS NOT NULL THEN</span> a.request_value <span class="kw">END</span>),<span class="nm">0</span>)            AS ticket_medio
+<span class="kw">FROM</span> comms c  <span class="cm">-- mesma CTE da query 1</span>
+<span class="kw">INNER JOIN</span> setor_c sc <span class="kw">ON</span> c.consumer_id = <span class="fn">CAST</span>(sc.consumer_id <span class="kw">AS STRING</span>)
+<span class="kw">LEFT JOIN</span> antecip a  <span class="cm">-- mesma CTE da query 1</span>
+    <span class="kw">ON</span> <span class="fn">CAST</span>(c.consumer_id <span class="kw">AS BIGINT</span>) = a.consumer_id
+   <span class="kw">AND</span> a.ts_antecip &gt; c.sent_at
+   <span class="kw">AND</span> a.ts_antecip &lt;= c.sent_at + <span class="kw">INTERVAL</span> <span class="nm">24</span> <span class="kw">HOURS</span>
+<span class="kw">GROUP BY</span> sc.setor
+<span class="kw">ORDER BY</span> convertidos <span class="kw">DESC</span>
+
+<span class="cm">-- ─────────────────────────────────────────────────────────────────────────</span>
+<span class="cm">-- [3/3] Last-click 7d — última comunicação antes da antecipação por tipo</span>
+<span class="cm">-- Âncora = antecipação. Janela = 7d para trás. Last-click = sent_at DESC rn=1</span>
+<span class="kw">WITH</span> antecipacoes <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> consumer_id, created_at <span class="kw">AS</span> ts_antecip,
+           <span class="fn">DATE_FORMAT</span>(created_at, <span class="st">'yyyy-MM'</span>) <span class="kw">AS</span> mes
+    <span class="kw">FROM</span> benefits.anticipation_request
+    <span class="kw">WHERE</span> request_status = <span class="st">'FINISH'</span>
+      <span class="kw">AND</span> created_at &gt;= <span class="st">'2025-09-01'</span> <span class="kw">AND</span> created_at &lt; <span class="st">'&lt;HOJE&gt;'</span>
+),
+primeira_antecip_vida <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> consumer_id, <span class="fn">MIN</span>(created_at) <span class="kw">AS</span> ts_primeira
+    <span class="kw">FROM</span> benefits.anticipation_request
+    <span class="kw">WHERE</span> request_status = <span class="st">'FINISH'</span>
+    <span class="kw">GROUP BY</span> consumer_id
+),
+comms_janela <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        a.consumer_id, a.ts_antecip, a.mes, c.channel, c.sent_at,
+        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> a.consumer_id, a.ts_antecip
+            <span class="kw">ORDER BY</span> c.sent_at <span class="kw">DESC</span>  <span class="cm">-- mais recente = last click (rn=1)</span>
+        ) <span class="kw">AS</span> rn
+    <span class="kw">FROM</span> antecipacoes a
+    <span class="kw">JOIN</span> marketing.consumers_campaigns_communications c
+        <span class="kw">ON</span> <span class="fn">CAST</span>(c.consumer_id <span class="kw">AS BIGINT</span>) = a.consumer_id
+       <span class="kw">AND</span> c.sent_at &lt;= a.ts_antecip
+       <span class="kw">AND</span> c.sent_at &gt;  a.ts_antecip - <span class="kw">INTERVAL</span> <span class="nm">7</span> <span class="kw">DAYS</span>
+       <span class="kw">AND</span> <span class="fn">SPLIT</span>(c.journey_name, <span class="st">'-'</span>)[<span class="nm">7</span>] = <span class="st">'sfpjbene'</span>
+       <span class="kw">AND</span> <span class="fn">LOWER</span>(c.journey_name) <span class="kw">NOT LIKE</span> <span class="st">'%educacional%'</span>
+),
+last_click <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        cj.consumer_id, cj.ts_antecip, cj.mes, cj.channel,
+        <span class="kw">CASE</span>
+            <span class="kw">WHEN</span> pv.ts_primeira = cj.ts_antecip <span class="kw">THEN</span> <span class="st">'primeira_vida'</span>
+            <span class="kw">WHEN</span> pv.ts_primeira &lt; cj.ts_antecip  <span class="kw">THEN</span> <span class="st">'recompra'</span>
+        <span class="kw">END AS</span> tipo
+    <span class="kw">FROM</span> comms_janela cj
+    <span class="kw">JOIN</span> primeira_antecip_vida pv <span class="kw">ON</span> cj.consumer_id = pv.consumer_id
+    <span class="kw">WHERE</span> cj.rn = <span class="nm">1</span>
+)
+<span class="kw">SELECT</span> mes, channel, tipo,
+       <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> consumer_id) <span class="kw">AS</span> consumers
+<span class="kw">FROM</span> last_click
+<span class="kw">WHERE</span> tipo <span class="kw">IN</span> (<span class="st">'primeira_vida'</span>, <span class="st">'recompra'</span>)
+<span class="kw">GROUP BY</span> mes, channel, tipo
+<span class="kw">ORDER BY</span> mes, channel, tipo</pre>
+      </div>
 
 
     <div class="section-divider"></div>
@@ -1240,7 +1358,112 @@ antecipando <span class="kw">AS</span> (
       </div>
 
       <div class="source-note"><strong>Fonte:</strong> CSVs de realizado e retorno por convênio · Colunas: cpf, matricula, desconto, anomes (YYYYMM válido) · Processamento: script local de conciliação</div>
-    </div>
+
+      <button class="query-toggle-btn" onclick="toggleQuery('q-conciliador', this)">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 12.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z"/></svg>
+        Ver Lógica de Conciliação
+      </button>
+      <div id="q-conciliador" class="query-panel">
+        <div class="query-panel-header">
+          <span>📄 conciliador.py — <em>merge realizado × retorno com shift M+1 e absorção de órfãos</em></span>
+          <button class="copy-btn" onclick="copyQuery('q-conciliador', this)">Copiar</button>
+        </div>
+<pre class="query-code"><span class="cm">-- Lógica de conciliação (implementada em Python, representada como pseudoSQL)</span>
+<span class="cm">-- Fonte: CSVs realizado_&lt;convenio&gt;.csv e retorno_&lt;convenio&gt;.csv</span>
+<span class="cm">-- Convenios ativos: GDF, RJ</span>
+
+<span class="cm">-- PASSO 1: Carregar realizados e calcular primeiro mês por CPF</span>
+<span class="kw">WITH</span> realizados <span class="kw">AS</span> (
+    <span class="cm">-- agrupado por (convenio, cpf, anomes)</span>
+    <span class="kw">SELECT</span> convenio, cpf, matricula, anomes,
+           <span class="fn">SUM</span>(valor) <span class="kw">AS</span> valor_antecipado,
+           <span class="fn">COUNT</span>(*)   <span class="kw">AS</span> qtd_antecipacoes
+    <span class="kw">FROM</span> realizado_csv
+    <span class="kw">GROUP BY</span> convenio, cpf, matricula, anomes
+),
+primeiro_real <span class="kw">AS</span> (
+    <span class="cm">-- primeiro mês de realizado por (convenio, cpf) — referência para absorver órfãos</span>
+    <span class="kw">SELECT</span> convenio, cpf, <span class="fn">MIN</span>(anomes) <span class="kw">AS</span> primeiro_anomes
+    <span class="kw">FROM</span> realizados
+    <span class="kw">GROUP BY</span> convenio, cpf
+),
+
+<span class="cm">-- PASSO 2: Aplicar shift M+1 nos retornos</span>
+<span class="cm">-- Retorno com anomes_folha = M+1 → vinculado ao mês M (anomes_ref = M-1)</span>
+retornos_reindexados <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        r.convenio, r.cpf, r.matricula,
+        r.desconto,
+        r.anomes_folha,
+        <span class="cm">-- shift: anomes_ref = mes anterior ao anomes_folha</span>
+        <span class="fn">DATE_FORMAT</span>(<span class="fn">ADD_MONTHS</span>(r.anomes_folha, <span class="nm">-1</span>), <span class="st">'yyyyMM'</span>) <span class="kw">AS</span> anomes_ref
+    <span class="kw">FROM</span> retorno_csv r
+),
+
+<span class="cm">-- PASSO 3: Classificar retornos — normal ou órfão</span>
+<span class="cm">-- Órfão: anomes_ref &lt; primeiro_real do CPF → absorver no primeiro mês</span>
+retornos_classificados <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        r.*,
+        pr.primeiro_anomes,
+        <span class="kw">CASE</span>
+            <span class="kw">WHEN</span> pr.primeiro_anomes <span class="kw">IS NULL</span>          <span class="kw">THEN</span> r.anomes_folha  <span class="cm">-- CPF só-retorno: usa anomes_folha original</span>
+            <span class="kw">WHEN</span> r.anomes_ref &lt; pr.primeiro_anomes <span class="kw">THEN</span> pr.primeiro_anomes <span class="cm">-- órfão: absorve no 1º mês</span>
+            <span class="kw">ELSE</span> r.anomes_ref                                               <span class="cm">-- normal: usa anomes_ref</span>
+        <span class="kw">END AS</span> anomes_final
+    <span class="kw">FROM</span> retornos_reindexados r
+    <span class="kw">LEFT JOIN</span> primeiro_real pr
+        <span class="kw">ON</span> r.convenio = pr.convenio <span class="kw">AND</span> r.cpf = pr.cpf
+),
+
+<span class="cm">-- PASSO 4: Consolidar retornos por (convenio, cpf, anomes_final)</span>
+retornos_consolidados <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> convenio, cpf, anomes_final <span class="kw">AS</span> anomes,
+           <span class="fn">SUM</span>(desconto)   <span class="kw">AS</span> desconto,
+           <span class="fn">GROUP_CONCAT</span>(<span class="kw">DISTINCT</span> anomes_folha) <span class="kw">AS</span> mes_desconto
+    <span class="kw">FROM</span> retornos_classificados
+    <span class="kw">GROUP BY</span> convenio, cpf, anomes_final
+),
+
+<span class="cm">-- PASSO 5: Full outer join realizados × retornos</span>
+merged <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        <span class="fn">COALESCE</span>(rl.convenio, rt.convenio)   <span class="kw">AS</span> convenio,
+        <span class="fn">COALESCE</span>(rl.cpf,      rt.cpf)        <span class="kw">AS</span> cpf,
+        <span class="fn">COALESCE</span>(rl.matricula, rt.matricula) <span class="kw">AS</span> matricula,
+        <span class="fn">COALESCE</span>(rl.anomes,   rt.anomes)     <span class="kw">AS</span> anomes,
+        <span class="fn">COALESCE</span>(rl.qtd_antecipacoes, <span class="nm">0</span>)    <span class="kw">AS</span> qtd_antecipacoes,
+        <span class="fn">COALESCE</span>(rl.valor_antecipado, <span class="nm">0</span>)    <span class="kw">AS</span> valor_antecipado,
+        <span class="fn">COALESCE</span>(rt.desconto, <span class="nm">0</span>)            <span class="kw">AS</span> desconto,
+        rt.mes_desconto
+    <span class="kw">FROM</span> realizados rl
+    <span class="kw">FULL OUTER JOIN</span> retornos_consolidados rt
+        <span class="kw">ON</span> rl.convenio = rt.convenio
+       <span class="kw">AND</span> rl.cpf      = rt.cpf
+       <span class="kw">AND</span> rl.anomes   = rt.anomes
+)
+
+<span class="cm">-- PASSO 6: Calcular saldo acumulado mês a mês por (convenio, cpf)</span>
+<span class="cm">-- saldo = ROUND(saldo_anterior + valor_antecipado - desconto, 2)</span>
+<span class="cm">-- Status: Dívida (saldo > 0) / Crédito (saldo &lt; 0) / Quitado (|saldo| &lt; 0.005)</span>
+<span class="kw">SELECT</span>
+    convenio, cpf, matricula, anomes,
+    qtd_antecipacoes, valor_antecipado, desconto, mes_desconto,
+    <span class="fn">ROUND</span>(
+        <span class="fn">SUM</span>(valor_antecipado - desconto) <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> convenio, cpf
+            <span class="kw">ORDER BY</span> anomes <span class="kw">ASC</span>
+            <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>
+        ), <span class="nm">2</span>
+    ) <span class="kw">AS</span> saldo_acumulado,
+    <span class="kw">CASE</span>
+        <span class="kw">WHEN ABS</span>(saldo) &lt; <span class="nm">0.005</span> <span class="kw">THEN</span> <span class="st">'Quitado'</span>
+        <span class="kw">WHEN</span> saldo &gt; <span class="nm">0</span>           <span class="kw">THEN</span> <span class="st">'Dívida'</span>
+        <span class="kw">ELSE</span>                            <span class="st">'Crédito'</span>
+    <span class="kw">END AS</span> status
+<span class="kw">FROM</span> merged
+<span class="kw">ORDER BY</span> convenio, cpf, anomes</pre>
+      </div>
 
 
   </div><!-- /content -->
