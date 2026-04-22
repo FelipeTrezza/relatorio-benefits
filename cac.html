@@ -1884,9 +1884,12 @@ let CG_MES = 'total';
 
 function setCgMes(mes) {
     CG_MES = mes;
-    document.querySelectorAll('#cg-mes-tabs .mbtn').forEach(b => b.classList.remove('mbtn-active'));
-    const btn = document.querySelector(`#cg-mes-tabs .mbtn[onclick="setCgMes('${mes}')"]`);
-    if (btn) btn.classList.add('mbtn-active');
+    document.querySelectorAll('#cg-mes-tabs .mbtn').forEach(b => {
+        b.classList.remove('mbtn-active');
+        if (b.getAttribute('onclick') === "setCgMes('" + mes + "')") {
+            b.classList.add('mbtn-active');
+        }
+    });
     renderCustoGrowth();
 }
 
