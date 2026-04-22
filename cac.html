@@ -1858,6 +1858,16 @@ function renderCustoGrowth() {
         grad.addColorStop(1, cor + '11');
         ctx.fillStyle = grad;
         ctx.beginPath(); ctx.roundRect(x, y, bW, bH, [3,3,0,0]); ctx.fill();
+        // Rótulo da barra (volume)
+        const lb = v >= 1000 ? (v/1000).toFixed(1)+'K' : String(v);
+        ctx.font = destaque ? 'bold 10px sans-serif' : '9px sans-serif';
+        ctx.textAlign = 'center';
+        const tw = ctx.measureText(lb).width + 8;
+        const lbX = x + bW/2, lbY = y - 6;
+        ctx.fillStyle = 'rgba(13,17,23,.88)';
+        ctx.beginPath(); ctx.roundRect(lbX - tw/2, lbY - 11, tw, 13, 3); ctx.fill();
+        ctx.fillStyle = destaque ? '#fff' : cor + 'dd';
+        ctx.fillText(lb, lbX, lbY);
     });
 
     // Grid + eixo Y esquerdo (CAC) e direito (ant. growth)
@@ -1896,17 +1906,26 @@ function renderCustoGrowth() {
     });
     ctx.strokeStyle=cor;ctx.lineWidth=2.5;ctx.setLineDash([]);ctx.stroke();
 
-    // Pontos + labels
+    // Pontos + labels CAC
     cac_g.forEach((v,i)=>{
         if (v===null) return;
         const x=PAD.l+i*gap+gap/2, y=PAD.t+IH-v/maxA*IH;
         const destaque = i===mesSel;
+        // Halo branco para destacar o ponto sobre a barra
+        ctx.fillStyle='rgba(13,17,23,.7)';
+        ctx.beginPath();ctx.arc(x,y,destaque?8:6,0,Math.PI*2);ctx.fill();
         ctx.fillStyle=destaque?'#fff':cor;
-        ctx.beginPath();ctx.arc(x,y,destaque?6:4,0,Math.PI*2);ctx.fill();
-        const lb='R$'+v.toFixed(2), tw=ctx.measureText(lb).width+10;
+        ctx.beginPath();ctx.arc(x,y,destaque?5:3,0,Math.PI*2);ctx.fill();
+        // Rótulo com fundo sólido
+        const lb='R$'+v.toFixed(2);
         ctx.font=destaque?'bold 11px sans-serif':'bold 10px sans-serif';ctx.textAlign='center';
-        ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y-22,tw,16,3);ctx.fill();
-        ctx.fillStyle=destaque?'#fff':cor;ctx.fillText(lb,x,y-10);
+        const tw=ctx.measureText(lb).width+10;
+        const lbY = y-22;
+        ctx.fillStyle='rgba(13,17,23,.95)';
+        ctx.beginPath();ctx.roundRect(x-tw/2,lbY,tw,16,3);ctx.fill();
+        ctx.strokeStyle=cor+'66';ctx.lineWidth=1;
+        ctx.beginPath();ctx.roundRect(x-tw/2,lbY,tw,16,3);ctx.stroke();
+        ctx.fillStyle=destaque?'#fff':cor;ctx.fillText(lb,x,lbY+11);
     });
 
     // Labels X
