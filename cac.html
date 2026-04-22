@@ -464,6 +464,11 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
     <div class="sec-sub">Base de cálculo: <strong>1ª Antecipação na vida via Growth (last-click 7d)</strong> · Custo total investido por novo antecipador atribuído à campanha sfpjbene</div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:12px;margin-bottom:20px">
+      <div class="card" style="padding:18px 20px;border-top:2px solid var(--blue)">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Total Comunicações</div>
+        <div style="font-size:26px;font-weight:800;color:var(--blue)" id="cg-total-comms">—</div>
+        <div style="font-size:11px;color:var(--muted)">Disparos sfpjbene · Set/25–Mar/26</div>
+      </div>
       <div class="card" style="padding:18px 20px;border-top:2px solid var(--greenl)">
         <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Custo Total Investido</div>
         <div style="font-size:26px;font-weight:800;color:var(--greenl)" id="cg-custo-total">—</div>
@@ -1745,7 +1750,7 @@ const CG_CONV=[16336,37665,32934,62432,49651,42589,20394];
 const CG_PV=[9547,8132,7317,4739,5612,4831,4123];
 const CG_RC=[9678,32107,27666,59218,45760,39449,16822];
 const CG_CC={"PUSH":[172.36,298.62,235.48,335.35,221.02,152.6,78.46],"INAPP":[86.02,272.46,238.46,210.8,237.14,234.28,174.03],"DM":[3235.09,7096.81,7502.19,7616.42,6486.79,3837.05,2546.38],"WHATSAPP":[98688.91,101610.85,72990.99,62290.2,87797.65,53810.08,54570.4],"EMAIL":[0.01,87.47,0.31,0,59.24,1.31,0.97]};
-const CG_TOT={custo:581491.47,conv:122609,pv:44301,rc:230700,cac:4.7426,cac_pv:13.1259};
+const CG_TOT={custo:581491.47,conv:122609,pv:44301,rc:230700,cac:4.7426,cac_pv:13.1259,comms:15301922};
 
 function renderCustoGrowth(){
     const fR=v=>'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -1755,6 +1760,7 @@ function renderCustoGrowth(){
     const wa_pct=CG_TOT.custo>0?(wa_c/CG_TOT.custo*100).toFixed(1):0;
     // Base: apenas 1ª antecipação na vida via Growth
     const cac_pv=CG_TOT.pv>0?CG_TOT.custo/CG_TOT.pv:0;
+    set('cg-total-comms', fI(CG_TOT.comms));
     set('cg-custo-total','R$'+Math.round(CG_TOT.custo).toLocaleString('pt-BR'));
     set('cg-conv',fI(CG_TOT.pv));
     set('cg-cac-total',fR(cac_pv));
