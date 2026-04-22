@@ -501,9 +501,8 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
         <div style="font-size:11px;color:var(--muted)">Custo total ÷ novos antecipadores Growth</div>
       </div>
       <div class="card" style="padding:18px 20px;border-top:2px solid var(--teal)">
-        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">WhatsApp % do Custo</div>
-        <div style="font-size:26px;font-weight:800;color:var(--teal)" id="cg-wa-pct">—</div>
-        <div style="font-size:11px;color:var(--muted)" id="cg-wa-val">—</div>
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">% Custo por Canal</div>
+        <div id="cg-canal-pct-bars"></div>
       </div>
     </div>
 
@@ -1816,6 +1815,27 @@ function renderCustoGrowth() {
     set('cg-cac-total',   d.cac_pv > 0 ? fR(d.cac_pv) : '—');
     set('cg-wa-pct',      d.wa_pct + '%');
     set('cg-wa-val',      'R$' + Math.round(d.wa_c).toLocaleString('pt-BR') + ' de R$' + Math.round(d.custo).toLocaleString('pt-BR'));
+
+    // % custo por canal
+    const pctWrap = document.getElementById('cg-canal-pct-bars');
+    if (pctWrap) {
+        const COR_P = {PUSH:'#3fb950',INAPP:'#58a6ff',DM:'#bc8cff',WHATSAPP:'#25d366',EMAIL:'#f0883e'};
+        const canais = ['WHATSAPP','DM','PUSH','INAPP','EMAIL'];
+        const tot = d.custo || 1;
+        pctWrap.innerHTML = canais.map(c => {
+            const custo = d.cc[c] || 0;
+            if (custo < 0.01) return '';
+            const pct  = (custo / tot * 100).toFixed(1);
+            const cor  = COR_P[c];
+            return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+              <div style="width:62px;font-size:11px;font-weight:700;color:${cor};text-align:right;flex-shrink:0">${c}</div>
+              <div style="flex:1;background:rgba(255,255,255,.05);border-radius:3px;height:18px;overflow:hidden">
+                <div style="width:${pct}%;height:100%;background:${cor}88;border-radius:3px"></div>
+              </div>
+              <div style="width:38px;font-size:11px;font-weight:700;color:${cor};text-align:right;flex-shrink:0">${pct}%</div>
+            </div>`;
+        }).join('');
+    }
 
     // Gráfico linha — CAC 1ª Antecipação mês a mês (Set/25–Mar/26)
     const MESES_G  = ['2025-09','2025-10','2025-11','2025-12','2026-01','2026-02','2026-03'];
