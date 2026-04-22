@@ -186,6 +186,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
     <a class="nb" href="#conversao">Last Click</a>
     <a class="nb" href="#recorrencia">Recorrência</a>
     <a class="nb" href="#score">Score Canais</a>
+    <a class="nb" href="#custo-growth">Custo Growth</a>
     <a class="nb" href="#insights">Insights</a>
     <a class="nb" href="https://felipetrezza.github.io/relatorio-benefits/hub.html" style="margin-left:8px">← Hub</a>
   </nav>
@@ -457,6 +458,60 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
   <div class="divider"></div>
 
   <!-- INSIGHTS -->
+  <!-- ═══════════════════════════ SEÇÃO CUSTO GROWTH -->
+  <section id="custo-growth">
+    <div class="sec-title">💰 Custo Growth — <span id="titulo-custo-growth">Set/25–Mar/26</span></div>
+    <div class="sec-sub">Base de cálculo: <strong>Antecipações Growth (last-click 7d)</strong> · Custo total investido por antecipação atribuída à campanha sfpjbene</div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-bottom:20px">
+      <div class="card" style="padding:18px 20px;border-top:2px solid var(--greenl)">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Custo Total Growth</div>
+        <div style="font-size:26px;font-weight:800;color:var(--greenl)" id="cg-custo-total">—</div>
+        <div style="font-size:11px;color:var(--muted)" id="cg-custo-sub">Set/25–Mar/26 · 7 meses</div>
+      </div>
+      <div class="card" style="padding:18px 20px;border-top:2px solid var(--blue)">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Antecipações Growth</div>
+        <div style="font-size:26px;font-weight:800;color:var(--blue)" id="cg-conv">—</div>
+        <div style="font-size:11px;color:var(--muted)">Last-click 7d · distintos no período</div>
+      </div>
+      <div class="card" style="padding:18px 20px;border-top:2px solid var(--orange)">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">CAC Real (Total)</div>
+        <div style="font-size:26px;font-weight:800;color:var(--orange)" id="cg-cac-total">—</div>
+        <div style="font-size:11px;color:var(--muted)">Custo ÷ Ant. Growth distintos</div>
+      </div>
+      <div class="card" style="padding:18px 20px;border-top:2px solid var(--purple)">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">CAC 1ª Antecipação</div>
+        <div style="font-size:26px;font-weight:800;color:var(--purple)" id="cg-cac-pv">—</div>
+        <div style="font-size:11px;color:var(--muted)" id="cg-pv-n">—</div>
+      </div>
+      <div class="card" style="padding:18px 20px;border-top:2px solid var(--yellow)">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">CAC Recompra</div>
+        <div style="font-size:26px;font-weight:800;color:var(--yellow)" id="cg-cac-rc">—</div>
+        <div style="font-size:11px;color:var(--muted)" id="cg-rc-n">—</div>
+      </div>
+      <div class="card" style="padding:18px 20px;border-top:2px solid var(--teal)">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">WhatsApp % do Custo</div>
+        <div style="font-size:26px;font-weight:800;color:var(--teal)" id="cg-wa-pct">—</div>
+        <div style="font-size:11px;color:var(--muted)" id="cg-wa-val">—</div>
+      </div>
+    </div>
+
+    <!-- Gráfico linha custo + CAC -->
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:3px">📈 Custo Total × CAC Real — Evolução Mensal</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Área verde = Custo total investido (R$, eixo esq.) · Linha tracejada laranja = CAC Real (R$, eixo dir.) · Set/25–Mar/26</div>
+      <canvas id="cg-chart-linha" style="display:block;width:100%" height="200"></canvas>
+    </div>
+
+    <!-- Barras custo por canal -->
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:3px">💸 Custo por Canal — Acumulado Set/25–Mar/26</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">WhatsApp: R$0,3847/entrega · DM: R$0,006/envio · Push/InApp/Email: R$0,00044/envio</div>
+      <div id="cg-canal-bars"></div>
+    </div>
+
+  </section>
+
   <section id="insights">
     <div class="sec-title">💡 Insights & Recomendações</div>
     <div class="sec-sub">Ações priorizadas por impacto no CAC e ROI · Campanhas sfpjbene</div>
@@ -1280,6 +1335,8 @@ function renderTudo() {
     const label = MES_LABELS[MES_ATIVO] || MES_ATIVO;
     ['titulo-mes', 'titulo-canais', 'titulo-rec', 'titulo-score'].forEach(id => setText(id, label));
     try { renderKpis(); } catch(e) { console.warn('renderKpis erro:', e.message); }
+    try { renderCustoGrowth(); } catch(e) { console.warn('renderCustoGrowth erro:', e.message); }
+    try { renderCustoGrowth(); } catch(e) { console.warn('renderCustoGrowth erro:', e.message); }
     try { renderConversao(); } catch(e) { console.warn('renderConversao erro:', e.message); }
     try { renderRec2(); } catch(e) { console.error('renderRec2 erro:', e.message, e.stack); }
     if (typeof renderScoreSeq === 'function') {
@@ -1690,6 +1747,118 @@ window.renderScoreSeq   = renderScoreSeq;
 window.renderScoreCards = renderScoreCards;
 
 })();
+
+// ══════════ CUSTO GROWTH ══════════
+const CG_LABELS=["Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26"];
+const CG_CUSTOS=[109173.88,109473.51,80967.43,70452.77,95881.19,58172.45,57370.24];
+const CG_CONV=[16336,37665,32934,62432,49651,42589,20394];
+const CG_PV=[9547,8132,7317,4739,5612,4831,4123];
+const CG_RC=[9678,32107,27666,59218,45760,39449,16822];
+const CG_CC={"PUSH":[172.36,298.62,235.48,335.35,221.02,152.6,78.46],"INAPP":[86.02,272.46,238.46,210.8,237.14,234.28,174.03],"DM":[3235.09,7096.81,7502.19,7616.42,6486.79,3837.05,2546.38],"WHATSAPP":[98688.91,101610.85,72990.99,62290.2,87797.65,53810.08,54570.4],"EMAIL":[0.01,87.47,0.31,0,59.24,1.31,0.97]};
+const CG_TOT={custo:581491.47,conv:122609,pv:44301,rc:230700,cac:4.7426,cac_pv:13.1259};
+
+function renderCustoGrowth(){
+    const fR=v=>'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const fI=v=>Math.round(v).toLocaleString('pt-BR');
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+    const wa_c=CG_CUSTOS.reduce((s,_,i)=>s+(CG_CC['WHATSAPP']?.[i]||0),0);
+    const wa_pct=CG_TOT.custo>0?(wa_c/CG_TOT.custo*100).toFixed(1):0;
+    const cac_rc=CG_TOT.rc>0?CG_TOT.custo/CG_TOT.rc:0;
+    set('cg-custo-total','R$'+Math.round(CG_TOT.custo).toLocaleString('pt-BR'));
+    set('cg-conv',fI(CG_TOT.conv));
+    set('cg-cac-total',fR(CG_TOT.cac));
+    set('cg-cac-pv',fR(CG_TOT.cac_pv));
+    set('cg-pv-n',fI(CG_TOT.pv)+' novos antecipadores');
+    set('cg-cac-rc',fR(cac_rc));
+    set('cg-rc-n',fI(CG_TOT.rc)+' recompras Growth');
+    set('cg-wa-pct',wa_pct+'%');
+    set('cg-wa-val','R$'+Math.round(wa_c).toLocaleString('pt-BR')+' de R$'+Math.round(CG_TOT.custo).toLocaleString('pt-BR'));
+
+    // Gráfico linha
+    const canvas=document.getElementById('cg-chart-linha');
+    if(!canvas)return;
+    canvas.width=canvas.parentElement.clientWidth-44;
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width,H=canvas.height;
+    const PAD={t:28,b:44,l:80,r:80};
+    const IW=W-PAD.l-PAD.r,IH=H-PAD.t-PAD.b,N=CG_LABELS.length,gap=IW/N;
+    ctx.clearRect(0,0,W,H);
+    const maxC=Math.max(...CG_CUSTOS)*1.25;
+    const cacV=CG_CONV.map((cv,i)=>cv>0?CG_CUSTOS[i]/cv:0);
+    const maxA=Math.max(...cacV)*1.4;
+    // grid
+    for(let i=0;i<=5;i++){
+        const y=PAD.t+IH*i/5;
+        ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();
+        const vC=maxC*(1-i/5);
+        ctx.fillStyle='rgba(45,201,116,.6)';ctx.font='10px sans-serif';ctx.textAlign='right';
+        ctx.fillText('R$'+(vC>=1000?Math.round(vC/1000)+'K':Math.round(vC)),PAD.l-6,y+4);
+        ctx.fillStyle='rgba(240,136,62,.6)';ctx.textAlign='left';
+        ctx.fillText('R$'+(maxA*(1-i/5)).toFixed(2),W-PAD.r+6,y+4);
+    }
+    // área custo
+    ctx.beginPath();
+    CG_CUSTOS.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxC*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.lineTo(PAD.l+(N-1)*gap+gap/2,PAD.t+IH);ctx.lineTo(PAD.l+gap/2,PAD.t+IH);ctx.closePath();
+    const gC=ctx.createLinearGradient(0,PAD.t,0,PAD.t+IH);
+    gC.addColorStop(0,'rgba(33,163,102,.4)');gC.addColorStop(1,'rgba(33,163,102,.03)');
+    ctx.fillStyle=gC;ctx.fill();
+    // linha custo
+    ctx.beginPath();
+    CG_CUSTOS.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxC*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.strokeStyle='#2dc974';ctx.lineWidth=2.5;ctx.setLineDash([]);ctx.stroke();
+    CG_CUSTOS.forEach((v,i)=>{
+        const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxC*IH;
+        ctx.fillStyle='#2dc974';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+        const lb='R$'+Math.round(v/1000)+'K',tw=ctx.measureText(lb).width+10;
+        ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+        ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y-22,tw,16,3);ctx.fill();
+        ctx.fillStyle='#2dc974';ctx.fillText(lb,x,y-10);
+    });
+    // linha CAC tracejada
+    ctx.beginPath();
+    cacV.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.strokeStyle='#f0883e';ctx.lineWidth=2.5;ctx.setLineDash([7,4]);ctx.stroke();ctx.setLineDash([]);
+    cacV.forEach((v,i)=>{
+        const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;
+        ctx.fillStyle='#f0883e';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+        const lb='R$'+v.toFixed(2),tw=ctx.measureText(lb).width+8;
+        ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+        ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y+8,tw,14,3);ctx.fill();
+        ctx.fillStyle='#f0883e';ctx.fillText(lb,x,y+19);
+    });
+    CG_LABELS.forEach((lb,i)=>{
+        ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='10px sans-serif';ctx.textAlign='center';
+        ctx.fillText(lb,PAD.l+i*gap+gap/2,H-PAD.b+14);
+    });
+    [['#2dc974','Custo Total (eixo esq.)'],['#f0883e','CAC Real (eixo dir.)']].forEach(([cor,lb],i)=>{
+        const lx=PAD.l+i*195;
+        ctx.strokeStyle=cor;ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(lx,H-PAD.b+26);ctx.lineTo(lx+20,H-PAD.b+26);ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='left';
+        ctx.fillText(lb,lx+24,H-PAD.b+30);
+    });
+
+    // barras canal
+    const wrap=document.getElementById('cg-canal-bars');if(!wrap)return;
+    const COR={PUSH:'#3fb950',INAPP:'#58a6ff',DM:'#bc8cff',WHATSAPP:'#25d366',EMAIL:'#f0883e'};
+    const tots=['PUSH','INAPP','DM','WHATSAPP','EMAIL'].map(c=>({
+        canal:c,custo:CG_CUSTOS.reduce((s,_,i)=>s+(CG_CC[c]?.[i]||0),0),cor:COR[c]||'#8b949e'
+    })).filter(r=>r.custo>=0.01).sort((a,b)=>b.custo-a.custo);
+    const totG=tots.reduce((s,r)=>s+r.custo,0),maxB=tots[0].custo;
+    wrap.innerHTML=tots.map(r=>{
+        const w=Math.max(r.custo/maxB*100,2).toFixed(1),pct=(r.custo/totG*100).toFixed(1);
+        return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+            +'<div style="width:80px;font-size:12px;font-weight:700;color:'+r.cor+';text-align:right;flex-shrink:0">'+r.canal+'</div>'
+            +'<div style="flex:1;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden;height:28px">'
+            +'<div style="width:'+w+'%;height:100%;background:linear-gradient(90deg,'+r.cor+'cc,'+r.cor+'33);border-radius:4px;display:flex;align-items:center;padding-left:10px">'
+            +'<span style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap">R$'+Math.round(r.custo).toLocaleString('pt-BR')+'</span>'
+            +'</div></div>'
+            +'<div style="width:46px;font-size:12px;font-weight:700;color:'+r.cor+';text-align:right;flex-shrink:0">'+pct+'%</div>'
+            +'</div>';
+    }).join('');
+}
 
 </script>
 
