@@ -627,8 +627,8 @@ function fmtPct(v){ return v.toFixed(2).replace('.',',')+'%'; }
 // ── Seletor de mês ────────────────────────────────────────────────────────────
 function setMes(mes) {
     MES_ATIVO = mes;
-    document.querySelectorAll('.mbtn').forEach(b => b.classList.remove('mbtn-active'));
-    const btn = document.querySelector(`.mbtn[onclick="setMes('${mes}')"]`);
+    document.querySelectorAll('#mes-tabs .mbtn').forEach(b => b.classList.remove('mbtn-active'));
+    const btn = document.querySelector(`#mes-tabs .mbtn[onclick="setMes('${mes}')"]`);
     if(btn) btn.classList.add('mbtn-active');
     const aviso = document.getElementById('aviso-parcial');
     if(aviso) aviso.style.display = (mes !== 'total' && PARCIAIS.includes(mes)) ? 'inline' : 'none';
@@ -1885,7 +1885,7 @@ let CG_MES = 'total';
 function setCgMes(mes) {
     CG_MES = mes;
     document.querySelectorAll('#cg-mes-tabs .mbtn').forEach(b => b.classList.remove('mbtn-active'));
-    const btn = document.querySelector('#cg-mes-tabs .mbtn[onclick="setCgMes(\'' + mes + \'\')")');
+    const btn = document.querySelector(`#cg-mes-tabs .mbtn[onclick="setCgMes('${mes}')"]`);
     if (btn) btn.classList.add('mbtn-active');
     renderCustoGrowth();
 }
