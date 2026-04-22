@@ -1347,7 +1347,6 @@ function renderTudo() {
     ['titulo-mes', 'titulo-canais', 'titulo-rec', 'titulo-score'].forEach(id => setText(id, label));
     try { renderKpis(); } catch(e) { console.warn('renderKpis erro:', e.message); }
     try { renderCustoGrowth(); } catch(e) { console.warn('renderCustoGrowth erro:', e.message); }
-    try { renderCustoGrowth(); } catch(e) { console.warn('renderCustoGrowth erro:', e.message); }
     try { renderConversao(); } catch(e) { console.warn('renderConversao erro:', e.message); }
     try { renderRec2(); } catch(e) { console.error('renderRec2 erro:', e.message, e.stack); }
     if (typeof renderScoreSeq === 'function') {
@@ -1759,125 +1758,7 @@ window.renderScoreCards = renderScoreCards;
 
 })();
 
-// ══════════ CUSTO GROWTH ══════════
-const CG_LABELS=["Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26"];
-const CG_CUSTOS=[109173.88,109473.51,80967.43,70452.77,95881.19,58172.45,57370.24];
-const CG_CONV=[16336,37665,32934,62432,49651,42589,20394];
-const CG_PV=[9547,8132,7317,4739,5612,4831,4123];
-const CG_RC=[9678,32107,27666,59218,45760,39449,16822];
-const CG_CC={"PUSH":[172.36,298.62,235.48,335.35,221.02,152.6,78.46],"INAPP":[86.02,272.46,238.46,210.8,237.14,234.28,174.03],"DM":[3235.09,7096.81,7502.19,7616.42,6486.79,3837.05,2546.38],"WHATSAPP":[98688.91,101610.85,72990.99,62290.2,87797.65,53810.08,54570.4],"EMAIL":[0.01,87.47,0.31,0,59.24,1.31,0.97]};
-const CG_TOT={custo:581491.47,conv:122609,pv:44301,rc:230700,cac:4.7426,cac_pv:13.1259,comms:15301922};
-
-function renderCustoGrowth(){
-    const fR=v=>'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-    const fI=v=>Math.round(v).toLocaleString('pt-BR');
-    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-    const wa_c=CG_CUSTOS.reduce((s,_,i)=>s+(CG_CC['WHATSAPP']?.[i]||0),0);
-    const wa_pct=CG_TOT.custo>0?(wa_c/CG_TOT.custo*100).toFixed(1):0;
-    // Base: apenas 1ª antecipação na vida via Growth
-    const cac_pv=CG_TOT.pv>0?CG_TOT.custo/CG_TOT.pv:0;
-    set('cg-total-comms', fI(CG_TOT.comms));
-    set('cg-custo-total','R$'+Math.round(CG_TOT.custo).toLocaleString('pt-BR'));
-    set('cg-conv',fI(CG_TOT.pv));
-    set('cg-cac-total',fR(cac_pv));
-    set('cg-wa-pct',wa_pct+'%');
-    set('cg-wa-val','R$'+Math.round(wa_c).toLocaleString('pt-BR')+' de R$'+Math.round(CG_TOT.custo).toLocaleString('pt-BR'));
-
-    // Gráfico linha
-    const canvas=document.getElementById('cg-chart-linha');
-    if(!canvas)return;
-    canvas.width=canvas.parentElement.clientWidth-44;
-    const ctx=canvas.getContext('2d');
-    const W=canvas.width,H=canvas.height;
-    const PAD={t:28,b:44,l:80,r:80};
-    const IW=W-PAD.l-PAD.r,IH=H-PAD.t-PAD.b,N=CG_LABELS.length,gap=IW/N;
-    ctx.clearRect(0,0,W,H);
-    const maxC=Math.max(...CG_CUSTOS)*1.25;
-    const cacV=CG_PV.map((pv,i)=>pv>0?CG_CUSTOS[i]/pv:0);
-    const maxA=Math.max(...cacV)*1.4;
-    // grid
-    for(let i=0;i<=5;i++){
-        const y=PAD.t+IH*i/5;
-        ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
-        ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();
-        const vC=maxC*(1-i/5);
-        ctx.fillStyle='rgba(45,201,116,.6)';ctx.font='10px sans-serif';ctx.textAlign='right';
-        ctx.fillText('R$'+(vC>=1000?Math.round(vC/1000)+'K':Math.round(vC)),PAD.l-6,y+4);
-        ctx.fillStyle='rgba(188,140,255,.6)';ctx.textAlign='left';
-        ctx.fillText('R$'+(maxA*(1-i/5)).toFixed(2),W-PAD.r+6,y+4);
-    }
-    // área custo
-    ctx.beginPath();
-    CG_CUSTOS.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxC*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.lineTo(PAD.l+(N-1)*gap+gap/2,PAD.t+IH);ctx.lineTo(PAD.l+gap/2,PAD.t+IH);ctx.closePath();
-    const gC=ctx.createLinearGradient(0,PAD.t,0,PAD.t+IH);
-    gC.addColorStop(0,'rgba(33,163,102,.4)');gC.addColorStop(1,'rgba(33,163,102,.03)');
-    ctx.fillStyle=gC;ctx.fill();
-    // linha custo
-    ctx.beginPath();
-    CG_CUSTOS.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxC*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.strokeStyle='#2dc974';ctx.lineWidth=2.5;ctx.setLineDash([]);ctx.stroke();
-    CG_CUSTOS.forEach((v,i)=>{
-        const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxC*IH;
-        ctx.fillStyle='#2dc974';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
-        const lb='R$'+Math.round(v/1000)+'K',tw=ctx.measureText(lb).width+10;
-        ctx.font='bold 10px sans-serif';ctx.textAlign='center';
-        ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y-22,tw,16,3);ctx.fill();
-        ctx.fillStyle='#2dc974';ctx.fillText(lb,x,y-10);
-    });
-    // linha CAC tracejada
-    ctx.beginPath();
-    cacV.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.strokeStyle='#bc8cff';ctx.lineWidth=2.5;ctx.setLineDash([7,4]);ctx.stroke();ctx.setLineDash([]);
-    cacV.forEach((v,i)=>{
-        const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;
-        ctx.fillStyle='#bc8cff';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
-        const lb='R$'+v.toFixed(2),tw=ctx.measureText(lb).width+8;
-        ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-        ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y+8,tw,14,3);ctx.fill();
-        ctx.fillStyle='#bc8cff';ctx.fillText(lb,x,y+19);
-    });
-    CG_LABELS.forEach((lb,i)=>{
-        ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='10px sans-serif';ctx.textAlign='center';
-        ctx.fillText(lb,PAD.l+i*gap+gap/2,H-PAD.b+14);
-    });
-    [['#2dc974','Custo Total (eixo esq.)'],['#bc8cff','CAC 1ª Antecipação (eixo dir.)']].forEach(([cor,lb],i)=>{
-        const lx=PAD.l+i*195;
-        ctx.strokeStyle=cor;ctx.lineWidth=2;
-        ctx.beginPath();ctx.moveTo(lx,H-PAD.b+26);ctx.lineTo(lx+20,H-PAD.b+26);ctx.stroke();
-        ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='left';
-        ctx.fillText(lb,lx+24,H-PAD.b+30);
-    });
-
-    // barras canal
-    const wrap=document.getElementById('cg-canal-bars');if(!wrap)return;
-    const COR={PUSH:'#3fb950',INAPP:'#58a6ff',DM:'#bc8cff',WHATSAPP:'#25d366',EMAIL:'#f0883e'};
-    const tots=['PUSH','INAPP','DM','WHATSAPP','EMAIL'].map(c=>({
-        canal:c,custo:CG_CUSTOS.reduce((s,_,i)=>s+(CG_CC[c]?.[i]||0),0),cor:COR[c]||'#8b949e'
-    })).filter(r=>r.custo>=0.01).sort((a,b)=>b.custo-a.custo);
-    const totG=tots.reduce((s,r)=>s+r.custo,0),maxB=tots[0].custo;
-    wrap.innerHTML=tots.map(r=>{
-        const w=Math.max(r.custo/maxB*100,2).toFixed(1),pct=(r.custo/totG*100).toFixed(1);
-        return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
-            +'<div style="width:80px;font-size:12px;font-weight:700;color:'+r.cor+';text-align:right;flex-shrink:0">'+r.canal+'</div>'
-            +'<div style="flex:1;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden;height:28px">'
-            +'<div style="width:'+w+'%;height:100%;background:linear-gradient(90deg,'+r.cor+'cc,'+r.cor+'33);border-radius:4px;display:flex;align-items:center;padding-left:10px">'
-            +'<span style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap">R$'+Math.round(r.custo).toLocaleString('pt-BR')+'</span>'
-            +'</div></div>'
-            +'<div style="width:46px;font-size:12px;font-weight:700;color:'+r.cor+';text-align:right;flex-shrink:0">'+pct+'%</div>'
-            +'</div>';
-    }).join('');
-}
-
-</script>
-
-<footer>
-  Mantido por <span style="color:var(--greenl)">Benefits Analytics</span> · Dados via Databricks · Referência APR/26 🐺
-</footer>
-
-<div id="hor-tip" style="display:none;position:fixed;background:#1c2128;border:1px solid #30363d;border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:200;min-width:140px;"></div>
-</body>
-</html>// ════════════════════════════════ CUSTO GROWTH ════════════
+// ════════════════════════════════ CUSTO GROWTH ════════════
 const CG_DADOS_MES = {"2025-09":{"custo":109173.88,"pv":9547,"comms":1578507,"wa_c":98688.91,"wa_pct":90.4,"cc":{"PUSH":172.36,"INAPP":86.02,"DM":3235.09,"WHATSAPP":98688.91,"EMAIL":0.01},"cac_pv":11.4354},"2025-10":{"custo":109473.51,"pv":8132,"comms":3010190,"wa_c":101610.85,"wa_pct":92.8,"cc":{"PUSH":298.62,"INAPP":272.46,"DM":7096.81,"WHATSAPP":101610.85,"EMAIL":87.47},"cac_pv":13.4621},"2025-11":{"custo":80967.43,"pv":7317,"comms":2564258,"wa_c":72990.99,"wa_pct":90.1,"cc":{"PUSH":235.48,"INAPP":238.46,"DM":7502.19,"WHATSAPP":72990.99,"EMAIL":0.31},"cac_pv":11.0657},"2025-12":{"custo":70452.77,"pv":4739,"comms":2712122,"wa_c":62290.2,"wa_pct":88.4,"cc":{"PUSH":335.35,"INAPP":210.8,"DM":7616.42,"WHATSAPP":62290.2,"EMAIL":0},"cac_pv":14.8666},"2026-01":{"custo":95881.19,"pv":5612,"comms":2561507,"wa_c":87797.65,"wa_pct":91.6,"cc":{"PUSH":221.02,"INAPP":237.14,"DM":6486.79,"WHATSAPP":87797.65,"EMAIL":59.24},"cac_pv":17.085},"2026-02":{"custo":58172.45,"pv":4831,"comms":1698388,"wa_c":53810.08,"wa_pct":92.5,"cc":{"PUSH":152.6,"INAPP":234.28,"DM":3837.05,"WHATSAPP":53810.08,"EMAIL":1.31},"cac_pv":12.0415},"2026-03":{"custo":57370.24,"pv":4123,"comms":1176950,"wa_c":54570.4,"wa_pct":95.1,"cc":{"PUSH":78.46,"INAPP":174.03,"DM":2546.38,"WHATSAPP":54570.4,"EMAIL":0.97},"cac_pv":13.9147},"2026-04":{"custo":1191.94,"pv":2993,"comms":227304,"wa_c":725.07,"wa_pct":60.8,"cc":{"PUSH":43.04,"INAPP":26.68,"DM":397.0,"WHATSAPP":725.07,"EMAIL":0.15},"cac_pv":0.3982},"total":{"custo":581491.47,"pv":44301,"comms":15301922,"wa_c":531759.08,"cc":{"PUSH":1493.89,"INAPP":1453.19,"DM":38320.73,"WHATSAPP":531759.08,"EMAIL":149.31},"cac_pv":13.1259,"wa_pct":91.4}};
 const CG_MES_LABELS = {"2025-09":"Set/25","2025-10":"Out/25","2025-11":"Nov/25","2025-12":"Dez/25","2026-01":"Jan/26","2026-02":"Fev/26","2026-03":"Mar/26","2026-04":"Abr/26","total":"Set/25–Mar/26"};
 let CG_MES = 'total';
@@ -2015,3 +1896,13 @@ function renderCustoGrowth() {
             +'</div>';
     }).join('');
 }
+
+</script>
+
+<footer>
+  Mantido por <span style="color:var(--greenl)">Benefits Analytics</span> · Dados via Databricks · Referência APR/26 🐺
+</footer>
+
+<div id="hor-tip" style="display:none;position:fixed;background:#1c2128;border:1px solid #30363d;border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:200;min-width:140px;"></div>
+</body>
+</html>
