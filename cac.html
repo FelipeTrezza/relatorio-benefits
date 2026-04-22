@@ -501,14 +501,7 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
         <div style="font-size:11px;color:var(--muted)">Custo total ÷ novos antecipadores Growth</div>
       </div>
       <div class="card" style="padding:18px 20px;border-top:2px solid var(--teal)">
-        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">% Custo por Canal</div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px" id="cg-pct-canal-tabs">
-          <button class="mbtn mbtn-active" style="font-size:10px;padding:3px 8px" onclick="setCgCanal('TODOS')">Todos</button>
-          <button class="mbtn" style="font-size:10px;padding:3px 8px;color:#3fb950" onclick="setCgCanal('PUSH')">Push</button>
-          <button class="mbtn" style="font-size:10px;padding:3px 8px;color:#58a6ff" onclick="setCgCanal('INAPP')">InApp</button>
-          <button class="mbtn" style="font-size:10px;padding:3px 8px;color:#bc8cff" onclick="setCgCanal('DM')">DM</button>
-          <button class="mbtn" style="font-size:10px;padding:3px 8px;color:#25d366" onclick="setCgCanal('WHATSAPP')">WhatsApp</button>
-        </div>
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">% Custo por Canal</div>
         <div id="cg-canal-pct-bars"></div>
       </div>
     </div>
@@ -1795,14 +1788,11 @@ function setCgMes(mes) {
 
 function setCgCanal(canal) {
     CG_CANAL = canal;
-    // Sincronizar ambos os grupos de botões de canal
-    ['#cg-canal-tabs', '#cg-pct-canal-tabs'].forEach(sel => {
-        document.querySelectorAll(sel + ' .mbtn').forEach(b => {
-            b.classList.remove('mbtn-active');
-            if (b.getAttribute('onclick') === "setCgCanal('" + canal + "')") {
-                b.classList.add('mbtn-active');
-            }
-        });
+    document.querySelectorAll('#cg-canal-tabs .mbtn').forEach(b => {
+        b.classList.remove('mbtn-active');
+        if (b.getAttribute('onclick') === "setCgCanal('" + canal + "')") {
+            b.classList.add('mbtn-active');
+        }
     });
     renderCustoGrowth();
 }
