@@ -507,10 +507,20 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
       </div>
     </div>
 
-    <!-- Gráfico linha custo + CAC 1ª vida -->
+    <!-- Gráfico linha CAC 1ª vida -->
     <div class="card">
-      <div style="font-size:13px;font-weight:700;margin-bottom:3px">📈 CAC 1ª Antecipação — Evolução Mensal</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">CAC = Custo total ÷ Novos antecipadores Growth (last-click 7d) · Set/25–Mar/26 · mês selecionado destacado</div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">📈 CAC 1ª Antecipação — Evolução Mensal</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">CAC = Custo do canal ÷ Novos antecipadores Growth last-click 7d · Set/25–Mar/26</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <span style="font-size:11px;color:var(--muted);font-weight:600">Canal:</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="cg-canal-tabs">
+          <button class="mbtn mbtn-active" onclick="setCgCanal('TODOS')">Todos</button>
+          <button class="mbtn" onclick="setCgCanal('PUSH')" style="color:#3fb950">🔔 Push</button>
+          <button class="mbtn" onclick="setCgCanal('INAPP')" style="color:#58a6ff">📱 InApp</button>
+          <button class="mbtn" onclick="setCgCanal('DM')" style="color:#bc8cff">📩 DM</button>
+          <button class="mbtn" onclick="setCgCanal('WHATSAPP')" style="color:#25d366">💬 WhatsApp</button>
+        </div>
+      </div>
       <canvas id="cg-chart-linha" style="display:block;width:100%" height="200"></canvas>
     </div>
 
@@ -1760,14 +1770,27 @@ window.renderScoreCards = renderScoreCards;
 
 // ════════════════════════════════ CUSTO GROWTH ════════════
 const CG_DADOS_MES = {"2025-09":{"custo":109173.88,"pv":9547,"comms":1578507,"wa_c":98688.91,"wa_pct":90.4,"cc":{"PUSH":172.36,"INAPP":86.02,"DM":3235.09,"WHATSAPP":98688.91,"EMAIL":0.01},"cac_pv":11.4354},"2025-10":{"custo":109473.51,"pv":8132,"comms":3010190,"wa_c":101610.85,"wa_pct":92.8,"cc":{"PUSH":298.62,"INAPP":272.46,"DM":7096.81,"WHATSAPP":101610.85,"EMAIL":87.47},"cac_pv":13.4621},"2025-11":{"custo":80967.43,"pv":7317,"comms":2564258,"wa_c":72990.99,"wa_pct":90.1,"cc":{"PUSH":235.48,"INAPP":238.46,"DM":7502.19,"WHATSAPP":72990.99,"EMAIL":0.31},"cac_pv":11.0657},"2025-12":{"custo":70452.77,"pv":4739,"comms":2712122,"wa_c":62290.2,"wa_pct":88.4,"cc":{"PUSH":335.35,"INAPP":210.8,"DM":7616.42,"WHATSAPP":62290.2,"EMAIL":0},"cac_pv":14.8666},"2026-01":{"custo":95881.19,"pv":5612,"comms":2561507,"wa_c":87797.65,"wa_pct":91.6,"cc":{"PUSH":221.02,"INAPP":237.14,"DM":6486.79,"WHATSAPP":87797.65,"EMAIL":59.24},"cac_pv":17.085},"2026-02":{"custo":58172.45,"pv":4831,"comms":1698388,"wa_c":53810.08,"wa_pct":92.5,"cc":{"PUSH":152.6,"INAPP":234.28,"DM":3837.05,"WHATSAPP":53810.08,"EMAIL":1.31},"cac_pv":12.0415},"2026-03":{"custo":57370.24,"pv":4123,"comms":1176950,"wa_c":54570.4,"wa_pct":95.1,"cc":{"PUSH":78.46,"INAPP":174.03,"DM":2546.38,"WHATSAPP":54570.4,"EMAIL":0.97},"cac_pv":13.9147},"2026-04":{"custo":1191.94,"pv":2993,"comms":227304,"wa_c":725.07,"wa_pct":60.8,"cc":{"PUSH":43.04,"INAPP":26.68,"DM":397.0,"WHATSAPP":725.07,"EMAIL":0.15},"cac_pv":0.3982},"total":{"custo":581491.47,"pv":44301,"comms":15301922,"wa_c":531759.08,"cc":{"PUSH":1493.89,"INAPP":1453.19,"DM":38320.73,"WHATSAPP":531759.08,"EMAIL":149.31},"cac_pv":13.1259,"wa_pct":91.4}};
+const CG_CAC_CANAL = {"TODOS":[11.4354,13.4621,11.0657,14.8666,17.085,12.0415,13.9147],"PUSH":[0.0853,0.1582,0.1959,0.361,0.1749,0.1856,0.1416],"INAPP":[0.2515,0.1739,0.2655,0.2374,0.3472,0.1368,0.2754],"DM":[1.0827,2.2761,1.937,3.4448,2.4825,2.2167,1.1332],"WHATSAPP":[26.1497,73.8451,54.4709,87.6093,92.7114,95.9181,79.7813]};
 const CG_MES_LABELS = {"2025-09":"Set/25","2025-10":"Out/25","2025-11":"Nov/25","2025-12":"Dez/25","2026-01":"Jan/26","2026-02":"Fev/26","2026-03":"Mar/26","2026-04":"Abr/26","total":"Set/25–Mar/26"};
 let CG_MES = 'total';
+let CG_CANAL = 'TODOS';
 
 function setCgMes(mes) {
     CG_MES = mes;
     document.querySelectorAll('#cg-mes-tabs .mbtn').forEach(b => {
         b.classList.remove('mbtn-active');
         if (b.getAttribute('onclick') === "setCgMes('" + mes + "')") {
+            b.classList.add('mbtn-active');
+        }
+    });
+    renderCustoGrowth();
+}
+
+function setCgCanal(canal) {
+    CG_CANAL = canal;
+    document.querySelectorAll('#cg-canal-tabs .mbtn').forEach(b => {
+        b.classList.remove('mbtn-active');
+        if (b.getAttribute('onclick') === "setCgCanal('" + canal + "')") {
             b.classList.add('mbtn-active');
         }
     });
@@ -1794,9 +1817,11 @@ function renderCustoGrowth() {
     set('cg-wa-val',      'R$' + Math.round(d.wa_c).toLocaleString('pt-BR') + ' de R$' + Math.round(d.custo).toLocaleString('pt-BR'));
 
     // Gráfico linha — CAC 1ª Antecipação mês a mês (Set/25–Mar/26)
-    const MESES_G = ['2025-09','2025-10','2025-11','2025-12','2026-01','2026-02','2026-03'];
+    const MESES_G  = ['2025-09','2025-10','2025-11','2025-12','2026-01','2026-02','2026-03'];
     const LABELS_G = MESES_G.map(m => CG_MES_LABELS[m]);
-    const cac_g    = MESES_G.map(m => CG_DADOS_MES[m].cac_pv);
+    const cac_g    = (CG_CAC_CANAL[CG_CANAL] || CG_CAC_CANAL['TODOS']);
+    const COR_CANAL_CG = {TODOS:'#bc8cff',PUSH:'#3fb950',INAPP:'#58a6ff',DM:'#bc8cff',WHATSAPP:'#25d366'};
+    const cor = COR_CANAL_CG[CG_CANAL] || '#bc8cff';
 
     const canvas = document.getElementById('cg-chart-linha');
     if (!canvas) return;
@@ -1807,13 +1832,14 @@ function renderCustoGrowth() {
     const IW = W-PAD.l-PAD.r, IH = H-PAD.t-PAD.b;
     const N = LABELS_G.length, gap = IW/N;
     ctx.clearRect(0,0,W,H);
-    const maxA = Math.max(...cac_g)*1.35;
+    const validVals = cac_g.filter(v => v !== null);
+    const maxA = Math.max(...validVals) * 1.35;
 
     // Destaque do mês selecionado
     const mesSel = CG_MES !== 'total' ? MESES_G.indexOf(CG_MES) : -1;
     if (mesSel >= 0) {
         const x = PAD.l + mesSel*gap;
-        ctx.fillStyle = 'rgba(188,140,255,.07)';
+        ctx.fillStyle = cor + '12';
         ctx.fillRect(x, PAD.t, gap, IH);
     }
 
@@ -1823,33 +1849,44 @@ function renderCustoGrowth() {
         ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
         ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();
         const v=maxA*(1-i/5);
-        ctx.fillStyle='rgba(188,140,255,.55)';ctx.font='10px sans-serif';ctx.textAlign='right';
+        ctx.fillStyle='rgba(180,180,180,.4)';ctx.font='10px sans-serif';ctx.textAlign='right';
         ctx.fillText('R$'+v.toFixed(2),PAD.l-6,y+4);
     }
 
     // Área sob a linha
     ctx.beginPath();
-    cac_g.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    let aFirst = true;
+    cac_g.forEach((v,i)=>{
+        if (v===null) return;
+        const x=PAD.l+i*gap+gap/2, y=PAD.t+IH-v/maxA*IH;
+        aFirst ? ctx.moveTo(x,y) : ctx.lineTo(x,y); aFirst=false;
+    });
     ctx.lineTo(PAD.l+(N-1)*gap+gap/2,PAD.t+IH);ctx.lineTo(PAD.l+gap/2,PAD.t+IH);ctx.closePath();
     const gA=ctx.createLinearGradient(0,PAD.t,0,PAD.t+IH);
-    gA.addColorStop(0,'rgba(188,140,255,.25)');gA.addColorStop(1,'rgba(188,140,255,.02)');
+    gA.addColorStop(0,cor+'44');gA.addColorStop(1,cor+'05');
     ctx.fillStyle=gA;ctx.fill();
 
     // Linha CAC
     ctx.beginPath();
-    cac_g.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.strokeStyle='#bc8cff';ctx.lineWidth=2.5;ctx.setLineDash([]);ctx.stroke();
+    let lFirst = true;
+    cac_g.forEach((v,i)=>{
+        if (v===null) return;
+        const x=PAD.l+i*gap+gap/2, y=PAD.t+IH-v/maxA*IH;
+        lFirst ? ctx.moveTo(x,y) : ctx.lineTo(x,y); lFirst=false;
+    });
+    ctx.strokeStyle=cor;ctx.lineWidth=2.5;ctx.setLineDash([]);ctx.stroke();
 
     // Pontos + labels
     cac_g.forEach((v,i)=>{
-        const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;
+        if (v===null) return;
+        const x=PAD.l+i*gap+gap/2, y=PAD.t+IH-v/maxA*IH;
         const destaque = i===mesSel;
-        ctx.fillStyle=destaque?'#fff':'#bc8cff';
+        ctx.fillStyle=destaque?'#fff':cor;
         ctx.beginPath();ctx.arc(x,y,destaque?6:4,0,Math.PI*2);ctx.fill();
-        const lb='R$'+v.toFixed(2),tw=ctx.measureText(lb).width+10;
+        const lb='R$'+v.toFixed(2), tw=ctx.measureText(lb).width+10;
         ctx.font=destaque?'bold 11px sans-serif':'bold 10px sans-serif';ctx.textAlign='center';
         ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y-22,tw,16,3);ctx.fill();
-        ctx.fillStyle=destaque?'#fff':'#bc8cff';ctx.fillText(lb,x,y-10);
+        ctx.fillStyle=destaque?'#fff':cor;ctx.fillText(lb,x,y-10);
     });
 
     // Labels X
@@ -1860,10 +1897,11 @@ function renderCustoGrowth() {
         ctx.fillText(lb,PAD.l+i*gap+gap/2,H-PAD.b+14);
     });
     // Legenda
-    ctx.strokeStyle='#bc8cff';ctx.lineWidth=2;
+    ctx.strokeStyle=cor;ctx.lineWidth=2;
     ctx.beginPath();ctx.moveTo(PAD.l,H-PAD.b+26);ctx.lineTo(PAD.l+20,H-PAD.b+26);ctx.stroke();
     ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='left';
-    ctx.fillText('CAC 1ª Antecipação via Growth (R$)',PAD.l+24,H-PAD.b+30);
+    const lbl_canal = CG_CANAL === 'TODOS' ? 'Todos os canais' : CG_CANAL;
+    ctx.fillText('CAC 1ª Antecipação — ' + lbl_canal, PAD.l+24, H-PAD.b+30);
 
     // Barras canal — usa dados do mês/total selecionado
     const wrap=document.getElementById('cg-canal-bars');if(!wrap)return;
