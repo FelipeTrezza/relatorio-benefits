@@ -501,7 +501,14 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
         <div style="font-size:11px;color:var(--muted)">Custo total ÷ novos antecipadores Growth</div>
       </div>
       <div class="card" style="padding:18px 20px;border-top:2px solid var(--teal)">
-        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">% Custo por Canal</div>
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">% Custo por Canal</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px" id="cg-pct-canal-tabs">
+          <button class="mbtn mbtn-active" style="font-size:10px;padding:3px 8px" onclick="setCgCanal('TODOS')">Todos</button>
+          <button class="mbtn" style="font-size:10px;padding:3px 8px;color:#3fb950" onclick="setCgCanal('PUSH')">Push</button>
+          <button class="mbtn" style="font-size:10px;padding:3px 8px;color:#58a6ff" onclick="setCgCanal('INAPP')">InApp</button>
+          <button class="mbtn" style="font-size:10px;padding:3px 8px;color:#bc8cff" onclick="setCgCanal('DM')">DM</button>
+          <button class="mbtn" style="font-size:10px;padding:3px 8px;color:#25d366" onclick="setCgCanal('WHATSAPP')">WhatsApp</button>
+        </div>
         <div id="cg-canal-pct-bars"></div>
       </div>
     </div>
@@ -1788,11 +1795,14 @@ function setCgMes(mes) {
 
 function setCgCanal(canal) {
     CG_CANAL = canal;
-    document.querySelectorAll('#cg-canal-tabs .mbtn').forEach(b => {
-        b.classList.remove('mbtn-active');
-        if (b.getAttribute('onclick') === "setCgCanal('" + canal + "')") {
-            b.classList.add('mbtn-active');
-        }
+    // Sincronizar ambos os grupos de botões de canal
+    ['#cg-canal-tabs', '#cg-pct-canal-tabs'].forEach(sel => {
+        document.querySelectorAll(sel + ' .mbtn').forEach(b => {
+            b.classList.remove('mbtn-active');
+            if (b.getAttribute('onclick') === "setCgCanal('" + canal + "')") {
+                b.classList.add('mbtn-active');
+            }
+        });
     });
     renderCustoGrowth();
 }
@@ -1820,21 +1830,42 @@ function renderCustoGrowth() {
     const pctWrap = document.getElementById('cg-canal-pct-bars');
     if (pctWrap) {
         const COR_P = {PUSH:'#3fb950',INAPP:'#58a6ff',DM:'#bc8cff',WHATSAPP:'#25d366',EMAIL:'#f0883e'};
-        const canais = ['WHATSAPP','DM','PUSH','INAPP','EMAIL'];
-        const tot = d.custo || 1;
-        pctWrap.innerHTML = canais.map(c => {
-            const custo = d.cc[c] || 0;
-            if (custo < 0.01) return '';
-            const pct  = (custo / tot * 100).toFixed(1);
-            const cor  = COR_P[c];
-            return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
-              <div style="width:62px;font-size:11px;font-weight:700;color:${cor};text-align:right;flex-shrink:0">${c}</div>
-              <div style="flex:1;background:rgba(255,255,255,.05);border-radius:3px;height:18px;overflow:hidden">
-                <div style="width:${pct}%;height:100%;background:${cor}88;border-radius:3px"></div>
+        const tot   = d.custo || 1;
+
+        if (CG_CANAL === 'TODOS') {
+            // Mostrar todos os canais
+            const canais = ['WHATSAPP','DM','PUSH','INAPP','EMAIL'];
+            pctWrap.innerHTML = canais.map(c => {
+                const custo = d.cc[c] || 0;
+                if (custo < 0.01) return '';
+                const pct = (custo / tot * 100).toFixed(1);
+                const cor = COR_P[c];
+                return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+                  <div style="width:62px;font-size:11px;font-weight:700;color:${cor};text-align:right;flex-shrink:0">${c}</div>
+                  <div style="flex:1;background:rgba(255,255,255,.05);border-radius:3px;height:18px;overflow:hidden">
+                    <div style="width:${pct}%;height:100%;background:${cor}88;border-radius:3px"></div>
+                  </div>
+                  <div style="width:38px;font-size:11px;font-weight:700;color:${cor};text-align:right;flex-shrink:0">${pct}%</div>
+                </div>`;
+            }).join('');
+        } else {
+            // Canal filtrado: mostrar custo do canal + % sobre o total
+            const custo = d.cc[CG_CANAL] || 0;
+            const pct   = (custo / tot * 100).toFixed(1);
+            const cor   = COR_P[CG_CANAL] || '#8b949e';
+            pctWrap.innerHTML = `
+              <div style="text-align:center;padding:8px 0">
+                <div style="font-size:36px;font-weight:800;color:${cor};line-height:1">${pct}%</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:6px">do custo total</div>
               </div>
-              <div style="width:38px;font-size:11px;font-weight:700;color:${cor};text-align:right;flex-shrink:0">${pct}%</div>
-            </div>`;
-        }).join('');
+              <div style="background:rgba(255,255,255,.05);border-radius:4px;height:10px;overflow:hidden;margin:10px 0 8px">
+                <div style="width:${pct}%;height:100%;background:${cor};border-radius:4px"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px">
+                <span style="color:${cor};font-weight:700">R$${Math.round(custo).toLocaleString('pt-BR')}</span>
+                <span style="color:var(--muted)">de R$${Math.round(tot).toLocaleString('pt-BR')}</span>
+              </div>`;
+        }
     }
 
     // Gráfico linha — CAC 1ª Antecipação mês a mês (Set/25–Mar/26)
