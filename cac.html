@@ -510,7 +510,7 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
     <!-- Gráfico linha CAC 1ª vida -->
     <div class="card">
       <div style="font-size:13px;font-weight:700;margin-bottom:6px">📈 CAC 1ª Antecipação — Evolução Mensal</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">CAC = Custo do canal ÷ Novos antecipadores Growth last-click 7d · Set/25–Mar/26</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Barras = Antecipações Growth 1ª vida (eixo dir.) · Linha = CAC R$ (eixo esq.) · Set/25–Mar/26</div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
         <span style="font-size:11px;color:var(--muted);font-weight:600">Canal:</span>
         <div style="display:flex;gap:6px;flex-wrap:wrap" id="cg-canal-tabs">
@@ -1771,6 +1771,7 @@ window.renderScoreCards = renderScoreCards;
 // ════════════════════════════════ CUSTO GROWTH ════════════
 const CG_DADOS_MES = {"2025-09":{"custo":109173.88,"pv":9547,"comms":1578507,"wa_c":98688.91,"wa_pct":90.4,"cc":{"PUSH":172.36,"INAPP":86.02,"DM":3235.09,"WHATSAPP":98688.91,"EMAIL":0.01},"cac_pv":11.4354},"2025-10":{"custo":109473.51,"pv":8132,"comms":3010190,"wa_c":101610.85,"wa_pct":92.8,"cc":{"PUSH":298.62,"INAPP":272.46,"DM":7096.81,"WHATSAPP":101610.85,"EMAIL":87.47},"cac_pv":13.4621},"2025-11":{"custo":80967.43,"pv":7317,"comms":2564258,"wa_c":72990.99,"wa_pct":90.1,"cc":{"PUSH":235.48,"INAPP":238.46,"DM":7502.19,"WHATSAPP":72990.99,"EMAIL":0.31},"cac_pv":11.0657},"2025-12":{"custo":70452.77,"pv":4739,"comms":2712122,"wa_c":62290.2,"wa_pct":88.4,"cc":{"PUSH":335.35,"INAPP":210.8,"DM":7616.42,"WHATSAPP":62290.2,"EMAIL":0},"cac_pv":14.8666},"2026-01":{"custo":95881.19,"pv":5612,"comms":2561507,"wa_c":87797.65,"wa_pct":91.6,"cc":{"PUSH":221.02,"INAPP":237.14,"DM":6486.79,"WHATSAPP":87797.65,"EMAIL":59.24},"cac_pv":17.085},"2026-02":{"custo":58172.45,"pv":4831,"comms":1698388,"wa_c":53810.08,"wa_pct":92.5,"cc":{"PUSH":152.6,"INAPP":234.28,"DM":3837.05,"WHATSAPP":53810.08,"EMAIL":1.31},"cac_pv":12.0415},"2026-03":{"custo":57370.24,"pv":4123,"comms":1176950,"wa_c":54570.4,"wa_pct":95.1,"cc":{"PUSH":78.46,"INAPP":174.03,"DM":2546.38,"WHATSAPP":54570.4,"EMAIL":0.97},"cac_pv":13.9147},"2026-04":{"custo":1191.94,"pv":2993,"comms":227304,"wa_c":725.07,"wa_pct":60.8,"cc":{"PUSH":43.04,"INAPP":26.68,"DM":397.0,"WHATSAPP":725.07,"EMAIL":0.15},"cac_pv":0.3982},"total":{"custo":581491.47,"pv":44301,"comms":15301922,"wa_c":531759.08,"cc":{"PUSH":1493.89,"INAPP":1453.19,"DM":38320.73,"WHATSAPP":531759.08,"EMAIL":149.31},"cac_pv":13.1259,"wa_pct":91.4}};
 const CG_CAC_CANAL = {"TODOS":[11.4354,13.4621,11.0657,14.8666,17.085,12.0415,13.9147],"PUSH":[0.0853,0.1582,0.1959,0.361,0.1749,0.1856,0.1416],"INAPP":[0.2515,0.1739,0.2655,0.2374,0.3472,0.1368,0.2754],"DM":[1.0827,2.2761,1.937,3.4448,2.4825,2.2167,1.1332],"WHATSAPP":[26.1497,73.8451,54.4709,87.6093,92.7114,95.9181,79.7813]};
+const CG_PV_CANAL = {"TODOS":[9547,8132,7317,4739,5612,4831,4123],"PUSH":[2021,1888,1202,929,1264,822,554],"INAPP":[342,1567,898,888,683,1712,632],"DM":[2988,3118,3873,2211,2613,1731,2247],"WHATSAPP":[3774,1376,1340,711,947,561,684]};
 const CG_MES_LABELS = {"2025-09":"Set/25","2025-10":"Out/25","2025-11":"Nov/25","2025-12":"Dez/25","2026-01":"Jan/26","2026-02":"Fev/26","2026-03":"Mar/26","2026-04":"Abr/26","total":"Set/25–Mar/26"};
 let CG_MES = 'total';
 let CG_CANAL = 'TODOS';
@@ -1828,12 +1829,15 @@ function renderCustoGrowth() {
     canvas.width = canvas.parentElement.clientWidth - 44;
     const ctx = canvas.getContext('2d');
     const W = canvas.width, H = canvas.height;
-    const PAD = {t:30, b:44, l:60, r:20};
+    const PAD = {t:30, b:44, l:60, r:45};
     const IW = W-PAD.l-PAD.r, IH = H-PAD.t-PAD.b;
     const N = LABELS_G.length, gap = IW/N;
     ctx.clearRect(0,0,W,H);
+    const pv_g     = CG_PV_CANAL[CG_CANAL] || CG_PV_CANAL['TODOS'];
     const validVals = cac_g.filter(v => v !== null);
-    const maxA = Math.max(...validVals) * 1.35;
+    const maxA  = Math.max(...validVals) * 1.35;
+    const maxPV = Math.max(...pv_g) * 1.25;
+    const bW    = gap * 0.55;
 
     // Destaque do mês selecionado
     const mesSel = CG_MES !== 'total' ? MESES_G.indexOf(CG_MES) : -1;
@@ -1843,14 +1847,30 @@ function renderCustoGrowth() {
         ctx.fillRect(x, PAD.t, gap, IH);
     }
 
-    // Grid
+    // Barras de Ant. Growth (pv) — eixo direito
+    pv_g.forEach((v,i) => {
+        const x  = PAD.l + i*gap + (gap-bW)/2;
+        const bH = v / maxPV * IH;
+        const y  = PAD.t + IH - bH;
+        const destaque = i === mesSel;
+        const grad = ctx.createLinearGradient(0, y, 0, y+bH);
+        grad.addColorStop(0, cor + (destaque ? 'cc' : '55'));
+        grad.addColorStop(1, cor + '11');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.roundRect(x, y, bW, bH, [3,3,0,0]); ctx.fill();
+    });
+
+    // Grid + eixo Y esquerdo (CAC) e direito (ant. growth)
     for (let i=0;i<=5;i++) {
         const y=PAD.t+IH*i/5;
         ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
         ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();
-        const v=maxA*(1-i/5);
+        const vC=maxA*(1-i/5);
         ctx.fillStyle='rgba(180,180,180,.4)';ctx.font='10px sans-serif';ctx.textAlign='right';
-        ctx.fillText('R$'+v.toFixed(2),PAD.l-6,y+4);
+        ctx.fillText('R$'+vC.toFixed(2),PAD.l-6,y+4);
+        const vP=maxPV*(1-i/5);
+        ctx.fillStyle='rgba(180,180,180,.3)';ctx.textAlign='left';
+        ctx.fillText(vP>=1000?Math.round(vP/1000)+'K':Math.round(vP),W-PAD.r+6,y+4);
     }
 
     // Área sob a linha
@@ -1901,7 +1921,10 @@ function renderCustoGrowth() {
     ctx.beginPath();ctx.moveTo(PAD.l,H-PAD.b+26);ctx.lineTo(PAD.l+20,H-PAD.b+26);ctx.stroke();
     ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='left';
     const lbl_canal = CG_CANAL === 'TODOS' ? 'Todos os canais' : CG_CANAL;
-    ctx.fillText('CAC 1ª Antecipação — ' + lbl_canal, PAD.l+24, H-PAD.b+30);
+    ctx.fillText('CAC 1ª Ant. — ' + lbl_canal + ' (eixo esq.)', PAD.l+24, H-PAD.b+30);
+    ctx.fillStyle=cor+'88';ctx.fillRect(PAD.l+200,H-PAD.b+18,14,10);
+    ctx.fillStyle='rgba(255,255,255,.4)';
+    ctx.fillText('Ant. Growth (eixo dir.)', PAD.l+218, H-PAD.b+30);
 
     // Barras canal — usa dados do mês/total selecionado
     const wrap=document.getElementById('cg-canal-bars');if(!wrap)return;
