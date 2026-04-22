@@ -460,34 +460,24 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
   <!-- INSIGHTS -->
   <!-- ═══════════════════════════ SEÇÃO CUSTO GROWTH -->
   <section id="custo-growth">
-    <div class="sec-title">💰 Custo Growth — <span id="titulo-custo-growth">Set/25–Mar/26</span></div>
-    <div class="sec-sub">Base de cálculo: <strong>Antecipações Growth (last-click 7d)</strong> · Custo total investido por antecipação atribuída à campanha sfpjbene</div>
+    <div class="sec-title">💰 Custo Growth — 1ª Antecipação na Vida <span id="titulo-custo-growth" style="font-size:14px;font-weight:500;color:var(--muted)">· Set/25–Mar/26</span></div>
+    <div class="sec-sub">Base de cálculo: <strong>1ª Antecipação na vida via Growth (last-click 7d)</strong> · Custo total investido por novo antecipador atribuído à campanha sfpjbene</div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:12px;margin-bottom:20px">
       <div class="card" style="padding:18px 20px;border-top:2px solid var(--greenl)">
-        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Custo Total Growth</div>
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Custo Total Investido</div>
         <div style="font-size:26px;font-weight:800;color:var(--greenl)" id="cg-custo-total">—</div>
         <div style="font-size:11px;color:var(--muted)" id="cg-custo-sub">Set/25–Mar/26 · 7 meses</div>
       </div>
-      <div class="card" style="padding:18px 20px;border-top:2px solid var(--blue)">
-        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Antecipações Growth</div>
-        <div style="font-size:26px;font-weight:800;color:var(--blue)" id="cg-conv">—</div>
-        <div style="font-size:11px;color:var(--muted)">Last-click 7d · distintos no período</div>
+      <div class="card" style="padding:18px 20px;border-top:2px solid var(--purple)">
+        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Novos Antecipadores (Growth)</div>
+        <div style="font-size:26px;font-weight:800;color:var(--purple)" id="cg-conv">—</div>
+        <div style="font-size:11px;color:var(--muted)">1ª antecipação na vida · last-click 7d</div>
       </div>
       <div class="card" style="padding:18px 20px;border-top:2px solid var(--orange)">
-        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">CAC Real (Total)</div>
-        <div style="font-size:26px;font-weight:800;color:var(--orange)" id="cg-cac-total">—</div>
-        <div style="font-size:11px;color:var(--muted)">Custo ÷ Ant. Growth distintos</div>
-      </div>
-      <div class="card" style="padding:18px 20px;border-top:2px solid var(--purple)">
         <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">CAC 1ª Antecipação</div>
-        <div style="font-size:26px;font-weight:800;color:var(--purple)" id="cg-cac-pv">—</div>
-        <div style="font-size:11px;color:var(--muted)" id="cg-pv-n">—</div>
-      </div>
-      <div class="card" style="padding:18px 20px;border-top:2px solid var(--yellow)">
-        <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">CAC Recompra</div>
-        <div style="font-size:26px;font-weight:800;color:var(--yellow)" id="cg-cac-rc">—</div>
-        <div style="font-size:11px;color:var(--muted)" id="cg-rc-n">—</div>
+        <div style="font-size:26px;font-weight:800;color:var(--orange)" id="cg-cac-total">—</div>
+        <div style="font-size:11px;color:var(--muted)">Custo total ÷ novos antecipadores Growth</div>
       </div>
       <div class="card" style="padding:18px 20px;border-top:2px solid var(--teal)">
         <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">WhatsApp % do Custo</div>
@@ -496,10 +486,10 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
       </div>
     </div>
 
-    <!-- Gráfico linha custo + CAC -->
+    <!-- Gráfico linha custo + CAC 1ª vida -->
     <div class="card">
-      <div style="font-size:13px;font-weight:700;margin-bottom:3px">📈 Custo Total × CAC Real — Evolução Mensal</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Área verde = Custo total investido (R$, eixo esq.) · Linha tracejada laranja = CAC Real (R$, eixo dir.) · Set/25–Mar/26</div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:3px">📈 Custo Total × CAC 1ª Antecipação — Evolução Mensal</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Área verde = Custo total investido (R$, eixo esq.) · Linha tracejada roxa = CAC 1ª Antecipação via Growth (R$, eixo dir.) · Set/25–Mar/26</div>
       <canvas id="cg-chart-linha" style="display:block;width:100%" height="200"></canvas>
     </div>
 
@@ -1763,14 +1753,11 @@ function renderCustoGrowth(){
     const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
     const wa_c=CG_CUSTOS.reduce((s,_,i)=>s+(CG_CC['WHATSAPP']?.[i]||0),0);
     const wa_pct=CG_TOT.custo>0?(wa_c/CG_TOT.custo*100).toFixed(1):0;
-    const cac_rc=CG_TOT.rc>0?CG_TOT.custo/CG_TOT.rc:0;
+    // Base: apenas 1ª antecipação na vida via Growth
+    const cac_pv=CG_TOT.pv>0?CG_TOT.custo/CG_TOT.pv:0;
     set('cg-custo-total','R$'+Math.round(CG_TOT.custo).toLocaleString('pt-BR'));
-    set('cg-conv',fI(CG_TOT.conv));
-    set('cg-cac-total',fR(CG_TOT.cac));
-    set('cg-cac-pv',fR(CG_TOT.cac_pv));
-    set('cg-pv-n',fI(CG_TOT.pv)+' novos antecipadores');
-    set('cg-cac-rc',fR(cac_rc));
-    set('cg-rc-n',fI(CG_TOT.rc)+' recompras Growth');
+    set('cg-conv',fI(CG_TOT.pv));
+    set('cg-cac-total',fR(cac_pv));
     set('cg-wa-pct',wa_pct+'%');
     set('cg-wa-val','R$'+Math.round(wa_c).toLocaleString('pt-BR')+' de R$'+Math.round(CG_TOT.custo).toLocaleString('pt-BR'));
 
@@ -1784,7 +1771,7 @@ function renderCustoGrowth(){
     const IW=W-PAD.l-PAD.r,IH=H-PAD.t-PAD.b,N=CG_LABELS.length,gap=IW/N;
     ctx.clearRect(0,0,W,H);
     const maxC=Math.max(...CG_CUSTOS)*1.25;
-    const cacV=CG_CONV.map((cv,i)=>cv>0?CG_CUSTOS[i]/cv:0);
+    const cacV=CG_PV.map((pv,i)=>pv>0?CG_CUSTOS[i]/pv:0);
     const maxA=Math.max(...cacV)*1.4;
     // grid
     for(let i=0;i<=5;i++){
@@ -1794,7 +1781,7 @@ function renderCustoGrowth(){
         const vC=maxC*(1-i/5);
         ctx.fillStyle='rgba(45,201,116,.6)';ctx.font='10px sans-serif';ctx.textAlign='right';
         ctx.fillText('R$'+(vC>=1000?Math.round(vC/1000)+'K':Math.round(vC)),PAD.l-6,y+4);
-        ctx.fillStyle='rgba(240,136,62,.6)';ctx.textAlign='left';
+        ctx.fillStyle='rgba(188,140,255,.6)';ctx.textAlign='left';
         ctx.fillText('R$'+(maxA*(1-i/5)).toFixed(2),W-PAD.r+6,y+4);
     }
     // área custo
@@ -1819,20 +1806,20 @@ function renderCustoGrowth(){
     // linha CAC tracejada
     ctx.beginPath();
     cacV.forEach((v,i)=>{const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.strokeStyle='#f0883e';ctx.lineWidth=2.5;ctx.setLineDash([7,4]);ctx.stroke();ctx.setLineDash([]);
+    ctx.strokeStyle='#bc8cff';ctx.lineWidth=2.5;ctx.setLineDash([7,4]);ctx.stroke();ctx.setLineDash([]);
     cacV.forEach((v,i)=>{
         const x=PAD.l+i*gap+gap/2,y=PAD.t+IH-v/maxA*IH;
-        ctx.fillStyle='#f0883e';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#bc8cff';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
         const lb='R$'+v.toFixed(2),tw=ctx.measureText(lb).width+8;
         ctx.font='bold 9px sans-serif';ctx.textAlign='center';
         ctx.fillStyle='rgba(13,17,23,.92)';ctx.beginPath();ctx.roundRect(x-tw/2,y+8,tw,14,3);ctx.fill();
-        ctx.fillStyle='#f0883e';ctx.fillText(lb,x,y+19);
+        ctx.fillStyle='#bc8cff';ctx.fillText(lb,x,y+19);
     });
     CG_LABELS.forEach((lb,i)=>{
         ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='10px sans-serif';ctx.textAlign='center';
         ctx.fillText(lb,PAD.l+i*gap+gap/2,H-PAD.b+14);
     });
-    [['#2dc974','Custo Total (eixo esq.)'],['#f0883e','CAC Real (eixo dir.)']].forEach(([cor,lb],i)=>{
+    [['#2dc974','Custo Total (eixo esq.)'],['#bc8cff','CAC 1ª Antecipação (eixo dir.)']].forEach(([cor,lb],i)=>{
         const lx=PAD.l+i*195;
         ctx.strokeStyle=cor;ctx.lineWidth=2;
         ctx.beginPath();ctx.moveTo(lx,H-PAD.b+26);ctx.lineTo(lx+20,H-PAD.b+26);ctx.stroke();
