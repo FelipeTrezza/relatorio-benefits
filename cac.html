@@ -1936,15 +1936,18 @@ function renderCustoGrowth() {
         ctx.font=destaque?'bold 11px sans-serif':'10px sans-serif';ctx.textAlign='center';
         ctx.fillText(lb,PAD.l+i*gap+gap/2,H-PAD.b+14);
     });
-    // Legenda
-    ctx.strokeStyle=cor;ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(PAD.l,H-PAD.b+26);ctx.lineTo(PAD.l+20,H-PAD.b+26);ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='10px sans-serif';ctx.textAlign='left';
-    const lbl_canal = CG_CANAL === 'TODOS' ? 'Todos os canais' : CG_CANAL;
-    ctx.fillText('CAC 1ª Ant. — ' + lbl_canal + ' (eixo esq.)', PAD.l+24, H-PAD.b+30);
-    ctx.fillStyle=cor+'88';ctx.fillRect(PAD.l+200,H-PAD.b+18,14,10);
-    ctx.fillStyle='rgba(255,255,255,.4)';
-    ctx.fillText('Ant. Growth (eixo dir.)', PAD.l+218, H-PAD.b+30);
+    // Legenda — linha CAC
+    ctx.strokeStyle = cor; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(PAD.l, H-PAD.b+26); ctx.lineTo(PAD.l+18, H-PAD.b+26); ctx.stroke();
+    ctx.fillStyle = cor; ctx.beginPath(); ctx.arc(PAD.l+9, H-PAD.b+26, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+    const lbl_canal = CG_CANAL === 'TODOS' ? 'Todos' : CG_CANAL;
+    ctx.fillText('CAC — ' + lbl_canal, PAD.l+24, H-PAD.b+30);
+    // Legenda — barras
+    const barLegX = PAD.l + 110;
+    ctx.fillStyle = cor + '88'; ctx.beginPath(); ctx.roundRect(barLegX, H-PAD.b+20, 12, 10, 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ctx.fillText('Ant. Growth', barLegX+16, H-PAD.b+30);
 
     // Barras canal — usa dados do mês/total selecionado
     const wrap=document.getElementById('cg-canal-bars');if(!wrap)return;
