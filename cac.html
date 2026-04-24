@@ -111,64 +111,8 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:11px;border-t
   .setor-grid{grid-template-columns:repeat(2,1fr)}
   .insight-grid{grid-template-columns:1fr}
   .nav{display:none}
-  .score-cards{grid-template-columns:repeat(2,1fr)}
 }
 
-/* ── Score de Canais ─────────────────────────────────── */
-.score-racional{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;padding:14px 18px;font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:20px}
-.score-racional strong{color:#58a6ff}
-.score-racional b{color:var(--text)}
-.score-formula{margin:10px 0 4px;padding:10px 14px;background:rgba(0,0,0,.3);border-radius:6px;font-family:monospace;font-size:11px;color:var(--muted);line-height:1.9}
-.score-formula span{color:var(--green)}
-.score-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
-.score-card{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:14px 12px;text-align:center}
-.sc-name{font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:8px}
-.sc-num{font-size:32px;font-weight:800;line-height:1;margin-bottom:2px}
-.sc-deno{font-size:10px;color:var(--muted);margin-bottom:8px}
-.sc-delta{font-size:10px;padding:2px 7px;border-radius:10px;display:inline-block;margin-bottom:10px;font-weight:600}
-.sc-delta-up{background:rgba(33,163,102,.12);color:var(--greenl)}
-.sc-delta-eq{background:rgba(139,148,158,.1);color:var(--muted)}
-.dim-bars{display:flex;flex-direction:column;gap:5px;text-align:left}
-.db-row{display:flex;align-items:center;gap:5px}
-.db-lbl{font-size:9px;color:var(--muted);width:58px;flex-shrink:0;line-height:1.3}
-.db-bg{flex:1;height:4px;background:var(--surf3);border-radius:2px;overflow:hidden}
-.db-fill{height:100%;border-radius:2px}
-.db-val{font-size:9px;color:var(--muted);width:22px;text-align:right;flex-shrink:0}
-/* tabela de sequências */
-.seq-table{width:100%;border-collapse:collapse;font-size:12px}
-.seq-table thead th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500}
-.seq-table thead th.r{text-align:right}
-.seq-table thead th.c{text-align:center}
-.seq-table tbody tr{border-bottom:1px solid var(--surf2);transition:background .12s;cursor:default}
-.seq-table tbody tr:hover{background:rgba(255,255,255,.025)}
-.seq-table tbody td{padding:10px 10px;vertical-align:middle}
-.seq-table tbody td.r{text-align:right}
-.seq-table tbody td.c{text-align:center}
-tr.seq-otima td:first-child{border-left:3px solid var(--greenl)}
-tr.seq-boa   td:first-child{border-left:3px solid #58a6ff}
-tr.seq-media td:first-child{border-left:3px solid var(--orange)}
-tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
-.sbadge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:24px;border-radius:6px;font-size:12px;font-weight:700}
-.sbadge-otima{background:rgba(33,163,102,.12);color:var(--greenl)}
-.sbadge-boa{background:rgba(88,166,255,.12);color:#58a6ff}
-.sbadge-media{background:rgba(240,136,62,.12);color:var(--orange)}
-.sbadge-fraca{background:rgba(248,81,73,.12);color:var(--red)}
-.sbar-bg{flex:1;height:4px;background:var(--surf3);border-radius:2px;overflow:hidden;min-width:40px}
-.sbar-fill{height:100%;border-radius:2px}
-.seq-pills{display:flex;align-items:center;gap:3px;flex-wrap:nowrap}
-.seq-pill{padding:2px 6px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
-.sp-INAPP{background:rgba(88,166,255,.15);color:#58a6ff}
-.sp-PUSH{background:rgba(63,185,80,.15);color:#3fb950}
-.sp-DM{background:rgba(188,140,255,.15);color:#bc8cff}
-.sp-WHATSAPP{background:rgba(240,136,62,.15);color:var(--orange)}
-.sp-dim{background:rgba(139,148,158,.08);color:var(--muted);opacity:.55}
-.sp-score{font-size:9px;padding:1px 4px;border-radius:7px;background:rgba(255,255,255,.05);color:var(--muted);font-weight:600}
-.seq-sec-hdr{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:5px 10px;background:rgba(255,255,255,.02);margin:2px 0}
-.seq-ganho{font-size:11px;color:var(--muted)}
-.seq-ganho .gv{font-weight:700}
-.seq-legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-.seq-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
-.seq-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -184,8 +128,7 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
   <nav class="nav">
     <a class="nb" href="#visao-geral">Visão Geral</a>
     <a class="nb" href="#conversao">Last Click</a>
-    <a class="nb" href="#recorrencia">Recorrência</a>
-    <a class="nb" href="#score">Score Canais</a>
+
     <a class="nb" href="#custo-growth">Custo Growth</a>
     <a class="nb" href="#insights">Insights</a>
     <a class="nb" href="https://felipetrezza.github.io/relatorio-benefits/hub.html" style="margin-left:8px">← Hub</a>
@@ -352,111 +295,6 @@ tr.seq-fraca td:first-child{border-left:3px solid var(--red)}
 
   <div class="divider"></div>
 
-
-
-  <!-- RECORRÊNCIA DE CANAIS -->
-  <section id="recorrencia">
-    <div class="sec-title">🔀 Mix de Canais — <span id="titulo-rec">Março 2026</span></div>
-    <div class="sec-sub">Base: <strong>antecipações Growth</strong> · canais recebidos nos 7d após o disparo · last-click = último canal antes de antecipar</div>
-
-    <!-- Filtro 1ª antecipação / recompra -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
-      <span style="font-size:12px;color:var(--muted);font-weight:600">Tipo:</span>
-      <div style="display:flex;gap:6px" id="rec-tipo-tabs">
-        <button class="mbtn mbtn-active" onclick="setRecTipo('total')">📊 Total</button>
-        <button class="mbtn" onclick="setRecTipo('primeira_vida')">🆕 1ª Antecipação</button>
-        <button class="mbtn" onclick="setRecTipo('recompra')">🔄 Recompra</button>
-      </div>
-    </div>
-
-    <!-- Last-click por canal -->
-    <div class="card" style="margin-bottom:18px">
-      <div class="card-title">🎯 Last-Click por Canal</div>
-      <div class="card-sub">Último canal recebido antes de antecipar · taxa = antecipações atribuídas ÷ enviados pelo canal</div>
-      <div id="rec-last-bars" style="margin-top:14px"></div>
-    </div>
-
-    <!-- Combos de canais -->
-    <div class="card">
-      <div class="card-title">🧩 Combos de Canais</div>
-      <div class="card-sub">Sequência de canais recebidos nos 7d após o disparo · ordem: último → primeiro · top 20 por volume</div>
-      <div class="tbl-wrap" style="margin-top:10px">
-        <table>
-          <thead>
-            <tr>
-              <th>Canais recebidos <span style="font-size:10px;color:var(--muted)">(último ← ... ← primeiro)</span></th>
-              <th class="r">Antecipações</th>
-              <th class="r">% total</th>
-            </tr>
-          </thead>
-          <tbody id="rec-combo-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- ═══════════════════════════════════════════════════════════
-       SCORE DE CANAIS
-  ════════════════════════════════════════════════════════════ -->
-  <section id="score">
-    <div class="sec-title">🏅 Score de Canais & Sequências — <span id="titulo-score">Março 2026</span></div>
-    <div class="sec-sub">Score calculado com last-click real (ant ÷ enviados) · 7 meses ponderados Set/25–Mar/26 · Abr/26 excluído (mês parcial)</div>
-
-    <!-- Racional -->
-    <div class="score-racional">
-      <strong>Por que criar um score em vez de usar só Conv%?</strong><br>
-      Usar antecipações isoladas por canal gera três vieses: <b>(1) viés de intenção</b> — INAPP só entrega quando o app está aberto; <b>(2) viés de segmentação</b> — quem o sistema escolhe impacta mais que o canal; <b>(3) volatilidade extrema</b> — PUSH variou de 0,90% a 9,08% em 7 meses (taxa last-click real por mês).<br><br>
-      <strong>Novo conceito aplicado:</strong> D3 Conv LC usa a taxa <b>last-click real</b> — antecipações atribuídas ao canal (último nos 7d) ÷ total de comunicações enviadas por aquele canal. Denominador correto, sem inflação por multi-atribuição.<br><br>
-      <div class="score-formula">
-Score = <span>Alcance(25%)</span> + <span>Custo(30%)</span> + <span>Conv LC(30%)</span> + <span>Consistência(15%)</span><br>
-D1 Alcance      = taxa_entrega_ponderada / 100 × 10<br>
-D2 Custo        = (1 − custo_unit / max_custo) × 10  [max = R$0,3092 WA]<br>
-D3 Conv LC      = taxa_last_click_pond / max_taxa × 10  [max = 4,68% PUSH (ponderado Set/25–Mar/26)]<br>
-D4 Consistência = max(0, 1 − CV) × 10   onde CV = desvio_padrão / média da taxa_LC<br>
-Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Jan/26=2× · Fev/26=2,5× · Mar/26=3×
-      </div>
-      <strong>Resultado:</strong> PUSH lidera com score 8,92 — melhor equilíbrio entre alcance, custo e conversão LC (4,68% ponderada). DM perde em Alcance (0,00 — is_delivered não registrado). WHATSAPP perde em Custo (R$0,3092/entrega).
-    </div>
-
-    <!-- Score cards -->
-    <div class="score-cards" id="score-cards-wrap"></div>
-
-    <!-- Legenda + tabela -->
-    <div class="seq-legend" style="margin-top:20px">
-      <span style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Score da sequência:</span>
-      <div class="seq-legend-item"><div class="seq-legend-dot" style="background:#2dc974"></div>≥ 7,5 Ótima</div>
-      <div class="seq-legend-item"><div class="seq-legend-dot" style="background:#58a6ff"></div>6,5–7,5 Boa</div>
-      <div class="seq-legend-item"><div class="seq-legend-dot" style="background:#f0883e"></div>5,0–6,5 Média</div>
-      <div class="seq-legend-item"><div class="seq-legend-dot" style="background:#f85149"></div>&lt; 5,0 Fraca</div>
-      <span style="flex:1"></span>
-      <span style="font-size:10px;color:var(--muted)">★ = último canal recebido (maior peso) · hover para detalhe</span>
-    </div>
-
-    <div style="overflow-x:auto;margin-top:10px">
-      <table class="seq-table">
-        <thead>
-          <tr>
-            <th style="width:36%">Sequência <span style="font-weight:400;color:var(--muted)">(último ★ ← primeiro)</span></th>
-            <th class="c" style="width:9%">Score</th>
-            <th class="r">Antecipações</th>
-            <th class="r">Disparos por canal</th>
-            <th class="r">Conv%</th>
-
-          </tr>
-        </thead>
-        <tbody id="score-seq-tbody"></tbody>
-      </table>
-    </div>
-    <p style="font-size:11px;color:var(--muted);margin-top:10px">
-      ✦ Scores individuais (last-click 7d · Set/25–Mar/26): <b style="color:#3fb950">PUSH 7,35</b> · <b style="color:#58a6ff">INAPP 6,30</b> · <b style="color:#bc8cff">DM 4,17</b> · <b style="color:#f0883e">WA 3,43</b> ·
-      Canal âncora = maior score na sequência · Ganho = melhora ao remover o canal mais fraco
-    </p>
-  </section>
-
-  <div class="divider"></div>
-
   <!-- INSIGHTS -->
   <!-- ═══════════════════════════ SEÇÃO CUSTO GROWTH -->
   <section id="custo-growth">
@@ -612,7 +450,6 @@ Pesos temporais = Set/25=1× · Out/25=1× · Nov/25=1,5× · Dez/25=1,5× · Ja
 let MES_ATIVO    = '2026-03';
 let SETOR_ATIVO  = 'total';
 let CANAL_ATIVO  = 'TODOS';
-let REC_TIPO     = 'total';
 let KPI_TIPO     = 'total';
 let MENSAL_CANAL = 'TODOS';
 
@@ -1273,8 +1110,6 @@ const ANT_UNICAS = {"2025-09":85534,"2025-10":87619,"2025-11":95143,"2025-12":89
 const ANT_UNICAS_TIPO = {"2025-09":{"total":85534,"primeira_vida":13419,"recompra":72219},"2025-10":{"total":87619,"primeira_vida":10043,"recompra":77650},"2025-11":{"total":95143,"primeira_vida":10074,"recompra":85126},"2025-12":{"total":89897,"primeira_vida":5984,"recompra":83936},"2026-01":{"total":94566,"primeira_vida":7450,"recompra":87118},"2026-02":{"total":93786,"primeira_vida":6457,"recompra":87332},"2026-03":{"total":81398,"primeira_vida":6256,"recompra":75143},"2026-04":{"total":72476,"primeira_vida":6417,"recompra":69187}};
 const CONV_MKT = {"2025-09":16336,"2025-10":37665,"2025-11":32934,"2025-12":62432,"2026-01":49651,"2026-02":42589,"2026-03":20394,"2026-04":34343};
 const CONV_MKT_TIPO = {"2025-09":{"total":19225,"primeira_vida":9547,"recompra":9678},"2025-10":{"total":40239,"primeira_vida":8132,"recompra":32107},"2025-11":{"total":34983,"primeira_vida":7317,"recompra":27666},"2025-12":{"total":63957,"primeira_vida":4739,"recompra":59218},"2026-01":{"total":51372,"primeira_vida":5612,"recompra":45760},"2026-02":{"total":44280,"primeira_vida":4831,"recompra":39449},"2026-03":{"total":20945,"primeira_vida":4123,"recompra":16822},"2026-04":{"total":31283,"primeira_vida":2993,"recompra":28290}};
-const TOTAL_PERIODO = {"comms":15301922,"custo":450460,"vidas_unicas":425983,"ant_unicas":149765,"ant_unicas_tipo":{"total":149765,"primeira_vida":59683,"recompra":90082},"conv_mkt":122609,"conv_mkt_tipo":{"total":122609,"primeira_vida":44301,"recompra":230700},"conv_mkt_soma_mensal":262001};   // Set/25–Mar/26 acumulado
-const REC2_DADOS = {"2025-09":{"mix":[{"n":1,"ant":10164,"cons":7024},{"n":2,"ant":7110,"cons":5311},{"n":3,"ant":5472,"cons":3421},{"n":4,"ant":2431,"cons":1845},{"n":5,"ant":963,"cons":780}],"last":{"WHATSAPP":{"ant":8360,"cons":5636},"DM":{"ant":8082,"cons":4737},"PUSH":{"ant":7250,"cons":5092},"SMS":{"ant":1745,"cons":1583},"INAPP":{"ant":702,"cons":502},"EMAIL":{"ant":1,"cons":1}},"combo":[{"combo":"WHATSAPP","ant":4655,"cons":3233},{"combo":"PUSH+DM","ant":2562,"cons":1928},{"combo":"DM+PUSH","ant":2256,"cons":1679},{"combo":"PUSH","ant":2256,"cons":1332},{"combo":"DM","ant":2055,"cons":1635},{"combo":"SMS","ant":1019,"cons":915},{"combo":"DM+PUSH+INAPP","ant":603,"cons":264},{"combo":"PUSH+DM+INAPP","ant":535,"cons":229},{"combo":"DM+INAPP+PUSH","ant":480,"cons":208},{"combo":"WHATSAPP+DM","ant":438,"cons":378},{"combo":"INAPP+DM+PUSH","ant":370,"cons":173},{"combo":"DM+WHATSAPP","ant":351,"cons":283},{"combo":"WHATSAPP+PUSH+DM","ant":279,"cons":231},{"combo":"PUSH+DM+WHATSAPP","ant":278,"cons":235},{"combo":"PUSH+INAPP+DM","ant":274,"cons":148},{"combo":"INAPP+PUSH+DM","ant":273,"cons":140},{"combo":"WHATSAPP+DM+PUSH","ant":265,"cons":228},{"combo":"PUSH+WHATSAPP+DM","ant":256,"cons":216},{"combo":"DM+INAPP","ant":233,"cons":150},{"combo":"INAPP+WHATSAPP","ant":227,"cons":153},{"combo":"WHATSAPP+INAPP","ant":220,"cons":168},{"combo":"DM+WHATSAPP+PUSH","ant":212,"cons":170},{"combo":"DM+PUSH+WHATSAPP","ant":199,"cons":171},{"combo":"WHATSAPP+PUSH","ant":181,"cons":161},{"combo":"INAPP","ant":178,"cons":88},{"combo":"PUSH+WHATSAPP","ant":137,"cons":121},{"combo":"WHATSAPP+DM+INAPP+PUSH","ant":124,"cons":103},{"combo":"WHATSAPP+DM+INAPP","ant":124,"cons":87},{"combo":"INAPP+DM","ant":123,"cons":86},{"combo":"DM+WHATSAPP+PUSH+INAPP","ant":109,"cons":81}]},"2025-10":{"mix":[{"n":1,"ant":37641,"cons":23239},{"n":2,"ant":12718,"cons":9529},{"n":3,"ant":6814,"cons":4648},{"n":4,"ant":3714,"cons":2890},{"n":5,"ant":1402,"cons":1133},{"n":6,"ant":3,"cons":1}],"last":{"DM":{"ant":29750,"cons":19120},"PUSH":{"ant":23864,"cons":14982},"WHATSAPP":{"ant":4784,"cons":3923},"INAPP":{"ant":3632,"cons":2564},"EMAIL":{"ant":257,"cons":197},"SMS":{"ant":5,"cons":4}},"combo":[{"combo":"DM","ant":21115,"cons":13566},{"combo":"PUSH","ant":13977,"cons":8674},{"combo":"PUSH+DM","ant":3822,"cons":3048},{"combo":"DM+PUSH","ant":3553,"cons":2911},{"combo":"INAPP","ant":1350,"cons":914},{"combo":"WHATSAPP","ant":1151,"cons":882},{"combo":"DM+INAPP+PUSH","ant":981,"cons":645},{"combo":"DM+PUSH+INAPP","ant":955,"cons":589},{"combo":"DM+INAPP","ant":941,"cons":717},{"combo":"INAPP+DM+PUSH","ant":813,"cons":511},{"combo":"PUSH+INAPP","ant":802,"cons":430},{"combo":"INAPP+DM","ant":757,"cons":513},{"combo":"PUSH+DM+INAPP","ant":753,"cons":491},{"combo":"INAPP+PUSH","ant":705,"cons":400},{"combo":"DM+WHATSAPP","ant":612,"cons":481},{"combo":"INAPP+PUSH+DM","ant":605,"cons":365},{"combo":"PUSH+INAPP+DM","ant":560,"cons":358},{"combo":"WHATSAPP+DM","ant":483,"cons":397},{"combo":"INAPP+WHATSAPP","ant":311,"cons":261},{"combo":"PUSH+DM+INAPP+WHATSAPP","ant":277,"cons":222},{"combo":"DM+PUSH+INAPP+WHATSAPP","ant":275,"cons":226},{"combo":"PUSH+DM+WHATSAPP","ant":260,"cons":223},{"combo":"WHATSAPP+INAPP","ant":240,"cons":189},{"combo":"PUSH+INAPP+DM+WHATSAPP","ant":233,"cons":177},{"combo":"DM+INAPP+PUSH+WHATSAPP","ant":232,"cons":181},{"combo":"INAPP+DM+PUSH+WHATSAPP","ant":214,"cons":165},{"combo":"PUSH+WHATSAPP+DM","ant":211,"cons":182},{"combo":"WHATSAPP+PUSH","ant":210,"cons":170},{"combo":"WHATSAPP+PUSH+DM","ant":210,"cons":183},{"combo":"INAPP+PUSH+DM+WHATSAPP","ant":210,"cons":176}]},"2025-11":{"mix":[{"n":1,"ant":13451,"cons":8835},{"n":2,"ant":27078,"cons":17247},{"n":3,"ant":5969,"cons":4528},{"n":4,"ant":6563,"cons":5015},{"n":5,"ant":105,"cons":79},{"n":6,"ant":2,"cons":1}],"last":{"DM":{"ant":26959,"cons":17144},"INAPP":{"ant":11398,"cons":7616},"WHATSAPP":{"ant":7436,"cons":5633},"PUSH":{"ant":7370,"cons":4633},"EMAIL":{"ant":5,"cons":3}},"combo":[{"combo":"DM+INAPP","ant":10445,"cons":6458},{"combo":"INAPP+DM","ant":10138,"cons":6386},{"combo":"INAPP","ant":5416,"cons":3648},{"combo":"DM","ant":4253,"cons":2950},{"combo":"PUSH","ant":2323,"cons":1211},{"combo":"WHATSAPP","ant":1459,"cons":1142},{"combo":"DM+PUSH","ant":1320,"cons":974},{"combo":"DM+INAPP+PUSH","ant":1014,"cons":781},{"combo":"PUSH+DM","ant":1008,"cons":754},{"combo":"DM+PUSH+INAPP","ant":879,"cons":655},{"combo":"PUSH+INAPP","ant":872,"cons":486},{"combo":"INAPP+PUSH","ant":800,"cons":436},{"combo":"DM+WHATSAPP","ant":758,"cons":591},{"combo":"INAPP+DM+PUSH","ant":745,"cons":563},{"combo":"WHATSAPP+DM","ant":644,"cons":504},{"combo":"INAPP+WHATSAPP","ant":614,"cons":480},{"combo":"PUSH+DM+INAPP","ant":605,"cons":468},{"combo":"DM+INAPP+PUSH+WHATSAPP","ant":482,"cons":382},{"combo":"DM+PUSH+INAPP+WHATSAPP","ant":448,"cons":361},{"combo":"DM+INAPP+WHATSAPP+PUSH","ant":410,"cons":315},{"combo":"WHATSAPP+INAPP","ant":410,"cons":338},{"combo":"PUSH+DM+INAPP+WHATSAPP","ant":383,"cons":296},{"combo":"DM+PUSH+WHATSAPP+INAPP","ant":367,"cons":290},{"combo":"INAPP+DM+PUSH+WHATSAPP","ant":364,"cons":289},{"combo":"PUSH+INAPP+DM","ant":363,"cons":287},{"combo":"DM+INAPP+WHATSAPP","ant":358,"cons":296},{"combo":"INAPP+DM+WHATSAPP+PUSH","ant":358,"cons":269},{"combo":"DM+WHATSAPP+INAPP+PUSH","ant":357,"cons":268},{"combo":"INAPP+PUSH+DM","ant":342,"cons":283},{"combo":"DM+WHATSAPP+PUSH+INAPP","ant":326,"cons":249}]},"2025-12":{"mix":[{"n":1,"ant":58464,"cons":32522},{"n":2,"ant":80832,"cons":38399},{"n":3,"ant":8185,"cons":5431},{"n":4,"ant":2370,"cons":1806}],"last":{"PUSH":{"ant":79929,"cons":32723},"DM":{"ant":54715,"cons":31479},"INAPP":{"ant":10590,"cons":5902},"WHATSAPP":{"ant":4617,"cons":3310}},"combo":[{"combo":"DM+PUSH","ant":37382,"cons":19256},{"combo":"DM","ant":33482,"cons":20165},{"combo":"PUSH+DM","ant":29852,"cons":14484},{"combo":"PUSH","ant":17373,"cons":11249},{"combo":"INAPP","ant":6310,"cons":3269},{"combo":"INAPP+PUSH","ant":4811,"cons":2045},{"combo":"PUSH+INAPP","ant":4572,"cons":2123},{"combo":"PUSH+DM+INAPP","ant":1306,"cons":858},{"combo":"WHATSAPP","ant":1299,"cons":962},{"combo":"PUSH+INAPP+DM","ant":1223,"cons":770},{"combo":"DM+PUSH+INAPP","ant":1209,"cons":819},{"combo":"DM+WHATSAPP","ant":1162,"cons":880},{"combo":"WHATSAPP+DM","ant":1087,"cons":865},{"combo":"INAPP+PUSH+DM","ant":1018,"cons":647},{"combo":"DM+INAPP+PUSH","ant":958,"cons":639},{"combo":"INAPP+DM+PUSH","ant":753,"cons":522},{"combo":"INAPP+DM","ant":676,"cons":479},{"combo":"DM+INAPP","ant":667,"cons":524},{"combo":"DM+PUSH+INAPP+WHATSAPP","ant":260,"cons":189},{"combo":"PUSH+DM+INAPP+WHATSAPP","ant":218,"cons":186},{"combo":"DM+PUSH+WHATSAPP","ant":215,"cons":192},{"combo":"PUSH+DM+WHATSAPP","ant":213,"cons":179},{"combo":"DM+WHATSAPP+PUSH","ant":208,"cons":180},{"combo":"INAPP+WHATSAPP","ant":187,"cons":148},{"combo":"WHATSAPP+PUSH+DM","ant":186,"cons":162},{"combo":"PUSH+WHATSAPP+DM","ant":183,"cons":155},{"combo":"WHATSAPP+DM+PUSH","ant":176,"cons":161},{"combo":"DM+INAPP+PUSH+WHATSAPP","ant":174,"cons":141},{"combo":"DM+PUSH+WHATSAPP+INAPP","ant":174,"cons":138},{"combo":"WHATSAPP+PUSH","ant":170,"cons":151}]},"2026-01":{"mix":[{"n":1,"ant":27734,"cons":16825},{"n":2,"ant":36175,"cons":20325},{"n":3,"ant":29373,"cons":19568},{"n":4,"ant":2768,"cons":2013},{"n":5,"ant":12,"cons":2}],"last":{"DM":{"ant":32505,"cons":22271},"PUSH":{"ant":29414,"cons":15288},"INAPP":{"ant":28792,"cons":15452},"WHATSAPP":{"ant":5177,"cons":3820},"EMAIL":{"ant":129,"cons":77},"SMS":{"ant":45,"cons":30}},"combo":[{"combo":"DM+INAPP","ant":10239,"cons":5861},{"combo":"INAPP","ant":9984,"cons":5194},{"combo":"INAPP+DM","ant":9612,"cons":5443},{"combo":"DM","ant":7997,"cons":5905},{"combo":"DM+INAPP+PUSH","ant":6201,"cons":4255},{"combo":"PUSH","ant":5793,"cons":3242},{"combo":"DM+PUSH+INAPP","ant":5362,"cons":3732},{"combo":"INAPP+DM+PUSH","ant":5007,"cons":3463},{"combo":"INAPP+PUSH","ant":4943,"cons":2126},{"combo":"PUSH+INAPP","ant":4813,"cons":2082},{"combo":"PUSH+DM+INAPP","ant":4516,"cons":3126},{"combo":"WHATSAPP","ant":3789,"cons":2700},{"combo":"INAPP+PUSH+DM","ant":3639,"cons":2381},{"combo":"PUSH+INAPP+DM","ant":3618,"cons":2420},{"combo":"DM+PUSH","ant":2787,"cons":2371},{"combo":"PUSH+DM","ant":2378,"cons":2021},{"combo":"DM+WHATSAPP","ant":412,"cons":321},{"combo":"WHATSAPP+DM","ant":320,"cons":233},{"combo":"DM+PUSH+INAPP+WHATSAPP","ant":277,"cons":215},{"combo":"INAPP+WHATSAPP","ant":242,"cons":181},{"combo":"DM+INAPP+PUSH+WHATSAPP","ant":242,"cons":174},{"combo":"WHATSAPP+INAPP","ant":205,"cons":154},{"combo":"PUSH+DM+INAPP+WHATSAPP","ant":203,"cons":157},{"combo":"INAPP+DM+PUSH+WHATSAPP","ant":187,"cons":133},{"combo":"DM+INAPP+WHATSAPP+PUSH","ant":161,"cons":115},{"combo":"DM+PUSH+WHATSAPP+INAPP","ant":156,"cons":122},{"combo":"PUSH+INAPP+DM+WHATSAPP","ant":134,"cons":112},{"combo":"WHATSAPP+DM+PUSH+INAPP","ant":128,"cons":104},{"combo":"EMAIL","ant":126,"cons":75},{"combo":"DM+WHATSAPP+PUSH+INAPP","ant":118,"cons":93}]},"2026-02":{"mix":[{"n":1,"ant":55818,"cons":29674},{"n":2,"ant":25230,"cons":12090},{"n":3,"ant":6026,"cons":3737},{"n":4,"ant":2196,"cons":1599},{"n":5,"ant":2,"cons":1},{"n":6,"ant":2,"cons":1}],"last":{"PUSH":{"ant":65999,"cons":31086},"INAPP":{"ant":10050,"cons":6017},"DM":{"ant":8923,"cons":5247},"WHATSAPP":{"ant":4284,"cons":3109},"SMS":{"ant":13,"cons":7},"EMAIL":{"ant":5,"cons":1}},"combo":[{"combo":"PUSH","ant":44529,"cons":24285},{"combo":"PUSH+DM","ant":5480,"cons":2485},{"combo":"DM+PUSH","ant":5118,"cons":2213},{"combo":"DM","ant":5093,"cons":2865},{"combo":"PUSH+INAPP","ant":4639,"cons":2413},{"combo":"INAPP","ant":4296,"cons":2232},{"combo":"INAPP+PUSH","ant":4135,"cons":2087},{"combo":"INAPP+DM","ant":2086,"cons":1422},{"combo":"DM+INAPP","ant":2054,"cons":1360},{"combo":"WHATSAPP","ant":1887,"cons":1302},{"combo":"DM+INAPP+PUSH","ant":888,"cons":498},{"combo":"INAPP+DM+PUSH","ant":721,"cons":454},{"combo":"INAPP+PUSH+DM","ant":712,"cons":409},{"combo":"DM+PUSH+INAPP","ant":679,"cons":423},{"combo":"PUSH+DM+INAPP","ant":614,"cons":343},{"combo":"PUSH+INAPP+DM","ant":602,"cons":368},{"combo":"PUSH+WHATSAPP","ant":561,"cons":459},{"combo":"WHATSAPP+PUSH","ant":385,"cons":322},{"combo":"INAPP+WHATSAPP","ant":309,"cons":231},{"combo":"WHATSAPP+INAPP","ant":293,"cons":210},{"combo":"INAPP+DM+WHATSAPP","ant":276,"cons":223},{"combo":"DM+INAPP+WHATSAPP","ant":273,"cons":237},{"combo":"DM+WHATSAPP+INAPP","ant":260,"cons":202},{"combo":"INAPP+WHATSAPP+DM","ant":259,"cons":216},{"combo":"WHATSAPP+DM+INAPP","ant":235,"cons":200},{"combo":"DM+INAPP+PUSH+WHATSAPP","ant":232,"cons":171},{"combo":"WHATSAPP+INAPP+DM","ant":198,"cons":165},{"combo":"INAPP+DM+PUSH+WHATSAPP","ant":187,"cons":129},{"combo":"DM+PUSH+INAPP+WHATSAPP","ant":159,"cons":112},{"combo":"PUSH+INAPP+DM+WHATSAPP","ant":131,"cons":78}]},"2026-03":{"mix":[{"n":1,"ant":12325,"cons":6804},{"n":2,"ant":8789,"cons":6200},{"n":3,"ant":2870,"cons":1910},{"n":4,"ant":1158,"cons":845},{"n":5,"ant":2,"cons":1}],"last":{"PUSH":{"ant":11591,"cons":6798},"DM":{"ant":5871,"cons":3389},"INAPP":{"ant":4812,"cons":3318},"WHATSAPP":{"ant":2870,"cons":2111}},"combo":[{"combo":"PUSH","ant":5532,"cons":2616},{"combo":"INAPP+PUSH","ant":3122,"cons":2222},{"combo":"DM","ant":2991,"cons":1449},{"combo":"PUSH+INAPP","ant":2971,"cons":2103},{"combo":"INAPP","ant":2321,"cons":1659},{"combo":"WHATSAPP","ant":1481,"cons":1118},{"combo":"DM+INAPP","ant":570,"cons":377},{"combo":"INAPP+DM","ant":464,"cons":337},{"combo":"PUSH+DM","ant":454,"cons":339},{"combo":"DM+PUSH","ant":326,"cons":247},{"combo":"DM+PUSH+INAPP","ant":311,"cons":188},{"combo":"INAPP+WHATSAPP","ant":300,"cons":218},{"combo":"DM+INAPP+PUSH","ant":293,"cons":196},{"combo":"INAPP+DM+PUSH","ant":273,"cons":173},{"combo":"DM+WHATSAPP+INAPP","ant":257,"cons":168},{"combo":"PUSH+DM+INAPP","ant":255,"cons":145},{"combo":"WHATSAPP+INAPP","ant":234,"cons":163},{"combo":"DM+INAPP+WHATSAPP","ant":224,"cons":179},{"combo":"INAPP+DM+WHATSAPP","ant":195,"cons":134},{"combo":"INAPP+PUSH+DM","ant":178,"cons":110},{"combo":"WHATSAPP+DM+INAPP","ant":155,"cons":109},{"combo":"WHATSAPP+INAPP+DM","ant":141,"cons":92},{"combo":"PUSH+INAPP+DM","ant":137,"cons":101},{"combo":"INAPP+WHATSAPP+DM","ant":128,"cons":98},{"combo":"DM+WHATSAPP","ant":127,"cons":91},{"combo":"DM+INAPP+WHATSAPP+PUSH","ant":95,"cons":68},{"combo":"WHATSAPP+DM","ant":88,"cons":77},{"combo":"DM+INAPP+PUSH+WHATSAPP","ant":77,"cons":65},{"combo":"PUSH+WHATSAPP","ant":71,"cons":61},{"combo":"DM+WHATSAPP+INAPP+PUSH","ant":69,"cons":61}]},"2026-04":{"mix":[{"n":1,"ant":20228,"cons":12131},{"n":2,"ant":30767,"cons":21456},{"n":3,"ant":9512,"cons":5529},{"n":4,"ant":993,"cons":767}],"last":{"PUSH":{"ant":33171,"cons":21875},"DM":{"ant":18877,"cons":11403},"INAPP":{"ant":7901,"cons":5381},"WHATSAPP":{"ant":1551,"cons":1219}},"combo":[{"combo":"PUSH","ant":9353,"cons":4983},{"combo":"INAPP+PUSH","ant":8308,"cons":5892},{"combo":"PUSH+INAPP","ant":8254,"cons":5916},{"combo":"PUSH+DM","ant":5933,"cons":4372},{"combo":"DM+PUSH","ant":5825,"cons":4336},{"combo":"DM","ant":5462,"cons":3448},{"combo":"INAPP","ant":4641,"cons":3285},{"combo":"PUSH+DM+INAPP","ant":1630,"cons":1031},{"combo":"DM+PUSH+INAPP","ant":1522,"cons":895},{"combo":"INAPP+PUSH+DM","ant":1255,"cons":706},{"combo":"PUSH+INAPP+DM","ant":1241,"cons":836},{"combo":"INAPP+DM+PUSH","ant":1181,"cons":599},{"combo":"DM+INAPP+PUSH","ant":1173,"cons":595},{"combo":"DM+INAPP","ant":848,"cons":442},{"combo":"WHATSAPP","ant":772,"cons":524},{"combo":"INAPP+DM","ant":720,"cons":380},{"combo":"PUSH+DM+WHATSAPP","ant":273,"cons":211},{"combo":"DM+WHATSAPP","ant":264,"cons":205},{"combo":"DM+PUSH+WHATSAPP","ant":248,"cons":207},{"combo":"DM+WHATSAPP+PUSH","ant":174,"cons":150},{"combo":"WHATSAPP+DM","ant":172,"cons":140},{"combo":"WHATSAPP+DM+PUSH","ant":152,"cons":137},{"combo":"PUSH+WHATSAPP+DM","ant":147,"cons":129},{"combo":"PUSH+WHATSAPP","ant":134,"cons":98},{"combo":"WHATSAPP+PUSH+DM","ant":121,"cons":102},{"combo":"INAPP+WHATSAPP","ant":117,"cons":91},{"combo":"WHATSAPP+PUSH","ant":109,"cons":90},{"combo":"DM+PUSH+INAPP+WHATSAPP","ant":97,"cons":74},{"combo":"PUSH+DM+INAPP+WHATSAPP","ant":91,"cons":72},{"combo":"WHATSAPP+INAPP","ant":83,"cons":60}]}};   // populado pelo atualizar_cac.py   // populado pelo atualizar_cac.py
 
 function setKpiTipo(tipo) {
     KPI_TIPO = tipo;
@@ -1284,88 +1119,12 @@ function setKpiTipo(tipo) {
     renderKpis();
 }
 
-function setRecTipo(tipo) {
-    REC_TIPO = tipo;
-    document.querySelectorAll('#rec-tipo-tabs .mbtn').forEach(b => b.classList.remove('mbtn-active'));
-    const btn = document.querySelector(`#rec-tipo-tabs .mbtn[onclick="setRecTipo('${tipo}')"]`);
-    if(btn) btn.classList.add('mbtn-active');
-    renderRec2();
-}
-
-function renderRec2() {
-    const mes   = MES_ATIVO;
-    const d     = REC2_DADOS[mes] || {};
-    const tipo  = REC_TIPO || 'total';
-    const dTipo = d[tipo] || d['total'] || {};
-    const last  = dTipo.last  || {};
-    const combo = dTipo.combo || [];
-
-    // ── Last-click por canal ───────────────────────────────────────────────
-    const lastWrap = document.getElementById('rec-last-bars');
-    if (lastWrap) {
-        const canalMes = (DADOS.canal && DADOS.canal[mes]) ? DADOS.canal[mes] : {};
-        // suporta {CANAL: N} e {CANAL: {ant: N}}
-        const getAnt = v => (typeof v === 'object' && v !== null) ? (v.ant || 0) : (v || 0);
-        const entries = Object.entries(last).sort((a, b) => getAnt(b[1]) - getAnt(a[1]));
-        const maxAnt  = Math.max(...entries.map(e => getAnt(e[1])), 1);
-        lastWrap.innerHTML = entries.map(([canal, v]) => {
-            const ant      = getAnt(v);
-            const cor      = CANAL_COR[canal] || '#8b949e';
-            const w        = Math.max((ant / maxAnt * 100).toFixed(1), 1);
-            const enviados = canalMes[canal]?.enviados || 0;
-            const taxa     = enviados > 0 ? (ant / enviados * 100) : null;
-            const taxaFmt  = taxa !== null ? taxa.toFixed(2).replace('.', ',') + '%' : '—';
-            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-              <div style="width:76px;font-size:12px;font-weight:700;color:${cor};text-align:right;flex-shrink:0">${canal}</div>
-              <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;height:28px;min-width:0">
-                <div style="width:${w}%;height:100%;background:linear-gradient(90deg,${cor}cc,${cor}44);border-radius:4px;display:flex;align-items:center;padding-left:10px">
-                  <span style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap">${fmt(ant)} ant.</span>
-                </div>
-              </div>
-              <div style="width:90px;font-size:11px;color:var(--muted);text-align:right;flex-shrink:0;white-space:nowrap">${enviados > 0 ? fmt(enviados) + ' env.' : '—'}</div>
-              <div style="width:58px;font-size:13px;color:${cor};font-weight:800;text-align:right;flex-shrink:0">${taxaFmt}</div>
-            </div>`;
-        }).join('');
-    }
-
-    // ── Combos ────────────────────────────────────────────────────────────
-    const comboBody = document.getElementById('rec-combo-tbody');
-    if (comboBody) {
-        const totalCombo = combo.reduce((s, r) => s + r.ant, 0);
-        comboBody.innerHTML = combo.slice(0, 20).map((r, i) => {
-            const canais = r.combo.split('+');
-            const tags = canais.map((ch, idx) => {
-                const cor = CANAL_COR[ch.trim()] || 'var(--muted)';
-                const isLast = idx === 0;
-                const sep = idx < canais.length - 1
-                    ? `<span style="color:var(--muted);margin:0 3px;font-size:10px">←</span>`
-                    : '';
-                return `<span style="color:${cor};font-weight:${isLast?'700':'600'};font-size:11px;background:${cor}18;padding:1px 6px;border-radius:10px;margin-right:2px${isLast?';border:1px solid '+cor+'44':''}">${ch}</span>${sep}`;
-            }).join('');
-            const pct = totalCombo > 0 ? (r.ant / totalCombo * 100).toFixed(1).replace('.', ',') + '%' : '—';
-            return `<tr style="${i === 0 ? 'background:rgba(33,163,102,.05)' : ''}">
-              <td>${tags}</td>
-              <td class="r" style="font-weight:700">${fmt(r.ant)}</td>
-              <td class="r" style="color:var(--blue)">${pct}</td>
-            </tr>`;
-        }).join('');
-    }
-}
-
 function renderTudo() {
-    console.log('[renderTudo] chamado');
     const label = MES_LABELS[MES_ATIVO] || MES_ATIVO;
-    ['titulo-mes', 'titulo-canais', 'titulo-rec', 'titulo-score'].forEach(id => setText(id, label));
+    ['titulo-mes', 'titulo-canais'].forEach(id => setText(id, label));
     try { renderKpis(); } catch(e) { console.warn('renderKpis erro:', e.message); }
     try { renderCustoGrowth(); } catch(e) { console.warn('renderCustoGrowth erro:', e.message); }
     try { renderConversao(); } catch(e) { console.warn('renderConversao erro:', e.message); }
-    try { renderRec2(); } catch(e) { console.error('renderRec2 erro:', e.message, e.stack); }
-    if (typeof renderScoreSeq === 'function') {
-        try { renderScoreSeq(); } catch(e) { console.warn('renderScoreSeq erro:', e.message); }
-    }
-    if (typeof renderScoreCards === 'function') {
-        try { renderScoreCards(); } catch(e) { console.warn('renderScoreCards erro:', e.message); }
-    }
 }
 
 
@@ -1415,15 +1174,6 @@ function atualizarCAC() {
 // ── Inicialização ────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   setMes('2026-03');
-  // Garantia: renderRec2 executada após renderização inicial
-  setTimeout(() => {
-    try {
-      renderRec2();
-      console.log('[DOMContentLoaded] renderRec2 executada via fallback');
-    } catch(e) {
-      console.error('[DOMContentLoaded] renderRec2 fallback erro:', e.message);
-    }
-  }, 300);
 
   // Garante render do gráfico após layout calculado
   const canvas = document.getElementById('chart-canal');
@@ -1573,200 +1323,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   draw();
-})();
-
-// ═══════════════════════════════════════════════════════
-// SCORE DE CANAIS
-// ═══════════════════════════════════════════════════════
-(function() {
-
-const CANAL_COR_S = { PUSH:'#3fb950', INAPP:'#58a6ff', DM:'#bc8cff', WHATSAPP:'#f0883e' };
-const CLASSE_COR  = { otima:'#2dc974', boa:'#58a6ff', media:'#f0883e', fraca:'#f85149' };
-
-// Score individual — last-click 7d (ant÷enviados), ponderado Set/25–Mar/26
-const SCORE_IND = {
-  PUSH:      { total:8.92, d1:9.85, d2:9.99, d3:10.0, d4:3.09, cor:'#3fb950', borda:'rgba(63,185,80,.3)' },
-  INAPP:     { total:6.77, d1:9.09, d2:9.99, d3:3.06, d4:3.89, cor:'#58a6ff', borda:'rgba(88,166,255,.3)' },
-  DM:        { total:4.79, d1:0.0, d2:9.81, d3:3.07, d4:6.15, cor:'#bc8cff', borda:'rgba(188,140,255,.3)' },
-  WHATSAPP:  { total:4.01, d1:7.29, d2:0.0, d3:3.54, d4:7.48, cor:'#f0883e', borda:'rgba(240,136,62,.3)' },
-};
-
-// Pesos posicionais — índice 0 = último canal recebido = maior peso
-const PESOS_POS = { 1:[1.0], 2:[0.4,0.6], 3:[0.2,0.3,0.5], 4:[0.1,0.2,0.3,0.4] };
-
-function scoreSeq(canais) {
-  const p = PESOS_POS[canais.length] || canais.map(() => 1/canais.length);
-  return canais.reduce((s, c, i) => s + (SCORE_IND[c]?.total || 0) * p[i], 0);
-}
-function classe(s) {
-  return s >= 7.5 ? 'otima' : s >= 6.5 ? 'boa' : s >= 5.0 ? 'media' : 'fraca';
-}
-function fmt(n)  { return Number(n).toLocaleString('pt-BR'); }
-function fmtP(n) { return Number(n).toFixed(2).replace('.',',') + '%'; }
-
-// ── Score cards por canal ──────────────────────────────────────────────────
-function renderScoreCards() {
-  const wrap = document.getElementById('score-cards-wrap');
-  if (!wrap) return;
-  const DIM_LABELS = ['Alcance real','Efic. custo','Conv LC','Consistência'];
-  const DIM_PESOS  = ['25%','30%','30%','15%'];
-  const DIM_DESCS  = [
-    'Taxa de entrega ponderada (D1)',
-    '1 − custo_unit / max_custo (D2)',
-    'Taxa last-click / máx. global (D3)',
-    'Penaliza volatilidade: 1 − CV (D4)'
-  ];
-  wrap.innerHTML = Object.entries(SCORE_IND)
-    .sort((a,b) => b[1].total - a[1].total)
-    .map(([c, s]) => {
-      const dims = [s.d1, s.d2, s.d3, s.d4];
-      const barsHtml = dims.map((v, i) => `
-        <div class="db-row" title="${DIM_DESCS[i]}">
-          <div class="db-lbl">${DIM_LABELS[i]} <span style="color:var(--muted);font-size:8px">${DIM_PESOS[i]}</span></div>
-          <div class="db-bg"><div class="db-fill" style="width:${v*10}%;background:${s.cor}"></div></div>
-          <div class="db-val">${v.toFixed(1)}</div>
-        </div>`).join('');
-      const faixa = s.total >= 7.5 ? 'Ótima' : s.total >= 6.5 ? 'Boa' : s.total >= 5.0 ? 'Média' : 'Fraca';
-      const faixaCor = s.total >= 7.5 ? '#2dc974' : s.total >= 6.5 ? '#58a6ff' : s.total >= 5.0 ? '#f0883e' : '#f85149';
-      return `<div class="score-card" style="border-color:${s.borda}">
-        <div class="sc-name" style="color:${s.cor}">${c}</div>
-        <div class="sc-num" style="color:${s.cor}">${s.total.toFixed(2)}</div>
-        <div class="sc-deno">/ 10 &nbsp;<span style="font-size:9px;padding:1px 6px;border-radius:8px;background:${faixaCor}22;color:${faixaCor}">${faixa}</span></div>
-        <div class="dim-bars" style="margin-top:8px">${barsHtml}</div>
-      </div>`;
-    }).join('');
-}
-
-// ── Tabela de sequências ───────────────────────────────────────────────────
-function renderScoreSeq() {
-  const tbody = document.getElementById('score-seq-tbody');
-  if (!tbody) return;
-
-  const mes      = (typeof MES_ATIVO !== 'undefined' ? MES_ATIVO : '2026-03');
-  const dMes     = REC2_DADOS[mes] || REC2_DADOS['2026-03'] || {};
-  const combos   = (dMes.total || dMes).combo || [];
-  const totalAnt = combos.reduce((s, r) => s + r.ant, 0);
-  const canalEnv = (DADOS && DADOS.canal && DADOS.canal[mes]) ? DADOS.canal[mes] : {};
-
-  // Tooltip flutuante
-  let tip = document.getElementById('score-tip');
-  if (!tip) {
-    tip = document.createElement('div');
-    tip.id = 'score-tip';
-    tip.style.cssText = 'display:none;position:fixed;background:#1c2128;border:1px solid #30363d;border-radius:8px;padding:10px 14px;font-size:11px;pointer-events:none;z-index:300;min-width:200px;box-shadow:0 4px 16px rgba(0,0,0,.6)';
-    document.body.appendChild(tip);
-  }
-
-  // Processar todos os combos e calcular scores
-  const rows = [];
-  combos.forEach(r => {
-    const canais = r.combo.split('+');
-    const sc     = scoreSeq(canais);
-    const cl     = classe(sc);
-    const pesos  = PESOS_POS[canais.length] || canais.map(() => 1/canais.length);
-    const melhor = canais.reduce((a,b) => (SCORE_IND[a]?.total||0) >= (SCORE_IND[b]?.total||0) ? a : b);
-    const pior   = canais.length > 1
-      ? canais.reduce((a,b) => (SCORE_IND[a]?.total||0) <= (SCORE_IND[b]?.total||0) ? a : b)
-      : null;
-    let scSemPior = 0, ganho = 0;
-    if (pior) {
-      const sem = canais.filter(c => c !== pior);
-      const p2  = PESOS_POS[sem.length] || sem.map(() => 1/sem.length);
-      scSemPior = sem.reduce((s, c, i) => s + (SCORE_IND[c]?.total||0) * p2[i], 0);
-      ganho     = scSemPior - sc;
-    }
-    const totalEnvSeq = canais.reduce((s, c) => s + (canalEnv[c] ? canalEnv[c].enviados : 0), 0);
-    const pct  = totalEnvSeq > 0 ? (r.ant / totalEnvSeq * 100).toFixed(2).replace('.',',') + '%' : '—';
-    const aCor = SCORE_IND[melhor]?.cor || 'var(--muted)';
-    rows.push({ canais, pesos, sc, cl, melhor, pior, scSemPior, ganho, ant: r.ant, cons: r.cons || 0, pct, seq: r.combo, aCor });
-  });
-
-  // Configuração dos 4 blocos
-  const BLOCOS = [
-    { cl:'otima', label:'🟢 Ótima', range:'≥ 7,5', cor:'#2dc974', bg:'rgba(45,201,116,.06)', border:'rgba(45,201,116,.25)' },
-    { cl:'boa',   label:'🔵 Boa',   range:'6,5–7,5', cor:'#58a6ff', bg:'rgba(88,166,255,.06)', border:'rgba(88,166,255,.25)' },
-    { cl:'media', label:'🟠 Média', range:'5,0–6,5', cor:'#f0883e', bg:'rgba(240,136,62,.06)',  border:'rgba(240,136,62,.25)'  },
-    { cl:'fraca', label:'🔴 Fraca', range:'< 5,0',   cor:'#f85149', bg:'rgba(248,81,73,.06)',   border:'rgba(248,81,73,.25)'   },
-  ];
-
-  function buildRow(d) {
-    const pills = d.canais.map((c, i) => {
-      const isLast = i === 0;
-      return `<span class="seq-pill sp-${c}" title="peso ${(d.pesos[i]*100).toFixed(0)}%${isLast?' — último recebido':''}">${c}${isLast ? ' ★' : ''}</span>`;
-    }).join('<span style="color:var(--muted);font-size:9px;margin:0 1px">←</span>');
-
-    const ganhoHtml = (d.ganho > 0.05 && d.pior)
-      ? `<span style="color:#f0883e;font-size:11px;font-weight:600">+${d.ganho.toFixed(2)}</span> <span style="color:var(--muted);font-size:10px">sem ${d.pior}</span>`
-      : `<span style="color:var(--muted);font-size:10px">—</span>`;
-
-    return `<tr class="seq-${d.cl}" data-seq="${d.seq}" data-idx="${rows.indexOf(d)}">
-      <td><div class="seq-pills">${pills}</div></td>
-      <td class="c"><span class="sbadge sbadge-${d.cl}">${d.sc.toFixed(2)}</span></td>
-      <td class="r" style="font-weight:600;color:var(--text)">${fmt(d.ant)}</td>
-      <td class="r" style="font-size:10px;color:var(--muted);line-height:1.6">${
-        d.canais.map(c => {
-          const env = canalEnv[c] ? canalEnv[c].enviados : 0;
-          const cor = CANAL_COR_S[c] || '#8b949e';
-          return env > 0
-            ? '<span style="color:' + cor + ';font-weight:600">' + c + '</span> ' + fmt(env)
-            : '<span style="color:var(--muted)">' + c + ' —</span>';
-        }).join('<br>')
-      }</td>
-      <td class="r" style="color:var(--muted)">${d.pct}</td>
-
-    </tr>`;
-  }
-
-  // Montar HTML com 4 blocos separados
-  let html = '';
-  BLOCOS.forEach(bloco => {
-    const grupo = rows.filter(r => r.cl === bloco.cl).slice(0, 20);
-    if (grupo.length === 0) return;
-    const totalGrupo = grupo.reduce((s, r) => s + r.ant, 0);
-    const pctGrupo   = totalAnt > 0 ? (totalGrupo / totalAnt * 100).toFixed(1).replace('.',',') + '%' : '—';
-    // Cabeçalho do bloco
-    html += `<tr>
-      <td colspan="4" style="padding:14px 10px 8px;background:${bloco.bg};border-top:2px solid ${bloco.border};border-bottom:1px solid ${bloco.border};">
-        <div style="display:flex;align-items:center;gap:12px">
-          <span style="font-size:13px;font-weight:800;color:${bloco.cor}">${bloco.label}</span>
-          <span style="font-size:11px;color:var(--muted)">Score ${bloco.range}</span>
-          <span style="margin-left:auto;font-size:11px;color:var(--muted)">${grupo.length} sequências · <span style="color:${bloco.cor};font-weight:600">${fmt(totalGrupo)}</span> antecipações (${pctGrupo})</span>
-        </div>
-      </td>
-    </tr>`;
-    html += grupo.map(d => buildRow(d)).join('');
-  });
-
-  tbody.innerHTML = html;
-
-  // Hover tooltips — usando data-idx para mapear linha → row (ignora linhas de cabeçalho)
-  tbody.querySelectorAll('tr[data-idx]').forEach(tr => {
-    const d = rows[+tr.dataset.idx];
-    if (!d) return;
-    const det = d.canais.map((c,i) =>
-      `<span style="color:${SCORE_IND[c]?.cor||'#fff'}">${c}</span>(${(SCORE_IND[c]?.total||0).toFixed(2)}) ×${d.pesos[i].toFixed(2)}`
-    ).join(' <span style="color:var(--muted)">+</span> ');
-    tr.style.cursor = 'default';
-    tr.addEventListener('mouseenter', e => {
-      tip.innerHTML = `
-        <b style="color:var(--text);display:block;margin-bottom:6px">${d.seq}</b>
-        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">${det}</div>
-        <div style="display:flex;justify-content:space-between;gap:20px;margin-bottom:3px"><span style="color:var(--muted)">Score seq.</span><span style="color:${CLASSE_COR[d.cl]};font-weight:700">${d.sc.toFixed(2)}</span></div>
-        <div style="display:flex;justify-content:space-between;gap:20px;margin-bottom:3px"><span style="color:var(--muted)">Antecipações</span><span style="color:var(--text)">${fmt(d.ant)}</span></div>
-        <div style="display:flex;justify-content:space-between;gap:20px;margin-bottom:3px"><span style="color:var(--muted)">% do mês</span><span style="color:var(--text)">${d.pct}</span></div>
-        ${d.ganho > 0.05 ? `<div style="display:flex;justify-content:space-between;gap:20px"><span style="color:var(--muted)">Sem ${d.pior}</span><span style="color:#f0883e">+${d.ganho.toFixed(2)} → ${d.scSemPior.toFixed(2)}</span></div>` : ''}`;
-      tip.style.display = 'block';
-    });
-    tr.addEventListener('mousemove', e => { tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-10)+'px'; });
-    tr.addEventListener('mouseleave', () => { tip.style.display='none'; });
-  });
-}
-
-renderScoreCards();
-renderScoreSeq();
-window.renderScoreSeq   = renderScoreSeq;
-window.renderScoreCards = renderScoreCards;
-
 })();
 
 // ════════════════════════════════ CUSTO GROWTH ════════════
